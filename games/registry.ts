@@ -58,7 +58,7 @@ export const GAMES: readonly GameMeta[] = [
     controls: 'Click / Tap to flip',
     color: '#a78bfa',
     keywords: ['memory game', 'matching cards', 'concentration', 'card matching'],
-    status: 'coming-soon',
+    status: 'live',
     engine: 'react',
   },
   {
