@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 import type { GameMeta, GameLoader } from '@/types/game';
 import GameContainer from '@/components/GameContainer';
 
@@ -10,14 +10,19 @@ interface GameStageProps {
 
 /**
  * Routes a game slug to its dynamically-imported Phaser module (or React
- * widget). Until each game lands, every Phaser slot falls back to the
- * Hello-Phaser test scene so we can prove end-to-end wiring works.
+ * widget). Each game's module imports Phaser at module-evaluation time, so
+ * we MUST resolve them via dynamic `import('@/games/<slug>')` — never via a
+ * static import — to keep SSR safe.
  */
+const PHASER_LOADERS: Record<string, GameLoader> = {
+  'flap-hero': () => import('@/games/flap-hero'),
+};
+
 export default function GameStage({ game }: GameStageProps) {
-  const loadGame: GameLoader = useCallback(
-    () => import('@/games/test-scene'),
-    []
-  );
+  const loadGame = useMemo<GameLoader | null>(() => {
+    if (game.engine !== 'phaser') return null;
+    return PHASER_LOADERS[game.slug] ?? null;
+  }, [game.engine, game.slug]);
 
   if (game.status !== 'live') {
     return (
@@ -30,13 +35,13 @@ export default function GameStage({ game }: GameStageProps) {
     );
   }
 
-  if (game.engine === 'phaser') {
-    return <GameContainer loadGame={loadGame} />;
+  if (game.engine === 'phaser' && loadGame) {
+    return <GameContainer loadGame={loadGame} aspectClassName="aspect-[2/3] max-h-[80vh] mx-auto max-w-md" />;
   }
 
   return (
     <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400">
-      React game placeholder
+      Game module missing for {game.slug}
     </div>
   );
 }

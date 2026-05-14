@@ -13,7 +13,7 @@ export const GAMES: readonly GameMeta[] = [
     controls: 'Click / Space / Tap to flap',
     color: '#4ade80',
     keywords: ['flap hero', 'flying game', 'arcade', 'tap game', 'free browser game'],
-    status: 'coming-soon',
+    status: 'live',
     engine: 'phaser',
   },
   {
