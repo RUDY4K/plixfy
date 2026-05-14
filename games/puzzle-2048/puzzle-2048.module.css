@@ -1,0 +1,112 @@
+.boardWrap {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+  position: relative;
+  border-radius: 14px;
+  background: #1f2937;
+  /*
+   * Enables `cqw` units below — every percentage anchored to the actual
+   * rendered board width, so tiles and bg cells stay pixel-aligned at any
+   * viewport size.
+   */
+  container-type: inline-size;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.bgGrid {
+  position: absolute;
+  inset: 2.5cqw;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 2.5cqw;
+}
+
+.cell {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 1.5cqw;
+}
+
+.tilesLayer {
+  position: absolute;
+  inset: 2.5cqw;
+  pointer-events: none;
+}
+
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 21.875cqw;
+  height: 21.875cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.5cqw;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.tileNew {
+  animation: tilePop 200ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.tileMerged {
+  animation: tileMerged 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  z-index: 1;
+}
+
+/*
+ * --tx is set inline by the tile component and is `translate(Xcqw, Ycqw)`.
+ * The slide transition above only animates the tile's transform, but pop and
+ * merge animations need to keep the tile in place — so they multiply by the
+ * existing translate via the custom property.
+ */
+@keyframes tilePop {
+  0% { transform: var(--tx) scale(0); opacity: 0; }
+  60% { transform: var(--tx) scale(1.1); opacity: 1; }
+  100% { transform: var(--tx) scale(1); opacity: 1; }
+}
+
+@keyframes tileMerged {
+  0% { transform: var(--tx) scale(1); }
+  40% { transform: var(--tx) scale(1.22); }
+  100% { transform: var(--tx) scale(1); }
+}
+
+.scoreFloat {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  font-weight: 800;
+  color: #fde047;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  pointer-events: none;
+  animation: scoreFloat 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes scoreFloat {
+  0% { transform: translate(-50%, 0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(-50%, -40px); opacity: 0; }
+}
+
+.overlayIn {
+  animation: overlayIn 280ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes overlayIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.glowWin {
+  box-shadow: 0 0 0 3px rgba(254, 240, 138, 0.6), 0 0 30px rgba(254, 240, 138, 0.5);
+}

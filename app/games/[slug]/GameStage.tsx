@@ -32,6 +32,14 @@ const REACT_GAMES: Record<string, ComponentType> = {
       </div>
     ),
   }),
+  'puzzle-2048': dynamic(() => import('@/games/puzzle-2048'), {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-64 w-full items-center justify-center text-neutral-400">
+        Loading game…
+      </div>
+    ),
+  }),
 };
 
 export default function GameStage({ game }: GameStageProps) {

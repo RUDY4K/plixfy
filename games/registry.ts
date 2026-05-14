@@ -43,7 +43,7 @@ export const GAMES: readonly GameMeta[] = [
     controls: 'Arrow keys / Swipe',
     color: '#fbbf24',
     keywords: ['2048', 'puzzle game', 'tile merge', 'numbers puzzle', 'free 2048'],
-    status: 'coming-soon',
+    status: 'live',
     engine: 'react',
   },
   {
