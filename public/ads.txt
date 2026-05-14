@@ -1,0 +1,5 @@
+# PlayHub ads.txt
+# Replace with your AdSense publisher ID once approved (Month 2+).
+# Format: domain, publisher ID, relationship, certification authority ID
+#
+# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

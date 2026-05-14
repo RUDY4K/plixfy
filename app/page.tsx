@@ -1,65 +1,77 @@
-import Image from "next/image";
+import { GAMES } from '@/games/registry';
+import GameCard from '@/components/GameCard';
+import AdPlacement from '@/components/AdPlacement';
+
+const FEATURES = [
+  { icon: '⚡', title: 'No downloads', body: 'Plays instantly in your browser.' },
+  { icon: '🆓', title: '100% free', body: 'No accounts, no paywalls.' },
+  { icon: '📱', title: 'Mobile friendly', body: 'Touch controls on every game.' },
+  { icon: '🆕', title: 'New games weekly', body: 'Fresh additions all the time.' },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="mx-auto max-w-6xl px-4 py-10">
+      <section className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-8 sm:p-14">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-30"
+          style={{
+            background:
+              'radial-gradient(800px 300px at 20% 10%, #4ade8033, transparent), radial-gradient(600px 300px at 80% 90%, #60a5fa22, transparent)',
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+        <div className="relative">
+          <p className="text-sm uppercase tracking-[0.2em] text-emerald-400">PlayHub</p>
+          <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
+            Free Browser Games
+            <span className="block text-neutral-400">No Download Required</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-4 max-w-xl text-neutral-400">
+            A curated collection of casual games — puzzle, arcade, strategy. Plays instantly on any device.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#games"
+            className="mt-6 inline-block rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-neutral-950 transition hover:bg-emerald-400"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+            Play now →
           </a>
         </div>
-      </main>
+      </section>
+
+      <section id="games" className="mt-12">
+        <div className="mb-6 flex items-end justify-between">
+          <h2 className="text-2xl font-bold tracking-tight">All games</h2>
+          <span className="text-sm text-neutral-500">{GAMES.length} titles</span>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {GAMES.map((game, idx) => (
+            <div key={game.slug} className="contents">
+              <GameCard game={game} />
+              {(idx + 1) % 4 === 0 && (
+                <div className="sm:col-span-2 lg:col-span-3">
+                  <AdPlacement slot="between" label="Ad · between games" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-16">
+        <h2 className="mb-6 text-2xl font-bold tracking-tight">Why PlayHub</h2>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {FEATURES.map((f) => (
+            <div
+              key={f.title}
+              className="rounded-xl border border-neutral-800 bg-neutral-900 p-5 text-center"
+            >
+              <div className="text-2xl">{f.icon}</div>
+              <h3 className="mt-2 font-semibold">{f.title}</h3>
+              <p className="mt-1 text-xs text-neutral-500">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
