@@ -28,7 +28,7 @@ export const GAMES: readonly GameMeta[] = [
     controls: 'Arrow keys / WASD / Swipe',
     color: '#22c55e',
     keywords: ['snake game', 'slither', 'arcade', 'classic snake', 'free online'],
-    status: 'coming-soon',
+    status: 'live',
     engine: 'phaser',
   },
   {

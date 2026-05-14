@@ -16,6 +16,7 @@ interface GameStageProps {
  */
 const PHASER_LOADERS: Record<string, GameLoader> = {
   'flap-hero': () => import('@/games/flap-hero'),
+  'slither-trail': () => import('@/games/slither-trail'),
 };
 
 export default function GameStage({ game }: GameStageProps) {
