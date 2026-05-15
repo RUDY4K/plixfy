@@ -1,9 +1,20 @@
 import type Phaser from 'phaser';
 
-export type GameCategory = 'puzzle' | 'arcade' | 'strategy' | 'casual' | 'word';
+export type GameCategory =
+  | 'puzzle'
+  | 'arcade'
+  | 'strategy'
+  | 'casual'
+  | 'word'
+  | 'racing'
+  | 'sports';
 export type Difficulty = 'easy' | 'medium' | 'hard';
+export type GameStatus = 'live' | 'coming-soon' | 'unverified';
 
-export interface GameMeta {
+export type EmbedProvider = 'gamedistribution' | 'gamemonetize' | 'gamepix' | 'other';
+export type EmbedAspect = '16:9' | '4:3' | '3:4';
+
+interface BaseGameMeta {
   slug: string;
   title: string;
   description: string;
@@ -14,12 +25,25 @@ export interface GameMeta {
   controls: string;
   color: string;
   keywords: string[];
-  status: 'live' | 'coming-soon';
+  status: GameStatus;
+}
+
+export interface CustomGameMeta extends BaseGameMeta {
+  kind: 'custom';
   engine: 'phaser' | 'react';
 }
 
+export interface EmbedGameMeta extends BaseGameMeta {
+  kind: 'embed';
+  provider: EmbedProvider;
+  embedUrl: string;
+  aspect?: EmbedAspect;
+}
+
+export type GameMeta = CustomGameMeta | EmbedGameMeta;
+
 /**
- * Each game module is loaded lazily, so its `import Phaser from 'phaser'`
+ * Each Phaser game module is loaded lazily, so its `import Phaser from 'phaser'`
  * statement only runs in the browser. The shape below is what callers
  * (PhaserGame) expect a dynamically-imported game module to export.
  */

@@ -1,6 +1,5 @@
-import { GAMES } from '@/games/registry';
-import GameCard from '@/components/GameCard';
-import AdPlacement from '@/components/AdPlacement';
+import { GAMES, liveGames } from '@/games/registry';
+import HomeGrid from '@/components/HomeGrid';
 
 const FEATURES = [
   { icon: '⚡', title: 'No downloads', body: 'Plays instantly in your browser.' },
@@ -10,6 +9,8 @@ const FEATURES = [
 ];
 
 export default function Home() {
+  const liveCount = liveGames().length;
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <section className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-8 sm:p-14">
@@ -23,11 +24,11 @@ export default function Home() {
         <div className="relative">
           <p className="text-sm uppercase tracking-[0.2em] text-emerald-400">PlayHub</p>
           <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
-            Free Browser Games
+            {liveCount}+ Free Browser Games
             <span className="block text-neutral-400">No Download Required</span>
           </h1>
           <p className="mt-4 max-w-xl text-neutral-400">
-            A curated collection of casual games — puzzle, arcade, strategy. Plays instantly on any device.
+            A curated collection of casual games — puzzle, arcade, racing, sports. Plays instantly on any device.
           </p>
           <a
             href="#games"
@@ -38,24 +39,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="games" className="mt-12">
-        <div className="mb-6 flex items-end justify-between">
-          <h2 className="text-2xl font-bold tracking-tight">All games</h2>
-          <span className="text-sm text-neutral-500">{GAMES.length} titles</span>
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {GAMES.map((game, idx) => (
-            <div key={game.slug} className="contents">
-              <GameCard game={game} />
-              {(idx + 1) % 4 === 0 && (
-                <div className="sm:col-span-2 lg:col-span-3">
-                  <AdPlacement slot="between" label="Ad · between games" />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+      <HomeGrid games={GAMES} />
 
       <section className="mt-16">
         <h2 className="mb-6 text-2xl font-bold tracking-tight">Why PlayHub</h2>
@@ -67,7 +51,7 @@ export default function Home() {
             >
               <div className="text-2xl">{f.icon}</div>
               <h3 className="mt-2 font-semibold">{f.title}</h3>
-              <p className="mt-1 text-xs text-neutral-500">{f.body}</p>
+              <p className="mt-1 text-xs text-neutral-400">{f.body}</p>
             </div>
           ))}
         </div>

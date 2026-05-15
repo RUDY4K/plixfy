@@ -49,10 +49,13 @@ export function trackShare(game: string, method: string): void {
   track('game_share', { game_name: game, method });
 }
 
-export function trackAd(
-  type: 'impression' | 'click' | 'reward' | 'skip' | 'error',
-  placement: string,
-  game?: string
-): void {
-  track('ad_interaction', { ad_type: type, placement, game_name: game });
+export type AdEvent =
+  | 'impression'
+  | 'click'
+  | 'rewarded_complete'
+  | 'skipped'
+  | 'error';
+
+export function trackAd(type: AdEvent, placement: string, game?: string): void {
+  track(`ad_${type}`, { placement, game_name: game });
 }

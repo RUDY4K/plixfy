@@ -33,6 +33,11 @@ export default function GameCard({ game }: GameCardProps) {
         >
           {game.title}
         </span>
+        {game.kind === 'custom' && (
+          <span className="absolute left-2 top-2 rounded-full bg-emerald-500/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-950">
+            Custom
+          </span>
+        )}
         {!isLive && (
           <span className="absolute right-2 top-2 rounded-full bg-neutral-800/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-300">
             Coming soon
@@ -48,7 +53,7 @@ export default function GameCard({ game }: GameCardProps) {
           >
             {game.category}
           </span>
-          <span className="flex items-center gap-0.5 text-neutral-500">
+          <span className="flex items-center gap-0.5 text-neutral-400">
             {Array.from({ length: 3 }).map((_, i) => (
               <span
                 key={i}
@@ -63,7 +68,7 @@ export default function GameCard({ game }: GameCardProps) {
         <p className="text-sm text-neutral-400 line-clamp-2">{game.description}</p>
 
         <div className="mt-auto flex items-center justify-between pt-2">
-          <span className="text-xs text-neutral-500">{game.controls}</span>
+          <span className="text-xs text-neutral-400">{game.controls}</span>
           <span
             className="rounded-md px-3 py-1 text-xs font-semibold text-neutral-950 transition group-hover:scale-105"
             style={{ background: game.color }}

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'How PlayHub collects, uses, and protects your data.',
+  alternates: { canonical: '/privacy' },
 };
 
 export default function PrivacyPage() {
@@ -14,37 +15,69 @@ export default function PrivacyPage() {
       <section className="mt-8 space-y-4 text-sm leading-relaxed">
         <h2 className="text-lg font-bold text-white">What we collect</h2>
         <p>
-          We do not collect personally identifiable information. High scores and player nicknames
-          are stored in your browser&apos;s <code>localStorage</code> and never leave your device
-          unless you explicitly submit them to a leaderboard.
+          We do not collect personally identifiable information on our servers. High scores,
+          player nicknames, and game preferences are stored locally in your browser&apos;s
+          <code className="mx-1">localStorage</code> and never leave your device unless you
+          explicitly submit them to a leaderboard.
+        </p>
+
+        <h2 className="text-lg font-bold text-white">Cookies & consent</h2>
+        <p>
+          PlayHub shows a cookie banner on your first visit. Until you accept, we do not load
+          third-party advertising scripts. Your choice is stored in <code>localStorage</code>
+          under the key <code>playhub:ad-consent</code>. You can revoke consent at any time by
+          clearing your browser storage for this site.
         </p>
 
         <h2 className="text-lg font-bold text-white">Analytics</h2>
         <p>
-          We use Google Analytics to understand aggregate site usage. Analytics may set cookies on
-          your device. See Google&apos;s privacy policy at{' '}
+          When configured, we use Google Analytics to understand aggregate site usage (page
+          views, game starts, session length). Analytics may set cookies on your device. See
+          Google&apos;s privacy policy at{' '}
           <a className="text-emerald-400 underline" href="https://policies.google.com/privacy">
             policies.google.com/privacy
           </a>
           .
         </p>
 
-        <h2 className="text-lg font-bold text-white">Advertising</h2>
+        <h2 className="text-lg font-bold text-white">Advertising — Google AdSense</h2>
         <p>
-          Once approved, we display ads via Google AdSense and partner gaming ad networks. These
-          providers may use cookies to personalize ads. You can review and adjust ad personalization
-          at{' '}
+          Once approved, we display ads via Google AdSense and partner gaming ad networks.
+          AdSense uses cookies to serve and personalize ads based on your prior visits to this
+          and other sites. Third-party vendors, including Google, use cookies to serve ads
+          based on your visits to this site or other sites on the Internet. You can opt out of
+          personalized advertising at{' '}
           <a className="text-emerald-400 underline" href="https://adssettings.google.com">
             adssettings.google.com
-          </a>
-          .
+          </a>{' '}
+          or visit{' '}
+          <a className="text-emerald-400 underline" href="https://www.aboutads.info/choices">
+            aboutads.info/choices
+          </a>{' '}
+          for industry-wide opt-out.
+        </p>
+
+        <h2 className="text-lg font-bold text-white">Third-party game content</h2>
+        <p>
+          Some games on PlayHub are embedded via iframe from third-party providers (such as
+          GameDistribution). Those iframes are operated by their respective providers and may
+          collect data, set cookies, and display their own advertisements independently of
+          PlayHub. Their privacy practices are governed by their own policies — we link to the
+          provider on each game&apos;s page where applicable.
         </p>
 
         <h2 className="text-lg font-bold text-white">GDPR / CCPA</h2>
         <p>
-          You have the right to access, correct, or delete personal data. Since we don&apos;t store
-          personal data on our servers, the simplest way to exercise this right is to clear your
-          browser&apos;s storage for this site.
+          You have the right to access, correct, or delete personal data. Since we don&apos;t
+          store personal data on our servers, the simplest way to exercise this right is to
+          clear your browser&apos;s storage for this site. For data held by ad and analytics
+          providers, please use their respective opt-out tools linked above.
+        </p>
+
+        <h2 className="text-lg font-bold text-white">Children</h2>
+        <p>
+          PlayHub is intended for general audiences. We do not knowingly collect data from
+          children under 13. If you believe we have done so, contact us and we will remove it.
         </p>
 
         <h2 className="text-lg font-bold text-white">Contact</h2>

@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import FooterAd from '@/components/FooterAd';
+import CookieConsent from '@/components/CookieConsent';
+import AdSenseScript from '@/components/AdSenseScript';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
@@ -20,6 +23,7 @@ export const metadata: Metadata = {
   description:
     'Play free casual browser games — puzzle, arcade, strategy and word games. No downloads, no accounts, plays instantly on desktop and mobile.',
   keywords: ['free online games', 'browser games', 'html5 games', 'play games online'],
+  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
@@ -54,7 +58,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100">
         <Header />
         <main className="flex-1">{children}</main>
+        <FooterAd />
         <Footer />
+        <CookieConsent />
+        <AdSenseScript />
       </body>
     </html>
   );

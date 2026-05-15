@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'About',
   description: 'About PlayHub — a free browser games portal. No accounts, no downloads.',
+  alternates: { canonical: '/about' },
 };
 
 const FAQ = [

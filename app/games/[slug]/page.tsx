@@ -22,14 +22,22 @@ export async function generateMetadata({
   const { slug } = await params;
   const game = findGame(slug);
   if (!game) return { title: 'Not found' };
+  const path = `/games/${game.slug}`;
   return {
     title: `${game.title} — Play Free Online`,
     description: game.longDescription,
     keywords: game.keywords,
+    alternates: { canonical: path },
     openGraph: {
       title: `${game.title} — PlayHub`,
       description: game.description,
       type: 'website',
+      url: path,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${game.title} — Play Free Online`,
+      description: game.description,
     },
   };
 }
@@ -84,11 +92,30 @@ export default async function GamePage({
             <p className="mt-2 max-w-2xl text-neutral-400">{game.longDescription}</p>
           </header>
 
+          {game.kind === 'embed' && game.status === 'live' && (
+            <div className="mb-4">
+              <AdPlacement slot="above-game" label="Ad · leaderboard 728×90" />
+            </div>
+          )}
+
           <GameStage game={game} />
 
           <div className="mt-3 rounded-lg bg-neutral-900 px-4 py-2 text-sm text-neutral-400">
             <strong className="text-white">Controls:</strong> {game.controls}
           </div>
+
+          {game.kind === 'embed' && game.status === 'live' && (
+            <div className="mt-6">
+              <AdPlacement slot="below-game" label="Ad · 728×90 below game" />
+            </div>
+          )}
+
+          {game.kind === 'embed' && (
+            <p className="mt-3 text-xs text-neutral-600">
+              This game is provided by a third-party publisher. PlayHub does not control its
+              content or in-game ads.
+            </p>
+          )}
 
           {related.length > 0 && (
             <section className="mt-10">

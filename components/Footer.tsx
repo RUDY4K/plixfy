@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-neutral-900 bg-neutral-950 py-8 text-sm text-neutral-500">
+    <footer className="mt-auto border-t border-neutral-900 bg-neutral-950 py-8 text-sm text-neutral-400">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row">
         <p>© {new Date().getFullYear()} PlayHub. Free browser games, no download required.</p>
         <nav className="flex items-center gap-4">

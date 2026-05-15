@@ -4,19 +4,20 @@ import { useMemo, type ComponentType } from 'react';
 import dynamic from 'next/dynamic';
 import type { GameMeta, GameLoader } from '@/types/game';
 import GameContainer from '@/components/GameContainer';
+import EmbedGame from '@/components/EmbedGame';
 
 interface GameStageProps {
   game: GameMeta;
 }
 
 /**
- * Routes a game slug to its dynamically-imported module. Phaser games are
- * loaded as a GameLoader (returns { createConfig }) and rendered through
- * GameContainer. React games are loaded as full Client Components.
+ * Routes a game to its renderer based on `game.kind`:
+ *   - 'custom' + engine: 'phaser' → dynamic Phaser module via GameContainer
+ *   - 'custom' + engine: 'react'  → dynamic React component (ssr: false)
+ *   - 'embed'                     → EmbedGame iframe
  *
- * Every loader uses dynamic `import('@/games/<slug>')` to keep SSR safe:
  * Phaser modules touch `window` at module-eval time, React modules touch
- * localStorage in effects.
+ * localStorage in effects — both must stay client-only.
  */
 const PHASER_LOADERS: Record<string, GameLoader> = {
   'flap-hero': () => import('@/games/flap-hero'),
@@ -44,9 +45,9 @@ const REACT_GAMES: Record<string, ComponentType> = {
 
 export default function GameStage({ game }: GameStageProps) {
   const phaserLoader = useMemo<GameLoader | null>(() => {
-    if (game.engine !== 'phaser') return null;
+    if (game.kind !== 'custom' || game.engine !== 'phaser') return null;
     return PHASER_LOADERS[game.slug] ?? null;
-  }, [game.engine, game.slug]);
+  }, [game]);
 
   if (game.status !== 'live') {
     return (
@@ -57,6 +58,10 @@ export default function GameStage({ game }: GameStageProps) {
         </div>
       </div>
     );
+  }
+
+  if (game.kind === 'embed') {
+    return <EmbedGame embedUrl={game.embedUrl} title={game.title} aspect={game.aspect ?? '16:9'} />;
   }
 
   if (game.engine === 'phaser' && phaserLoader) {
