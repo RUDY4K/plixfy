@@ -7,7 +7,16 @@ export type GameCategory =
   | 'casual'
   | 'word'
   | 'racing'
-  | 'sports';
+  | 'sports'
+  | 'action'
+  | 'shooting'
+  | 'adventure'
+  | 'io'
+  | 'simulation'
+  | 'clicker'
+  | 'board'
+  | 'girls'
+  | 'skill';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type GameStatus = 'live' | 'coming-soon' | 'unverified';
 
