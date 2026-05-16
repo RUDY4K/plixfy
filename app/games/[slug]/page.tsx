@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { GAMES, findGame } from '@/games/registry';
+import { GAMES, findGame, relatedGames } from '@/games/registry';
 import GameCard from '@/components/GameCard';
 import AdPlacement from '@/components/AdPlacement';
+import FavoriteButton from '@/components/FavoriteButton';
+import PlayTracker from '@/components/PlayTracker';
+import { baseCount, formatPlayCount } from '@/lib/userState';
 import GameStage from './GameStage';
 
 interface Params {
@@ -51,10 +54,8 @@ export default async function GamePage({
   const game = findGame(slug);
   if (!game) notFound();
 
-  const related = GAMES.filter((g) => g.slug !== game.slug && g.category === game.category).slice(
-    0,
-    3
-  );
+  const related = relatedGames(game.slug, 8);
+  const playCount = game.kind === 'embed' ? baseCount(game.slug) : null;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -74,22 +75,36 @@ export default async function GamePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <PlayTracker slug={game.slug} />
 
       <nav className="mb-4 text-sm text-neutral-500">
         <Link href="/" className="hover:text-white">← All games</Link>
+        <span className="px-2 text-neutral-700">/</span>
+        <Link href={`/#games?category=${game.category}`} className="capitalize hover:text-white">
+          {game.category}
+        </Link>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
         <article>
-          <header className="mb-4">
-            <span
-              className="inline-block rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wider"
-              style={{ background: `${game.color}22`, color: game.color }}
-            >
-              {game.category}
-            </span>
-            <h1 className="mt-2 text-3xl font-extrabold tracking-tight">{game.title}</h1>
-            <p className="mt-2 max-w-2xl text-neutral-400">{game.longDescription}</p>
+          <header className="mb-4 flex items-start justify-between gap-3">
+            <div>
+              <span
+                className="inline-block rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wider"
+                style={{ background: `${game.color}22`, color: game.color }}
+              >
+                {game.category}
+              </span>
+              <h1 className="mt-2 text-3xl font-extrabold tracking-tight">{game.title}</h1>
+              <p className="mt-2 max-w-2xl text-neutral-400">{game.longDescription}</p>
+              {playCount !== null && (
+                <p className="mt-2 text-xs text-neutral-500">
+                  <span aria-hidden="true">▶ </span>
+                  {formatPlayCount(playCount)} plays · ★★★★☆
+                </p>
+              )}
+            </div>
+            <FavoriteButton slug={game.slug} size="lg" stopPropagation={false} />
           </header>
 
           {game.kind === 'embed' && game.status === 'live' && (
@@ -110,22 +125,25 @@ export default async function GamePage({
             </div>
           )}
 
-          {game.kind === 'embed' && (
-            <p className="mt-3 text-xs text-neutral-600">
-              This game is provided by a third-party publisher. PlayHub does not control its
-              content or in-game ads.
-            </p>
-          )}
-
           {related.length > 0 && (
             <section className="mt-10">
-              <h2 className="mb-3 text-lg font-bold">More {game.category} games</h2>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <h2 className="mb-3 text-lg font-bold">You might also like</h2>
+              <p className="mb-4 text-xs text-neutral-500">
+                Based on category and shared tags with {game.title}.
+              </p>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {related.map((r) => (
                   <GameCard key={r.slug} game={r} />
                 ))}
               </div>
             </section>
+          )}
+
+          {game.kind === 'embed' && (
+            <p className="mt-6 text-xs text-neutral-600">
+              This game is provided by a third-party publisher. PlayHub does not control its
+              content or in-game ads.
+            </p>
           )}
         </article>
 

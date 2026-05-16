@@ -8,6 +8,8 @@ import {
 import HomeGrid from '@/components/HomeGrid';
 import GameRow from '@/components/GameRow';
 import CategoryCards from '@/components/CategoryCards';
+import DailyFeatured from '@/components/DailyFeatured';
+import RecentlyPlayedRow from '@/components/RecentlyPlayedRow';
 
 const FEATURES = [
   { icon: '⚡', title: 'No downloads', body: 'Plays instantly in your browser.' },
@@ -49,6 +51,10 @@ export default function Home() {
           </a>
         </div>
       </section>
+
+      <DailyFeatured games={GAMES} />
+
+      <RecentlyPlayedRow allGames={GAMES} />
 
       <GameRow
         title="Trending"

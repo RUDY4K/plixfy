@@ -58,3 +58,32 @@ export function recentlyAddedGames(limit = 12): GameMeta[] {
     .slice(-limit)
     .reverse();
 }
+
+/**
+ * Recommendations for a game-detail page.
+ *
+ * Score = same-category (3pts) + shared keyword (1pt each). Self-excluded.
+ * Picks up to `limit` distinct top-scored live games. When ties happen,
+ * embed games sort before custom because the catalog is mostly embeds and
+ * users want similar discovery, not the same 4 originals over and over.
+ */
+export function relatedGames(slug: string, limit = 8): GameMeta[] {
+  const target = findGame(slug);
+  if (!target) return [];
+  const targetKeywords = new Set(target.keywords.map((k) => k.toLowerCase()));
+
+  const scored = GAMES
+    .filter((g) => g.slug !== slug && g.status === 'live')
+    .map((g) => {
+      let score = 0;
+      if (g.category === target.category) score += 3;
+      for (const kw of g.keywords) {
+        if (targetKeywords.has(kw.toLowerCase())) score += 1;
+      }
+      return { game: g, score };
+    })
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return scored.slice(0, limit).map((s) => s.game);
+}

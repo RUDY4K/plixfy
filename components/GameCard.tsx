@@ -3,14 +3,15 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { GameMeta } from '@/types/game';
+import { baseCount, formatPlayCount } from '@/lib/userState';
+import FavoriteButton from './FavoriteButton';
 
 interface GameCardProps {
   game: GameMeta;
-  /**
-   * compact: smaller mobile-friendly card used in horizontal scroll rows.
-   * default: the standard grid card with description + meta.
-   */
+  /** compact = horizontal-row card; default = main-grid card. */
   variant?: 'default' | 'compact';
+  /** Override the auto-derived badge ("New", "Hot", "Top"). */
+  badge?: 'new' | 'hot' | 'top' | 'daily' | null;
 }
 
 const difficultyDots: Record<GameMeta['difficulty'], number> = {
@@ -20,10 +21,7 @@ const difficultyDots: Record<GameMeta['difficulty'], number> = {
 };
 
 function Thumbnail({ game }: { game: GameMeta }) {
-  // Some scraped thumbnails 404 or are blocked when proxied at runtime.
-  // Track an error flag so we fall back to the gradient + title block.
   const [errored, setErrored] = useState(false);
-
   if (errored) {
     return (
       <div
@@ -36,7 +34,6 @@ function Thumbnail({ game }: { game: GameMeta }) {
       </div>
     );
   }
-
   return (
     <img
       src={game.thumbnail}
@@ -49,9 +46,30 @@ function Thumbnail({ game }: { game: GameMeta }) {
   );
 }
 
-export default function GameCard({ game, variant = 'default' }: GameCardProps) {
+const BADGE_STYLES: Record<NonNullable<GameCardProps['badge']>, { label: string; cls: string }> = {
+  hot: { label: '🔥 Hot', cls: 'bg-orange-500/95 text-neutral-950' },
+  top: { label: '★ Top', cls: 'bg-amber-400/95 text-neutral-950' },
+  new: { label: 'New', cls: 'bg-sky-500/95 text-neutral-950' },
+  daily: { label: '✨ Today', cls: 'bg-fuchsia-500/95 text-neutral-950' },
+};
+
+/**
+ * Auto-pick a tier badge from baseCount when the caller didn't specify.
+ * Thresholds: 2M+ → top, 500K+ → hot. Below that → no badge.
+ */
+function autoBadge(game: GameMeta): GameCardProps['badge'] {
+  if (game.kind === 'custom') return null;
+  const c = baseCount(game.slug);
+  if (c >= 2_000_000) return 'top';
+  if (c >= 500_000) return 'hot';
+  return null;
+}
+
+export default function GameCard({ game, variant = 'default', badge }: GameCardProps) {
   const isLive = game.status === 'live';
   const dots = difficultyDots[game.difficulty];
+  const resolvedBadge = badge === undefined ? autoBadge(game) : badge;
+  const playCount = baseCount(game.slug);
 
   if (variant === 'compact') {
     return (
@@ -70,12 +88,19 @@ export default function GameCard({ game, variant = 'default' }: GameCardProps) {
               Original
             </span>
           )}
+          {resolvedBadge && game.kind !== 'custom' && (
+            <span
+              className={`absolute left-2 top-2 rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${BADGE_STYLES[resolvedBadge].cls}`}
+            >
+              {BADGE_STYLES[resolvedBadge].label}
+            </span>
+          )}
           {!isLive && (
             <span className="absolute right-2 top-2 rounded-full bg-neutral-800/90 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-neutral-300">
               Soon
             </span>
           )}
-          <div className="absolute bottom-1 left-2 right-2">
+          <div className="absolute bottom-1 left-2 right-2 flex items-center justify-between gap-2">
             <p className="truncate text-sm font-semibold text-white drop-shadow">{game.title}</p>
           </div>
         </div>
@@ -93,15 +118,37 @@ export default function GameCard({ game, variant = 'default' }: GameCardProps) {
     >
       <div className="relative aspect-video overflow-hidden bg-neutral-950">
         <Thumbnail game={game} />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+        {/* Top-left: kind/tier badge */}
         {game.kind === 'custom' && (
           <span className="absolute left-2 top-2 rounded-full bg-emerald-500/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-950">
             Original
           </span>
         )}
+        {resolvedBadge && game.kind !== 'custom' && (
+          <span
+            className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${BADGE_STYLES[resolvedBadge].cls}`}
+          >
+            {BADGE_STYLES[resolvedBadge].label}
+          </span>
+        )}
+
+        {/* Top-right: favorite */}
+        <div className="absolute right-2 top-2 z-10">
+          <FavoriteButton slug={game.slug} size="sm" />
+        </div>
+
         {!isLive && (
-          <span className="absolute right-2 top-2 rounded-full bg-neutral-800/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-300">
+          <span className="absolute bottom-2 right-2 rounded-full bg-neutral-800/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-300">
             Coming soon
+          </span>
+        )}
+
+        {/* Play-count chip — bottom-left over the gradient */}
+        {isLive && game.kind !== 'custom' && (
+          <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-1.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur">
+            ▶ {formatPlayCount(playCount)}
           </span>
         )}
       </div>
