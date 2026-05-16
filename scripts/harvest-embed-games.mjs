@@ -22,6 +22,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
+import { categorize, passesQualityFilter } from './lib/categorize.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -36,26 +37,9 @@ const PAGE_REFERER = 'https://html5.gamedistribution.com/';
 const CONCURRENCY = 16;
 const REQUEST_TIMEOUT_MS = 12_000;
 
-const CATEGORY_RULES = [
-  // order matters — first match wins
-  { cat: 'racing', kws: ['race', 'racing', 'drift', 'drive', 'driving', 'car', 'truck', 'bike', 'motorcycle', 'highway', 'traffic', 'parking', 'formula'] },
-  { cat: 'sports', kws: ['soccer', 'football', 'basketball', 'baseball', 'tennis', 'golf', 'pool', 'billiard', 'snooker', 'volleyball', 'cricket', 'bowling', 'boxing', 'mma', 'wrestling', 'hockey', 'rugby', 'skate', 'surf', 'ski', 'archery', 'darts'] },
-  { cat: 'shooting', kws: ['shoot', 'shooter', 'gun', 'sniper', 'fps', 'pistol', 'weapon', 'army', 'military', 'tank battle', 'war'] },
-  { cat: 'puzzle', kws: ['puzzle', 'match 3', 'match-3', 'match three', 'jewel', 'gem', 'solitaire', 'mahjong', 'sudoku', 'crossword', 'jigsaw', 'block', 'tetris', 'connect', 'merge', 'tile', '2048', 'memory', 'hidden object', 'logic', 'sliding'] },
-  { cat: 'word', kws: ['word', 'spelling', 'typing', 'wpm', 'crossword', 'vocabulary', 'anagram', 'scrabble'] },
-  { cat: 'board', kws: ['chess', 'checkers', 'backgammon', 'domino', 'card', 'poker', 'blackjack', 'uno', 'rummy', 'go fish'] },
-  { cat: 'strategy', kws: ['strategy', 'tower defense', 'td ', 'rts', 'kingdom', 'empire', 'civilization', 'tactic', 'tactical', 'war game'] },
-  { cat: 'io', kws: ['.io', ' io ', 'agar', 'slither.io', 'paper.io', 'krunker', 'mope', 'multiplayer io'] },
-  { cat: 'simulation', kws: ['simulator', 'simulation', 'tycoon', 'farm', 'restaurant', 'business', 'manage', 'manager', 'truck simulator'] },
-  { cat: 'clicker', kws: ['clicker', 'idle', 'incremental', 'tap to'] },
-  { cat: 'adventure', kws: ['adventure', 'quest', 'rpg', 'role play', 'mystery', 'escape', 'explore', 'dungeon'] },
-  { cat: 'girls', kws: ['girls', 'dress up', 'dress-up', 'makeup', 'makeover', 'fashion', 'princess', 'wedding', 'salon', 'beauty', 'cooking', 'baking', 'cake', 'pizza', 'burger'] },
-  { cat: 'action', kws: ['action', 'fight', 'fighting', 'ninja', 'samurai', 'stickman', 'zombie', 'survival', 'monster', 'beat em up'] },
-  { cat: 'skill', kws: ['skill', 'balance', 'aim', 'precision', 'reaction'] },
-  { cat: 'arcade', kws: ['arcade', 'runner', 'endless', 'jump', 'jumping', 'platform', 'flap', 'snake', 'classic', 'retro', 'pacman', 'breakout', 'ball', 'flappy'] },
-  { cat: 'casual', kws: ['casual', 'cute', 'fun', 'family', 'kids', 'children'] },
-];
-const DEFAULT_CATEGORY = 'casual';
+// Categorization logic lives in ./lib/categorize.mjs — shared with
+// recategorize-manifest.mjs so we apply identical rules to fresh
+// harvests and re-runs against the existing manifest.
 
 function parseArgs(argv) {
   const a = { target: 200, pool: 320, resume: false, seed: 0xc0ffee };
@@ -96,14 +80,6 @@ function slugify(s) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 60);
-}
-
-function pickCategory(title, description, keywords) {
-  const blob = (title + ' ' + description + ' ' + keywords).toLowerCase();
-  for (const { cat, kws } of CATEGORY_RULES) {
-    if (kws.some((k) => blob.includes(k))) return cat;
-  }
-  return DEFAULT_CATEGORY;
 }
 
 function isLikelyEnglish(s) {
@@ -262,6 +238,16 @@ async function main() {
         while (existingSlugs.has(slug) || manifest.games.some((g) => g.slug === slug)) {
           slug = `${baseSlug}-${n++}`;
         }
+        // Run quality + categorize on the freshly scraped meta before we
+        // pay the cost of downloading the thumbnail. Saves bandwidth on
+        // entries we'd throw away anyway.
+        const candidate = {
+          title: meta.title,
+          description: meta.description ?? '',
+          keywords: meta.keywords,
+        };
+        if (!passesQualityFilter(candidate)) throw new Error('quality filter');
+        const { category } = categorize(candidate);
         const dest = join(THUMBS_DIR, `embed-${slug}.jpg`);
         const bytes = await downloadImage(meta.image, dest);
         const game = {
@@ -273,7 +259,7 @@ async function main() {
           imageUrl: meta.image,
           imageBytes: bytes,
           embedUrl: `https://html5.gamedistribution.com/${id}/`,
-          category: pickCategory(meta.title, meta.description ?? '', meta.keywords),
+          category,
           color: colorFromSlug(slug),
         };
         manifest.games.push(game);

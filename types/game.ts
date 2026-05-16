@@ -16,7 +16,10 @@ export type GameCategory =
   | 'clicker'
   | 'board'
   | 'girls'
-  | 'skill';
+  | 'skill'
+  | 'stickman'
+  | 'zombie'
+  | 'cooking';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type GameStatus = 'live' | 'coming-soon' | 'unverified';
 

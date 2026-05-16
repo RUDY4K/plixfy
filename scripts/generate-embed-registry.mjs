@@ -35,6 +35,9 @@ const CONTROLS_BY_CATEGORY = {
   skill: 'Mouse / Touch',
   arcade: 'Arrow keys / Touch',
   casual: 'Mouse / Touch',
+  stickman: 'Arrow keys / Touch',
+  zombie: 'WASD / Mouse',
+  cooking: 'Mouse / Touch',
 };
 
 function escSingle(s) {
@@ -87,8 +90,8 @@ function keywordsFor(title, category) {
 
 function difficultyFor(category) {
   if (['puzzle', 'strategy', 'word'].includes(category)) return 'medium';
-  if (['casual', 'girls', 'clicker', 'simulation'].includes(category)) return 'easy';
-  if (['shooting', 'action', 'io', 'adventure'].includes(category)) return 'hard';
+  if (['casual', 'girls', 'clicker', 'simulation', 'cooking'].includes(category)) return 'easy';
+  if (['shooting', 'action', 'io', 'adventure', 'zombie'].includes(category)) return 'hard';
   return 'medium';
 }
 
@@ -175,9 +178,9 @@ async function main() {
   }
 
   const categoryOrder = [
-    'arcade', 'action', 'racing', 'shooting', 'sports',
+    'arcade', 'action', 'stickman', 'zombie', 'racing', 'shooting', 'sports',
     'puzzle', 'strategy', 'board', 'word', 'io',
-    'adventure', 'simulation', 'clicker', 'skill', 'girls', 'casual',
+    'adventure', 'simulation', 'clicker', 'cooking', 'skill', 'girls', 'casual',
   ];
 
   let body = '';

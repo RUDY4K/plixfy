@@ -1,5 +1,13 @@
-import { GAMES, liveGames } from '@/games/registry';
+import {
+  GAMES,
+  customGames,
+  liveGames,
+  recentlyAddedGames,
+  trendingGames,
+} from '@/games/registry';
 import HomeGrid from '@/components/HomeGrid';
+import GameRow from '@/components/GameRow';
+import CategoryCards from '@/components/CategoryCards';
 
 const FEATURES = [
   { icon: '⚡', title: 'No downloads', body: 'Plays instantly in your browser.' },
@@ -10,6 +18,9 @@ const FEATURES = [
 
 export default function Home() {
   const liveCount = liveGames().length;
+  const trending = trendingGames();
+  const originals = customGames().filter((g) => g.status === 'live');
+  const recent = recentlyAddedGames(12);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -28,7 +39,7 @@ export default function Home() {
             <span className="block text-neutral-400">No Download Required</span>
           </h1>
           <p className="mt-4 max-w-xl text-neutral-400">
-            A curated collection of casual games — puzzle, arcade, racing, sports. Plays instantly on any device.
+            A curated collection of casual games — puzzle, arcade, racing, sports, IO, stickman, zombie and more. Plays instantly on any device.
           </p>
           <a
             href="#games"
@@ -38,6 +49,29 @@ export default function Home() {
           </a>
         </div>
       </section>
+
+      <GameRow
+        title="Trending"
+        icon="🔥"
+        subtitle="Most-played picks across the catalog"
+        games={trending}
+      />
+
+      <GameRow
+        title="PlayHub Originals"
+        icon="⭐"
+        subtitle="Games we built ourselves — no third-party iframes"
+        games={originals}
+      />
+
+      <GameRow
+        title="Recently Added"
+        icon="🆕"
+        subtitle="Fresh from the harvest"
+        games={recent}
+      />
+
+      <CategoryCards games={GAMES} />
 
       <HomeGrid games={GAMES} />
 
