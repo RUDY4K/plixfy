@@ -1,6 +1,115 @@
 # Plixfy — Deployment Checklist
 
-Launch target: this week. Last build: clean (3264 pages, 0 errors).
+Launch target: **today**. Last build: clean (5,886 pages, 0 errors).
+
+Repo: <https://github.com/RUDY4K/plixfy> · Domain: `plixfy.com` (Namecheap)
+
+---
+
+## GO LIVE — exact steps (do these in order)
+
+### Step 1 · Vercel project (5 min)
+
+1. Open <https://vercel.com/new>
+2. **Import Git Repository** → connect GitHub if not already → pick `RUDY4K/plixfy`
+3. **Configure Project** screen:
+   - Framework Preset: **Next.js** (auto-detected)
+   - Root Directory: `./` (default)
+   - Build Command: `next build` (default — already in `package.json`)
+   - Output Directory: leave empty (Next handles it)
+   - Install Command: `npm install` (default)
+4. **Environment Variables** — add these BEFORE the first deploy:
+
+   | Name | Value | Apply to |
+   |---|---|---|
+   | `NEXT_PUBLIC_SITE_URL` | `https://plixfy.com` | Production, Preview, Development |
+   | `NEXT_PUBLIC_GSC_VERIFICATION` | _(add after Step 5)_ | Production |
+   | `NEXT_PUBLIC_GA_ID` | _(your `G-XXXXXX`)_ | Production |
+   | `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | _(your `ca-pub-...`)_ | Production |
+
+   The last three are optional for the first deploy — analytics/ads can land later.
+5. Click **Deploy**. Wait ~3-5 minutes. The build will produce 5,886 static pages.
+6. You'll get a `plixfy.vercel.app` URL. Open it — verify the homepage shows "5,000+ Free Browser Games".
+
+### Step 2 · Add the custom domain in Vercel (2 min)
+
+1. In the new project → **Settings → Domains**
+2. Add `plixfy.com` → Vercel will show a DNS configuration card with the exact records you need to add at Namecheap.
+3. Also add `www.plixfy.com` and choose to redirect it to the apex (or vice versa — pick one canonical).
+4. Leave this tab open — you'll come back after DNS propagates.
+
+### Step 3 · Namecheap DNS records (2 min to add, up to 30 min to propagate)
+
+1. Log in to Namecheap → **Domain List** → **Manage** next to `plixfy.com` → **Advanced DNS** tab.
+2. Delete every existing record (Parking Page, default CNAMEs) to avoid conflicts.
+3. Add these records — these are the values Vercel currently requires for custom domains. Cross-check against what Vercel's Domains tab shows (Vercel sometimes rotates IPs):
+
+   | Type | Host | Value | TTL |
+   |---|---|---|---|
+   | `A` | `@` | `76.76.21.21` | Automatic |
+   | `CNAME` | `www` | `cname.vercel-dns.com.` | Automatic |
+
+4. **Important**: turn OFF Namecheap's "Domain Privacy" parking page redirect if it's on — it adds a competing A record.
+5. Save. Wait 2–30 minutes for propagation. Check with `nslookup plixfy.com` or <https://dnschecker.org>.
+
+### Step 4 · Verify HTTPS + canonical (5 min after propagation)
+
+1. Refresh Vercel → **Settings → Domains** — both `plixfy.com` and `www.plixfy.com` should show ✅ green checks.
+2. Vercel auto-provisions a Let's Encrypt cert — happens in ~30s after DNS verifies.
+3. Visit `https://plixfy.com` — should serve the homepage. Confirm:
+   - URL bar shows the padlock
+   - Hero reads "5,000+ Free Browser Games"
+   - Click any game card → game page loads with iframe
+4. `https://www.plixfy.com` should 308-redirect to `https://plixfy.com` (or whichever direction you picked).
+5. `http://plixfy.com` should 308-redirect to `https://plixfy.com`.
+
+### Step 5 · Google Search Console (10 min)
+
+1. Open <https://search.google.com/search-console>
+2. **Add property** → URL prefix → `https://plixfy.com`
+3. Verification method: **HTML tag** → copy the `content="..."` value
+4. Back in Vercel → Settings → Environment Variables → set `NEXT_PUBLIC_GSC_VERIFICATION` to that value → redeploy (Deployments → ⋯ → Redeploy on the latest deploy)
+5. Back in GSC → click Verify
+6. Once verified: GSC → **Sitemaps** → submit `https://plixfy.com/sitemap.xml` (5,886 URLs)
+7. Optional but recommended: also submit to Bing Webmaster Tools (<https://www.bing.com/webmasters/>) — same sitemap URL.
+
+### Step 6 · Smoke test the live site (15 min)
+
+Walk through these on `https://plixfy.com` with the production URL:
+
+- [ ] Home page loads, "5,000+ Free Browser Games" hero
+- [ ] Hit `🎲 Quick Play` button — random game loads
+- [ ] Open a custom game (e.g. `/games/flap-hero`) — Phaser canvas appears
+- [ ] Open an embed game (e.g. `/games/moto-x3m`) — iframe loads
+- [ ] Open an .io game (e.g. `/games/slither-io`) — iframe loads slither.io
+- [ ] Open `/play/io-games` — landing page with 30+ games + breadcrumb
+- [ ] Click **Sign in** in header → set nickname + avatar → confirm header chip updates
+- [ ] Visit `/profile` — stats card shows
+- [ ] `/sitemap.xml` — opens, has 5,886 `<url>` entries
+- [ ] `/robots.txt` — opens, has AI-crawler sections
+- [ ] `/llms.txt` — opens, has the Plixfy summary
+- [ ] View source of `/games/moto-x3m` — confirm 3 JSON-LD scripts (Organization, WebSite, VideoGame+BreadcrumbList)
+
+### Step 7 · Lighthouse on the live URL (10 min)
+
+```
+npx lighthouse https://plixfy.com --view --form-factor=mobile
+npx lighthouse https://plixfy.com --view --preset=desktop
+```
+
+Targets (from prior section below): Performance ≥ 80 mobile / 95 desktop,
+Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 95.
+
+### Step 8 · Announce (whenever you're ready)
+
+- Tweet/X with a Challenge URL screenshot to seed the viral loop
+- Submit to Hacker News (Show HN), r/WebGames, r/incremental_games
+- DM friends with a `/games/<slug>?c=<token>` challenge link to seed
+  their leaderboards
+- Set up the GA4 realtime dashboard and watch the first hour of traffic
+
+---
+
 
 ## 0 · Domain & DNS
 
