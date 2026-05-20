@@ -21,33 +21,17 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const MANIFEST_PATH = join(__dirname, 'harvest-manifest.json');
 
 /**
- * Per-category caps. Prevents any single category from dominating the
- * catalog. Tuned so the homepage carousel rows feel balanced.
- *   - girls capped hard (per user direction)
- *   - casual + puzzle previously took 1/3 of the catalog; trim them
- *   - keep small categories at their natural size
+ * Per-category caps. Scaled up for the 2000+ catalog: most categories run
+ * uncapped (Infinity) so we let the catalog grow naturally. Only girls and
+ * casual still have hard ceilings — those buckets attract long-tail filler
+ * we don't want dominating browse rows.
+ *
+ * If you want to rebalance, lower individual values; missing keys are
+ * treated as uncapped.
  */
 const CAPS = {
-  girls: 5,
-  casual: 25,
-  puzzle: 45,
-  arcade: 40,
-  racing: 30,
-  shooting: 25,
-  sports: 20,
-  adventure: 20,
-  action: 20,
-  shadow: 20,
-  simulation: 12,
-  zombie: 15,
-  stickman: 12,
-  cooking: 12,
-  io: 15,
-  strategy: 12,
-  board: 8,
-  word: 8,
-  clicker: 8,
-  skill: 8,
+  girls: 120,
+  casual: 200,
 };
 
 async function main() {

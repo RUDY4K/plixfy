@@ -1,6 +1,7 @@
 import {
-  GAMES,
+  LIGHT_GAMES,
   customGames,
+  ioMultiplayerGames,
   liveGames,
   recentlyAddedGames,
   trendingGames,
@@ -18,11 +19,28 @@ const FEATURES = [
   { icon: '🆕', title: 'New games weekly', body: 'Fresh additions all the time.' },
 ];
 
+/**
+ * Round the live count down to the nearest "headline-friendly" tier so
+ * the hero always advertises a confident, slightly conservative number
+ * (e.g. 3,224 → "3,000+", 2,150 → "2,000+"). Beats a moving precise
+ * count for SEO snippets and avoids overpromising.
+ */
+function heroCountLabel(n: number): string {
+  if (n >= 5000) return '5,000+';
+  if (n >= 3000) return '3,000+';
+  if (n >= 2000) return '2,000+';
+  if (n >= 1000) return '1,000+';
+  if (n >= 500) return '500+';
+  return `${n}+`;
+}
+
 export default function Home() {
   const liveCount = liveGames().length;
+  const heroLabel = heroCountLabel(liveCount);
   const trending = trendingGames();
   const originals = customGames().filter((g) => g.status === 'live');
   const recent = recentlyAddedGames(12);
+  const ioRow = ioMultiplayerGames(20);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -35,13 +53,13 @@ export default function Home() {
           }}
         />
         <div className="relative">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-400">PlayHub</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-emerald-400">Plixfy</p>
           <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
-            {liveCount}+ Free Browser Games
+            {heroLabel} Free Browser Games
             <span className="block text-neutral-400">No Download Required</span>
           </h1>
           <p className="mt-4 max-w-xl text-neutral-400">
-            A curated collection of casual games — puzzle, arcade, racing, sports, IO, stickman, zombie and more. Plays instantly on any device.
+            {liveCount.toLocaleString()} games across 19 categories — puzzle, racing, shooting, .io multiplayer, action, sports, adventure, stickman, zombie, cooking and more. Plays instantly on any device.
           </p>
           <a
             href="#games"
@@ -52,9 +70,9 @@ export default function Home() {
         </div>
       </section>
 
-      <DailyFeatured games={GAMES} />
+      <DailyFeatured games={LIGHT_GAMES} />
 
-      <RecentlyPlayedRow allGames={GAMES} />
+      <RecentlyPlayedRow allGames={LIGHT_GAMES} />
 
       <GameRow
         title="Trending"
@@ -64,10 +82,18 @@ export default function Home() {
       />
 
       <GameRow
-        title="PlayHub Originals"
+        title="Plixfy Originals"
         icon="⭐"
         subtitle="Games we built ourselves — no third-party iframes"
         games={originals}
+      />
+
+      <GameRow
+        title="IO & Multiplayer"
+        icon="🌐"
+        subtitle="Live multiplayer .io games — slither, shoot, survive"
+        games={ioRow}
+        href="/play/io-games"
       />
 
       <GameRow
@@ -77,12 +103,12 @@ export default function Home() {
         games={recent}
       />
 
-      <CategoryCards games={GAMES} />
+      <CategoryCards games={LIGHT_GAMES} />
 
-      <HomeGrid games={GAMES} />
+      <HomeGrid games={LIGHT_GAMES} />
 
       <section className="mt-16">
-        <h2 className="mb-6 text-2xl font-bold tracking-tight">Why PlayHub</h2>
+        <h2 className="mb-6 text-2xl font-bold tracking-tight">Why Plixfy</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {FEATURES.map((f) => (
             <div

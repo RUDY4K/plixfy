@@ -12,6 +12,7 @@ export type GameCategory =
   | 'shooting'
   | 'adventure'
   | 'io'
+  | 'multiplayer'
   | 'simulation'
   | 'clicker'
   | 'board'
@@ -23,7 +24,17 @@ export type GameCategory =
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type GameStatus = 'live' | 'coming-soon' | 'unverified';
 
-export type EmbedProvider = 'gamedistribution' | 'gamemonetize' | 'gamepix' | 'other';
+export type EmbedProvider =
+  | 'gamedistribution'
+  | 'gamemonetize'
+  | 'gamepix'
+  | 'direct'
+  | 'onlinegames'
+  | 'miniplay'
+  | 'gameflare'
+  | 'silvergames'
+  | 'rocketgames'
+  | 'other';
 export type EmbedAspect = '16:9' | '4:3' | '3:4';
 
 interface BaseGameMeta {
@@ -53,6 +64,40 @@ export interface EmbedGameMeta extends BaseGameMeta {
 }
 
 export type GameMeta = CustomGameMeta | EmbedGameMeta;
+
+/**
+ * Slim projection used by browse views (homepage grid, category cards,
+ * carousel rows). Drops the heavy fields — longDescription, controls,
+ * embedUrl, provider — which only the detail page needs. Keeps the
+ * RSC payload tight when 2000+ games are listed.
+ */
+export interface LightGameMeta {
+  kind: 'custom' | 'embed';
+  slug: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  category: GameCategory;
+  difficulty: Difficulty;
+  color: string;
+  keywords: string[];
+  status: GameStatus;
+}
+
+export function toLightGame(g: GameMeta): LightGameMeta {
+  return {
+    kind: g.kind,
+    slug: g.slug,
+    title: g.title,
+    description: g.description,
+    thumbnail: g.thumbnail,
+    category: g.category,
+    difficulty: g.difficulty,
+    color: g.color,
+    keywords: g.keywords,
+    status: g.status,
+  };
+}
 
 /**
  * Each Phaser game module is loaded lazily, so its `import Phaser from 'phaser'`

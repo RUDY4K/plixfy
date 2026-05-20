@@ -167,7 +167,7 @@ export default function Puzzle2048() {
 
   const handleShare = useCallback(async () => {
     trackShare('puzzle-2048', 'clipboard');
-    const msg = `I scored ${score} in 2048 on PlayHub (best: ${best}). Can you beat it?`;
+    const msg = `I scored ${score} in 2048 on Plixfy (best: ${best}). Can you beat it?`;
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({ title: '2048', text: msg });

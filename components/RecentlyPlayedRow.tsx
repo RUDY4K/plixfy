@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import type { GameMeta } from '@/types/game';
+import type { LightGameMeta } from '@/types/game';
 import { useRecent } from '@/lib/userStateClient';
 import GameRow from './GameRow';
 
 interface RecentlyPlayedRowProps {
-  allGames: readonly GameMeta[];
+  allGames: readonly LightGameMeta[];
 }
 
 /**
@@ -23,7 +23,7 @@ export default function RecentlyPlayedRow({ allGames }: RecentlyPlayedRowProps) 
   const games = useMemo(() => {
     if (!mounted) return [];
     const by = new Map(allGames.map((g) => [g.slug, g] as const));
-    return recent.map((r) => by.get(r.slug)).filter((g): g is GameMeta => Boolean(g));
+    return recent.map((r) => by.get(r.slug)).filter((g): g is LightGameMeta => Boolean(g));
   }, [recent, allGames, mounted]);
 
   if (!mounted || games.length === 0) return null;

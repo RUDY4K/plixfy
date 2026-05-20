@@ -28,7 +28,7 @@ interface AdState {
 
 const INTERSTITIAL_COOLDOWN_MS = 60_000;
 const MAX_PER_SESSION = 3;
-const CONSENT_KEY = 'playhub:ad-consent';
+const CONSENT_KEY = 'plixfy:ad-consent';
 
 const state: AdState = {
   provider: null,

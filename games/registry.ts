@@ -1,8 +1,18 @@
-import type { GameMeta } from '@/types/game';
+import type { GameMeta, LightGameMeta } from '@/types/game';
+import { toLightGame } from '@/types/game';
 import { CUSTOM_GAMES } from './registry-custom';
 import { EMBED_GAMES } from './registry-embed';
+import { EXTRA_GAMES } from './registry-extra';
 
-export const GAMES: readonly GameMeta[] = [...CUSTOM_GAMES, ...EMBED_GAMES];
+export const GAMES: readonly GameMeta[] = [...CUSTOM_GAMES, ...EMBED_GAMES, ...EXTRA_GAMES];
+
+/**
+ * Light projection of the full catalog. Used by every browse-side
+ * surface (homepage grid, category cards, carousel rows, favorites,
+ * random link). Drops longDescription/controls/embedUrl/provider so
+ * the RSC payload shipped to the client stays small at 3000+ games.
+ */
+export const LIGHT_GAMES: readonly LightGameMeta[] = GAMES.map(toLightGame);
 
 export function findGame(slug: string): GameMeta | undefined {
   return GAMES.find((g) => g.slug === slug);
@@ -12,16 +22,23 @@ export function gamesByCategory(category: GameMeta['category']): GameMeta[] {
   return GAMES.filter((g) => g.category === category);
 }
 
-export function liveGames(): GameMeta[] {
-  return GAMES.filter((g) => g.status === 'live');
+export function liveGames(): LightGameMeta[] {
+  return LIGHT_GAMES.filter((g) => g.status === 'live');
 }
 
-export function customGames(): GameMeta[] {
-  return GAMES.filter((g) => g.kind === 'custom');
+export function customGames(): LightGameMeta[] {
+  return LIGHT_GAMES.filter((g) => g.kind === 'custom');
 }
 
-export function embedGames(): GameMeta[] {
-  return GAMES.filter((g) => g.kind === 'embed');
+export function embedGames(): LightGameMeta[] {
+  return LIGHT_GAMES.filter((g) => g.kind === 'embed');
+}
+
+/** All live games in the "io" or "multiplayer" categories, for the dedicated row. */
+export function ioMultiplayerGames(limit = 24): LightGameMeta[] {
+  return LIGHT_GAMES
+    .filter((g) => g.status === 'live' && (g.category === 'io' || g.category === 'multiplayer'))
+    .slice(0, limit);
 }
 
 /**
@@ -41,9 +58,9 @@ const TRENDING_SLUGS = [
   'highway-traffic',
 ] as const;
 
-export function trendingGames(): GameMeta[] {
-  const by = new Map(GAMES.map((g) => [g.slug, g] as const));
-  return TRENDING_SLUGS.map((s) => by.get(s)).filter((g): g is GameMeta => Boolean(g) && g!.status === 'live');
+export function trendingGames(): LightGameMeta[] {
+  const by = new Map(LIGHT_GAMES.map((g) => [g.slug, g] as const));
+  return TRENDING_SLUGS.map((s) => by.get(s)).filter((g): g is LightGameMeta => Boolean(g) && g!.status === 'live');
 }
 
 /**
@@ -51,12 +68,13 @@ export function trendingGames(): GameMeta[] {
  * added" — generate-embed-registry.mjs appends new harvest results, so
  * tail of the array is the freshest set.
  */
-export function recentlyAddedGames(limit = 12): GameMeta[] {
+export function recentlyAddedGames(limit = 12): LightGameMeta[] {
   const trendingSet = new Set<string>(TRENDING_SLUGS);
   return EMBED_GAMES
     .filter((g) => g.status === 'live' && !trendingSet.has(g.slug))
     .slice(-limit)
-    .reverse();
+    .reverse()
+    .map(toLightGame);
 }
 
 /**

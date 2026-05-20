@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import type { GameMeta } from '@/types/game';
+import type { LightGameMeta } from '@/types/game';
 import { dailyIndex, msUntilUtcMidnight } from '@/lib/userState';
 import FavoriteButton from './FavoriteButton';
 
 interface DailyFeaturedProps {
-  games: readonly GameMeta[];
+  games: readonly LightGameMeta[];
 }
 
 function formatCountdown(ms: number): string {
@@ -40,7 +40,12 @@ export default function DailyFeatured({ games }: DailyFeaturedProps) {
   if (!featured) return null;
 
   return (
-    <section className="mt-10 overflow-hidden rounded-2xl border border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-950/60 via-neutral-950 to-neutral-950">
+    <section
+      className="daily-pulse mt-10 overflow-hidden rounded-2xl border bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-950"
+      style={{
+        borderColor: 'color-mix(in srgb, var(--accent-creative) 35%, transparent)',
+      }}
+    >
       <div className="grid gap-4 p-5 sm:grid-cols-[1fr_2fr] sm:p-6">
         <Link
           href={`/games/${featured.slug}`}
@@ -52,14 +57,20 @@ export default function DailyFeatured({ games }: DailyFeaturedProps) {
             loading="eager"
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <span className="absolute left-2 top-2 rounded-full bg-fuchsia-500/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-950">
+          <span
+            className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white"
+            style={{ background: 'var(--accent-creative)' }}
+          >
             ✨ Today
           </span>
         </Link>
 
         <div className="flex flex-col justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-300">
+            <p
+              className="text-xs font-semibold uppercase tracking-[0.2em]"
+              style={{ color: 'color-mix(in srgb, var(--accent-creative) 70%, white)' }}
+            >
               Game of the Day
             </p>
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">
@@ -70,7 +81,8 @@ export default function DailyFeatured({ games }: DailyFeaturedProps) {
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href={`/games/${featured.slug}`}
-              className="rounded-lg bg-fuchsia-500 px-5 py-2 text-sm font-semibold text-neutral-950 transition hover:bg-fuchsia-400"
+              className="rounded-lg px-5 py-2 text-sm font-semibold text-white shadow-lg hover:brightness-110"
+              style={{ background: 'var(--accent-creative)' }}
             >
               Play now →
             </Link>

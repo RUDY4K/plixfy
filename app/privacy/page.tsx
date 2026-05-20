@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'How PlayHub collects, uses, and protects your data.',
+  description: 'How Plixfy collects, uses, and protects your data.',
   alternates: { canonical: '/privacy' },
 };
 
@@ -23,9 +23,9 @@ export default function PrivacyPage() {
 
         <h2 className="text-lg font-bold text-white">Cookies & consent</h2>
         <p>
-          PlayHub shows a cookie banner on your first visit. Until you accept, we do not load
+          Plixfy shows a cookie banner on your first visit. Until you accept, we do not load
           third-party advertising scripts. Your choice is stored in <code>localStorage</code>
-          under the key <code>playhub:ad-consent</code>. You can revoke consent at any time by
+          under the key <code>plixfy:ad-consent</code>. You can revoke consent at any time by
           clearing your browser storage for this site.
         </p>
 
@@ -59,10 +59,10 @@ export default function PrivacyPage() {
 
         <h2 className="text-lg font-bold text-white">Third-party game content</h2>
         <p>
-          Some games on PlayHub are embedded via iframe from third-party providers (such as
+          Some games on Plixfy are embedded via iframe from third-party providers (such as
           GameDistribution). Those iframes are operated by their respective providers and may
           collect data, set cookies, and display their own advertisements independently of
-          PlayHub. Their privacy practices are governed by their own policies — we link to the
+          Plixfy. Their privacy practices are governed by their own policies — we link to the
           provider on each game&apos;s page where applicable.
         </p>
 
@@ -76,13 +76,13 @@ export default function PrivacyPage() {
 
         <h2 className="text-lg font-bold text-white">Children</h2>
         <p>
-          PlayHub is intended for general audiences. We do not knowingly collect data from
+          Plixfy is intended for general audiences. We do not knowingly collect data from
           children under 13. If you believe we have done so, contact us and we will remove it.
         </p>
 
         <h2 className="text-lg font-bold text-white">Contact</h2>
         <p>
-          Privacy questions? Email <code>privacy@playhub.example</code>.
+          Privacy questions? Email <code>privacy@plixfy.example</code>.
         </p>
       </section>
     </div>

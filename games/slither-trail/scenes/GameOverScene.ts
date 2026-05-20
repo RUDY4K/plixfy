@@ -164,7 +164,7 @@ export class GameOverScene extends Phaser.Scene {
 
   private async handleShare(score: number, best: number): Promise<void> {
     trackShare('slither-trail', 'clipboard');
-    const msg = `I scored ${score} in Slither Trail on PlayHub (best: ${best}). Can you beat it?`;
+    const msg = `I scored ${score} in Slither Trail on Plixfy (best: ${best}). Can you beat it?`;
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({ title: 'Slither Trail', text: msg });

@@ -95,11 +95,27 @@ function difficultyFor(category) {
   return 'medium';
 }
 
+function deriveProxyThumb(imageUrl) {
+  if (!imageUrl) return null;
+  try {
+    const u = new URL(imageUrl);
+    return `/api/thumb/${u.pathname.replace(/^\/+/, '')}`;
+  } catch {
+    return null;
+  }
+}
+
 function emitEntry(g) {
   const controls = CONTROLS_BY_CATEGORY[g.category] ?? 'Mouse / Touch';
   const description = cleanDescription(g.description, 140);
   const longDescription = cleanDescription(buildLongDescription(description, g.title, g.category), 320);
   const kws = keywordsFor(g.title, g.category);
+  // Prefer the proxy path (set by recent harvests). Older manifest rows
+  // predate the field — derive it from imageUrl when missing.
+  const thumbnail =
+    g.thumbnail ||
+    deriveProxyThumb(g.imageUrl) ||
+    `/assets/thumbnails/embed-${g.slug}.jpg`;
   return `  {
     kind: 'embed',
     slug: '${escSingle(g.slug)}',
@@ -107,7 +123,7 @@ function emitEntry(g) {
     description: '${escSingle(description || `${g.title} — play free in your browser.`)}',
     longDescription:
       '${escSingle(longDescription)}',
-    thumbnail: '/assets/thumbnails/embed-${g.slug}.jpg',
+    thumbnail: '${escSingle(thumbnail)}',
     category: '${g.category}',
     difficulty: '${difficultyFor(g.category)}',
     controls: '${escSingle(controls)}',
@@ -212,10 +228,14 @@ async function main() {
  */
 const gd = (id: string) => \`https://html5.gamedistribution.com/\${id}/\`;
 
-export const EMBED_GAMES: readonly EmbedGameMeta[] = [
+// Cast at the end rather than annotating the array literal: with ${total}+
+// entries TypeScript's type inference of the literal blows past the union
+// complexity limit (TS2590). The cast keeps type safety at the export
+// boundary while letting TS skip per-element widening inside.
+const _EMBED_GAMES = [
 `;
 
-  const out = header + body + '];\n';
+  const out = header + body + '];\n\nexport const EMBED_GAMES: readonly EmbedGameMeta[] = _EMBED_GAMES as unknown as readonly EmbedGameMeta[];\n';
   await writeFile(REGISTRY_PATH, out);
   console.log(`Wrote ${REGISTRY_PATH} — ${total} entries (${HANDCRAFTED.length} handcrafted + ${manifest.games.length} harvested).`);
 }

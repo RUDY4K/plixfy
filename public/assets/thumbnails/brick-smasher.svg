@@ -1,23 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 384" width="512" height="384">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fa8f45"/>
-      <stop offset="100%" stop-color="#a24b0e"/>
+    <linearGradient id="bsBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a1a08"/>
+      <stop offset="100%" stop-color="#7a2a08"/>
     </linearGradient>
-    <radialGradient id="vignette" cx="50%" cy="40%" r="65%">
-      <stop offset="60%" stop-color="rgba(0,0,0,0)"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0.4)"/>
-    </radialGradient>
   </defs>
-  <rect width="512" height="384" fill="url(#bg)"/>
-  <rect width="512" height="384" fill="url(#vignette)"/>
-  <text x="256" y="204" text-anchor="middle"
-        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="56" font-weight="800" fill="#ffffff"
-        style="text-shadow: 0 2px 8px rgba(0,0,0,0.4)">Brick Smasher</text>
+  <rect width="512" height="384" fill="url(#bsBg)"/>
+  <!-- Stars (decorative) -->
+  <g fill="#ffffff" opacity="0.7">
+    <circle cx="50" cy="40" r="1.5"/>
+    <circle cx="120" cy="20" r="1"/>
+    <circle cx="220" cy="35" r="1.5"/>
+    <circle cx="330" cy="20" r="1"/>
+    <circle cx="450" cy="40" r="1.5"/>
+    <circle cx="80" cy="120" r="1"/>
+    <circle cx="430" cy="100" r="1"/>
+  </g>
+  <!-- Brick rows: 5 rows of 8 bricks. Brick: 56x22, gap 4 -->
+  <!-- Total width = 56*8 + 4*7 = 476; offset x = (512-476)/2 = 18 -->
+  <g stroke="rgba(0,0,0,0.4)" stroke-width="1">
+    <!-- Row 1 (red) -->
+    <g fill="#ff5757">
+      <rect x="18"  y="60" width="56" height="22" rx="3"/>
+      <rect x="78"  y="60" width="56" height="22" rx="3"/>
+      <rect x="138" y="60" width="56" height="22" rx="3"/>
+      <rect x="198" y="60" width="56" height="22" rx="3"/>
+      <rect x="258" y="60" width="56" height="22" rx="3"/>
+      <rect x="318" y="60" width="56" height="22" rx="3"/>
+      <rect x="378" y="60" width="56" height="22" rx="3"/>
+      <rect x="438" y="60" width="56" height="22" rx="3"/>
+    </g>
+    <!-- Row 2 (orange) -->
+    <g fill="#ff993a">
+      <rect x="18"  y="86" width="56" height="22" rx="3"/>
+      <rect x="78"  y="86" width="56" height="22" rx="3"/>
+      <rect x="138" y="86" width="56" height="22" rx="3"/>
+      <rect x="198" y="86" width="56" height="22" rx="3"/>
+      <rect x="258" y="86" width="56" height="22" rx="3"/>
+      <rect x="318" y="86" width="56" height="22" rx="3"/>
+      <rect x="378" y="86" width="56" height="22" rx="3"/>
+      <rect x="438" y="86" width="56" height="22" rx="3"/>
+    </g>
+    <!-- Row 3 (yellow) -->
+    <g fill="#ffd54a">
+      <rect x="18"  y="112" width="56" height="22" rx="3"/>
+      <rect x="78"  y="112" width="56" height="22" rx="3"/>
+      <rect x="138" y="112" width="56" height="22" rx="3"/>
+      <!-- gap from broken brick -->
+      <rect x="258" y="112" width="56" height="22" rx="3"/>
+      <rect x="318" y="112" width="56" height="22" rx="3"/>
+      <rect x="378" y="112" width="56" height="22" rx="3"/>
+      <rect x="438" y="112" width="56" height="22" rx="3"/>
+    </g>
+    <!-- Row 4 (green) -->
+    <g fill="#5cd06b">
+      <rect x="18"  y="138" width="56" height="22" rx="3"/>
+      <rect x="78"  y="138" width="56" height="22" rx="3"/>
+      <rect x="138" y="138" width="56" height="22" rx="3"/>
+      <rect x="198" y="138" width="56" height="22" rx="3"/>
+      <rect x="258" y="138" width="56" height="22" rx="3"/>
+      <rect x="318" y="138" width="56" height="22" rx="3"/>
+      <rect x="378" y="138" width="56" height="22" rx="3"/>
+      <rect x="438" y="138" width="56" height="22" rx="3"/>
+    </g>
+    <!-- Row 5 (blue) -->
+    <g fill="#4aa6ff">
+      <rect x="18"  y="164" width="56" height="22" rx="3"/>
+      <rect x="78"  y="164" width="56" height="22" rx="3"/>
+      <rect x="138" y="164" width="56" height="22" rx="3"/>
+      <rect x="198" y="164" width="56" height="22" rx="3"/>
+      <rect x="258" y="164" width="56" height="22" rx="3"/>
+      <rect x="318" y="164" width="56" height="22" rx="3"/>
+      <rect x="378" y="164" width="56" height="22" rx="3"/>
+      <rect x="438" y="164" width="56" height="22" rx="3"/>
+    </g>
+  </g>
+  <!-- Ball trail dots -->
+  <g fill="#ffffff" opacity="0.4">
+    <circle cx="170" cy="225" r="3"/>
+    <circle cx="200" cy="240" r="4"/>
+    <circle cx="230" cy="258" r="5"/>
+  </g>
+  <!-- Ball -->
+  <circle cx="266" cy="282" r="11" fill="#ffffff" stroke="#a3a3a3" stroke-width="2"/>
+  <!-- Paddle -->
+  <rect x="180" y="320" width="160" height="18" rx="9" fill="#ffffff" stroke="#a3a3a3" stroke-width="2"/>
+  <rect x="184" y="322" width="152" height="6" rx="3" fill="rgba(255,255,255,0.6)"/>
+  <!-- Title chip -->
+  <g transform="translate(20, 22)">
+    <rect width="180" height="34" rx="8" fill="rgba(0,0,0,0.6)"/>
+    <text x="90" y="23" text-anchor="middle"
+          font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+          font-size="18" font-weight="800" fill="#ffffff" letter-spacing="0.04em">BRICK SMASHER</text>
+  </g>
+  <!-- Coming soon ribbon -->
   <g transform="translate(488, 24)">
-    <rect x="-110" y="-2" width="108" height="28" rx="14" fill="rgba(0,0,0,0.55)"/>
-    <text x="-56" y="17" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#fff" letter-spacing="0.05em">COMING SOON</text>
+    <rect x="-122" y="-2" width="120" height="28" rx="14" fill="rgba(0,0,0,0.6)"/>
+    <text x="-62" y="17" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff" letter-spacing="0.06em">COMING SOON</text>
   </g>
 </svg>

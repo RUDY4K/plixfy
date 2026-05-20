@@ -1,6 +1,6 @@
 import { log } from './logger';
 
-const PREFIX = 'playhub:';
+const PREFIX = 'plixfy:';
 
 function safe<T>(fn: () => T, fallback: T): T {
   try {

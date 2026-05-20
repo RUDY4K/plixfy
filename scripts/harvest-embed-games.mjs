@@ -42,13 +42,17 @@ const REQUEST_TIMEOUT_MS = 12_000;
 // harvests and re-runs against the existing manifest.
 
 function parseArgs(argv) {
-  const a = { target: 200, pool: 320, resume: false, seed: 0xc0ffee };
+  // downloadThumbs defaults to false because at 2000+ games we serve
+  // thumbnails through the /api/thumb proxy — no local storage needed.
+  // Use --download-thumbs to opt back into the legacy local-file mode.
+  const a = { target: 200, pool: 320, resume: false, seed: 0xc0ffee, downloadThumbs: false };
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
     if (x === '--target') a.target = Number(argv[++i]);
     else if (x === '--pool') a.pool = Number(argv[++i]);
     else if (x === '--seed') a.seed = Number(argv[++i]);
     else if (x === '--resume') a.resume = true;
+    else if (x === '--download-thumbs') a.downloadThumbs = true;
   }
   return a;
 }
@@ -169,6 +173,58 @@ async function downloadImage(url, dest) {
   return buf.length;
 }
 
+/**
+ * Verify a CDN image URL is reachable WITHOUT downloading the full body.
+ * We use a ranged GET (HEAD is unreliable on the GD CDN — returns 403 for
+ * some assets that serve fine with GET+Referer). Range: bytes=0-2047 lets
+ * us check the response code and content-type cheaply.
+ */
+async function probeImage(url) {
+  const res = await fetchWithTimeout(url, {
+    headers: {
+      'User-Agent': UA,
+      Referer: PAGE_REFERER,
+      Range: 'bytes=0-2047',
+      Accept: 'image/*,*/*;q=0.8',
+    },
+    redirect: 'follow',
+  });
+  // 206 (partial) or 200 (server ignored Range) both mean the URL is live.
+  if (res.status !== 200 && res.status !== 206) {
+    throw new Error(`image HTTP ${res.status}`);
+  }
+  const ct = res.headers.get('content-type') ?? '';
+  if (!ct.startsWith('image/')) throw new Error(`not an image (${ct})`);
+  // Drain a small chunk so the connection releases cleanly.
+  try {
+    const reader = res.body?.getReader();
+    if (reader) {
+      const { value } = await reader.read();
+      await reader.cancel();
+      if (value && value.byteLength < 200) throw new Error('image header too small');
+    }
+  } catch (e) {
+    // If we got here with a thrown "header too small", rethrow.
+    if (String(e?.message ?? '').includes('header too small')) throw e;
+  }
+  return ct;
+}
+
+/**
+ * Convert the GameDistribution CDN imageUrl into the proxy path our Next
+ * route serves: /api/thumb/<filename>. The filename is content-addressed
+ * (id + optional dimensions + ext), so the route is safe to cache hard.
+ */
+function toProxyThumbPath(imageUrl) {
+  try {
+    const u = new URL(imageUrl);
+    const file = u.pathname.replace(/^\/+/, '');
+    return `/api/thumb/${file}`;
+  } catch {
+    return null;
+  }
+}
+
 async function pMap(items, fn, concurrency) {
   const results = [];
   let idx = 0;
@@ -248,8 +304,17 @@ async function main() {
         };
         if (!passesQualityFilter(candidate)) throw new Error('quality filter');
         const { category } = categorize(candidate);
-        const dest = join(THUMBS_DIR, `embed-${slug}.jpg`);
-        const bytes = await downloadImage(meta.image, dest);
+        const proxyThumb = toProxyThumbPath(meta.image);
+        if (!proxyThumb) throw new Error('bad image url');
+        let bytes = 0;
+        if (args.downloadThumbs) {
+          const dest = join(THUMBS_DIR, `embed-${slug}.jpg`);
+          bytes = await downloadImage(meta.image, dest);
+        } else {
+          // Probe only — verify the CDN URL is alive so dead thumbnails don't
+          // sneak into the registry. Much cheaper than a full download.
+          await probeImage(meta.image);
+        }
         const game = {
           id,
           slug,
@@ -257,6 +322,9 @@ async function main() {
           description: (meta.description ?? '').slice(0, 220),
           keywords: meta.keywords,
           imageUrl: meta.image,
+          thumbnail: args.downloadThumbs
+            ? `/assets/thumbnails/embed-${slug}.jpg`
+            : proxyThumb,
           imageBytes: bytes,
           embedUrl: `https://html5.gamedistribution.com/${id}/`,
           category,

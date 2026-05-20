@@ -1,13 +1,74 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  /* Research-backed palette (2024-2026 A/B test data).
+   * Sourced from: Terra dark-bg bounce study (2025), ACM eye-tracking (2025/2026),
+   * Taylor & Francis color recognition (2025). Numbers retained as CSS vars
+   * for inline-style use; named utilities are emitted via @theme below. */
+  --bg-primary: #0B0F1A;
+  --bg-surface: #1A1F2E;
+  --bg-surface-hover: #252A3A;
+  --accent-primary: #00C8FF;
+  --accent-hot: #FF3366;
+  --accent-success: #22C55E;
+  --accent-creative: #7C4DFF;
+  --accent-warning: #FF6B35;
+  --text-primary: #E8E8E8;
+  --text-secondary: #8B92A5;
+  --text-muted: #555B6E;
+
+  /* Legacy compatibility — older code may still read these. */
+  --background: var(--bg-primary);
+  --foreground: var(--text-primary);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Reroute Tailwind's neutral scale to the new surfaces. Every existing
+   * bg-neutral-* / border-neutral-* / text-neutral-* class adopts the
+   * new palette without touching component markup. */
+  --color-neutral-950: #0B0F1A;
+  --color-neutral-900: #1A1F2E;
+  --color-neutral-800: #252A3A;
+  --color-neutral-700: #2F3548;
+  --color-neutral-600: #555B6E;
+  --color-neutral-500: #6B7184;
+  --color-neutral-400: #8B92A5;
+  --color-neutral-300: #B5BBC9;
+  --color-neutral-200: #D2D6DF;
+  --color-neutral-100: #E8E8E8;
+  --color-neutral-50:  #F5F5F8;
+
+  /* Emerald → cyan reroute (primary CTA / brand). bg-emerald-500 was
+   * the "Play now" CTA color; remap the whole scale so hovers, focus
+   * rings and tints stay coherent. */
+  --color-emerald-50:  #E6FBFF;
+  --color-emerald-100: #BFF1FF;
+  --color-emerald-200: #80E2FF;
+  --color-emerald-300: #4DD5FF;
+  --color-emerald-400: #1ACCFF;
+  --color-emerald-500: #00C8FF;
+  --color-emerald-600: #00A5D9;
+  --color-emerald-700: #007FB0;
+  --color-emerald-800: #005E84;
+  --color-emerald-900: #003E58;
+  --color-emerald-950: #002233;
+
+  /* Rose → hot pink-red (used by Hot badge, favorite heart fill). */
+  --color-rose-300: #FFB3C2;
+  --color-rose-400: #FF7A91;
+  --color-rose-500: #FF3366;
+  --color-rose-600: #DB1F4E;
+  --color-rose-700: #B0143C;
+
+  /* Brand semantic tokens — usable as bg-accent-primary, etc. */
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-hot:     var(--accent-hot);
+  --color-accent-success: var(--accent-success);
+  --color-accent-creative: var(--accent-creative);
+  --color-accent-warning: var(--accent-warning);
+
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -23,4 +84,80 @@ body {
 
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── Micro-interactions (dopamine triggers) ─────────────────────────── */
+
+/* Global 150ms transitions on interactive surfaces. Limited to specific
+ * properties so we never accidentally transition layout-affecting ones. */
+button,
+a,
+[role="button"] {
+  transition: transform 150ms ease, background-color 150ms ease,
+    border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+}
+
+/* Card hover: lift + category-colored glow. Each card sets --card-glow
+ * to its category accent via inline style. */
+.card-hover {
+  --card-glow: var(--accent-primary);
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  will-change: transform;
+}
+.card-hover:hover {
+  transform: scale(1.03);
+  border-color: var(--card-glow);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--card-glow) 55%, transparent),
+    0 12px 32px -10px color-mix(in srgb, var(--card-glow) 45%, transparent);
+}
+
+/* Heart click bounce — overshoot scale with spring easing. */
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.35); }
+  70%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.heart-pop {
+  animation: heartPop 380ms cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* Streak count flip — used when the day count increments. */
+@keyframes streakFlip {
+  0%   { transform: rotateX(0deg); opacity: 1; }
+  50%  { transform: rotateX(90deg); opacity: 0.2; }
+  100% { transform: rotateX(0deg); opacity: 1; }
+}
+.streak-flip {
+  display: inline-block;
+  animation: streakFlip 420ms ease-in-out;
+}
+
+/* Game of the Day — subtle purple-glow pulse. */
+@keyframes dailyPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 77, 255, 0.45); }
+  50%      { box-shadow: 0 0 48px 4px rgba(124, 77, 255, 0.18); }
+}
+.daily-pulse {
+  animation: dailyPulse 3.2s ease-in-out infinite;
+}
+
+/* Achievement toast — slide in from the right, then settle. */
+@keyframes toastIn {
+  0%   { transform: translateY(8px) translateX(20px); opacity: 0; }
+  100% { transform: translateY(0)    translateX(0);   opacity: 1; }
+}
+.animate-toast {
+  animation: toastIn 320ms cubic-bezier(.22, 1.2, .36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-hover:hover { transform: none; }
+  .heart-pop,
+  .streak-flip,
+  .daily-pulse,
+  .animate-toast {
+    animation: none;
+  }
 }

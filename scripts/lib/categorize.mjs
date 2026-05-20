@@ -78,22 +78,25 @@ const SPECIFIC = [
 const GENRES = [
   {
     cat: 'racing',
-    minScore: 2,
+    minScore: 1,
     keywords: [
       'race', 'racing', 'racer', 'drift', 'drifting', 'driving', 'driver', 'drive',
       'car', 'cars', 'truck', 'trucks', 'bike', 'bikes', 'motorcycle', 'motorbike',
-      'highway', 'traffic', 'parking', 'park', 'formula', 'rally', 'speedway',
-      'speed', 'turbo', 'nitro', 'circuit', 'grand prix', 'f1', 'autobahn',
-      'taxi', 'bus', 'lorry',
+      'highway', 'traffic', 'parking', 'formula', 'rally', 'speedway',
+      'turbo', 'nitro', 'circuit', 'grand prix', 'f1', 'autobahn',
+      'taxi', 'bus', 'kart', 'karts', 'go kart', 'ride', 'rider',
+      'atv', 'buggy', 'monster truck', 'pickup', 'jeep', 'tractor',
     ],
   },
   {
     cat: 'shooting',
-    minScore: 2,
+    minScore: 1,
     keywords: [
       'shoot', 'shooter', 'shooting', 'gun', 'guns', 'sniper', 'fps', 'pistol',
-      'rifle', 'weapon', 'army', 'military', 'soldier', 'tank', 'tanks', 'war',
-      'warfare', 'combat', 'battlefield', 'marine', 'commando', 'arsenal', 'crosshair',
+      'rifle', 'weapon', 'weapons', 'army', 'military', 'soldier', 'tank', 'tanks',
+      'war', 'warfare', 'combat', 'battlefield', 'marine', 'commando', 'arsenal',
+      'crosshair', 'bullet', 'bullets', 'machine gun', 'shotgun', 'gunner',
+      'mafia', 'agent', 'spec ops', 'paintball', 'turret', 'ammo',
     ],
   },
   {
@@ -104,76 +107,114 @@ const GENRES = [
       'billiard', 'billiards', 'snooker', 'volleyball', 'cricket', 'bowling',
       'boxing', 'mma', 'wrestling', 'hockey', 'rugby', 'skate', 'skateboard',
       'surf', 'ski', 'archery', 'darts', 'dart', 'pong', 'ping pong',
+      'goal', 'goalkeeper', 'penalty', 'free kick', 'fifa', 'nba', 'nfl',
+      'olympics', 'olympic', 'champion', 'cup',
     ],
   },
   {
     cat: 'puzzle',
     minScore: 1,
     keywords: [
-      'puzzle', 'match 3', 'match three', 'jewel', 'jewels', 'gem', 'gems',
-      'solitaire', 'mahjong', 'sudoku', 'crossword', 'jigsaw', 'block', 'blocks',
+      'puzzle', 'match 3', 'match three', 'match-3', 'jewel', 'jewels', 'gem', 'gems',
+      'mahjong', 'sudoku', 'jigsaw', 'block', 'blocks',
       'tetris', 'tetriz', 'connect', 'merge', 'tile', 'tiles', '2048', 'memory',
-      'hidden object', 'sliding', 'sokoban', 'tangram',
+      'hidden object', 'sliding', 'sokoban', 'tangram', 'physics puzzle',
+      'pipe', 'pipes', 'unblock', 'rubik', 'logic',
     ],
   },
   {
     cat: 'word',
     minScore: 1,
-    keywords: ['word', 'words', 'spelling', 'typing', 'wpm', 'crossword', 'vocabulary', 'anagram', 'scrabble'],
+    keywords: ['word', 'words', 'spelling', 'typing', 'wpm', 'crossword', 'vocabulary', 'anagram', 'scrabble', 'wordle'],
   },
   {
     cat: 'board',
     minScore: 1,
-    keywords: ['chess', 'checkers', 'backgammon', 'domino', 'card', 'cards', 'poker', 'blackjack', 'uno', 'rummy'],
+    keywords: [
+      'chess', 'checkers', 'backgammon', 'domino', 'dominoes', 'card', 'cards',
+      'poker', 'blackjack', 'uno', 'rummy', 'solitaire', 'klondike', 'spider',
+      'freecell', 'tripeaks', 'pyramid', 'baccarat', 'go fish',
+    ],
   },
   {
     cat: 'strategy',
     minScore: 1,
-    keywords: ['tower defense', 'tower defence', 'td game', 'defend the tower', 'rts', 'kingdom', 'empire', 'civilization', 'tactic', 'tactical', 'strategy', 'defend'],
+    keywords: [
+      'tower defense', 'tower defence', 'td game', 'defend the tower', 'rts',
+      'kingdom', 'kingdoms', 'empire', 'empires', 'civilization', 'tactic',
+      'tactical', 'tactics', 'strategy', 'strategic', 'defend', 'defense',
+      'defence', 'commander', 'troops', 'conquer', 'siege', 'medieval',
+      'army war', 'base defense', 'turn based',
+    ],
   },
   {
     cat: 'simulation',
     minScore: 1,
-    keywords: ['simulator', 'simulation', 'tycoon', 'farm', 'farming', 'business', 'manager', 'doctor', 'surgery', 'hospital'],
+    keywords: [
+      'simulator', 'simulation', 'tycoon', 'farm', 'farming', 'business',
+      'manager', 'managing', 'doctor', 'surgery', 'hospital', 'dentist',
+      'builder', 'building', 'construction', 'crane', 'bulldozer', 'excavator',
+      'forklift', 'mechanic', 'workshop', 'pilot', 'flight sim', 'sim',
+      'pet care', 'baby care', 'nursery', 'salon manager', 'shopkeeper',
+    ],
   },
   {
     cat: 'clicker',
     minScore: 1,
-    keywords: ['clicker', 'idle', 'incremental', 'tap to'],
+    keywords: ['clicker', 'idle', 'incremental', 'tap to', 'tap tap', 'auto clicker'],
   },
   {
     cat: 'girls',
     minScore: 1,
     keywords: [
       'dress up', 'dress-up', 'dressup', 'makeup', 'make-up', 'makeover', 'fashion',
-      'princess', 'wedding', 'salon', 'beauty', 'barbie', 'bride', 'diva', 'glam',
-      'manicure', 'pedicure', 'spa', 'shopping', 'mall',
+      'princess', 'wedding', 'salon', 'beauty', 'bride', 'diva', 'glam',
+      'manicure', 'pedicure', 'spa', 'shopping', 'mall', 'fashionista',
+      'stylist', 'hairstyle', 'haircut', 'nail art', 'bff',
     ],
   },
   {
     cat: 'adventure',
     minScore: 1,
-    keywords: ['adventure', 'quest', 'rpg', 'mystery', 'escape', 'explore', 'dungeon', 'pirate', 'pirates', 'treasure'],
+    keywords: [
+      'adventure', 'quest', 'rpg', 'mystery', 'escape', 'explore', 'exploration',
+      'dungeon', 'pirate', 'pirates', 'treasure', 'journey', 'fantasy', 'magic',
+      'wizard', 'sorcerer', 'castle', 'cave', 'jungle', 'tomb', 'ruins', 'ancient',
+      'sky kingdom', 'discover', 'expedition', 'mystic', 'enchanted',
+    ],
   },
   {
     cat: 'action',
     minScore: 1,
-    keywords: ['fight', 'fighting', 'fighter', 'ninja', 'samurai', 'monster', 'monsters', 'beat em up', 'brawler', 'parkour', 'ragdoll'],
+    keywords: [
+      'fight', 'fighting', 'fighter', 'ninja', 'samurai', 'monster', 'monsters',
+      'beat em up', 'brawler', 'parkour', 'ragdoll', 'hero', 'attack', 'blade',
+      'sword', 'swords', 'dragon', 'dragons', 'smash', 'slash', 'knight',
+      'knights', 'warrior', 'warriors', 'battle', 'battles', 'boss', 'kungfu',
+      'kung fu', 'karate', 'punch', 'kick', 'mortal', 'duel', 'gladiator',
+      'rampage', 'crusader', 'assassin', 'survivor', 'rage', 'mech', 'mecha',
+      'robot fight', 'epic',
+    ],
   },
   {
     cat: 'skill',
     minScore: 1,
-    keywords: ['aim', 'precision', 'reaction', 'balance', 'knife', 'throw'],
+    keywords: ['aim', 'precision', 'reaction', 'balance', 'knife', 'throw', 'throwing', 'dodge'],
   },
   {
     cat: 'arcade',
     minScore: 1,
-    keywords: ['arcade', 'runner', 'endless', 'jump', 'jumping', 'platformer', 'platform', 'flap', 'snake', 'classic', 'retro', 'pacman', 'breakout', 'ball', 'flappy', 'bounce', 'helix', 'stack'],
+    keywords: [
+      'arcade', 'runner', 'endless', 'jump', 'jumping', 'platformer', 'platform',
+      'flap', 'snake', 'classic', 'retro', 'pacman', 'breakout', 'ball', 'flappy',
+      'bounce', 'helix', 'stack', 'tap', 'pinball', 'whack', 'dash', 'roll',
+      'rolling', 'fall', 'falling', 'climb', 'sky jump',
+    ],
   },
   {
     cat: 'casual',
     minScore: 1,
-    keywords: ['casual', 'cute', 'kids', 'baby', 'family', 'children', 'coloring', 'colouring', 'pop it', 'fidget'],
+    keywords: ['casual', 'cute', 'kids', 'baby', 'family', 'children', 'pop it', 'fidget', 'relax', 'relaxing', 'chill'],
   },
 ];
 
@@ -247,8 +288,9 @@ export function passesQualityFilter({ title = '', description = '' }) {
   const BAD_BRAND_WORDS = ['barbie', 'elsa', 'frozen princess', 'bts', 'huggy', 'eliza', 'draculaura', 'angelina', 'shimmer', 'baby taylor', 'paw care', 'ladybug masquerade'];
   if (BAD_BRAND_WORDS.some((s) => t.includes(s))) return false;
 
-  // Description too short / placeholder.
-  if (description && description.trim().length < 20) return false;
+  // Description too short / placeholder (only when present — empty is OK,
+  // we'll synthesize one from title/category in the registry generator).
+  if (description && description.trim().length < 10) return false;
 
   return true;
 }

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { GAMES } from '@/games/registry';
+import { LIGHT_GAMES } from '@/games/registry';
 import FavoritesGrid from './FavoritesGrid';
 
 export const metadata: Metadata = {
-  title: 'My Favorites — PlayHub',
-  description: 'Your saved games on PlayHub. Pick up where you left off.',
+  title: 'My Favorites — Plixfy',
+  description: 'Your saved games on Plixfy. Pick up where you left off.',
   alternates: { canonical: '/favorites' },
 };
 
@@ -17,7 +17,7 @@ export default function FavoritesPage() {
       <p className="mt-2 max-w-xl text-neutral-400">
         Saved on this device. Hit the heart on any game card to keep it here.
       </p>
-      <FavoritesGrid allGames={GAMES} />
+      <FavoritesGrid allGames={LIGHT_GAMES} />
     </div>
   );
 }

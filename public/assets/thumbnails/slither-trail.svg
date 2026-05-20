@@ -1,19 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 384" width="512" height="384">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4ed17e"/>
-      <stop offset="100%" stop-color="#16803d"/>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e5a2b"/>
+      <stop offset="100%" stop-color="#0e3517"/>
     </linearGradient>
-    <radialGradient id="vignette" cx="50%" cy="40%" r="65%">
-      <stop offset="60%" stop-color="rgba(0,0,0,0)"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0.4)"/>
+    <radialGradient id="appleGlow" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#ff7878"/>
+      <stop offset="100%" stop-color="#b51e1e"/>
     </radialGradient>
   </defs>
-  <rect width="512" height="384" fill="url(#bg)"/>
-  <rect width="512" height="384" fill="url(#vignette)"/>
-  <text x="256" y="204" text-anchor="middle"
-        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="56" font-weight="800" fill="#ffffff"
-        style="text-shadow: 0 2px 8px rgba(0,0,0,0.4)">Slither Trail</text>
+  <rect width="512" height="384" fill="url(#grass)"/>
+  <!-- Grid lines -->
+  <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
+    <path d="M 0 32 H 512 M 0 64 H 512 M 0 96 H 512 M 0 128 H 512 M 0 160 H 512 M 0 192 H 512 M 0 224 H 512 M 0 256 H 512 M 0 288 H 512 M 0 320 H 512 M 0 352 H 512"/>
+    <path d="M 32 0 V 384 M 64 0 V 384 M 96 0 V 384 M 128 0 V 384 M 160 0 V 384 M 192 0 V 384 M 224 0 V 384 M 256 0 V 384 M 288 0 V 384 M 320 0 V 384 M 352 0 V 384 M 384 0 V 384 M 416 0 V 384 M 448 0 V 384 M 480 0 V 384"/>
+  </g>
+  <!-- Snake body (chain of circles) -->
+  <g>
+    <circle cx="80"  cy="288" r="18" fill="#86e561" stroke="#1d4a13" stroke-width="2"/>
+    <circle cx="112" cy="288" r="19" fill="#86e561" stroke="#1d4a13" stroke-width="2"/>
+    <circle cx="144" cy="280" r="20" fill="#86e561" stroke="#1d4a13" stroke-width="2"/>
+    <circle cx="176" cy="256" r="21" fill="#86e561" stroke="#1d4a13" stroke-width="2"/>
+    <circle cx="200" cy="224" r="21" fill="#86e561" stroke="#1d4a13" stroke-width="2"/>
+    <circle cx="224" cy="192" r="22" fill="#86e561" stroke="#1d4a13" stroke-width="2"/>
+    <circle cx="256" cy="176" r="23" fill="#86e561" stroke="#1d4a13" stroke-width="2"/>
+    <circle cx="288" cy="192" r="23" fill="#86e561" stroke="#1d4a13" stroke-width="2"/>
+    <circle cx="312" cy="224" r="24" fill="#86e561" stroke="#1d4a13" stroke-width="2"/>
+    <!-- Head -->
+    <circle cx="336" cy="252" r="26" fill="#a8f08a" stroke="#1d4a13" stroke-width="3"/>
+    <circle cx="346" cy="245" r="6" fill="#ffffff"/>
+    <circle cx="348" cy="245" r="3" fill="#000000"/>
+    <circle cx="346" cy="262" r="6" fill="#ffffff"/>
+    <circle cx="348" cy="262" r="3" fill="#000000"/>
+    <!-- Tongue -->
+    <path d="M 360 252 q 14 -2 22 -8 m -22 8 q 14 2 22 8" stroke="#ff3a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- Apple -->
+  <g transform="translate(420, 130)">
+    <circle cx="0" cy="0" r="22" fill="url(#appleGlow)" stroke="#6b0e0e" stroke-width="2"/>
+    <path d="M 0 -22 Q 4 -34 14 -32" stroke="#3a1e0c" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="-6" cy="-10" rx="6" ry="3" fill="#ffd0d0" opacity="0.7"/>
+  </g>
+  <!-- Score chip -->
+  <g transform="translate(20, 22)">
+    <rect width="170" height="34" rx="8" fill="rgba(0,0,0,0.6)"/>
+    <text x="85" y="23" text-anchor="middle"
+          font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+          font-size="18" font-weight="800" fill="#ffffff" letter-spacing="0.04em">SLITHER TRAIL</text>
+  </g>
 </svg>

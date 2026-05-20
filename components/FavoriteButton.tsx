@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { useIsFavorite } from '@/lib/userStateClient';
+import { evaluate, getSessionPlays } from '@/lib/achievements';
 
 interface FavoriteButtonProps {
   slug: string;
@@ -14,9 +16,26 @@ interface FavoriteButtonProps {
  * Heart toggle backed by localStorage. SSR-safe (renders the empty state
  * during hydration; populates on mount). When placed inside an <a> we
  * intercept the click so the user can favorite without navigating.
+ *
+ * On every click we re-trigger the .heart-pop spring animation by toggling
+ * the class via key change — restartAnim flips each click, forcing React
+ * to remount the inner glyph so the keyframe replays.
  */
 export default function FavoriteButton({ slug, size = 'sm', stopPropagation = true }: FavoriteButtonProps) {
   const [fav, toggle] = useIsFavorite(slug);
+  const [popKey, setPopKey] = useState(0);
+  const firstRender = useRef(true);
+
+  // Don't play the animation on initial hydration — only when the user
+  // actually clicks. We use a ref instead of mount state because we want
+  // popKey to advance every click after that.
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    setPopKey((k) => k + 1);
+  }, [fav]);
 
   const dims = size === 'lg' ? 'h-10 w-10 text-xl' : 'h-8 w-8 text-sm';
 
@@ -31,14 +50,17 @@ export default function FavoriteButton({ slug, size = 'sm', stopPropagation = tr
           e.stopPropagation();
         }
         toggle();
+        evaluate({ sessionPlays: getSessionPlays() });
       }}
-      className={`flex shrink-0 items-center justify-center rounded-full border backdrop-blur transition ${dims} ${
+      className={`flex shrink-0 items-center justify-center rounded-full border backdrop-blur ${dims} ${
         fav
           ? 'border-rose-500/60 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30'
           : 'border-neutral-700/70 bg-neutral-950/70 text-neutral-400 hover:border-neutral-500 hover:text-rose-400'
       }`}
     >
-      <span aria-hidden="true">{fav ? '♥' : '♡'}</span>
+      <span key={popKey} aria-hidden="true" className={popKey > 0 ? 'heart-pop' : undefined}>
+        {fav ? '♥' : '♡'}
+      </span>
     </button>
   );
 }

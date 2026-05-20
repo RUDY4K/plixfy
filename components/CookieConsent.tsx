@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { resetAdProvider } from '@/lib/ads';
 
-const CONSENT_KEY = 'playhub:ad-consent';
+const CONSENT_KEY = 'plixfy:ad-consent';
 
 type Choice = 'accepted' | 'rejected';
 
@@ -21,7 +21,7 @@ function readChoice(): Choice | null {
 /**
  * Lightweight cookie consent bar. Not a full IAB CMP — pragmatic for a
  * placeholder-mode portal. Saves choice to localStorage and dispatches
- * `playhub:consent-change` so the AdSense loader can mount/unmount.
+ * `plixfy:consent-change` so the AdSense loader can mount/unmount.
  */
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
@@ -37,7 +37,7 @@ export default function CookieConsent() {
       // Safari private mode etc — banner just stays hidden for this session.
     }
     resetAdProvider();
-    window.dispatchEvent(new CustomEvent('playhub:consent-change', { detail: choice }));
+    window.dispatchEvent(new CustomEvent('plixfy:consent-change', { detail: choice }));
     setVisible(false);
   };
 
@@ -51,7 +51,7 @@ export default function CookieConsent() {
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 text-sm text-neutral-300 sm:flex-row sm:items-center sm:justify-between">
         <p className="leading-relaxed">
-          PlayHub uses cookies for ads and analytics. By accepting, you allow personalised ads.{' '}
+          Plixfy uses cookies for ads and analytics. By accepting, you allow personalised ads.{' '}
           <Link href="/privacy" className="underline hover:text-white">
             Read our privacy policy
           </Link>

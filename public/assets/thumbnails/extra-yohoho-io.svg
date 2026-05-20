@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 384" width="512" height="384">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="50%" cy="40%" r="65%">
+      <stop offset="60%" stop-color="rgba(0,0,0,0)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.5)"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="384" fill="url(#bg)"/>
+  <rect width="512" height="384" fill="url(#vignette)"/>
+  <text x="256" y="200" text-anchor="middle"
+        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="52" font-weight="800" fill="#ffffff"
+        style="text-shadow: 0 2px 8px rgba(0,0,0,0.6)">YoHoHo.io</text>
+</svg>

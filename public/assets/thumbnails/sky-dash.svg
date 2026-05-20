@@ -1,23 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 384" width="512" height="384">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#38c5dd"/>
+    <linearGradient id="skyBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a5e7f4"/>
       <stop offset="100%" stop-color="#04768a"/>
     </linearGradient>
-    <radialGradient id="vignette" cx="50%" cy="40%" r="65%">
-      <stop offset="60%" stop-color="rgba(0,0,0,0)"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0.4)"/>
-    </radialGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a3a18"/>
+      <stop offset="100%" stop-color="#2d1a08"/>
+    </linearGradient>
   </defs>
-  <rect width="512" height="384" fill="url(#bg)"/>
-  <rect width="512" height="384" fill="url(#vignette)"/>
-  <text x="256" y="204" text-anchor="middle"
-        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="56" font-weight="800" fill="#ffffff"
-        style="text-shadow: 0 2px 8px rgba(0,0,0,0.4)">Sky Dash</text>
+  <rect width="512" height="384" fill="url(#skyBg)"/>
+  <!-- Clouds -->
+  <g fill="#ffffff" opacity="0.9">
+    <ellipse cx="80" cy="80" rx="40" ry="16"/>
+    <ellipse cx="120" cy="70" rx="26" ry="12"/>
+    <ellipse cx="380" cy="120" rx="46" ry="18"/>
+    <ellipse cx="420" cy="110" rx="28" ry="13"/>
+    <ellipse cx="240" cy="60" rx="32" ry="13"/>
+  </g>
+  <!-- Distant mountains -->
+  <g opacity="0.4">
+    <polygon points="0,260 100,180 200,250 300,170 400,240 512,200 512,300 0,300" fill="#1f5a6e"/>
+  </g>
+  <!-- Ground band -->
+  <rect x="0" y="300" width="512" height="84" fill="url(#ground)"/>
+  <rect x="0" y="298" width="512" height="6" fill="#7fb53b"/>
+  <!-- Obstacle: rock pile (right) -->
+  <g transform="translate(380, 252)">
+    <polygon points="0,48 30,8 56,48" fill="#3f3f3f" stroke="#1a1a1a" stroke-width="2"/>
+    <polygon points="40,48 60,18 86,48" fill="#555" stroke="#1a1a1a" stroke-width="2"/>
+  </g>
+  <!-- Coin (mid-air) -->
+  <g transform="translate(290, 200)">
+    <circle r="16" fill="#ffd34a" stroke="#a96d00" stroke-width="3"/>
+    <text y="6" text-anchor="middle" font-family="system-ui, sans-serif" font-size="18" font-weight="800" fill="#a96d00">$</text>
+  </g>
+  <!-- Runner (stick figure, mid-jump) -->
+  <g transform="translate(160, 220)" stroke="#0a1a2a" stroke-width="5" stroke-linecap="round" fill="none">
+    <!-- head -->
+    <circle cx="0" cy="-30" r="14" fill="#ffd6aa"/>
+    <!-- body -->
+    <line x1="0" y1="-16" x2="0" y2="22"/>
+    <!-- arms -->
+    <line x1="0" y1="-4" x2="-22" y2="8"/>
+    <line x1="0" y1="-4" x2="24" y2="-14"/>
+    <!-- legs -->
+    <line x1="0" y1="22" x2="-18" y2="46"/>
+    <line x1="0" y1="22" x2="22" y2="40"/>
+  </g>
+  <!-- Speed lines behind runner -->
+  <g stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.7">
+    <line x1="60"  y1="210" x2="100" y2="210"/>
+    <line x1="40"  y1="230" x2="90"  y2="230"/>
+    <line x1="70"  y1="252" x2="110" y2="252"/>
+  </g>
+  <!-- Title chip -->
+  <g transform="translate(20, 22)">
+    <rect width="124" height="34" rx="8" fill="rgba(0,0,0,0.6)"/>
+    <text x="62" y="23" text-anchor="middle"
+          font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+          font-size="18" font-weight="800" fill="#ffffff" letter-spacing="0.04em">SKY DASH</text>
+  </g>
+  <!-- Coming soon ribbon -->
   <g transform="translate(488, 24)">
-    <rect x="-110" y="-2" width="108" height="28" rx="14" fill="rgba(0,0,0,0.55)"/>
-    <text x="-56" y="17" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#fff" letter-spacing="0.05em">COMING SOON</text>
+    <rect x="-122" y="-2" width="120" height="28" rx="14" fill="rgba(0,0,0,0.6)"/>
+    <text x="-62" y="17" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff" letter-spacing="0.06em">COMING SOON</text>
   </g>
 </svg>

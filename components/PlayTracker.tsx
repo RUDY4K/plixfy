@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { recordPlay } from '@/lib/userStateClient';
+import { evaluate, getSessionPlays, recordSessionPlay } from '@/lib/achievements';
 
 /**
  * Fire-and-forget hook that records a play event when the game-detail
@@ -11,6 +12,8 @@ import { recordPlay } from '@/lib/userStateClient';
 export default function PlayTracker({ slug }: { slug: string }) {
   useEffect(() => {
     recordPlay(slug);
+    recordSessionPlay(slug);
+    evaluate({ sessionPlays: getSessionPlays() });
   }, [slug]);
   return null;
 }

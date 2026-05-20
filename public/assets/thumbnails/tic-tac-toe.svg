@@ -1,23 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 384" width="512" height="384">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#80b7fb"/>
-      <stop offset="100%" stop-color="#3e6ba3"/>
+    <linearGradient id="tttBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6aa8ff"/>
+      <stop offset="100%" stop-color="#1f3d70"/>
     </linearGradient>
-    <radialGradient id="vignette" cx="50%" cy="40%" r="65%">
-      <stop offset="60%" stop-color="rgba(0,0,0,0)"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0.4)"/>
-    </radialGradient>
   </defs>
-  <rect width="512" height="384" fill="url(#bg)"/>
-  <rect width="512" height="384" fill="url(#vignette)"/>
-  <text x="256" y="204" text-anchor="middle"
-        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="56" font-weight="800" fill="#ffffff"
-        style="text-shadow: 0 2px 8px rgba(0,0,0,0.4)">Tic Tac Toe</text>
+  <rect width="512" height="384" fill="url(#tttBg)"/>
+  <!-- Stars -->
+  <g fill="rgba(255,255,255,0.5)">
+    <circle cx="50" cy="60" r="1.5"/>
+    <circle cx="450" cy="50" r="2"/>
+    <circle cx="80" cy="340" r="2"/>
+    <circle cx="430" cy="320" r="1.5"/>
+  </g>
+  <!-- Board: 3x3 grid, each cell 84x84, gap = 12 grid line.
+       Total = 84*3 + 12*2 = 276. Offset x = (512-276)/2 = 118, y = (384-276)/2 = 54 -->
+  <!-- Cells background panels -->
+  <g fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.25)" stroke-width="1">
+    <rect x="118" y="54"  width="84" height="84" rx="10"/>
+    <rect x="214" y="54"  width="84" height="84" rx="10"/>
+    <rect x="310" y="54"  width="84" height="84" rx="10"/>
+    <rect x="118" y="150" width="84" height="84" rx="10"/>
+    <rect x="214" y="150" width="84" height="84" rx="10"/>
+    <rect x="310" y="150" width="84" height="84" rx="10"/>
+    <rect x="118" y="246" width="84" height="84" rx="10"/>
+    <rect x="214" y="246" width="84" height="84" rx="10"/>
+    <rect x="310" y="246" width="84" height="84" rx="10"/>
+  </g>
+  <!-- Grid lines (chalk style) -->
+  <g stroke="#ffffff" stroke-width="6" stroke-linecap="round" fill="none">
+    <line x1="208" y1="60"  x2="208" y2="324"/>
+    <line x1="304" y1="60"  x2="304" y2="324"/>
+    <line x1="124" y1="144" x2="388" y2="144"/>
+    <line x1="124" y1="240" x2="388" y2="240"/>
+  </g>
+  <!-- X marks -->
+  <g stroke="#ff5757" stroke-width="10" stroke-linecap="round" fill="none">
+    <!-- top-left -->
+    <line x1="142" y1="78"  x2="178" y2="114"/>
+    <line x1="178" y1="78"  x2="142" y2="114"/>
+    <!-- center -->
+    <line x1="238" y1="174" x2="274" y2="210"/>
+    <line x1="274" y1="174" x2="238" y2="210"/>
+    <!-- bottom-right -->
+    <line x1="334" y1="270" x2="370" y2="306"/>
+    <line x1="370" y1="270" x2="334" y2="306"/>
+  </g>
+  <!-- Winning diagonal line -->
+  <line x1="138" y1="80" x2="376" y2="306" stroke="#ffd24a" stroke-width="6" stroke-linecap="round" opacity="0.9"/>
+  <!-- O marks -->
+  <g stroke="#5cd0ff" stroke-width="8" fill="none">
+    <!-- top-right -->
+    <circle cx="352" cy="96"  r="22"/>
+    <!-- middle-left -->
+    <circle cx="160" cy="192" r="22"/>
+  </g>
+  <!-- Title chip -->
+  <g transform="translate(20, 22)">
+    <rect width="160" height="34" rx="8" fill="rgba(0,0,0,0.6)"/>
+    <text x="80" y="23" text-anchor="middle"
+          font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+          font-size="18" font-weight="800" fill="#ffffff" letter-spacing="0.04em">TIC TAC TOE</text>
+  </g>
+  <!-- Coming soon ribbon -->
   <g transform="translate(488, 24)">
-    <rect x="-110" y="-2" width="108" height="28" rx="14" fill="rgba(0,0,0,0.55)"/>
-    <text x="-56" y="17" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#fff" letter-spacing="0.05em">COMING SOON</text>
+    <rect x="-122" y="-2" width="120" height="28" rx="14" fill="rgba(0,0,0,0.6)"/>
+    <text x="-62" y="17" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff" letter-spacing="0.06em">COMING SOON</text>
   </g>
 </svg>

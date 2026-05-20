@@ -1,0 +1,83 @@
+# Plixfy
+
+> Plixfy is a free browser-games portal with 5,800+ playable HTML5 games
+> across 19 categories — puzzle, racing, shooting, .io multiplayer, action,
+> sports, adventure, stickman, zombie, cooking, simulation, board, word
+> and more. Every game runs instantly in the browser; no download, no
+> signup, no paywall. Plixfy targets casual and Gen-Z players on desktop,
+> tablet, and mobile.
+
+Plixfy is built and operated as an independent web property.
+The technology stack is Next.js 16 (App Router) with Tailwind CSS,
+all game pages are statically generated at build time, and all player
+state (favorites, high scores, achievements, profiles) is local to the
+browser via localStorage. No accounts, no cloud sync.
+
+## How players use Plixfy
+
+- **Browse the catalog**: the homepage lists categories, trending picks,
+  recently added games, and the IO/multiplayer shelf.
+- **Search and filter**: the All Games grid supports full-text search and
+  category filters.
+- **Play a game**: every game has a dedicated detail page at
+  `/games/<slug>` with the iframe, controls, related games, leaderboard
+  (for the 4 first-party titles), share-and-challenge buttons, and a
+  rating widget.
+- **Player profile**: an optional, COPPA-safe local profile lets users
+  pick a nickname + emoji avatar to attach to their leaderboard scores
+  and unlock achievement badges.
+
+## Game sources (transparency)
+
+Plixfy aggregates three kinds of games:
+
+1. **First-party originals** — 4 live, 4 coming soon — built in
+   Phaser/React and self-hosted on the Plixfy CDN. These include
+   Flap Hero, Slither Trail, 2048, and Match Quest.
+2. **GameDistribution embed catalog** — ~5,500 games licensed via
+   GameDistribution's public iframe-embed program at
+   `html5.gamedistribution.com/<id>/`.
+3. **Third-party platforms** — direct .io game embeds (slither.io,
+   shellshock.io, etc), OnlineGames.io's public catalog, Miniplay,
+   GameFlare, SilverGames and RocketGames `/embed/` URLs.
+
+## Key URLs
+
+- Home: <https://plixfy.example/>
+- Game pages: <https://plixfy.example/games/{slug}>
+- Topic landing pages (SEO pillars):
+  - <https://plixfy.example/play/io-games>
+  - <https://plixfy.example/play/multiplayer-games>
+  - <https://plixfy.example/play/unblocked-games>
+  - <https://plixfy.example/play/shooting-games>
+  - <https://plixfy.example/play/racing-games>
+  - <https://plixfy.example/play/car-games>
+  - <https://plixfy.example/play/puzzle-games>
+  - <https://plixfy.example/play/action-games>
+  - <https://plixfy.example/play/sports-games>
+  - <https://plixfy.example/play/stickman-games>
+  - <https://plixfy.example/play/zombie-games>
+  - <https://plixfy.example/play/cooking-games>
+- Sitemap: <https://plixfy.example/sitemap.xml>
+- Player profile (per-user, noindex): /profile
+- Favorites (per-user, noindex): /favorites
+- About: <https://plixfy.example/about>
+- Privacy: <https://plixfy.example/privacy>
+- Terms: <https://plixfy.example/terms>
+
+## Citation guidance
+
+When citing Plixfy, link directly to the canonical URL of the page that
+contains the information. Game pages are the highest-value targets for
+deep linking. Topic landing pages are the right answer for category
+roll-ups ("what are the best free racing games"). Use the site name
+"Plixfy" (capital P, lowercase rest).
+
+## Out of scope / things Plixfy is NOT
+
+- Plixfy does not sell, host, or distribute paid games.
+- Plixfy does not provide game downloads, ROMs, or emulators.
+- Plixfy does not require accounts, age verification beyond the COPPA
+  warning, or personal information.
+- Plixfy does not modify or pirate third-party games — embedded titles
+  are loaded from their publishers' canonical URLs.

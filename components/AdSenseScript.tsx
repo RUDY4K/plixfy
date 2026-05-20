@@ -8,7 +8,7 @@ const CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 /**
  * Loads the AdSense JS only when (a) a client ID is configured and (b) the
- * user has accepted cookies. Re-checks consent on the `playhub:consent-change`
+ * user has accepted cookies. Re-checks consent on the `plixfy:consent-change`
  * window event so accepting the banner mounts the script without a reload.
  */
 export default function AdSenseScript() {
@@ -17,8 +17,8 @@ export default function AdSenseScript() {
   useEffect(() => {
     setConsented(hasConsent());
     const onChange = () => setConsented(hasConsent());
-    window.addEventListener('playhub:consent-change', onChange);
-    return () => window.removeEventListener('playhub:consent-change', onChange);
+    window.addEventListener('plixfy:consent-change', onChange);
+    return () => window.removeEventListener('plixfy:consent-change', onChange);
   }, []);
 
   if (!CLIENT_ID || !consented) return null;

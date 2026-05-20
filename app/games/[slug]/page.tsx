@@ -6,11 +6,81 @@ import GameCard from '@/components/GameCard';
 import AdPlacement from '@/components/AdPlacement';
 import FavoriteButton from '@/components/FavoriteButton';
 import PlayTracker from '@/components/PlayTracker';
+import PlayTimer from '@/components/PlayTimer';
+import Leaderboard from '@/components/Leaderboard';
+import ChallengeBanner from '@/components/ChallengeBanner';
+import ShareGameActions from '@/components/ShareGameActions';
+import RatingButtons from '@/components/RatingButtons';
 import { baseCount, formatPlayCount } from '@/lib/userState';
 import GameStage from './GameStage';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://plixfy.example';
+
 interface Params {
   slug: string;
+}
+
+/**
+ * Build a 150-160 char meta description. Logic:
+ *   1. Start with the game's short description (≤ 140 chars in our
+ *      registry).
+ *   2. If too short, splice in category context + the canonical CTA
+ *      tail until we land in 150-160. We prefer one clean concatenation
+ *      over keyword stuffing.
+ *   3. Hard-cap at 160 chars — Google truncates beyond that and adds
+ *      its own ellipsis we don't control.
+ */
+function makeMetaDescription(game: ReturnType<typeof findGame>): string {
+  if (!game) return '';
+  const base = (game.description || `${game.title} — free online game.`).trim().replace(/\.+$/, '');
+  const cat = game.category.charAt(0).toUpperCase() + game.category.slice(1);
+  // Tail variants of increasing length — we pick the shortest one that
+  // pushes us into the 150-160 target window.
+  const tails = [
+    ` Play ${game.title} free on Plixfy — no download.`,
+    ` Play ${game.title} free in your browser on Plixfy — no download, no signup.`,
+    ` Play ${game.title} free on Plixfy — instant ${cat} game in your browser, no download required.`,
+  ];
+  let out = base + '.';
+  for (const tail of tails) {
+    const candidate = base + '.' + tail;
+    if (candidate.length >= 150 && candidate.length <= 160) {
+      return candidate;
+    }
+    if (candidate.length > out.length && candidate.length <= 160) {
+      out = candidate;
+    }
+  }
+  // If the longest tail still leaves us short, fall through; if any
+  // candidate overshoots 160, truncate at a word boundary.
+  if (out.length > 160) {
+    const slice = out.slice(0, 157);
+    const lastSpace = slice.lastIndexOf(' ');
+    out = (lastSpace > 100 ? slice.slice(0, lastSpace) : slice) + '…';
+  }
+  return out;
+}
+
+/**
+ * Mapping from registry category to the canonical SEO landing-page slug
+ * (when we have one). Falls back to the catalog filter URL otherwise.
+ */
+const CATEGORY_TO_TOPIC: Record<string, string> = {
+  io: 'io-games',
+  multiplayer: 'multiplayer-games',
+  shooting: 'shooting-games',
+  racing: 'racing-games',
+  puzzle: 'puzzle-games',
+  action: 'action-games',
+  sports: 'sports-games',
+  stickman: 'stickman-games',
+  zombie: 'zombie-games',
+  cooking: 'cooking-games',
+};
+
+function categoryHref(category: string): string {
+  const topic = CATEGORY_TO_TOPIC[category];
+  return topic ? `/play/${topic}` : `/#games?category=${category}`;
 }
 
 export async function generateStaticParams(): Promise<Params[]> {
@@ -26,21 +96,30 @@ export async function generateMetadata({
   const game = findGame(slug);
   if (!game) return { title: 'Not found' };
   const path = `/games/${game.slug}`;
+  // Title format matches the SEO spec exactly: hyphen + pipe, no em-dash.
+  // The `template` in app/layout.tsx auto-appends ` | Plixfy`.
+  const title = `${game.title} - Play Free Online`;
+  const description = makeMetaDescription(game);
+  // Thumbnails on the home grid live at /assets/thumbnails/... — those
+  // paths are relative to the site root, which is exactly what OG needs.
+  const ogImage = game.thumbnail || '/og-default.svg';
   return {
-    title: `${game.title} — Play Free Online`,
-    description: game.longDescription,
+    title,
+    description,
     keywords: game.keywords,
     alternates: { canonical: path },
     openGraph: {
-      title: `${game.title} — PlayHub`,
-      description: game.description,
+      title: `${game.title} - Plixfy`,
+      description,
       type: 'website',
       url: path,
+      images: [{ url: ogImage, alt: `${game.title} screenshot` }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${game.title} — Play Free Online`,
-      description: game.description,
+      title,
+      description,
+      images: [ogImage],
     },
   };
 }
@@ -56,17 +135,48 @@ export default async function GamePage({
 
   const related = relatedGames(game.slug, 8);
   const playCount = game.kind === 'embed' ? baseCount(game.slug) : null;
+  const categoryLabel = game.category.charAt(0).toUpperCase() + game.category.slice(1);
 
+  // Combined JSON-LD: VideoGame metadata + BreadcrumbList. Using @graph
+  // lets us emit both in a single <script> tag — cleaner and lets
+  // Google's parser deduplicate references.
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'VideoGame',
-    name: game.title,
-    description: game.longDescription,
-    genre: game.category,
-    gamePlatform: 'Web Browser',
-    applicationCategory: 'Game',
-    operatingSystem: 'Any',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    '@graph': [
+      {
+        '@type': 'VideoGame',
+        '@id': `${SITE_URL}/games/${game.slug}#game`,
+        name: game.title,
+        description: game.longDescription,
+        url: `${SITE_URL}/games/${game.slug}`,
+        image: game.thumbnail.startsWith('http') ? game.thumbnail : `${SITE_URL}${game.thumbnail}`,
+        genre: game.category,
+        gamePlatform: 'Web Browser',
+        applicationCategory: 'Game',
+        operatingSystem: 'Any',
+        inLanguage: 'en',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        publisher: { '@id': `${SITE_URL}#org` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: categoryLabel,
+            item: `${SITE_URL}${categoryHref(game.category)}`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: game.title,
+            item: `${SITE_URL}/games/${game.slug}`,
+          },
+        ],
+      },
+    ],
   };
 
   return (
@@ -76,13 +186,25 @@ export default async function GamePage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <PlayTracker slug={game.slug} />
+      <PlayTimer slug={game.slug} />
 
-      <nav className="mb-4 text-sm text-neutral-500">
-        <Link href="/" className="hover:text-white">← All games</Link>
-        <span className="px-2 text-neutral-700">/</span>
-        <Link href={`/#games?category=${game.category}`} className="capitalize hover:text-white">
-          {game.category}
-        </Link>
+      {/* Semantic breadcrumb — Home › Category › Game */}
+      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-neutral-500">
+        <ol className="flex flex-wrap items-center gap-1.5">
+          <li>
+            <Link href="/" className="hover:text-white">Home</Link>
+          </li>
+          <li aria-hidden="true" className="text-neutral-700">›</li>
+          <li>
+            <Link href={categoryHref(game.category)} className="hover:text-white">
+              {categoryLabel}
+            </Link>
+          </li>
+          <li aria-hidden="true" className="text-neutral-700">›</li>
+          <li aria-current="page" className="line-clamp-1 max-w-[16rem] text-neutral-300">
+            {game.title}
+          </li>
+        </ol>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
@@ -113,11 +235,28 @@ export default async function GamePage({
             </div>
           )}
 
+          {game.status === 'live' && (
+            <ChallengeBanner gameTitle={game.title} />
+          )}
+
           <GameStage game={game} />
 
           <div className="mt-3 rounded-lg bg-neutral-900 px-4 py-2 text-sm text-neutral-400">
             <strong className="text-white">Controls:</strong> {game.controls}
           </div>
+
+          {game.status === 'live' && (
+            <div className="mt-4 flex flex-col gap-3">
+              <RatingButtons slug={game.slug} />
+              <ShareGameActions slug={game.slug} title={game.title} />
+            </div>
+          )}
+
+          {game.kind === 'custom' && game.status === 'live' && (
+            <div className="mt-6">
+              <Leaderboard slug={game.slug} unit="pts" />
+            </div>
+          )}
 
           {game.kind === 'embed' && game.status === 'live' && (
             <div className="mt-6">
@@ -141,7 +280,7 @@ export default async function GamePage({
 
           {game.kind === 'embed' && (
             <p className="mt-6 text-xs text-neutral-600">
-              This game is provided by a third-party publisher. PlayHub does not control its
+              This game is provided by a third-party publisher. Plixfy does not control its
               content or in-game ads.
             </p>
           )}

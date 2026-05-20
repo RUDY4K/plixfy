@@ -13,7 +13,7 @@ function emit(level: Level, args: unknown[]): void {
           console.warn
         : // eslint-disable-next-line no-console
           console.log;
-  fn(`[playhub:${level}]`, ...args);
+  fn(`[plixfy:${level}]`, ...args);
 }
 
 export const log = {

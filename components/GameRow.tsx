@@ -1,14 +1,14 @@
 'use client';
 
 import { useRef } from 'react';
-import type { GameMeta } from '@/types/game';
+import type { LightGameMeta } from '@/types/game';
 import GameCard from './GameCard';
 
 interface GameRowProps {
   title: string;
   subtitle?: string;
   icon?: string;
-  games: readonly GameMeta[];
+  games: readonly LightGameMeta[];
   /** Optional "see all" link target, e.g. "?category=racing" */
   href?: string;
 }

@@ -48,8 +48,8 @@ export default function AdPlacement({ slot, label, game }: AdPlacementProps) {
   useEffect(() => {
     setConsented(hasConsent());
     const onChange = () => setConsented(hasConsent());
-    window.addEventListener('playhub:consent-change', onChange);
-    return () => window.removeEventListener('playhub:consent-change', onChange);
+    window.addEventListener('plixfy:consent-change', onChange);
+    return () => window.removeEventListener('plixfy:consent-change', onChange);
   }, []);
 
   const adSlotId = SLOT_IDS[slot];

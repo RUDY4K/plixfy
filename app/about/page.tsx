@@ -2,23 +2,23 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'About',
-  description: 'About PlayHub — a free browser games portal. No accounts, no downloads.',
+  description: 'About Plixfy — a free browser games portal. No accounts, no downloads.',
   alternates: { canonical: '/about' },
 };
 
 const FAQ = [
-  { q: 'Are the games really free?', a: 'Yes — every game on PlayHub is free to play.' },
+  { q: 'Are the games really free?', a: 'Yes — every game on Plixfy is free to play.' },
   { q: 'Do I need to download anything?', a: 'No. Games run directly in your browser.' },
   { q: 'Can I play on mobile?', a: 'Yes — every game supports touch controls.' },
-  { q: 'How do I report a bug?', a: 'Email us at support@playhub.example.' },
+  { q: 'How do I report a bug?', a: 'Email us at support@plixfy.example.' },
 ];
 
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-3xl font-extrabold tracking-tight">About PlayHub</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight">About Plixfy</h1>
       <p className="mt-4 text-neutral-400">
-        PlayHub is a small portal of free casual browser games. No accounts, no downloads, no
+        Plixfy is a small portal of free casual browser games. No accounts, no downloads, no
         paywalls — just open a game and play. Built by a solo developer who likes shipping things.
       </p>
 

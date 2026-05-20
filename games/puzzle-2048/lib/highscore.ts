@@ -1,4 +1,6 @@
 import { getHighScore, setHighScore } from '@/lib/storage';
+import { countChampionships, submitScore } from '@/lib/leaderboard';
+import { evaluate, getSessionPlays } from '@/lib/achievements';
 
 const KEY = 'puzzle-2048';
 
@@ -7,5 +9,11 @@ export function loadBest(): number {
 }
 
 export function recordScore(score: number): number {
-  return setHighScore(KEY, score);
+  const newBest = setHighScore(KEY, score);
+  submitScore(KEY, score, 'higher-better');
+  evaluate({
+    sessionPlays: getSessionPlays(),
+    championships: countChampionships(),
+  });
+  return newBest;
 }

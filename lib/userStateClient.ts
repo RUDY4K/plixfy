@@ -11,12 +11,12 @@ import { log } from './logger';
  * boundary. Pure helpers (baseCount, formatPlayCount, dailyIndex, …)
  * live in `./userState.ts` so server components can use them.
  *
- * Reactivity: every mutation fires a custom 'playhub:state' event; hooks
+ * Reactivity: every mutation fires a custom 'plixfy:state' event; hooks
  * subscribe to that plus the native 'storage' event for cross-tab sync.
  */
 
-const PREFIX = 'playhub:';
-const EVENT = 'playhub:state';
+const PREFIX = 'plixfy:';
+const EVENT = 'plixfy:state';
 const MAX_RECENT = 12;
 
 const KEYS = {

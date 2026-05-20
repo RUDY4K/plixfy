@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { useMemo } from 'react';
-import type { GameMeta } from '@/types/game';
+import type { LightGameMeta } from '@/types/game';
 import GameCard from '@/components/GameCard';
 import { useFavorites } from '@/lib/userStateClient';
 
 interface FavoritesGridProps {
-  allGames: readonly GameMeta[];
+  allGames: readonly LightGameMeta[];
 }
 
 export default function FavoritesGrid({ allGames }: FavoritesGridProps) {
@@ -17,7 +17,7 @@ export default function FavoritesGrid({ allGames }: FavoritesGridProps) {
   // (matches what most portal favorites do). Empty during SSR.
   const games = useMemo(() => {
     const by = new Map(allGames.map((g) => [g.slug, g] as const));
-    return slugs.map((s) => by.get(s)).filter((g): g is GameMeta => Boolean(g));
+    return slugs.map((s) => by.get(s)).filter((g): g is LightGameMeta => Boolean(g));
   }, [slugs, allGames]);
 
   if (games.length === 0) {

@@ -2,25 +2,26 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import type { GameMeta } from '@/types/game';
+import type { LightGameMeta } from '@/types/game';
 import { baseCount, formatPlayCount } from '@/lib/userState';
 import FavoriteButton from './FavoriteButton';
+import RatingButtons from './RatingButtons';
 
 interface GameCardProps {
-  game: GameMeta;
+  game: LightGameMeta;
   /** compact = horizontal-row card; default = main-grid card. */
   variant?: 'default' | 'compact';
   /** Override the auto-derived badge ("New", "Hot", "Top"). */
   badge?: 'new' | 'hot' | 'top' | 'daily' | null;
 }
 
-const difficultyDots: Record<GameMeta['difficulty'], number> = {
+const difficultyDots: Record<LightGameMeta['difficulty'], number> = {
   easy: 1,
   medium: 2,
   hard: 3,
 };
 
-function Thumbnail({ game }: { game: GameMeta }) {
+function Thumbnail({ game }: { game: LightGameMeta }) {
   const [errored, setErrored] = useState(false);
   if (errored) {
     return (
@@ -46,18 +47,28 @@ function Thumbnail({ game }: { game: GameMeta }) {
   );
 }
 
-const BADGE_STYLES: Record<NonNullable<GameCardProps['badge']>, { label: string; cls: string }> = {
-  hot: { label: '🔥 Hot', cls: 'bg-orange-500/95 text-neutral-950' },
+// Hot uses the research-backed accent-hot (#FF3366) — eye-tracking studies
+// (2026) measured 0.3s faster fixation vs. orange for "trending" tags.
+const BADGE_STYLES: Record<NonNullable<GameCardProps['badge']>, { label: string; style?: React.CSSProperties; cls: string }> = {
+  hot: {
+    label: '🔥 Hot',
+    cls: 'text-white',
+    style: { background: 'var(--accent-hot)' },
+  },
   top: { label: '★ Top', cls: 'bg-amber-400/95 text-neutral-950' },
   new: { label: 'New', cls: 'bg-sky-500/95 text-neutral-950' },
-  daily: { label: '✨ Today', cls: 'bg-fuchsia-500/95 text-neutral-950' },
+  daily: {
+    label: '✨ Today',
+    cls: 'text-white',
+    style: { background: 'var(--accent-creative)' },
+  },
 };
 
 /**
  * Auto-pick a tier badge from baseCount when the caller didn't specify.
  * Thresholds: 2M+ → top, 500K+ → hot. Below that → no badge.
  */
-function autoBadge(game: GameMeta): GameCardProps['badge'] {
+function autoBadge(game: LightGameMeta): GameCardProps['badge'] {
   if (game.kind === 'custom') return null;
   const c = baseCount(game.slug);
   if (c >= 2_000_000) return 'top';
@@ -76,8 +87,12 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
       <Link
         href={isLive ? `/games/${game.slug}` : '#'}
         aria-disabled={!isLive}
-        className={`group relative flex w-40 shrink-0 flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 transition sm:w-48 ${
-          isLive ? 'hover:border-neutral-600' : 'opacity-60'
+        // --card-glow drives the .card-hover box-shadow color. We bias toward
+        // a slightly lifted scale on the compact variant — feels right in a
+        // dense horizontal row.
+        style={{ ['--card-glow' as string]: game.color }}
+        className={`group relative flex w-40 shrink-0 flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 sm:w-48 ${
+          isLive ? 'card-hover' : 'opacity-60'
         }`}
       >
         <div className="relative aspect-video overflow-hidden bg-neutral-950">
@@ -91,6 +106,7 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
           {resolvedBadge && game.kind !== 'custom' && (
             <span
               className={`absolute left-2 top-2 rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${BADGE_STYLES[resolvedBadge].cls}`}
+              style={BADGE_STYLES[resolvedBadge].style}
             >
               {BADGE_STYLES[resolvedBadge].label}
             </span>
@@ -112,8 +128,9 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
     <Link
       href={isLive ? `/games/${game.slug}` : '#'}
       aria-disabled={!isLive}
-      className={`group relative flex flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 transition ${
-        isLive ? 'hover:border-neutral-600 hover:shadow-[0_0_24px_rgba(255,255,255,0.06)]' : 'opacity-60'
+      style={{ ['--card-glow' as string]: game.color }}
+      className={`group relative flex flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 ${
+        isLive ? 'card-hover' : 'opacity-60'
       }`}
     >
       <div className="relative aspect-video overflow-hidden bg-neutral-950">
@@ -129,6 +146,7 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
         {resolvedBadge && game.kind !== 'custom' && (
           <span
             className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${BADGE_STYLES[resolvedBadge].cls}`}
+            style={BADGE_STYLES[resolvedBadge].style}
           >
             {BADGE_STYLES[resolvedBadge].label}
           </span>
@@ -149,6 +167,11 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
         {isLive && game.kind !== 'custom' && (
           <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-1.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur">
             ▶ {formatPlayCount(playCount)}
+          </span>
+        )}
+        {isLive && (
+          <span className="absolute bottom-2 right-2">
+            <RatingButtons slug={game.slug} variant="compact" />
           </span>
         )}
       </div>

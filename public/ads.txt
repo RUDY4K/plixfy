@@ -1,4 +1,4 @@
-# PlayHub ads.txt
+# Plixfy ads.txt
 # Replace with your AdSense publisher ID once approved (Month 2+).
 # Format: domain, publisher ID, relationship, certification authority ID
 #
