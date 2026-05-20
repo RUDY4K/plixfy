@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Plixfy">
+  <title>Plixfy — Play P</title>
+  <rect width="64" height="64" rx="14" fill="#0B0F1A"/>
+  <!-- Outer P silhouette in cyan -->
+  <path d="M18 12h18a12 12 0 0 1 0 24H26v16h-8V12z" fill="#00C8FF"/>
+  <!-- Bowl negative space: dark cutout sized to host the play triangle -->
+  <path d="M26 20h10a4 4 0 0 1 0 8H26z" fill="#0B0F1A"/>
+  <!-- Pink play triangle sitting inside the bowl as counter -->
+  <path d="M28 21.5 L34 24 L28 26.5 Z" fill="#FF3366"/>
+</svg>

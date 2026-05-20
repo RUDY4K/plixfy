@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Plixfy">
+  <title>Plixfy — Block P</title>
+  <rect width="64" height="64" rx="14" fill="#0B0F1A"/>
+  <!-- Block P: bold filled stem + bowl, cyan glyph -->
+  <path d="M18 12h18a12 12 0 0 1 0 24H26v16h-8V12zm8 8v8h10a4 4 0 0 0 0-8H26z" fill="#00C8FF"/>
+  <!-- Pink pixel accent in the bowl corner -->
+  <rect x="34" y="22" width="4" height="4" fill="#FF3366"/>
+</svg>

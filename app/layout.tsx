@@ -28,19 +28,24 @@ export const metadata: Metadata = {
     'io games', 'unblocked games', 'multiplayer games', 'free games no download',
   ],
   alternates: { canonical: '/' },
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
     title: `${SITE_NAME} - Free Browser Games`,
     description: 'Play 5,000+ free casual browser games. No download, no signup, plays instantly.',
     url: SITE_URL,
-    images: ['/og-default.svg'],
+    images: ['/og-default.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: `${SITE_NAME} - Free Browser Games`,
     description: 'Free browser games — play instantly on any device.',
-    images: ['/og-default.svg'],
+    images: ['/og-default.png'],
   },
   ...(GSC_VERIFICATION
     ? { verification: { google: GSC_VERIFICATION } }
@@ -67,7 +72,7 @@ const rootJsonLd = {
       '@id': `${SITE_URL}#org`,
       name: SITE_NAME,
       url: SITE_URL,
-      logo: `${SITE_URL}/og-default.svg`,
+      logo: `${SITE_URL}/logo-full.svg`,
       sameAs: [
         // Placeholders — replace with real handles when accounts go live.
         'https://twitter.com/plixfy',

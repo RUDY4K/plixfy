@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" role="img" aria-label="Plixfy">
+  <title>Plixfy</title>
+  <!-- Wordmark only: cyan letters, pink square replaces the i-dot for personality -->
+  <g font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="52" fill="#00C8FF" letter-spacing="-1.5">
+    <text x="0" y="48">Pl</text>
+    <text x="48" y="48">xfy</text>
+  </g>
+  <!-- Stem of the 'i' -->
+  <rect x="54" y="22" width="8" height="26" fill="#00C8FF"/>
+  <!-- Pink pixel i-dot accent -->
+  <rect x="54" y="10" width="8" height="8" fill="#FF3366"/>
+</svg>

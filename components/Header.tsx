@@ -12,9 +12,35 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-neutral-900 bg-neutral-950/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-white">
-          <span className="inline-block h-6 w-6 rounded-md bg-gradient-to-br from-green-400 to-emerald-600" />
-          Plixfy
+        <Link href="/" aria-label="Plixfy home" className="flex items-center gap-2">
+          {/* Inline SVG: icon + wordmark, brand-accurate, no network hop */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 340 80"
+            className="h-7 w-auto"
+            role="img"
+            aria-label="Plixfy"
+          >
+            <g>
+              <rect y="8" width="64" height="64" rx="14" fill="#0B0F1A" />
+              <path d="M18 20h18a12 12 0 0 1 0 24H26v16h-8V20z" fill="#00C8FF" />
+              <path d="M26 28h10a4 4 0 0 1 0 8H26z" fill="#0B0F1A" />
+              <path d="M28 29.5 L34 32 L28 34.5 Z" fill="#FF3366" />
+            </g>
+            <g
+              transform="translate(80,16)"
+              fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+              fontWeight="800"
+              fontSize="52"
+              fill="#00C8FF"
+              letterSpacing="-1.5"
+            >
+              <text x="0" y="48">Pl</text>
+              <text x="48" y="48">xfy</text>
+            </g>
+            <rect x="134" y="38" width="8" height="26" fill="#00C8FF" />
+            <rect x="134" y="26" width="8" height="8" fill="#FF3366" />
+          </svg>
         </Link>
         <nav className="flex items-center gap-3 text-sm text-neutral-400 sm:gap-5">
           <RandomGameLink liveSlugs={LIVE_SLUGS} />

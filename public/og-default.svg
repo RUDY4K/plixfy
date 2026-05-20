@@ -1,76 +1,47 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#00C8FF"/>
-      <stop offset="55%" stop-color="#1A1F2E"/>
-      <stop offset="100%" stop-color="#0B0F1A"/>
+      <stop offset="0" stop-color="#0B0F1A"/>
+      <stop offset="1" stop-color="#11182B"/>
     </linearGradient>
-    <radialGradient id="glow" cx="20%" cy="35%" r="55%">
-      <stop offset="0%" stop-color="rgba(0,200,255,0.55)"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
-    </radialGradient>
-    <linearGradient id="logoChip" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#34D399"/>
-      <stop offset="100%" stop-color="#059669"/>
+    <linearGradient id="card1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00C8FF" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#00C8FF" stop-opacity="0.04"/>
+    </linearGradient>
+    <linearGradient id="card2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF3366" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#FF3366" stop-opacity="0.03"/>
     </linearGradient>
   </defs>
 
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect width="1200" height="630" fill="url(#glow)"/>
 
-  <!-- Floating game-card silhouettes for visual texture -->
-  <g opacity="0.18" fill="#ffffff">
-    <rect x="780" y="80" width="170" height="100" rx="16"/>
-    <rect x="960" y="160" width="170" height="100" rx="16"/>
-    <rect x="850" y="280" width="170" height="100" rx="16"/>
-    <rect x="1000" y="400" width="170" height="100" rx="16"/>
-    <rect x="780" y="480" width="170" height="100" rx="16"/>
+  <g opacity="0.9">
+    <rect x="60"   y="430" width="160" height="120" rx="14" fill="url(#card1)"/>
+    <rect x="240"  y="450" width="160" height="120" rx="14" fill="url(#card2)"/>
+    <rect x="420"  y="470" width="160" height="120" rx="14" fill="url(#card1)"/>
+    <rect x="780"  y="60"  width="160" height="120" rx="14" fill="url(#card2)"/>
+    <rect x="960"  y="80"  width="160" height="120" rx="14" fill="url(#card1)"/>
+    <rect x="1050" y="430" width="160" height="120" rx="14" fill="url(#card2)"/>
   </g>
 
-  <!-- Brand chip -->
-  <g transform="translate(80, 110)">
-    <rect width="60" height="60" rx="16" fill="url(#logoChip)"/>
-    <text x="80" y="48" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-          font-size="48" font-weight="800" fill="#ffffff" letter-spacing="-0.02em">Plixfy</text>
+  <g transform="translate(280,180)">
+    <g transform="scale(3.5)">
+      <rect width="64" height="64" rx="14" fill="#0B0F1A"/>
+      <path d="M18 12h18a12 12 0 0 1 0 24H26v16h-8V12z" fill="#00C8FF"/>
+      <path d="M26 20h10a4 4 0 0 1 0 8H26z" fill="#0B0F1A"/>
+      <path d="M28 21.5 L34 24 L28 26.5 Z" fill="#FF3366"/>
+    </g>
+    <g transform="translate(260,55)" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="140" fill="#00C8FF" letter-spacing="-4">
+      <text x="0" y="120">Pl</text>
+      <text x="128" y="120">xfy</text>
+    </g>
+    <rect x="378" y="80" width="22" height="70" fill="#00C8FF"/>
+    <rect x="378" y="48" width="22" height="22" fill="#FF3366"/>
   </g>
 
-  <!-- Headline -->
-  <text x="80" y="270"
-        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="86" font-weight="900" fill="#ffffff" letter-spacing="-0.02em">
-    5,000+ Free
-  </text>
-  <text x="80" y="370"
-        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="86" font-weight="900" fill="#ffffff" letter-spacing="-0.02em">
-    Browser Games
-  </text>
-
-  <!-- Subhead -->
-  <text x="80" y="445"
-        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="32" font-weight="500" fill="#B5BBC9">
-    Play instantly. No download. No signup.
-  </text>
-
-  <!-- Category pills -->
-  <g font-family="system-ui, sans-serif" font-size="20" font-weight="700" fill="#0B0F1A">
-    <g transform="translate(80, 510)">
-      <rect width="120" height="44" rx="22" fill="#FFD24A"/>
-      <text x="60" y="29" text-anchor="middle">🎯 FPS</text>
-    </g>
-    <g transform="translate(216, 510)">
-      <rect width="140" height="44" rx="22" fill="#7CD1FF"/>
-      <text x="70" y="29" text-anchor="middle">🌐 .io</text>
-    </g>
-    <g transform="translate(370, 510)">
-      <rect width="150" height="44" rx="22" fill="#7FDE4A"/>
-      <text x="75" y="29" text-anchor="middle">🏁 Racing</text>
-    </g>
-    <g transform="translate(536, 510)">
-      <rect width="150" height="44" rx="22" fill="#F472B6"/>
-      <text x="75" y="29" text-anchor="middle">🧩 Puzzle</text>
-    </g>
+  <g font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" text-anchor="middle">
+    <text x="600" y="510" font-size="44" font-weight="700" fill="#FFFFFF">5,000+ Free Browser Games</text>
+    <text x="600" y="558" font-size="26" font-weight="500" fill="#8FA0B5">Instant play. No download. No signup.</text>
   </g>
 </svg>

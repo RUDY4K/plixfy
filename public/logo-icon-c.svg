@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Plixfy">
+  <title>Plixfy — Trail P</title>
+  <rect width="64" height="64" rx="14" fill="#0B0F1A"/>
+  <!-- Bold P glyph in cyan -->
+  <path d="M22 12h18a12 12 0 0 1 0 24H30v16h-8V12zm8 8v8h10a4 4 0 0 0 0-8H30z" fill="#00C8FF"/>
+  <!-- Pink pixel trail cascading off the stem -->
+  <rect x="14" y="46" width="5" height="5" fill="#FF3366"/>
+  <rect x="8"  y="50" width="4" height="4" fill="#FF3366" opacity="0.7"/>
+  <rect x="3"  y="54" width="3" height="3" fill="#FF3366" opacity="0.45"/>
+</svg>

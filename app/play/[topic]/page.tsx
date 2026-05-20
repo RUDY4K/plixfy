@@ -191,13 +191,13 @@ export async function generateMetadata({
       description: t.metaDescription,
       type: 'website',
       url: `/play/${t.slug}`,
-      images: ['/og-default.svg'],
+      images: ['/og-default.png'],
     },
     twitter: {
       card: 'summary_large_image',
       title: t.metaTitle,
       description: t.metaDescription,
-      images: ['/og-default.svg'],
+      images: ['/og-default.png'],
     },
   };
 }

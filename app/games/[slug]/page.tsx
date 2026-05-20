@@ -102,7 +102,7 @@ export async function generateMetadata({
   const description = makeMetaDescription(game);
   // Thumbnails on the home grid live at /assets/thumbnails/... — those
   // paths are relative to the site root, which is exactly what OG needs.
-  const ogImage = game.thumbnail || '/og-default.svg';
+  const ogImage = game.thumbnail || '/og-default.png';
   return {
     title,
     description,
