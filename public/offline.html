@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>You're offline — Plixfy</title>
+    <meta name="theme-color" content="#00C8FF" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background: #0B0F1A;
+        color: #f5f5f5;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+      main {
+        max-width: 28rem;
+        text-align: center;
+        padding: 2rem 1.5rem;
+        border-radius: 1.25rem;
+        background: linear-gradient(180deg, #111827 0%, #0B0F1A 100%);
+        border: 1px solid #1f2937;
+        box-shadow: 0 20px 60px rgba(0, 200, 255, 0.08);
+      }
+      h1 { font-size: 1.5rem; font-weight: 800; margin: 1rem 0 0.5rem; }
+      p { color: #a3a3a3; font-size: 0.9rem; line-height: 1.5; margin: 0 0 1.25rem; }
+      .glyph { font-size: 3rem; line-height: 1; }
+      .retry {
+        display: inline-block;
+        background: #00C8FF;
+        color: #0B0F1A;
+        font-weight: 700;
+        padding: 0.6rem 1.25rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-size: 0.875rem;
+      }
+      .retry:hover { background: #5dd9ff; }
+      .small { font-size: 0.75rem; color: #6b7280; margin-top: 1rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="glyph" aria-hidden="true">📡</div>
+      <h1>You&rsquo;re offline</h1>
+      <p>Connect to play 5,000+ games on Plixfy.</p>
+      <a class="retry" href="/" onclick="event.preventDefault(); location.reload();">Try again</a>
+      <p class="small">Some pages you&rsquo;ve already visited may still work — try navigating back.</p>
+    </main>
+  </body>
+</html>

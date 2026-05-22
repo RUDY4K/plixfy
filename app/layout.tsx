@@ -9,6 +9,9 @@ import CookieConsent from '@/components/CookieConsent';
 import AdSenseScript from '@/components/AdSenseScript';
 import AchievementToast from '@/components/AchievementToast';
 import FavoritesSync from '@/components/FavoritesSync';
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
+import InstallPrompt from '@/components/InstallPrompt';
+import MobileBottomNav from '@/components/MobileBottomNav';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
@@ -30,10 +33,22 @@ export const metadata: Metadata = {
     'io games', 'unblocked games', 'multiplayer games', 'free games no download',
   ],
   alternates: { canonical: '/' },
+  manifest: '/manifest.webmanifest',
+  applicationName: SITE_NAME,
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: 'black-translucent',
+  },
+  formatDetection: { telephone: false },
   icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
     shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   openGraph: {
     type: 'website',
@@ -55,9 +70,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0a0a0a',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#00C8FF' },
+    { media: '(prefers-color-scheme: dark)', color: '#0B0F1A' },
+  ],
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
 };
 
 /**
@@ -174,13 +193,18 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{ __html: JSON.stringify(rootJsonLd) }}
           />
           <Header />
-          <main className="flex-1">{children}</main>
+          {/* pb on mobile leaves room for the fixed MobileBottomNav so
+              content (cards, footer) isn't covered by the nav bar. */}
+          <main className="flex-1 pb-16 md:pb-0">{children}</main>
           <FooterAd />
           <Footer />
           <CookieConsent />
           <AdSenseScript />
           <AchievementToast />
           <FavoritesSync />
+          <ServiceWorkerRegister />
+          <InstallPrompt />
+          <MobileBottomNav />
         </body>
       </html>
     </ClerkProvider>
