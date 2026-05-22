@@ -7,16 +7,10 @@ import AdPlacement from '@/components/AdPlacement';
 import FavoriteButton from '@/components/FavoriteButton';
 import PlayTracker from '@/components/PlayTracker';
 import PlayTimer from '@/components/PlayTimer';
-import GlobalLeaderboard from '@/components/GlobalLeaderboard';
 import ChallengeBanner from '@/components/ChallengeBanner';
 import ShareGameActions from '@/components/ShareGameActions';
 import RatingButtons from '@/components/RatingButtons';
-import Comments from '@/components/Comments';
 import { baseCount, formatPlayCount } from '@/lib/userState';
-import { listComments } from '@/lib/comments';
-import { getGameRating } from '@/lib/ratings-server';
-import { getGlobalLeaderboard } from '@/lib/leaderboard-server';
-import { getCurrentDbUser } from '@/lib/users';
 import GameStage from './GameStage';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://plixfy.example';
@@ -26,21 +20,12 @@ interface Params {
 }
 
 /**
- * Build a 150-160 char meta description. Logic:
- *   1. Start with the game's short description (≤ 140 chars in our
- *      registry).
- *   2. If too short, splice in category context + the canonical CTA
- *      tail until we land in 150-160. We prefer one clean concatenation
- *      over keyword stuffing.
- *   3. Hard-cap at 160 chars — Google truncates beyond that and adds
- *      its own ellipsis we don't control.
+ * Build a 150-160 char meta description.
  */
 function makeMetaDescription(game: ReturnType<typeof findGame>): string {
   if (!game) return '';
   const base = (game.description || `${game.title} — free online game.`).trim().replace(/\.+$/, '');
   const cat = game.category.charAt(0).toUpperCase() + game.category.slice(1);
-  // Tail variants of increasing length — we pick the shortest one that
-  // pushes us into the 150-160 target window.
   const tails = [
     ` Play ${game.title} free on Plixfy — no download.`,
     ` Play ${game.title} free in your browser on Plixfy — no download, no signup.`,
@@ -56,8 +41,6 @@ function makeMetaDescription(game: ReturnType<typeof findGame>): string {
       out = candidate;
     }
   }
-  // If the longest tail still leaves us short, fall through; if any
-  // candidate overshoots 160, truncate at a word boundary.
   if (out.length > 160) {
     const slice = out.slice(0, 157);
     const lastSpace = slice.lastIndexOf(' ');
@@ -66,10 +49,6 @@ function makeMetaDescription(game: ReturnType<typeof findGame>): string {
   return out;
 }
 
-/**
- * Mapping from registry category to the canonical SEO landing-page slug
- * (when we have one). Falls back to the catalog filter URL otherwise.
- */
 const CATEGORY_TO_TOPIC: Record<string, string> = {
   io: 'io-games',
   multiplayer: 'multiplayer-games',
@@ -101,12 +80,8 @@ export async function generateMetadata({
   const game = findGame(slug);
   if (!game) return { title: 'Not found' };
   const path = `/games/${game.slug}`;
-  // Title format matches the SEO spec exactly: hyphen + pipe, no em-dash.
-  // The `template` in app/layout.tsx auto-appends ` | Plixfy`.
   const title = `${game.title} - Play Free Online`;
   const description = makeMetaDescription(game);
-  // Thumbnails on the home grid live at /assets/thumbnails/... — those
-  // paths are relative to the site root, which is exactly what OG needs.
   const ogImage = game.thumbnail || '/og-default.png';
   return {
     title,
@@ -142,21 +117,6 @@ export default async function GamePage({
   const playCount = game.kind === 'embed' ? baseCount(game.slug) : null;
   const categoryLabel = game.category.charAt(0).toUpperCase() + game.category.slice(1);
 
-  // Fetch comments + current viewer in parallel for the game's comment thread.
-  // Falls through to empty list when Supabase isn't configured yet so the
-  // page still renders during local placeholder dev.
-  const viewer = await getCurrentDbUser().catch(() => null);
-  const [comments, serverRating, leaderboard] = await Promise.all([
-    listComments(game.slug, viewer?.id ?? null, 50).catch(() => []),
-    getGameRating(game.slug, viewer?.id ?? null).catch(() => undefined),
-    game.kind === 'custom'
-      ? getGlobalLeaderboard(game.slug, viewer?.id ?? null).catch(() => null)
-      : Promise.resolve(null),
-  ]);
-
-  // Combined JSON-LD: VideoGame metadata + BreadcrumbList. Using @graph
-  // lets us emit both in a single <script> tag — cleaner and lets
-  // Google's parser deduplicate references.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -205,7 +165,6 @@ export default async function GamePage({
       <PlayTracker slug={game.slug} />
       <PlayTimer slug={game.slug} />
 
-      {/* Semantic breadcrumb — Home › Category › Game */}
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-neutral-500">
         <ol className="flex flex-wrap items-center gap-1.5">
           <li>
@@ -264,14 +223,8 @@ export default async function GamePage({
 
           {game.status === 'live' && (
             <div className="mt-4 flex flex-col gap-3">
-              <RatingButtons slug={game.slug} serverRating={serverRating} />
+              <RatingButtons slug={game.slug} />
               <ShareGameActions slug={game.slug} title={game.title} />
-            </div>
-          )}
-
-          {game.kind === 'custom' && game.status === 'live' && leaderboard && (
-            <div className="mt-6">
-              <GlobalLeaderboard slug={game.slug} unit="pts" data={leaderboard} />
             </div>
           )}
 
@@ -279,10 +232,6 @@ export default async function GamePage({
             <div className="mt-6">
               <AdPlacement slot="below-game" label="Ad · 728×90 below game" />
             </div>
-          )}
-
-          {game.status === 'live' && (
-            <Comments gameSlug={game.slug} initialComments={comments} />
           )}
 
           {related.length > 0 && (

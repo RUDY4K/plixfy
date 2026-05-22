@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 import { log } from './logger';
+import { getProfile } from './profile';
 
 /**
  * Per-game top-10 leaderboard. Local-only for now — every device keeps its
@@ -108,12 +109,9 @@ export function getTop(slug: string): ScoreEntry[] {
 
 /**
  * Submit a score for `slug`. Returns the rank (1-indexed) if it made the
- * top 10, or `null` otherwise.
- *
- * The local leaderboard is anonymous-only — identity (nickname / avatar)
- * lives in Clerk now and is only accessible from React. The authoritative
- * cross-device leaderboard is `lib/leaderboard-server.ts` which the game
- * pages read from for the GlobalLeaderboard widget.
+ * top 10, or `null` otherwise. Falls back to "Anonymous" if no
+ * localStorage profile is set yet so a kid can still play without
+ * committing to a nickname.
  */
 export function submitScore(
   slug: string,
@@ -121,9 +119,10 @@ export function submitScore(
   direction: ScoreDirection = 'higher-better',
 ): number | null {
   if (!Number.isFinite(score)) return null;
+  const profile = getProfile();
   const entry: ScoreEntry = {
-    nickname: 'You',
-    avatar: '👾',
+    nickname: profile?.nickname ?? 'Anonymous',
+    avatar: profile?.avatar ?? '👾',
     score,
     at: Date.now(),
   };
@@ -152,21 +151,18 @@ export function useLeaderboard(slug: string): ScoreEntry[] {
   );
 }
 
-/**
- * Champion-badge counter. Returns the number of local leaderboards the
- * player tops (#1 with nickname "You"). Local-only signal — the
- * server-side leaderboard (lib/leaderboard-server) is where real
- * cross-device wins are tracked.
- */
+/** All leaderboards the user appears on at #1 — for the champion badge. */
 export function countChampionships(): number {
   if (typeof window === 'undefined') return 0;
+  const profile = getProfile();
+  if (!profile) return 0;
   let wins = 0;
   for (let i = 0; i < window.localStorage.length; i++) {
     const k = window.localStorage.key(i);
     if (!k || !k.startsWith(`${PREFIX}lb:`)) continue;
     const list = safeRead(k);
     if (list.length === 0) continue;
-    if (list[0]?.nickname === 'You') wins += 1;
+    if (list[0]?.nickname === profile.nickname) wins += 1;
   }
   return wins;
 }

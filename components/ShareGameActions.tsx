@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
 import { topScore } from '@/lib/leaderboard';
 import { buildChallengeUrl } from '@/lib/challenge';
+import { useProfile } from '@/lib/profile';
 import { buildTwitterUrl, buildWhatsappUrl, share } from '@/lib/share';
+import ProfileSetupModal from './ProfileSetupModal';
 
 interface ShareGameActionsProps {
   slug: string;
@@ -15,17 +15,16 @@ interface ShareGameActionsProps {
 /**
  * Two-button row beside the game: "Challenge a friend" and "Share".
  *
- * Challenge — needs a Clerk-authed player + a score on this game; if the
- * user isn't signed in we send them to /sign-in. If they're signed in but
- * haven't played a round yet we flash a hint. The challenge URL bakes the
- * score into the path so no backend is needed.
+ * Challenge — needs a localStorage profile + a score on this game; if
+ * either is missing we open the setup modal or flash a hint. The
+ * challenge URL bakes the score into the path so no backend is needed.
  *
  * Share — opens an action sheet (native Web Share if available, otherwise
  * Twitter / WhatsApp / copy-link).
  */
 export default function ShareGameActions({ slug, title }: ShareGameActionsProps) {
-  const router = useRouter();
-  const { isLoaded, isSignedIn, user } = useUser();
+  const profile = useProfile();
+  const [setupOpen, setSetupOpen] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [origin, setOrigin] = useState('');
@@ -40,9 +39,8 @@ export default function ShareGameActions({ slug, title }: ShareGameActionsProps)
   }
 
   function handleChallenge() {
-    if (!isLoaded) return;
-    if (!isSignedIn || !user) {
-      router.push('/sign-in');
+    if (!profile) {
+      setSetupOpen(true);
       return;
     }
     const score = topScore(slug);
@@ -50,14 +48,10 @@ export default function ShareGameActions({ slug, title }: ShareGameActionsProps)
       flash('Play a round first, then challenge!');
       return;
     }
-    const nickname = user.username ?? user.firstName ?? 'Player';
-    // Clerk doesn't ship emoji avatars — use the first letter of the
-    // handle (rendered as a glyph by the receiver's challenge page).
-    const avatar = nickname.slice(0, 1).toUpperCase();
     const url = buildChallengeUrl(origin, slug, {
       score,
-      nickname,
-      avatar,
+      nickname: profile.nickname,
+      avatar: profile.avatar,
     });
     void share({
       title: `${title} — Challenge`,
@@ -127,6 +121,8 @@ export default function ShareGameActions({ slug, title }: ShareGameActionsProps)
           </button>
         </div>
       )}
+
+      <ProfileSetupModal open={setupOpen} onClose={() => setSetupOpen(false)} />
     </>
   );
 }

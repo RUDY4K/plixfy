@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { LIGHT_GAMES } from '@/games/registry';
 import StreakWidget from './StreakWidget';
 import RandomGameLink from './RandomGameLink';
-import AuthChip from './AuthChip';
 
 // Cached at module-eval time — recomputed once per server boot, not per
 // request. Just the slugs of live games; full game objects stay server-side.
@@ -55,7 +54,6 @@ export default function Header() {
             About
           </Link>
           <StreakWidget />
-          <AuthChip />
         </nav>
       </div>
     </header>

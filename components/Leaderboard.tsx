@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
 import { useLeaderboard, type ScoreEntry } from '@/lib/leaderboard';
+import { useProfile } from '@/lib/profile';
+import ProfileSetupModal from './ProfileSetupModal';
 
 interface LeaderboardProps {
   slug: string;
@@ -19,13 +19,14 @@ interface LeaderboardProps {
 /**
  * Top-10 leaderboard for a game. Shows the rank, avatar, nickname and
  * score; rows belonging to the current player are highlighted. Renders a
- * "Sign in to claim" CTA when the visitor is anonymous so they know how
- * to attach scores to a real account.
+ * "Pick a nickname" CTA when no localStorage profile exists so the user
+ * knows their next score will save as Anonymous unless they set one up.
  */
 export default function Leaderboard({ slug, unit = 'pts', direction = 'higher-better' }: LeaderboardProps) {
   const entries = useLeaderboard(slug);
-  const { isLoaded, isSignedIn, user } = useUser();
+  const profile = useProfile();
   const [mounted, setMounted] = useState(false);
+  const [setupOpen, setSetupOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -42,7 +43,6 @@ export default function Leaderboard({ slug, unit = 'pts', direction = 'higher-be
   const ranked = entries; // Already sorted on write.
   const topScore = ranked[0]?.score;
   const cta = formatBeatCta(topScore, direction);
-  const myHandle = isLoaded && isSignedIn ? user?.username ?? user?.firstName ?? null : null;
 
   return (
     <section
@@ -53,13 +53,14 @@ export default function Leaderboard({ slug, unit = 'pts', direction = 'higher-be
         <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white">
           <span aria-hidden="true">🏆</span> Leaderboard
         </h3>
-        {isLoaded && !isSignedIn && (
-          <Link
-            href="/sign-in"
+        {!profile && (
+          <button
+            type="button"
+            onClick={() => setSetupOpen(true)}
             className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300"
           >
-            Sign in to claim →
-          </Link>
+            Pick a nickname →
+          </button>
         )}
       </header>
 
@@ -75,7 +76,7 @@ export default function Leaderboard({ slug, unit = 'pts', direction = 'higher-be
               rank={i + 1}
               entry={entry}
               unit={unit}
-              isMine={isMine(entry, myHandle)}
+              isMine={isMine(entry, profile?.nickname)}
             />
           ))}
         </ol>
@@ -86,6 +87,8 @@ export default function Leaderboard({ slug, unit = 'pts', direction = 'higher-be
           {cta}
         </p>
       )}
+
+      <ProfileSetupModal open={setupOpen} onClose={() => setSetupOpen(false)} />
     </section>
   );
 }
@@ -115,7 +118,7 @@ function Row({ rank, entry, unit, isMine }: { rank: number; entry: ScoreEntry; u
   );
 }
 
-function isMine(entry: ScoreEntry, nickname: string | null): boolean {
+function isMine(entry: ScoreEntry, nickname: string | undefined): boolean {
   if (!nickname) return false;
   return entry.nickname === nickname;
 }
