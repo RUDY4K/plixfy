@@ -3808,7 +3808,8 @@ const _EXTRA_GAMES = [
     keywords: ['bitlife — life simulator', 'simulation', 'bitlife', 'life', 'simulator', 'life simulator', 'free online'],
     status: 'live',
     provider: 'gamedistribution',
-    embedUrl: 'https://html5.gamedistribution.com/2e44fb60fd3f4606b1b06c17a2b9d60d/?gd_sdk_referrer_url=https://www.plixfy.com',
+    // TODO: re-enable referrer after GD approval
+    embedUrl: 'https://html5.gamedistribution.com/2e44fb60fd3f4606b1b06c17a2b9d60d/',
   },
   {
     kind: 'embed',
