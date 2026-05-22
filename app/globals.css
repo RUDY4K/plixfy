@@ -75,15 +75,40 @@
 
 html {
   color-scheme: dark;
+  /* Smooth in-page anchor scrolls (e.g. /#games from the bottom nav). */
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  /* Prevent rubber-band overscroll showing white when running as a PWA on
+   * iOS — the body color shows through instead. */
+  overscroll-behavior-y: none;
+  /* Sharper font rendering on iOS when installed as an app. */
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* When the page runs as an installed PWA, lock down text-selection and
+ * touch-callouts on chrome (header, nav, buttons). Article copy keeps
+ * normal selection so users can still copy quotes. */
+@media (display-mode: standalone) {
+  header,
+  nav,
+  button,
+  [role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  /* Hide URL bar artifacts when iOS launches the PWA in landscape. */
+  html, body {
+    overflow-x: hidden;
+  }
 }
 
 /* ─── Micro-interactions (dopamine triggers) ─────────────────────────── */
@@ -98,18 +123,29 @@ a,
 }
 
 /* Card hover: lift + category-colored glow. Each card sets --card-glow
- * to its category accent via inline style. */
+ * to its category accent via inline style. Hover-effects are gated to
+ * fine pointers so we don't get "stuck hover" on touch devices. */
 .card-hover {
   --card-glow: var(--accent-primary);
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
   will-change: transform;
 }
-.card-hover:hover {
-  transform: scale(1.03);
-  border-color: var(--card-glow);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--card-glow) 55%, transparent),
-    0 12px 32px -10px color-mix(in srgb, var(--card-glow) 45%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .card-hover:hover {
+    transform: scale(1.03);
+    border-color: var(--card-glow);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--card-glow) 55%, transparent),
+      0 12px 32px -10px color-mix(in srgb, var(--card-glow) 45%, transparent);
+  }
+}
+
+/* Press-feedback for touch — quick scale-down so the tap registers
+ * visually like a native button. Active state is universal (mouse +
+ * touch) so it also enhances desktop click feel. */
+.card-tap:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
 }
 
 /* Heart click bounce — overshoot scale with spring easing. */
@@ -152,12 +188,59 @@ a,
   animation: toastIn 320ms cubic-bezier(.22, 1.2, .36, 1);
 }
 
+/* ─── App-like page transitions ──────────────────────────────────────── */
+
+/* View Transitions API (Chrome 111+, Safari 18+). When the browser
+ * supports it, Next router navigations animate cross-fade automatically.
+ * Falls back to a no-op on unsupported browsers — no JS needed. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(.22, 1, .36, 1);
+}
+::view-transition-old(root) {
+  animation-name: vt-fade-out;
+}
+::view-transition-new(root) {
+  animation-name: vt-fade-in;
+}
+@keyframes vt-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Grid entrance — newly-mounted lists fade-up so the page feels alive
+ * on first load. Use sparingly on top-of-page containers via
+ * `.animate-grid-in`. */
+@keyframes gridIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-grid-in {
+  animation: gridIn 320ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   .card-hover:hover { transform: none; }
+  .card-tap:active { transform: none; }
   .heart-pop,
   .streak-flip,
   .daily-pulse,
-  .animate-toast {
+  .animate-toast,
+  .animate-grid-in {
+    animation: none;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
     animation: none;
   }
 }

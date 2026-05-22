@@ -91,8 +91,8 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
         // a slightly lifted scale on the compact variant — feels right in a
         // dense horizontal row.
         style={{ ['--card-glow' as string]: game.color }}
-        className={`group relative flex w-40 shrink-0 flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 sm:w-48 ${
-          isLive ? 'card-hover' : 'opacity-60'
+        className={`group relative flex w-40 shrink-0 flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 touch-manipulation sm:w-48 ${
+          isLive ? 'card-hover card-tap' : 'opacity-60'
         }`}
       >
         <div className="relative aspect-video overflow-hidden bg-neutral-950">
@@ -129,8 +129,8 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
       href={isLive ? `/games/${game.slug}` : '#'}
       aria-disabled={!isLive}
       style={{ ['--card-glow' as string]: game.color }}
-      className={`group relative flex flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 ${
-        isLive ? 'card-hover' : 'opacity-60'
+      className={`group relative flex flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 touch-manipulation ${
+        isLive ? 'card-hover card-tap' : 'opacity-60'
       }`}
     >
       <div className="relative aspect-video overflow-hidden bg-neutral-950">
