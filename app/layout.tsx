@@ -116,15 +116,51 @@ export default function RootLayout({
           colorInputBackground: '#171717',
           colorInputText: '#f5f5f5',
           borderRadius: '0.625rem',
+          fontFamily: 'var(--font-geist-sans)',
         },
         elements: {
+          // Cards (sign-in, sign-up, UserProfile, UserButton popover)
           card: 'bg-neutral-950 border border-neutral-800 shadow-2xl',
+          rootBox: 'mx-auto',
           headerTitle: 'text-white',
-          socialButtonsBlockButton:
-            'border border-neutral-700 bg-neutral-900 hover:bg-neutral-800',
+          headerSubtitle: 'text-neutral-400',
+          // UserButton's popover
+          userButtonPopoverCard:
+            'bg-neutral-950 border border-neutral-800 shadow-2xl',
+          userButtonPopoverActionButton:
+            'text-neutral-200 hover:bg-neutral-900 hover:text-white',
+          userButtonPopoverActionButtonText: 'text-neutral-200',
+          userButtonPopoverActionButtonIcon: 'text-cyan-300',
+          userButtonPopoverFooter: 'border-t border-neutral-800 bg-neutral-950',
+          userPreviewMainIdentifier: 'text-white',
+          userPreviewSecondaryIdentifier: 'text-neutral-400',
+          // UserProfile navbar (modal/page)
+          navbar: 'bg-neutral-950 border-r border-neutral-800',
+          navbarButton: 'text-neutral-300 hover:text-white',
+          navbarButtonActive: 'text-cyan-300',
+          profileSectionTitleText: 'text-white',
+          profileSectionPrimaryButton: 'text-cyan-300 hover:text-cyan-200',
+          // Forms (shared by sign-in, sign-up, UserProfile)
           formButtonPrimary:
             'bg-cyan-500 hover:bg-cyan-400 text-neutral-950 font-semibold',
+          formButtonReset: 'text-neutral-400 hover:text-white',
+          formFieldInput:
+            'bg-neutral-900 border border-neutral-700 text-white focus:border-cyan-500',
+          formFieldLabel: 'text-neutral-300',
+          // Social buttons (Google / Twitter / GitHub)
+          socialButtonsBlockButton:
+            'border border-neutral-700 bg-neutral-900 hover:bg-neutral-800 text-white',
+          socialButtonsBlockButtonText: 'text-white',
+          dividerLine: 'bg-neutral-800',
+          dividerText: 'text-neutral-500',
+          // Footer
+          footerActionText: 'text-neutral-400',
           footerActionLink: 'text-cyan-400 hover:text-cyan-300',
+          // Misc
+          badge: 'bg-cyan-500/15 text-cyan-300',
+          alert: 'bg-rose-500/10 border border-rose-500/40 text-rose-300',
+          identityPreviewText: 'text-neutral-200',
+          identityPreviewEditButton: 'text-cyan-300 hover:text-cyan-200',
         },
       }}
     >

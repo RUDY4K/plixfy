@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 import { topScore } from '@/lib/leaderboard';
 import { buildChallengeUrl } from '@/lib/challenge';
-import { useProfile } from '@/lib/profile';
 import { buildTwitterUrl, buildWhatsappUrl, share } from '@/lib/share';
-import ProfileSetupModal from './ProfileSetupModal';
 
 interface ShareGameActionsProps {
   slug: string;
@@ -15,16 +15,17 @@ interface ShareGameActionsProps {
 /**
  * Two-button row beside the game: "Challenge a friend" and "Share".
  *
- * Challenge — needs a player + a score on this game; if either is missing
- * we open the setup modal or a hint. The challenge URL bakes the score
- * into the path so no backend is needed.
+ * Challenge — needs a Clerk-authed player + a score on this game; if the
+ * user isn't signed in we send them to /sign-in. If they're signed in but
+ * haven't played a round yet we flash a hint. The challenge URL bakes the
+ * score into the path so no backend is needed.
  *
  * Share — opens an action sheet (native Web Share if available, otherwise
  * Twitter / WhatsApp / copy-link).
  */
 export default function ShareGameActions({ slug, title }: ShareGameActionsProps) {
-  const profile = useProfile();
-  const [setupOpen, setSetupOpen] = useState(false);
+  const router = useRouter();
+  const { isLoaded, isSignedIn, user } = useUser();
   const [actionsOpen, setActionsOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [origin, setOrigin] = useState('');
@@ -39,8 +40,9 @@ export default function ShareGameActions({ slug, title }: ShareGameActionsProps)
   }
 
   function handleChallenge() {
-    if (!profile) {
-      setSetupOpen(true);
+    if (!isLoaded) return;
+    if (!isSignedIn || !user) {
+      router.push('/sign-in');
       return;
     }
     const score = topScore(slug);
@@ -48,10 +50,14 @@ export default function ShareGameActions({ slug, title }: ShareGameActionsProps)
       flash('Play a round first, then challenge!');
       return;
     }
+    const nickname = user.username ?? user.firstName ?? 'Player';
+    // Clerk doesn't ship emoji avatars — use the first letter of the
+    // handle (rendered as a glyph by the receiver's challenge page).
+    const avatar = nickname.slice(0, 1).toUpperCase();
     const url = buildChallengeUrl(origin, slug, {
       score,
-      nickname: profile.nickname,
-      avatar: profile.avatar,
+      nickname,
+      avatar,
     });
     void share({
       title: `${title} — Challenge`,
@@ -80,13 +86,13 @@ export default function ShareGameActions({ slug, title }: ShareGameActionsProps)
         <button
           type="button"
           onClick={() => setActionsOpen((v) => !v)}
-          className="inline-flex items-center gap-1 rounded-full border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-semibold text-neutral-200 transition hover:border-emerald-500/60 hover:text-white"
+          className="inline-flex items-center gap-1 rounded-full border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-semibold text-neutral-200 transition hover:border-cyan-500/60 hover:text-white"
           aria-expanded={actionsOpen}
         >
           <span aria-hidden="true">📤</span>
           Share
         </button>
-        {toast && <span className="text-xs text-emerald-400">{toast}</span>}
+        {toast && <span className="text-xs text-cyan-400">{toast}</span>}
       </div>
 
       {actionsOpen && (
@@ -115,14 +121,12 @@ export default function ShareGameActions({ slug, title }: ShareGameActionsProps)
               else if (result === 'failed') flash('Share unavailable');
               setActionsOpen(false);
             }}
-            className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1 text-xs font-semibold text-neutral-200 transition hover:border-emerald-500/60 hover:text-white"
+            className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1 text-xs font-semibold text-neutral-200 transition hover:border-cyan-500/60 hover:text-white"
           >
             Copy link
           </button>
         </div>
       )}
-
-      <ProfileSetupModal open={setupOpen} onClose={() => setSetupOpen(false)} />
     </>
   );
 }

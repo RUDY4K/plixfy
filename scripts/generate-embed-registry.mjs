@@ -231,7 +231,7 @@ async function main() {
 // when the gd_sdk_referrer_url is set to a domain they haven't whitelisted
 // yet. Stripping the param lets the games play in the meantime; revenue
 // attribution is paused until our publisher account is approved, at which
-// point we restore the param to `?gd_sdk_referrer_url=https://www.plixfy.com`.
+// point we restore the param to '?gd_sdk_referrer_url=https://www.plixfy.com'.
 const gd = (id: string) =>
   \`https://html5.gamedistribution.com/\${id}/\`;
 

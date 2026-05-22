@@ -1,9 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { useLeaderboard, type ScoreEntry } from '@/lib/leaderboard';
-import { useProfile } from '@/lib/profile';
-import ProfileSetupModal from './ProfileSetupModal';
 
 interface LeaderboardProps {
   slug: string;
@@ -19,14 +19,13 @@ interface LeaderboardProps {
 /**
  * Top-10 leaderboard for a game. Shows the rank, avatar, nickname and
  * score; rows belonging to the current player are highlighted. Renders a
- * "Sign in to claim" CTA when no profile exists so the user knows their
- * next score will be anonymous unless they set up a profile.
+ * "Sign in to claim" CTA when the visitor is anonymous so they know how
+ * to attach scores to a real account.
  */
 export default function Leaderboard({ slug, unit = 'pts', direction = 'higher-better' }: LeaderboardProps) {
   const entries = useLeaderboard(slug);
-  const profile = useProfile();
+  const { isLoaded, isSignedIn, user } = useUser();
   const [mounted, setMounted] = useState(false);
-  const [setupOpen, setSetupOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -43,6 +42,7 @@ export default function Leaderboard({ slug, unit = 'pts', direction = 'higher-be
   const ranked = entries; // Already sorted on write.
   const topScore = ranked[0]?.score;
   const cta = formatBeatCta(topScore, direction);
+  const myHandle = isLoaded && isSignedIn ? user?.username ?? user?.firstName ?? null : null;
 
   return (
     <section
@@ -53,14 +53,13 @@ export default function Leaderboard({ slug, unit = 'pts', direction = 'higher-be
         <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white">
           <span aria-hidden="true">🏆</span> Leaderboard
         </h3>
-        {!profile && (
-          <button
-            type="button"
-            onClick={() => setSetupOpen(true)}
-            className="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300"
+        {isLoaded && !isSignedIn && (
+          <Link
+            href="/sign-in"
+            className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300"
           >
             Sign in to claim →
-          </button>
+          </Link>
         )}
       </header>
 
@@ -76,19 +75,17 @@ export default function Leaderboard({ slug, unit = 'pts', direction = 'higher-be
               rank={i + 1}
               entry={entry}
               unit={unit}
-              isMine={isMine(entry, profile?.nickname)}
+              isMine={isMine(entry, myHandle)}
             />
           ))}
         </ol>
       )}
 
       {topScore != null && (
-        <p className="mt-3 text-center text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
+        <p className="mt-3 text-center text-[11px] font-semibold uppercase tracking-wider text-cyan-400">
           {cta}
         </p>
       )}
-
-      <ProfileSetupModal open={setupOpen} onClose={() => setSetupOpen(false)} />
     </section>
   );
 }
@@ -99,7 +96,7 @@ function Row({ rank, entry, unit, isMine }: { rank: number; entry: ScoreEntry; u
     <li
       className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition ${
         isMine
-          ? 'bg-emerald-500/15 ring-1 ring-emerald-500/40'
+          ? 'bg-cyan-500/15 ring-1 ring-cyan-500/40'
           : 'hover:bg-neutral-800/60'
       }`}
     >
@@ -109,16 +106,16 @@ function Row({ rank, entry, unit, isMine }: { rank: number; entry: ScoreEntry; u
       <span aria-hidden="true" className="text-base leading-none">{entry.avatar || '👾'}</span>
       <span className="flex-1 truncate font-semibold text-white">
         {entry.nickname}
-        {isMine && <span className="ml-1 text-[10px] text-emerald-400">(you)</span>}
+        {isMine && <span className="ml-1 text-[10px] text-cyan-400">(you)</span>}
       </span>
-      <span className="text-sm font-bold tabular-nums text-emerald-300">
+      <span className="text-sm font-bold tabular-nums text-cyan-300">
         {entry.score.toLocaleString()} <span className="text-[10px] font-normal text-neutral-500">{unit}</span>
       </span>
     </li>
   );
 }
 
-function isMine(entry: ScoreEntry, nickname: string | undefined): boolean {
+function isMine(entry: ScoreEntry, nickname: string | null): boolean {
   if (!nickname) return false;
   return entry.nickname === nickname;
 }
