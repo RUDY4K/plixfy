@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,6 +8,7 @@ import FooterAd from '@/components/FooterAd';
 import CookieConsent from '@/components/CookieConsent';
 import AdSenseScript from '@/components/AdSenseScript';
 import AchievementToast from '@/components/AchievementToast';
+import FavoritesSync from '@/components/FavoritesSync';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
@@ -104,23 +106,47 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: '#00C8FF',
+          colorBackground: '#0B0F1A',
+          colorText: '#f5f5f5',
+          colorTextSecondary: '#a3a3a3',
+          colorInputBackground: '#171717',
+          colorInputText: '#f5f5f5',
+          borderRadius: '0.625rem',
+        },
+        elements: {
+          card: 'bg-neutral-950 border border-neutral-800 shadow-2xl',
+          headerTitle: 'text-white',
+          socialButtonsBlockButton:
+            'border border-neutral-700 bg-neutral-900 hover:bg-neutral-800',
+          formButtonPrimary:
+            'bg-cyan-500 hover:bg-cyan-400 text-neutral-950 font-semibold',
+          footerActionLink: 'text-cyan-400 hover:text-cyan-300',
+        },
+      }}
     >
-      <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(rootJsonLd) }}
-        />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <FooterAd />
-        <Footer />
-        <CookieConsent />
-        <AdSenseScript />
-        <AchievementToast />
-      </body>
-    </html>
+      <html
+        lang="en"
+        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      >
+        <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(rootJsonLd) }}
+          />
+          <Header />
+          <main className="flex-1">{children}</main>
+          <FooterAd />
+          <Footer />
+          <CookieConsent />
+          <AdSenseScript />
+          <AchievementToast />
+          <FavoritesSync />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

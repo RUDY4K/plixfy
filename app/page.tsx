@@ -11,6 +11,8 @@ import GameRow from '@/components/GameRow';
 import CategoryCards from '@/components/CategoryCards';
 import DailyFeatured from '@/components/DailyFeatured';
 import RecentlyPlayedRow from '@/components/RecentlyPlayedRow';
+import ActivityFeed from '@/components/ActivityFeed';
+import { getRecentActivity } from '@/lib/activity-server';
 
 const FEATURES = [
   { icon: '⚡', title: 'No downloads', body: 'Plays instantly in your browser.' },
@@ -34,13 +36,14 @@ function heroCountLabel(n: number): string {
   return `${n}+`;
 }
 
-export default function Home() {
+export default async function Home() {
   const liveCount = liveGames().length;
   const heroLabel = heroCountLabel(liveCount);
   const trending = trendingGames();
   const originals = customGames().filter((g) => g.status === 'live');
   const recent = recentlyAddedGames(12);
   const ioRow = ioMultiplayerGames(20);
+  const activity = await getRecentActivity(20).catch(() => []);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -69,6 +72,8 @@ export default function Home() {
           </a>
         </div>
       </section>
+
+      <ActivityFeed initialItems={activity} />
 
       <DailyFeatured games={LIGHT_GAMES} />
 

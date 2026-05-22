@@ -1,8 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { useIsFavorite } from '@/lib/userStateClient';
+import { toggleFavorite as toggleFavoriteServer } from '@/app/actions/favorites';
 import { evaluate, getSessionPlays } from '@/lib/achievements';
+import { log } from '@/lib/logger';
 
 interface FavoriteButtonProps {
   slug: string;
@@ -23,8 +26,10 @@ interface FavoriteButtonProps {
  */
 export default function FavoriteButton({ slug, size = 'sm', stopPropagation = true }: FavoriteButtonProps) {
   const [fav, toggle] = useIsFavorite(slug);
+  const { isSignedIn } = useUser();
   const [popKey, setPopKey] = useState(0);
   const firstRender = useRef(true);
+  const [, startTransition] = useTransition();
 
   // Don't play the animation on initial hydration — only when the user
   // actually clicks. We use a ref instead of mount state because we want
@@ -51,6 +56,16 @@ export default function FavoriteButton({ slug, size = 'sm', stopPropagation = tr
         }
         toggle();
         evaluate({ sessionPlays: getSessionPlays() });
+        if (isSignedIn) {
+          // Fire-and-forget cross-device sync. localStorage is the source
+          // of truth in the UI; this just mirrors to Supabase in the
+          // background so other devices and the public profile page see it.
+          startTransition(() => {
+            toggleFavoriteServer(slug).catch((err) =>
+              log.warn('FavoriteButton server sync failed', err),
+            );
+          });
+        }
       }}
       className={`flex shrink-0 items-center justify-center rounded-full border backdrop-blur ${dims} ${
         fav

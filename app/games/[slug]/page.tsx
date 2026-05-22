@@ -7,11 +7,16 @@ import AdPlacement from '@/components/AdPlacement';
 import FavoriteButton from '@/components/FavoriteButton';
 import PlayTracker from '@/components/PlayTracker';
 import PlayTimer from '@/components/PlayTimer';
-import Leaderboard from '@/components/Leaderboard';
+import GlobalLeaderboard from '@/components/GlobalLeaderboard';
 import ChallengeBanner from '@/components/ChallengeBanner';
 import ShareGameActions from '@/components/ShareGameActions';
 import RatingButtons from '@/components/RatingButtons';
+import Comments from '@/components/Comments';
 import { baseCount, formatPlayCount } from '@/lib/userState';
+import { listComments } from '@/lib/comments';
+import { getGameRating } from '@/lib/ratings-server';
+import { getGlobalLeaderboard } from '@/lib/leaderboard-server';
+import { getCurrentDbUser } from '@/lib/users';
 import GameStage from './GameStage';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://plixfy.example';
@@ -137,6 +142,18 @@ export default async function GamePage({
   const playCount = game.kind === 'embed' ? baseCount(game.slug) : null;
   const categoryLabel = game.category.charAt(0).toUpperCase() + game.category.slice(1);
 
+  // Fetch comments + current viewer in parallel for the game's comment thread.
+  // Falls through to empty list when Supabase isn't configured yet so the
+  // page still renders during local placeholder dev.
+  const viewer = await getCurrentDbUser().catch(() => null);
+  const [comments, serverRating, leaderboard] = await Promise.all([
+    listComments(game.slug, viewer?.id ?? null, 50).catch(() => []),
+    getGameRating(game.slug, viewer?.id ?? null).catch(() => undefined),
+    game.kind === 'custom'
+      ? getGlobalLeaderboard(game.slug, viewer?.id ?? null).catch(() => null)
+      : Promise.resolve(null),
+  ]);
+
   // Combined JSON-LD: VideoGame metadata + BreadcrumbList. Using @graph
   // lets us emit both in a single <script> tag — cleaner and lets
   // Google's parser deduplicate references.
@@ -247,14 +264,14 @@ export default async function GamePage({
 
           {game.status === 'live' && (
             <div className="mt-4 flex flex-col gap-3">
-              <RatingButtons slug={game.slug} />
+              <RatingButtons slug={game.slug} serverRating={serverRating} />
               <ShareGameActions slug={game.slug} title={game.title} />
             </div>
           )}
 
-          {game.kind === 'custom' && game.status === 'live' && (
+          {game.kind === 'custom' && game.status === 'live' && leaderboard && (
             <div className="mt-6">
-              <Leaderboard slug={game.slug} unit="pts" />
+              <GlobalLeaderboard slug={game.slug} unit="pts" data={leaderboard} />
             </div>
           )}
 
@@ -262,6 +279,10 @@ export default async function GamePage({
             <div className="mt-6">
               <AdPlacement slot="below-game" label="Ad · 728×90 below game" />
             </div>
+          )}
+
+          {game.status === 'live' && (
+            <Comments gameSlug={game.slug} initialComments={comments} />
           )}
 
           {related.length > 0 && (
