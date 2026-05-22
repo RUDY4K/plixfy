@@ -3,6 +3,7 @@ import { toLightGame } from '@/types/game';
 import { CUSTOM_GAMES } from './registry-custom';
 import { EMBED_GAMES } from './registry-embed';
 import { EXTRA_GAMES } from './registry-extra';
+import { Y8_GAMES } from './registry-y8';
 
 /**
  * Feature flag — when true, every game with provider==='gamedistribution'
@@ -18,7 +19,7 @@ import { EXTRA_GAMES } from './registry-extra';
  */
 const HIDE_GAMEDISTRIBUTION = true;
 
-const ALL_GAMES: readonly GameMeta[] = [...CUSTOM_GAMES, ...EMBED_GAMES, ...EXTRA_GAMES];
+const ALL_GAMES: readonly GameMeta[] = [...CUSTOM_GAMES, ...EMBED_GAMES, ...EXTRA_GAMES, ...Y8_GAMES];
 
 export const GAMES: readonly GameMeta[] = HIDE_GAMEDISTRIBUTION
   ? ALL_GAMES.filter((g) => !(g.kind === 'embed' && g.provider === 'gamedistribution'))

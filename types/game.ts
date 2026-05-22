@@ -34,6 +34,8 @@ export type EmbedProvider =
   | 'gameflare'
   | 'silvergames'
   | 'rocketgames'
+  | 'y8'
+  | 'playgama'
   | 'other';
 export type EmbedAspect = '16:9' | '4:3' | '3:4';
 
