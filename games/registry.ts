@@ -4,7 +4,25 @@ import { CUSTOM_GAMES } from './registry-custom';
 import { EMBED_GAMES } from './registry-embed';
 import { EXTRA_GAMES } from './registry-extra';
 
-export const GAMES: readonly GameMeta[] = [...CUSTOM_GAMES, ...EMBED_GAMES, ...EXTRA_GAMES];
+/**
+ * Feature flag — when true, every game with provider==='gamedistribution'
+ * is excluded from the live catalog. GameDistribution's player checks the
+ * embedding domain against an approved-publisher list and redirects to a
+ * "CLICK HERE TO PLAY" page (their `dmain:false` gate) when our domain
+ * isn't approved. The publisher application is in flight; flip this back
+ * to `false` the moment GD whitelists plixfy.com to re-enable ~5,594
+ * games in one deploy without re-harvesting anything.
+ *
+ * Investigation + evidence: docs/research/embeddable-game-sources.md
+ * and the curl probe of game.api.gamedistribution.com.
+ */
+const HIDE_GAMEDISTRIBUTION = true;
+
+const ALL_GAMES: readonly GameMeta[] = [...CUSTOM_GAMES, ...EMBED_GAMES, ...EXTRA_GAMES];
+
+export const GAMES: readonly GameMeta[] = HIDE_GAMEDISTRIBUTION
+  ? ALL_GAMES.filter((g) => !(g.kind === 'embed' && g.provider === 'gamedistribution'))
+  : ALL_GAMES;
 
 /**
  * Light projection of the full catalog. Used by every browse-side

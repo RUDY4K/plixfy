@@ -350,7 +350,17 @@ async function main() {
   const seenSlugs = new Set(all.map((g) => g.slug));
   for (const og of ogEntries) {
     if (!og?.title || !og?.embed) continue;
-    const rawSlug = og.embed.replace(/\/index\.html$/, '').split('/').filter(Boolean).pop();
+    // The OnlineGames.io feed serves several tail patterns:
+    //   /<slug>/index.html      (~177 of 259 — the original case)
+    //   /<slug>/index-og.html   (~66 — earlier strip-rule missed these)
+    //   /<slug>/game.html       (~12)
+    //   /<slug>/game-og.html    (~1)
+    // Plus the occasional `#anchor` fragment. The previous slug
+    // derivation only stripped /index.html, so 79 games collapsed
+    // onto two slugs (`og-game-html`, `og-index-og-html`) and only
+    // the first of each survived dedupe — we lost 77 games.
+    const cleanedUrl = og.embed.split('#')[0].replace(/\/(index|game)(-og)?\.html$/i, '');
+    const rawSlug = cleanedUrl.split('/').filter(Boolean).pop();
     const slug = `og-${rawSlug}`.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     if (seenSlugs.has(slug)) continue;
     seenSlugs.add(slug);
