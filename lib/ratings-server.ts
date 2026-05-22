@@ -1,5 +1,6 @@
 import 'server-only';
 import { getSupabaseAdmin } from './supabase/admin';
+import { isSupabaseConfigured } from './supabase/config';
 import { log } from './logger';
 
 export interface ServerRating {
@@ -27,6 +28,7 @@ export async function getGameRating(
   gameSlug: string,
   viewerUserId: string | null,
 ): Promise<ServerRating> {
+  if (!isSupabaseConfigured()) return EMPTY;
   const supabase = getSupabaseAdmin();
 
   // Single query: select all likes for this slug. We tally in app code so
@@ -66,6 +68,7 @@ export async function getGameRatingsMap(
 ): Promise<Map<string, { percentLiked: number | null; total: number }>> {
   const result = new Map<string, { percentLiked: number | null; total: number }>();
   if (gameSlugs.length === 0) return result;
+  if (!isSupabaseConfigured()) return result;
 
   const supabase = getSupabaseAdmin();
   // `game_ratings` is a view — not declared in our hand-rolled Database

@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import type { Database } from './types';
+import { isSupabaseBrowserConfigured, SupabaseNotConfiguredError } from './config';
 
 /**
  * Server-side anon Supabase client for use in Server Components and Server
@@ -8,8 +9,13 @@ import type { Database } from './types';
  * client is unauthenticated as far as Postgres is concerned. Cookie passing
  * is here for completeness (so future Supabase native auth works) but is
  * unused under the Clerk+service-role pattern.
+ *
+ * Throws SupabaseNotConfiguredError when env still looks like placeholders.
  */
 export async function getSupabaseServer() {
+  if (!isSupabaseBrowserConfigured()) {
+    throw new SupabaseNotConfiguredError();
+  }
   const cookieStore = await cookies();
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -1,6 +1,7 @@
 import 'server-only';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from './supabase/admin';
+import { isSupabaseConfigured } from './supabase/config';
 import type { UserRow } from './supabase/types';
 import { log } from './logger';
 
@@ -15,6 +16,7 @@ import { log } from './logger';
  * Returns null when no Clerk user is signed in.
  */
 export async function getCurrentDbUser(): Promise<UserRow | null> {
+  if (!isSupabaseConfigured()) return null;
   const { userId } = await auth();
   if (!userId) return null;
 
@@ -79,6 +81,7 @@ export async function requireDbUser(): Promise<UserRow> {
 }
 
 export async function findUserByUsername(username: string): Promise<UserRow | null> {
+  if (!isSupabaseConfigured()) return null;
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('users')

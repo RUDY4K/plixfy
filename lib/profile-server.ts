@@ -1,5 +1,6 @@
 import 'server-only';
 import { getSupabaseAdmin } from './supabase/admin';
+import { isSupabaseConfigured } from './supabase/config';
 import { log } from './logger';
 
 export interface PublicProfileData {
@@ -25,9 +26,19 @@ export interface PublicProfileData {
  * sum. Each falls back to an empty value if the table doesn't exist yet
  * (during local dev with placeholder Supabase keys).
  */
+const EMPTY_PROFILE: PublicProfileData = {
+  gamesPlayed: 0,
+  bestScoresCount: 0,
+  commentsCount: 0,
+  favorites: [],
+  topScores: [],
+  activity: [],
+};
+
 export async function getUserPublicProfile(
   userId: string,
 ): Promise<PublicProfileData> {
+  if (!isSupabaseConfigured()) return EMPTY_PROFILE;
   const supabase = getSupabaseAdmin();
 
   const [

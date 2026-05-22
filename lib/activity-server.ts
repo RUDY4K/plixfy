@@ -1,5 +1,6 @@
 import 'server-only';
 import { getSupabaseAdmin } from './supabase/admin';
+import { isSupabaseConfigured } from './supabase/config';
 import { log } from './logger';
 
 export interface ActivityItem {
@@ -29,6 +30,7 @@ type RawActivityRow = {
  * for "happening now" vibe, not history.
  */
 export async function getRecentActivity(limit = 20): Promise<ActivityItem[]> {
+  if (!isSupabaseConfigured()) return [];
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('activity')

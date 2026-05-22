@@ -1,5 +1,6 @@
 import 'server-only';
 import { getSupabaseAdmin } from './supabase/admin';
+import { isSupabaseConfigured } from './supabase/config';
 import { log } from './logger';
 
 /**
@@ -7,6 +8,7 @@ import { log } from './logger';
  * surfaces that need to render the heart-filled state without flashing.
  */
 export async function getFavoriteSlugsForUser(userId: string): Promise<string[]> {
+  if (!isSupabaseConfigured()) return [];
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('favorites')

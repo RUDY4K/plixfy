@@ -1,5 +1,6 @@
 import 'server-only';
 import { getSupabaseAdmin } from './supabase/admin';
+import { isSupabaseConfigured } from './supabase/config';
 import { log } from './logger';
 
 type RawScoreRow = {
@@ -64,6 +65,9 @@ export async function getGlobalLeaderboard(
   gameSlug: string,
   viewerUserId: string | null,
 ): Promise<GlobalLeaderboardResult> {
+  if (!isSupabaseConfigured()) {
+    return { weekly: [], allTime: [], myRank: null, myBest: null };
+  }
   const supabase = getSupabaseAdmin();
 
   // Pull more than TOP_N raw scores so we can collapse duplicates per user

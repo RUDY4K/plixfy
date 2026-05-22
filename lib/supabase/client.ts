@@ -2,6 +2,7 @@
 
 import { createBrowserClient } from '@supabase/ssr';
 import type { Database } from './types';
+import { isSupabaseBrowserConfigured, SupabaseNotConfiguredError } from './config';
 
 /**
  * Browser-side Supabase client. Uses the public anon key — RLS policies
@@ -9,11 +10,16 @@ import type { Database } from './types';
  * never made directly; everything that mutates goes through a server
  * action that re-checks Clerk auth and uses the service-role client.
  *
- * Memoized per module to keep a single connection across hooks.
+ * Memoized per module to keep a single connection across hooks. Throws
+ * SupabaseNotConfiguredError when env still looks like placeholders so
+ * client callers can degrade gracefully (no network calls).
  */
 let _client: ReturnType<typeof createBrowserClient<Database>> | null = null;
 
 export function getSupabaseBrowser() {
+  if (!isSupabaseBrowserConfigured()) {
+    throw new SupabaseNotConfiguredError();
+  }
   if (_client) return _client;
   _client = createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
