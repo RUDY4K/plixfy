@@ -6,6 +6,8 @@ import GameCard from './GameCard';
 import AdPlacement from './AdPlacement';
 import { CATEGORY_META } from './CategoryCards';
 import { compareMostLiked } from '@/lib/ratings';
+import { isStrictlyMobile, isVisibleOnMobile } from '@/lib/platform';
+import { useIsMobile } from '@/lib/useIsMobile';
 
 interface HomeGridProps {
   games: readonly LightGameMeta[];
@@ -13,6 +15,16 @@ interface HomeGridProps {
 
 type Filter = 'all' | GameCategory;
 type Sort = 'default' | 'most-liked';
+
+/**
+ * Platform filter state.
+ *   'auto'    — default. On mobile, hide platform==='desktop'; on
+ *               desktop, show everything.
+ *   'mobile'  — strict mobile-only (hide 'desktop' AND 'unknown').
+ *   'desktop' — desktop-best only (show only games flagged 'desktop').
+ *   'off'     — show everything regardless of platform.
+ */
+type PlatformFilter = 'auto' | 'mobile' | 'desktop' | 'off';
 
 /**
  * Quick-filter pills (top-level genres). Less-popular categories are still
@@ -52,12 +64,14 @@ export default function HomeGrid({ games }: HomeGridProps) {
   const [sort, setSort] = useState<Sort>('default');
   const [query, setQuery] = useState('');
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const [platformFilter, setPlatformFilter] = useState<PlatformFilter>('auto');
   const deferredQuery = useDeferredValue(query.trim().toLowerCase());
+  const isMobile = useIsMobile();
 
   // Reset pagination whenever the filter / search / sort narrows results.
   useEffect(() => {
     setVisible(PAGE_SIZE);
-  }, [filter, sort, deferredQuery]);
+  }, [filter, sort, deferredQuery, platformFilter, isMobile]);
 
   // Wire up category-card "#games?category=X" anchors: when the URL hash
   // changes, jump to the matching filter. Lets us deep-link without
@@ -79,12 +93,19 @@ export default function HomeGrid({ games }: HomeGridProps) {
   const filtered = useMemo(() => {
     const byCategory = filter === 'all' ? games : games.filter((g) => g.category === filter);
     const byQuery = byCategory.filter((g) => matchesQuery(g, deferredQuery));
-    const baseSorted = sortGames(byQuery);
+    const byPlatform = byQuery.filter((g) => {
+      if (platformFilter === 'mobile') return isStrictlyMobile(g.platform);
+      if (platformFilter === 'desktop') return g.platform === 'desktop';
+      if (platformFilter === 'off') return true;
+      // 'auto' — mobile hides desktop-only, desktop shows everything.
+      return isMobile ? isVisibleOnMobile(g.platform) : true;
+    });
+    const baseSorted = sortGames(byPlatform);
     if (sort === 'most-liked') {
       return [...baseSorted].sort((a, b) => compareMostLiked(a.slug, b.slug));
     }
     return baseSorted;
-  }, [games, filter, deferredQuery, sort]);
+  }, [games, filter, deferredQuery, sort, platformFilter, isMobile]);
 
   const slice = filtered.slice(0, visible);
   const hasMore = visible < filtered.length;
@@ -94,7 +115,8 @@ export default function HomeGrid({ games }: HomeGridProps) {
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-bold tracking-tight sm:text-2xl">All games</h2>
         <span className="text-sm text-neutral-400">
-          {filtered.length} of {games.length} titles
+          {filtered.length.toLocaleString()} of {games.length.toLocaleString()}{' '}
+          {isMobile && platformFilter !== 'off' ? 'playable on your device' : 'titles'}
         </span>
       </div>
 
@@ -128,6 +150,31 @@ export default function HomeGrid({ games }: HomeGridProps) {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          {/* Platform filter row — mobile-first toggles. The mobile-only
+              pill is the prominent default on phones; the desktop-best
+              pill helps power-users find heavyweight titles on desktop. */}
+          <button
+            type="button"
+            onClick={() => setPlatformFilter(platformFilter === 'mobile' ? 'auto' : 'mobile')}
+            className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider transition ${
+              platformFilter === 'mobile'
+                ? 'bg-cyan-500 text-neutral-950'
+                : 'border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20'
+            }`}
+          >
+            📱 Mobile only
+          </button>
+          <button
+            type="button"
+            onClick={() => setPlatformFilter(platformFilter === 'desktop' ? 'auto' : 'desktop')}
+            className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider transition ${
+              platformFilter === 'desktop'
+                ? 'bg-amber-400 text-neutral-950'
+                : 'border border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20'
+            }`}
+          >
+            🖥️ Desktop best
+          </button>
           {PRIMARY_FILTERS.map((f) => {
             const isActive = filter === f.id;
             return (

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { LightGameMeta } from '@/types/game';
 import { baseCount, formatPlayCount } from '@/lib/userState';
+import { useIsMobile } from '@/lib/useIsMobile';
 import FavoriteButton from './FavoriteButton';
 import RatingButtons from './RatingButtons';
 
@@ -81,6 +82,10 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
   const dots = difficultyDots[game.difficulty];
   const resolvedBadge = badge === undefined ? autoBadge(game) : badge;
   const playCount = baseCount(game.slug);
+  const isMobile = useIsMobile();
+  // Only flag desktop-best games on mobile — on desktop the badge would
+  // be redundant clutter since the game's a good fit there anyway.
+  const showDesktopHint = isMobile && (game.platform === 'desktop' || game.platform === 'unknown');
 
   if (variant === 'compact') {
     return (
@@ -119,6 +124,14 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
           <div className="absolute bottom-1 left-2 right-2 flex items-center justify-between gap-2">
             <p className="truncate text-sm font-semibold text-white drop-shadow">{game.title}</p>
           </div>
+          {showDesktopHint && (
+            <span
+              title="Best on desktop — controls may be limited on mobile"
+              className="absolute right-1 top-1 rounded-md bg-amber-400/90 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-neutral-950 backdrop-blur"
+            >
+              🖥️
+            </span>
+          )}
         </div>
       </Link>
     );
@@ -178,7 +191,18 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
 
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="line-clamp-1 text-sm font-semibold text-white">{game.title}</h3>
+          <h3 className="line-clamp-1 text-sm font-semibold text-white">
+            {game.title}
+            {showDesktopHint && (
+              <span
+                title="Best on desktop — controls may be limited on mobile"
+                aria-label="Best on desktop"
+                className="ml-1.5 inline-flex items-center rounded-md bg-amber-400/20 px-1 py-0.5 align-middle text-[9px] font-bold uppercase tracking-wider text-amber-300"
+              >
+                🖥️ desktop
+              </span>
+            )}
+          </h3>
           <span className="flex shrink-0 items-center gap-0.5">
             {Array.from({ length: 3 }).map((_, i) => (
               <span

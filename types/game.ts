@@ -39,6 +39,20 @@ export type EmbedProvider =
   | 'other';
 export type EmbedAspect = '16:9' | '4:3' | '3:4';
 
+/**
+ * Mobile-vs-desktop compatibility.
+ *   'all'     — works on both (mouse + touch, or natively responsive)
+ *   'mobile'  — touch-first, works great on phones
+ *   'desktop' — keyboard / fine-pointer required; hidden by default on mobile
+ *   'unknown' — ambiguous; shown on mobile with a small "Best on desktop" badge
+ *
+ * The field is optional on stored metadata — `lib/platform.ts:classifyPlatform`
+ * fills it at registry-merge time using a rules engine over category /
+ * controls / keywords / provider, so older harvested entries don't need
+ * a re-harvest to participate in the filter.
+ */
+export type GamePlatform = 'all' | 'mobile' | 'desktop' | 'unknown';
+
 interface BaseGameMeta {
   slug: string;
   title: string;
@@ -51,6 +65,7 @@ interface BaseGameMeta {
   color: string;
   keywords: string[];
   status: GameStatus;
+  platform?: GamePlatform;
 }
 
 export interface CustomGameMeta extends BaseGameMeta {
@@ -84,6 +99,7 @@ export interface LightGameMeta {
   color: string;
   keywords: string[];
   status: GameStatus;
+  platform: GamePlatform;
 }
 
 export function toLightGame(g: GameMeta): LightGameMeta {
@@ -98,6 +114,7 @@ export function toLightGame(g: GameMeta): LightGameMeta {
     color: g.color,
     keywords: g.keywords,
     status: g.status,
+    platform: g.platform ?? 'unknown',
   };
 }
 

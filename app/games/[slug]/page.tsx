@@ -10,6 +10,7 @@ import PlayTimer from '@/components/PlayTimer';
 import ChallengeBanner from '@/components/ChallengeBanner';
 import ShareGameActions from '@/components/ShareGameActions';
 import RatingButtons from '@/components/RatingButtons';
+import DesktopOnlyBanner from '@/components/DesktopOnlyBanner';
 import { baseCount, formatPlayCount } from '@/lib/userState';
 import GameStage from './GameStage';
 
@@ -214,6 +215,8 @@ export default async function GamePage({
           {game.status === 'live' && (
             <ChallengeBanner gameTitle={game.title} />
           )}
+
+          <DesktopOnlyBanner platform={game.platform ?? 'unknown'} />
 
           <GameStage game={game} />
 

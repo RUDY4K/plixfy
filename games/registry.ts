@@ -1,5 +1,6 @@
 import type { GameMeta, LightGameMeta } from '@/types/game';
 import { toLightGame } from '@/types/game';
+import { classifyPlatform } from '@/lib/platform';
 import { CUSTOM_GAMES } from './registry-custom';
 import { EMBED_GAMES } from './registry-embed';
 import { EXTRA_GAMES } from './registry-extra';
@@ -19,7 +20,17 @@ import { Y8_GAMES } from './registry-y8';
  */
 const HIDE_GAMEDISTRIBUTION = true;
 
-const ALL_GAMES: readonly GameMeta[] = [...CUSTOM_GAMES, ...EMBED_GAMES, ...EXTRA_GAMES, ...Y8_GAMES];
+const RAW_GAMES: readonly GameMeta[] = [...CUSTOM_GAMES, ...EMBED_GAMES, ...EXTRA_GAMES, ...Y8_GAMES];
+
+/**
+ * Fill the `platform` field on every game using the rules engine in
+ * lib/platform.ts. Existing per-entry overrides (set by hand in a
+ * registry file) take precedence over the classifier's verdict.
+ */
+const ALL_GAMES: readonly GameMeta[] = RAW_GAMES.map((g) => ({
+  ...g,
+  platform: g.platform ?? classifyPlatform(g),
+})) as readonly GameMeta[];
 
 export const GAMES: readonly GameMeta[] = HIDE_GAMEDISTRIBUTION
   ? ALL_GAMES.filter((g) => !(g.kind === 'embed' && g.provider === 'gamedistribution'))
@@ -104,7 +115,7 @@ export function recentlyAddedGames(limit = 12): LightGameMeta[] {
  * embed games sort before custom because the catalog is mostly embeds and
  * users want similar discovery, not the same 4 originals over and over.
  */
-export function relatedGames(slug: string, limit = 8): GameMeta[] {
+export function relatedGames(slug: string, limit = 8): LightGameMeta[] {
   const target = findGame(slug);
   if (!target) return [];
   const targetKeywords = new Set(target.keywords.map((k) => k.toLowerCase()));
@@ -122,5 +133,5 @@ export function relatedGames(slug: string, limit = 8): GameMeta[] {
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score);
 
-  return scored.slice(0, limit).map((s) => s.game);
+  return scored.slice(0, limit).map((s) => toLightGame(s.game));
 }
