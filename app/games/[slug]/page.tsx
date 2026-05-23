@@ -158,7 +158,7 @@ export default async function GamePage({
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -172,30 +172,43 @@ export default async function GamePage({
             <Link href="/" className="hover:text-white">Home</Link>
           </li>
           <li aria-hidden="true" className="text-neutral-700">›</li>
-          <li>
-            <Link href={categoryHref(game.category)} className="hover:text-white">
+          <li className="min-w-0">
+            <Link
+              href={categoryHref(game.category)}
+              className="line-clamp-1 hover:text-white"
+            >
               {categoryLabel}
             </Link>
           </li>
           <li aria-hidden="true" className="text-neutral-700">›</li>
-          <li aria-current="page" className="line-clamp-1 max-w-[16rem] text-neutral-300">
+          <li
+            aria-current="page"
+            className="line-clamp-1 min-w-0 max-w-[12rem] text-neutral-300 sm:max-w-[20rem]"
+          >
             {game.title}
           </li>
         </ol>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
-        <article>
+      <div className="grid min-w-0 gap-8 lg:grid-cols-[1fr_300px]">
+        <article className="min-w-0">
           <header className="mb-4 flex items-start justify-between gap-3">
-            <div>
+            {/* `min-w-0 flex-1` lets this column shrink inside the flex —
+                without it, the title/description's intrinsic width pushes
+                the FavoriteButton off the right edge on narrow screens. */}
+            <div className="min-w-0 flex-1">
               <span
                 className="inline-block rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wider"
                 style={{ background: `${game.color}22`, color: game.color }}
               >
                 {game.category}
               </span>
-              <h1 className="mt-2 text-3xl font-extrabold tracking-tight">{game.title}</h1>
-              <p className="mt-2 max-w-2xl text-neutral-400">{game.longDescription}</p>
+              <h1 className="mt-2 text-2xl font-extrabold tracking-tight break-words sm:text-3xl">
+                {game.title}
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm text-neutral-400 break-words sm:text-base">
+                {game.longDescription}
+              </p>
               {playCount !== null && (
                 <p className="mt-2 text-xs text-neutral-500">
                   <span aria-hidden="true">▶ </span>
@@ -238,9 +251,9 @@ export default async function GamePage({
           )}
 
           {related.length > 0 && (
-            <section className="mt-10">
+            <section className="mt-10 min-w-0">
               <h2 className="mb-3 text-lg font-bold">You might also like</h2>
-              <p className="mb-4 text-xs text-neutral-500">
+              <p className="mb-4 text-xs text-neutral-500 break-words">
                 Based on category and shared tags with {game.title}.
               </p>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

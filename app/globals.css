@@ -134,6 +134,10 @@ body {
   overscroll-behavior-y: none;
   /* Sharper font rendering on iOS when installed as an app. */
   -webkit-font-smoothing: antialiased;
+  /* Defensive: never let a stray flex/grid child cause a horizontal
+   * scrollbar on mobile. Pages should still be designed to fit, but if
+   * something overflows we hide it rather than let the viewport pan. */
+  overflow-x: hidden;
 }
 
 * {
