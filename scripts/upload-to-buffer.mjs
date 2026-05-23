@@ -33,7 +33,7 @@
 //                                   default: customScheduled (uses --hour/--tz)
 //   --organization-id=ID            override Buffer org id (else first one).
 //
-// API: https://graph.buffer.com/graphql
+// API: https://api.buffer.com/graphql
 //      Auth: Authorization: Bearer <token>
 
 import { readFileSync, writeFileSync, copyFileSync, mkdirSync, existsSync } from 'node:fs';
@@ -98,7 +98,7 @@ const START_DATE = args['start-date'] || addDaysIso(todayIsoIn(TZ), 1);
 
 // ── GraphQL client ─────────────────────────────────────────────────────
 
-const GRAPHQL_ENDPOINT = 'https://graph.buffer.com/graphql';
+const GRAPHQL_ENDPOINT = 'https://api.buffer.com/graphql';
 
 async function gql({ query, variables, opName }) {
   const res = await fetch(GRAPHQL_ENDPOINT, {
