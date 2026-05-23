@@ -45,3 +45,7 @@ next-env.d.ts
 /scripts/harvest-manifest.json
 /scripts/extra-skipped.json
 /scripts/extra-manifest.json
+
+# generated outputs from local scripts (regenerated on demand;
+# never deployed, but they bloat the repo when committed by accident).
+/scripts/output/
