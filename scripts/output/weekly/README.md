@@ -1,6 +1,6 @@
 # Plixfy weekly social pack
 
-Generated: 2026-05-23T07:47:59.468Z
+Generated: 2026-05-23T08:41:17.284Z
 Source: 7 random live games from the Plixfy registry
 AI text generation: local templates
 
