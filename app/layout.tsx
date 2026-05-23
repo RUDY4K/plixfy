@@ -17,16 +17,19 @@ const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin']
 // Display: Orbitron — geometric, arcade/sci-fi, perfect for the "Neon Arcade"
 // brand. Loaded for headings + the wordmark. Body: DM Sans — clean geometric
 // sans that pairs with Orbitron without competing for attention.
+//
+// Variable names use the font's own name (e.g. --font-orbitron) so they
+// never collide with Tailwind theme tokens that are also named
+// `--font-display`/`--font-body`. globals.css' `--font-display-stack` then
+// references these next/font variables.
 const orbitron = Orbitron({
-  variable: '--font-display',
+  variable: '--font-orbitron',
   subsets: ['latin'],
-  weight: ['500', '700', '800', '900'],
   display: 'swap',
 });
 const dmSans = DM_Sans({
-  variable: '--font-body',
+  variable: '--font-dm-sans',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
   display: 'swap',
 });
 

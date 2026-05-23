@@ -50,10 +50,12 @@
   --glass-border-strong: rgba(255, 255, 255, 0.18);
   --glass-blur: 14px;
 
-  /* Display font stack (Orbitron when loaded; fallback to system geometric). */
-  --font-display-stack: var(--font-display, 'Orbitron'), 'Rajdhani', 'Exo 2',
+  /* Display font stack. next/font sets `--font-orbitron`/`--font-dm-sans`
+   * on the <html> element via its className; the stacks below pick them
+   * up and add safe fallbacks. */
+  --font-display-stack: var(--font-orbitron), 'Orbitron', 'Rajdhani', 'Exo 2',
     ui-sans-serif, system-ui, sans-serif;
-  --font-body-stack: var(--font-body, 'DM Sans'), ui-sans-serif, system-ui,
+  --font-body-stack: var(--font-dm-sans), 'DM Sans', ui-sans-serif, system-ui,
     -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 

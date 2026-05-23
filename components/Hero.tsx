@@ -32,15 +32,24 @@ const PARTICLES = Array.from({ length: 28 }, (_, i) => {
 });
 
 // Six float-drift positions for the background game thumbnails — fanned
-// across the hero so they read as a halo, not a stack. Each gets its own
-// rotation, drift vector and animation duration for organic movement.
-const FLOAT_POSITIONS = [
-  { top: '6%',  left: '4%',   rot: '-12deg', dx: '14px',  dy: '-22px', dur: '18s', delay: '0s'   },
-  { top: '12%', right: '6%',  rot: '14deg',  dx: '-18px', dy: '20px',  dur: '22s', delay: '1.4s' },
-  { top: '45%', left: '-2%',  rot: '8deg',   dx: '20px',  dy: '-18px', dur: '20s', delay: '0.6s' },
-  { top: '52%', right: '-1%', rot: '-9deg',  dx: '-12px', dy: '18px',  dur: '24s', delay: '2.2s' },
-  { bottom: '8%', left: '12%', rot: '4deg',   dx: '12px',  dy: '-22px', dur: '19s', delay: '1s'   },
-  { bottom: '14%', right: '14%', rot: '-6deg', dx: '-16px', dy: '-16px', dur: '21s', delay: '3s' },
+// across the hero so they read as a halo, not a stack. Each entry keeps
+// CSS placement separate from animation metadata so we never spread
+// non-CSS keys into a React `style` prop.
+type FloatSpec = {
+  place: React.CSSProperties;
+  rot: string;
+  dx: string;
+  dy: string;
+  dur: string;
+  delay: string;
+};
+const FLOAT_POSITIONS: FloatSpec[] = [
+  { place: { top: '6%',     left: '4%'   }, rot: '-12deg', dx: '14px',  dy: '-22px', dur: '18s', delay: '0s'   },
+  { place: { top: '12%',    right: '6%'  }, rot: '14deg',  dx: '-18px', dy: '20px',  dur: '22s', delay: '1.4s' },
+  { place: { top: '45%',    left: '-2%'  }, rot: '8deg',   dx: '20px',  dy: '-18px', dur: '20s', delay: '0.6s' },
+  { place: { top: '52%',    right: '-1%' }, rot: '-9deg',  dx: '-12px', dy: '18px',  dur: '24s', delay: '2.2s' },
+  { place: { bottom: '8%',  left: '12%'  }, rot: '4deg',   dx: '12px',  dy: '-22px', dur: '19s', delay: '1s'   },
+  { place: { bottom: '14%', right: '14%' }, rot: '-6deg',  dx: '-16px', dy: '-16px', dur: '21s', delay: '3s'   },
 ];
 
 export default function Hero({ liveCount, heroLabel, floaters }: HeroProps) {
@@ -72,7 +81,7 @@ export default function Hero({ liveCount, heroLabel, floaters }: HeroProps) {
               key={g.slug}
               className="float-drift absolute hidden sm:block"
               style={{
-                ...pos,
+                ...pos.place,
                 ['--rot' as string]: pos.rot,
                 ['--dx' as string]: pos.dx,
                 ['--dy' as string]: pos.dy,
