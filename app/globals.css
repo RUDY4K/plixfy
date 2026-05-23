@@ -111,6 +111,104 @@ body {
   }
 }
 
+/* ─── Premium polish utilities ───────────────────────────────────────── */
+
+/* Cyan-glow CTA. Apply to primary "Play" / "Play now" buttons. The glow
+ * intensifies on hover and shrinks on press for a tactile, AAA-feel
+ * interaction. Use over any cyan/emerald-rerouted background. */
+.glow-primary {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent-primary) 30%, transparent),
+    0 8px 28px -8px color-mix(in srgb, var(--accent-primary) 55%, transparent);
+  transition: box-shadow 180ms ease, transform 120ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .glow-primary:hover {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent-primary) 55%, transparent),
+      0 12px 36px -8px color-mix(in srgb, var(--accent-primary) 75%, transparent);
+  }
+}
+.glow-primary:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
+}
+
+/* Section-title icon — subtle pulsing glow keyed to the section's accent.
+ * Color is set via the `--section-accent` CSS variable on the parent. */
+.section-icon-glow {
+  --section-accent: var(--accent-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--section-accent) 45%, transparent));
+  animation: sectionIconPulse 3.6s ease-in-out infinite;
+}
+@keyframes sectionIconPulse {
+  0%, 100% { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--section-accent) 35%, transparent)); }
+  50%      { filter: drop-shadow(0 0 14px color-mix(in srgb, var(--section-accent) 65%, transparent)); }
+}
+
+/* Thin gradient divider line under section titles. Inherits the section's
+ * accent through `--section-accent` so each row gets its own personality. */
+.section-divider {
+  --section-accent: var(--accent-primary);
+  height: 2px;
+  width: 56px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--section-accent) 80%, transparent),
+    color-mix(in srgb, var(--section-accent) 0%, transparent)
+  );
+}
+
+/* Skeleton shimmer for loading cards. Use as `<div class="skeleton-shimmer">` */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 0%,
+    var(--bg-surface-hover) 50%,
+    var(--bg-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 12px;
+}
+
+/* Logo cyan glow — wraps the inline-SVG mark in the header. */
+.logo-glow {
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent-primary) 50%, transparent));
+}
+
+/* "TOP" badge gradient gold — keeps text dark for AA contrast on the
+ * brightest part of the gradient. */
+.badge-gold {
+  background: linear-gradient(135deg, #FFE57A 0%, #FFB300 55%, #C77700 100%);
+  color: #1A0F00;
+}
+
+/* Active-tab cyan underline used in nav links. */
+.nav-active {
+  color: var(--accent-primary);
+  position: relative;
+}
+.nav-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  background: var(--accent-primary);
+  border-radius: 2px;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent-primary) 60%, transparent);
+}
+
 /* ─── Micro-interactions (dopamine triggers) ─────────────────────────── */
 
 /* Global 150ms transitions on interactive surfaces. Limited to specific
@@ -236,7 +334,9 @@ a,
   .streak-flip,
   .daily-pulse,
   .animate-toast,
-  .animate-grid-in {
+  .animate-grid-in,
+  .section-icon-glow,
+  .skeleton-shimmer {
     animation: none;
   }
   ::view-transition-old(root),

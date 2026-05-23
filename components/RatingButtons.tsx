@@ -54,7 +54,7 @@ export default function RatingButtons({ slug, variant = 'default' }: RatingButto
         className={`flex h-9 items-center gap-1 rounded-md px-3 text-sm font-semibold transition ${
           upActive
             ? 'bg-emerald-500 text-neutral-950'
-            : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white'
+            : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-cyan-300'
         }`}
       >
         <span aria-hidden="true">👍</span>
@@ -71,7 +71,7 @@ export default function RatingButtons({ slug, variant = 'default' }: RatingButto
         className={`flex h-9 items-center gap-1 rounded-md px-3 text-sm font-semibold transition ${
           downActive
             ? 'bg-rose-500 text-neutral-950'
-            : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white'
+            : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-cyan-300'
         }`}
       >
         <span aria-hidden="true">👎</span>

@@ -12,11 +12,12 @@ export default function Header() {
     <header className="sticky top-0 z-30 border-b border-neutral-900 bg-neutral-950/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <Link href="/" aria-label="Plixfy home" className="flex items-center gap-2">
-          {/* Inline SVG: icon + wordmark, brand-accurate, no network hop */}
+          {/* Inline SVG: icon + wordmark, brand-accurate, no network hop.
+              `.logo-glow` paints a soft cyan drop-shadow around the mark. */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 340 80"
-            className="h-7 w-auto"
+            className="logo-glow h-7 w-auto"
             role="img"
             aria-label="Plixfy"
           >
@@ -43,14 +44,17 @@ export default function Header() {
         </Link>
         <nav className="flex items-center gap-3 text-sm text-neutral-400 sm:gap-5">
           <RandomGameLink liveSlugs={LIVE_SLUGS} />
-          <Link href="/favorites" className="flex items-center gap-1 transition hover:text-white">
+          <Link
+            href="/favorites"
+            className="flex items-center gap-1 transition hover:text-cyan-300"
+          >
             <span aria-hidden="true">♥</span>
             <span className="hidden sm:inline">Favorites</span>
           </Link>
-          <Link href="/" className="hidden transition hover:text-white sm:inline">
+          <Link href="/" className="hidden transition hover:text-cyan-300 sm:inline">
             Games
           </Link>
-          <Link href="/about" className="hidden transition hover:text-white sm:inline">
+          <Link href="/about" className="hidden transition hover:text-cyan-300 sm:inline">
             About
           </Link>
           <StreakWidget />

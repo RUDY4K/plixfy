@@ -47,12 +47,12 @@ export default async function Home() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <section className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-8 sm:p-14">
+      <section className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-950 p-8 sm:p-14">
         <div
-          className="pointer-events-none absolute inset-0 opacity-30"
+          className="pointer-events-none absolute inset-0 opacity-40"
           style={{
             background:
-              'radial-gradient(800px 300px at 20% 10%, #4ade8033, transparent), radial-gradient(600px 300px at 80% 90%, #60a5fa22, transparent)',
+              'radial-gradient(800px 300px at 20% 10%, color-mix(in srgb, var(--accent-primary) 22%, transparent), transparent), radial-gradient(600px 300px at 80% 90%, color-mix(in srgb, var(--accent-creative) 18%, transparent), transparent)',
           }}
         />
         <div className="relative">
@@ -66,7 +66,7 @@ export default async function Home() {
           </p>
           <a
             href="#games"
-            className="mt-6 inline-block rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-neutral-950 transition hover:bg-emerald-400"
+            className="glow-primary mt-6 inline-block rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-neutral-950 transition hover:bg-emerald-400"
           >
             Play now →
           </a>
@@ -84,6 +84,7 @@ export default async function Home() {
         icon="🔥"
         subtitle="Most-played picks across the catalog"
         games={trending}
+        accent="#FF3366"
       />
 
       <GameRow
@@ -91,6 +92,7 @@ export default async function Home() {
         icon="⭐"
         subtitle="Games we built ourselves — no third-party iframes"
         games={originals}
+        accent="#7C4DFF"
       />
 
       <GameRow
@@ -99,6 +101,7 @@ export default async function Home() {
         subtitle="Live multiplayer .io games — slither, shoot, survive"
         games={ioRow}
         href="/play/io-games"
+        accent="#00C8FF"
       />
 
       <GameRow
@@ -106,6 +109,7 @@ export default async function Home() {
         icon="🆕"
         subtitle="Fresh from the harvest"
         games={recent}
+        accent="#22C55E"
       />
 
       <CategoryCards games={LIGHT_GAMES} />

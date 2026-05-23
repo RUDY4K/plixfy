@@ -48,16 +48,23 @@ function Thumbnail({ game }: { game: LightGameMeta }) {
   );
 }
 
-// Hot uses the research-backed accent-hot (#FF3366) — eye-tracking studies
-// (2026) measured 0.3s faster fixation vs. orange for "trending" tags.
+// Badge palette per the research-backed spec:
+//   hot   — #FF3366 (accent-hot)    eye-tracking 2026: 0.3s faster fixation
+//   top   — gradient gold           premium feel, drives prestige
+//   new   — #22C55E (accent-success) green reads as "fresh / unlocked"
+//   daily — #7C4DFF (accent-creative) purple = curiosity trigger
 const BADGE_STYLES: Record<NonNullable<GameCardProps['badge']>, { label: string; style?: React.CSSProperties; cls: string }> = {
   hot: {
     label: '🔥 Hot',
     cls: 'text-white',
     style: { background: 'var(--accent-hot)' },
   },
-  top: { label: '★ Top', cls: 'bg-amber-400/95 text-neutral-950' },
-  new: { label: 'New', cls: 'bg-sky-500/95 text-neutral-950' },
+  top: { label: '★ Top', cls: 'badge-gold' },
+  new: {
+    label: 'New',
+    cls: 'text-neutral-950',
+    style: { background: 'var(--accent-success)' },
+  },
   daily: {
     label: '✨ Today',
     cls: 'text-white',
@@ -104,7 +111,10 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
           <Thumbnail game={game} />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
           {game.kind === 'custom' && (
-            <span className="absolute left-2 top-2 rounded-full bg-emerald-500/95 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-neutral-950">
+            <span
+              className="absolute left-2 top-2 rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white"
+              style={{ background: 'var(--accent-creative)' }}
+            >
               Original
             </span>
           )}
@@ -142,7 +152,7 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
       href={isLive ? `/games/${game.slug}` : '#'}
       aria-disabled={!isLive}
       style={{ ['--card-glow' as string]: game.color }}
-      className={`group relative flex flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 touch-manipulation ${
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900 touch-manipulation ${
         isLive ? 'card-hover card-tap' : 'opacity-60'
       }`}
     >
@@ -152,7 +162,10 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
 
         {/* Top-left: kind/tier badge */}
         {game.kind === 'custom' && (
-          <span className="absolute left-2 top-2 rounded-full bg-emerald-500/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-950">
+          <span
+            className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white"
+            style={{ background: 'var(--accent-creative)' }}
+          >
             Original
           </span>
         )}
@@ -221,7 +234,10 @@ export default function GameCard({ game, variant = 'default', badge }: GameCardP
           </span>
           <span
             className="rounded-md px-3 py-1 text-xs font-semibold text-neutral-950 transition group-hover:scale-105"
-            style={{ background: game.color }}
+            style={{
+              background: game.color,
+              boxShadow: `0 0 0 0 ${game.color}`,
+            }}
           >
             {isLive ? 'Play →' : 'Soon'}
           </span>

@@ -72,7 +72,12 @@ export default function ShareGameActions({ slug, title }: ShareGameActionsProps)
         <button
           type="button"
           onClick={handleChallenge}
-          className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-3 py-1 text-xs font-semibold text-neutral-950 transition hover:bg-amber-300"
+          className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-white transition hover:brightness-110 active:scale-95"
+          style={{
+            background: 'var(--accent-creative)',
+            boxShadow:
+              '0 0 0 1px color-mix(in srgb, var(--accent-creative) 35%, transparent), 0 6px 18px -6px color-mix(in srgb, var(--accent-creative) 55%, transparent)',
+          }}
         >
           <span aria-hidden="true">⚔️</span>
           Challenge a friend
@@ -80,7 +85,11 @@ export default function ShareGameActions({ slug, title }: ShareGameActionsProps)
         <button
           type="button"
           onClick={() => setActionsOpen((v) => !v)}
-          className="inline-flex items-center gap-1 rounded-full border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-semibold text-neutral-200 transition hover:border-cyan-500/60 hover:text-white"
+          className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold text-neutral-200 transition hover:text-white active:scale-95"
+          style={{
+            borderColor: 'color-mix(in srgb, var(--accent-creative) 35%, transparent)',
+            background: 'color-mix(in srgb, var(--accent-creative) 12%, var(--bg-surface))',
+          }}
           aria-expanded={actionsOpen}
         >
           <span aria-hidden="true">📤</span>

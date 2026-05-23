@@ -9,8 +9,9 @@ import { evaluate, getSessionPlays } from '@/lib/achievements';
  * doesn't flash on the SSR pass; calls recordVisit() once per mount to
  * advance/preserve the streak.
  *
- * Color follows the research-backed palette: green (#22C55E) — Taylor &
- * Francis 2025 found green had the best recognition for progress signals.
+ * Color follows the research-backed palette: orange (#FF6B35, accent-warning)
+ * — pairs with the 🔥 emoji for an FOMO/streak association and reads as
+ * "don't lose this" at a glance.
  * On count increment we replay the flip animation by keying the digit.
  */
 export default function StreakWidget() {
@@ -44,9 +45,9 @@ export default function StreakWidget() {
       aria-label={tooltip}
       className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold"
       style={{
-        background: 'color-mix(in srgb, var(--accent-success) 14%, transparent)',
-        borderColor: 'color-mix(in srgb, var(--accent-success) 35%, transparent)',
-        color: 'var(--accent-success)',
+        background: 'color-mix(in srgb, var(--accent-warning) 14%, transparent)',
+        borderColor: 'color-mix(in srgb, var(--accent-warning) 40%, transparent)',
+        color: 'var(--accent-warning)',
       }}
     >
       <span aria-hidden="true">🔥</span>

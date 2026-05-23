@@ -11,6 +11,11 @@ interface GameRowProps {
   games: readonly LightGameMeta[];
   /** Optional "see all" link target, e.g. "?category=racing" */
   href?: string;
+  /**
+   * Section accent color (CSS color). Drives the icon glow and the
+   * gradient divider under the title. Default: brand cyan.
+   */
+  accent?: string;
 }
 
 /**
@@ -18,7 +23,7 @@ interface GameRowProps {
  * buttons that appear on hover (desktop) — touch devices get native momentum
  * scrolling without the chrome.
  */
-export default function GameRow({ title, subtitle, icon, games, href }: GameRowProps) {
+export default function GameRow({ title, subtitle, icon, games, href, accent }: GameRowProps) {
   const scroller = useRef<HTMLDivElement>(null);
 
   function scrollBy(direction: -1 | 1) {
@@ -29,18 +34,32 @@ export default function GameRow({ title, subtitle, icon, games, href }: GameRowP
 
   if (games.length === 0) return null;
 
+  // Bind the section accent via a CSS var so .section-icon-glow and
+  // .section-divider inherit it without bespoke styles per row.
+  const sectionStyle = accent
+    ? ({ ['--section-accent' as string]: accent } as React.CSSProperties)
+    : undefined;
+
   return (
-    <section className="mt-10">
+    <section className="mt-10" style={sectionStyle}>
       <div className="mb-3 flex items-end justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight sm:text-2xl">
-            {icon && <span aria-hidden="true">{icon}</span>}
-            {title}
+            {icon && (
+              <span aria-hidden="true" className="section-icon-glow text-2xl sm:text-3xl">
+                {icon}
+              </span>
+            )}
+            <span>{title}</span>
           </h2>
-          {subtitle && <p className="mt-0.5 text-xs text-neutral-500">{subtitle}</p>}
+          <span aria-hidden="true" className="section-divider mt-1 block" />
+          {subtitle && <p className="mt-1.5 text-xs text-neutral-500">{subtitle}</p>}
         </div>
         {href && (
-          <a href={href} className="text-xs font-semibold text-neutral-400 hover:text-white">
+          <a
+            href={href}
+            className="text-xs font-semibold text-neutral-400 transition hover:text-cyan-300"
+          >
             See all →
           </a>
         )}
