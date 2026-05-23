@@ -60,7 +60,7 @@ export default function Header() {
             <span className="hidden sm:inline">Favorites</span>
           </Link>
           <Link
-            href="/"
+            href="/games"
             className="hidden transition hover:text-[color:var(--neon-cyan)] sm:inline"
           >
             Games
