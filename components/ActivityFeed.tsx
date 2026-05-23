@@ -115,12 +115,10 @@ export default function ActivityFeed({ initialItems }: Props) {
                 </span>
               )}
               <span className="flex-1 truncate text-neutral-300">
-                <Link
-                  href={`/profile/${encodeURIComponent(item.username)}`}
-                  className="font-semibold text-white hover:underline"
-                >
-                  {item.username}
-                </Link>{' '}
+                {/* No public profile page yet — render the username as plain
+                    text so we don't leak 404s into the activity feed. Wrap
+                    in <Link> again once /profile/[username] ships. */}
+                <span className="font-semibold text-white">{item.username}</span>{' '}
                 {verbText} {suffix && <span>{suffix}</span>}{' '}
                 <Link
                   href={`/games/${item.gameSlug}`}
