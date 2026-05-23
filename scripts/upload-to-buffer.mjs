@@ -26,12 +26,27 @@
 //                                   so Vercel will serve them after `git push`
 //   --skip-images                   schedule with a link asset only (no image)
 //   --scheduling-type=notification|automatic
-//                                   default: notification (Buffer free tier
-//                                   sends a phone-push reminder; switch to
-//                                   `automatic` if your plan supports it).
+//                                   global default; per-service flags below
+//                                   override. Buffer free tier supports
+//                                   `notification` (phone push reminder) for
+//                                   most channels but REQUIRES `automatic`
+//                                   for Twitter — defaults reflect that:
+//                                     twitter   → automatic
+//                                     instagram → notification
+//   --twitter-scheduling=…          override Twitter scheduling type.
+//   --instagram-scheduling=…        override Instagram scheduling type.
+//   --instagram-type=post|reel|story|carousel
+//                                   Instagram PostType (required by Buffer);
+//                                   default: post.
 //   --share-mode=customScheduled|addToQueue|shareNext|recommendedTime
 //                                   default: customScheduled (uses --hour/--tz)
 //   --organization-id=ID            override Buffer org id (else first one).
+//
+// Image-availability fallback: if the configured --image-base-url is not
+// reachable (HEAD non-200), the script falls back to image-less posting:
+// Twitter gets a link asset (link card auto-renders), Instagram posts are
+// SKIPPED (Buffer rejects link-only Instagram posts). The recommended fix
+// is `--copy-images`, commit + push, wait for Vercel deploy, then re-run.
 //
 // API: https://api.buffer.com/graphql
 //      Auth: Authorization: Bearer <token>
@@ -64,7 +79,30 @@ const PLATFORMS = (args.platforms || 'twitter,instagram')
   .split(',')
   .map((s) => s.trim().toLowerCase())
   .filter(Boolean);
-const SCHEDULING_TYPE = args['scheduling-type'] || 'notification';
+// Per-service `schedulingType` (Buffer GraphQL):
+//   - 'automatic'    → direct publish via Buffer; requires the channel to
+//                      support it. Twitter REQUIRES this — Buffer rejects
+//                      `notification` for Twitter ("not supported").
+//   - 'notification' → Buffer sends a push reminder to your phone, you tap
+//                      "Share now". Works on free tier for Instagram /
+//                      TikTok / etc. where direct publishing needs a paid
+//                      plan or Business account.
+// Defaults below match Buffer free tier; override per service with
+// --scheduling-type=auto|notification (applies to all), or with the
+// dedicated --twitter-scheduling / --instagram-scheduling flags.
+const GLOBAL_SCHEDULING_TYPE = args['scheduling-type'] || null;
+const DEFAULT_SCHEDULING_TYPE_BY_SERVICE = {
+  twitter: 'automatic',
+  instagram: 'notification',
+};
+function schedulingTypeFor(service) {
+  const override = args[`${service}-scheduling`];
+  if (override) return override;
+  if (GLOBAL_SCHEDULING_TYPE) return GLOBAL_SCHEDULING_TYPE;
+  return DEFAULT_SCHEDULING_TYPE_BY_SERVICE[service] || 'notification';
+}
+
+const INSTAGRAM_TYPE = args['instagram-type'] || 'post'; // post | reel | story | carousel
 const SHARE_MODE = args['share-mode'] || 'customScheduled';
 
 const TOKEN = process.env.BUFFER_ACCESS_TOKEN;
@@ -272,12 +310,20 @@ function copyImagesToPublic(entries) {
 
 // ── Build CreatePostInput ──────────────────────────────────────────────
 
-function buildCreatePostInput({ entry, channelId, service, scheduledAtUTC }) {
+// Buffer GraphQL rejects link-only Instagram posts (every Instagram post
+// must have an image, reel, or carousel). When images aren't available
+// (--skip-images, or HEAD-check failed) we skip Instagram entries instead
+// of submitting something Buffer will reject.
+function buildCreatePostInput({ entry, channelId, service, scheduledAtUTC, hasImage }) {
   const text = service === 'twitter' ? entry.twitter : entry.instagram;
-  const imageUrl = SKIP_IMAGES ? null : `${IMAGE_BASE_URL}${entry.image}`;
+  const imageUrl = hasImage ? `${IMAGE_BASE_URL}${entry.image}` : null;
 
-  // `assets` is required (non-null list). Image asset preferred; fall back
-  // to a link asset (with game URL) when image is skipped or unavailable.
+  if (service === 'instagram' && !imageUrl) {
+    return { skip: true, reason: 'Instagram requires an image asset — none available.' };
+  }
+
+  // `assets` is a required non-null list. Prefer image; Twitter falls back
+  // to a link asset (Buffer auto-renders a link card) when no image.
   const assets = imageUrl
     ? [{ image: { url: imageUrl, thumbnailUrl: imageUrl } }]
     : [{ link: { url: entry.game.url, title: entry.game.title, description: text.slice(0, 200) } }];
@@ -286,7 +332,7 @@ function buildCreatePostInput({ entry, channelId, service, scheduledAtUTC }) {
     channelId,
     text,
     assets,
-    schedulingType: SCHEDULING_TYPE, // 'notification' | 'automatic'
+    schedulingType: schedulingTypeFor(service),
     mode: SHARE_MODE, // 'customScheduled' for scheduled-at-time
     aiAssisted: true,
     source: 'plixfy-weekly-generator',
@@ -294,7 +340,18 @@ function buildCreatePostInput({ entry, channelId, service, scheduledAtUTC }) {
   if (SHARE_MODE === 'customScheduled') {
     input.dueAt = scheduledAtUTC.toISOString();
   }
-  return input;
+
+  // Instagram-specific required metadata: PostType + shouldShareToFeed.
+  if (service === 'instagram') {
+    input.metadata = {
+      instagram: {
+        type: INSTAGRAM_TYPE, // 'post' | 'reel' | 'story' | 'carousel'
+        shouldShareToFeed: true,
+      },
+    };
+  }
+
+  return { skip: false, input };
 }
 
 function unwrapCreatePostResult(payload) {
@@ -314,7 +371,8 @@ function unwrapCreatePostResult(payload) {
 async function main() {
   console.log('Buffer scheduler (GraphQL)');
   console.log(`  dry-run: ${DRY_RUN}    platforms: ${PLATFORMS.join(',')}    start-date: ${START_DATE}    ${HOUR}:00 ${TZ}`);
-  console.log(`  scheduling: ${SCHEDULING_TYPE}    mode: ${SHARE_MODE}`);
+  const schedSummary = PLATFORMS.map((p) => `${p}=${schedulingTypeFor(normaliseService(p))}`).join('  ');
+  console.log(`  scheduling: ${schedSummary}    mode: ${SHARE_MODE}    instagram-type: ${INSTAGRAM_TYPE}`);
   console.log(`  image base: ${SKIP_IMAGES ? '(none)' : IMAGE_BASE_URL}`);
 
   // Probe token + fetch account/org id.
@@ -367,19 +425,24 @@ async function main() {
     copyImagesToPublic(entries);
   }
 
-  // Verify image URLs are reachable (skip check on dry-run).
-  if (!SKIP_IMAGES && !DRY_RUN) {
+  // Verify image URLs are reachable. If they aren't, fall back to
+  // image-less posting automatically (Twitter gets a link card; Instagram
+  // is skipped further down because Buffer rejects link-only IG posts).
+  let hasImage = !SKIP_IMAGES;
+  if (hasImage && !DRY_RUN) {
     const sampleUrl = `${IMAGE_BASE_URL}${entries[0].image}`;
     try {
       const r = await fetch(sampleUrl, { method: 'HEAD' });
       if (!r.ok) {
-        console.warn(`  warn: HEAD ${sampleUrl} → ${r.status}. Buffer needs publicly reachable image URLs.`);
-        console.warn(`         Re-run with --copy-images and deploy, or pass --image-base-url=… or --skip-images.`);
+        console.warn(`  warn: HEAD ${sampleUrl} → ${r.status}. Falling back to image-less posting.`);
+        console.warn(`         Run --copy-images, commit + push (Vercel deploy), then re-run.`);
+        hasImage = false;
       } else {
         console.log(`  image base reachable (HEAD ${sampleUrl} → ${r.status})`);
       }
     } catch (err) {
-      console.warn(`  warn: could not HEAD-check ${sampleUrl}: ${err.message}`);
+      console.warn(`  warn: could not HEAD-check ${sampleUrl}: ${err.message}. Proceeding image-less.`);
+      hasImage = false;
     }
   }
 
@@ -403,11 +466,12 @@ async function main() {
     console.log(`  game: ${entry.game.title}`);
 
     for (const [svc, channel] of Object.entries(resolved)) {
-      const input = buildCreatePostInput({
+      const built = buildCreatePostInput({
         entry,
         channelId: channel.id,
         service: svc,
         scheduledAtUTC,
+        hasImage,
       });
       const summary = {
         day: entry.day,
@@ -415,13 +479,23 @@ async function main() {
         scheduledAtUTC: scheduledAtUTC.toISOString(),
         service: svc,
         channelId: channel.id,
-        textLength: input.text.length,
-        image: SKIP_IMAGES ? null : `${IMAGE_BASE_URL}${entry.image}`,
+        image: hasImage ? `${IMAGE_BASE_URL}${entry.image}` : null,
         link: entry.game.url,
       };
 
+      if (built.skip) {
+        console.warn(`  ${svc}: SKIPPED — ${built.reason}`);
+        results.push({ ...summary, status: 'skipped', reason: built.reason });
+        continue;
+      }
+
+      const input = built.input;
+      summary.textLength = input.text.length;
+      summary.schedulingType = input.schedulingType;
+
       if (DRY_RUN) {
-        console.log(`  [dry-run] ${svc}: would createPost (${input.text.length} chars${input.assets[0].image ? ', +image' : ', +link'})`);
+        const assetKind = input.assets[0].image ? 'image' : 'link';
+        console.log(`  [dry-run] ${svc}: would createPost (${input.text.length} chars, +${assetKind}, schedulingType=${input.schedulingType})`);
         results.push({ ...summary, status: 'dry-run' });
         continue;
       }
@@ -459,8 +533,11 @@ async function main() {
         startDate: START_DATE,
         hour: HOUR,
         tz: TZ,
-        schedulingType: SCHEDULING_TYPE,
+        schedulingTypeByService: Object.fromEntries(
+          Object.keys(resolved).map((svc) => [svc, schedulingTypeFor(svc)]),
+        ),
         shareMode: SHARE_MODE,
+        instagramType: INSTAGRAM_TYPE,
         organizationId,
         platforms: Object.keys(resolved),
         imageBaseUrl: SKIP_IMAGES ? null : IMAGE_BASE_URL,
@@ -473,8 +550,9 @@ async function main() {
 
   const ok = results.filter((r) => r.status === 'scheduled').length;
   const failed = results.filter((r) => r.status === 'error').length;
+  const skipped = results.filter((r) => r.status === 'skipped').length;
   const dry = results.filter((r) => r.status === 'dry-run').length;
-  console.log(`\nDone. scheduled=${ok}  failed=${failed}  dry-run=${dry}`);
+  console.log(`\nDone. scheduled=${ok}  failed=${failed}  skipped=${skipped}  dry-run=${dry}`);
   console.log(`Log: ${logPath}`);
   if (failed > 0) process.exit(2);
 }
