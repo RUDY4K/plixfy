@@ -21,8 +21,8 @@
 //   --hour=16                       hour-of-day in --tz; default 16 (4 PM)
 //   --tz=America/New_York           IANA timezone; default America/New_York
 //   --image-base-url=URL            where day-N.png is publicly hosted;
-//                                   default https://plixfy.com/social/weekly/
-//   --copy-images                   also copy the PNGs into public/social/weekly/
+//                                   default https://plixfy.com/socials/
+//   --copy-images                   also copy the PNGs into public/socials/
 //                                   so Vercel will serve them after `git push`
 //   --skip-images                   schedule with a link asset only (no image)
 //   --scheduling-type=notification|automatic
@@ -58,7 +58,11 @@ import { dirname, join } from 'node:path';
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..');
 const weeklyDir = join(repoRoot, 'scripts', 'output', 'weekly');
-const publicSocialDir = join(repoRoot, 'public', 'social', 'weekly');
+// `public/socials/` (not `public/social/weekly/`) intentionally — the
+// nested path was cached as a 404 by Vercel's CDN before the images first
+// deployed, and the edge wouldn't invalidate that across redeploys. A
+// fresh top-level path sidesteps the stale-cache issue entirely.
+const publicSocialDir = join(repoRoot, 'public', 'socials');
 
 // ── Args ────────────────────────────────────────────────────────────────
 const args = Object.fromEntries(
@@ -74,7 +78,7 @@ const COPY_IMAGES = !!args['copy-images'];
 const SKIP_IMAGES = !!args['skip-images'];
 const HOUR = Number(args.hour) || 16;
 const TZ = args.tz || 'America/New_York';
-const IMAGE_BASE_URL = (args['image-base-url'] || 'https://plixfy.com/social/weekly/').replace(/\/?$/, '/');
+const IMAGE_BASE_URL = (args['image-base-url'] || 'https://plixfy.com/socials/').replace(/\/?$/, '/');
 const PLATFORMS = (args.platforms || 'twitter,instagram')
   .split(',')
   .map((s) => s.trim().toLowerCase())
@@ -303,7 +307,7 @@ function copyImagesToPublic(entries) {
       continue;
     }
     copyFileSync(src, dst);
-    console.log(`  copied ${e.image} → public/social/weekly/`);
+    console.log(`  copied ${e.image} → public/socials/`);
   }
   console.log('  → commit + push to deploy these to Vercel before Buffer fetches them.');
 }
