@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* ════════════════════════════════════════════════════════════════════════
+   NEON ARCADE — design system
+   ════════════════════════════════════════════════════════════════════════
+   Maximalist gaming aesthetic for Gen Z: animated gradient mesh background,
+   glassmorphism surfaces, neon accent palette, CSS-only particle field,
+   gradient display type via Orbitron. Build philosophy: every surface
+   should feel ALIVE. */
+
 :root {
   /* Research-backed palette (2024-2026 A/B test data).
    * Sourced from: Terra dark-bg bounce study (2025), ACM eye-tracking (2025/2026),
@@ -20,6 +28,33 @@
   /* Legacy compatibility — older code may still read these. */
   --background: var(--bg-primary);
   --foreground: var(--text-primary);
+
+  /* ── NEON ARCADE PALETTE ─────────────────────────────────────────────
+   * Maximalist neon accents on top of the deep navy/purple/blue mesh. */
+  --neon-cyan:    #00F5FF;
+  --neon-magenta: #FF2DAA;
+  --neon-purple:  #7C4DFF;
+  --neon-green:   #39FF14;
+  --neon-amber:   #FFB300;
+
+  /* Background mesh stops — used by .neon-mesh-bg as a shifting gradient. */
+  --mesh-1: #060918;
+  --mesh-2: #0D0B21;
+  --mesh-3: #091428;
+  --mesh-4: #14082A;
+
+  /* Glassmorphism tokens — semi-transparent white + frosted blur. */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-strong: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-border-strong: rgba(255, 255, 255, 0.18);
+  --glass-blur: 14px;
+
+  /* Display font stack (Orbitron when loaded; fallback to system geometric). */
+  --font-display-stack: var(--font-display, 'Orbitron'), 'Rajdhani', 'Exo 2',
+    ui-sans-serif, system-ui, sans-serif;
+  --font-body-stack: var(--font-body, 'DM Sans'), ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 @theme inline {
@@ -69,8 +104,19 @@
 
   --color-background: var(--bg-primary);
   --color-foreground: var(--text-primary);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Neon palette utilities — usable as bg-neon-cyan, text-neon-magenta, etc. */
+  --color-neon-cyan:    var(--neon-cyan);
+  --color-neon-magenta: var(--neon-magenta);
+  --color-neon-purple:  var(--neon-purple);
+  --color-neon-green:   var(--neon-green);
+  --color-neon-amber:   var(--neon-amber);
+
+  /* Font family tokens — font-display (Orbitron) and font-body (DM Sans). */
+  --font-display: var(--font-display-stack);
+  --font-body:    var(--font-body-stack);
+  --font-sans:    var(--font-body-stack);
+  --font-mono:    var(--font-geist-mono);
 }
 
 html {
@@ -80,7 +126,6 @@ html {
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
   /* Prevent rubber-band overscroll showing white when running as a PWA on
    * iOS — the body color shows through instead. */
@@ -110,6 +155,241 @@ body {
     overflow-x: hidden;
   }
 }
+
+/* ─── Neon Arcade foundation ─────────────────────────────────────────── */
+
+/* Animated mesh-gradient background. Layered radial glows over a base
+ * gradient, with the radial layer slowly drifting (60s loop) so the whole
+ * site feels alive without any JavaScript. Body wears this by default. */
+.neon-mesh-bg {
+  background-color: var(--mesh-1);
+  background-image:
+    radial-gradient(1200px 800px at 15% 8%,
+      color-mix(in srgb, var(--neon-cyan) 18%, transparent) 0%,
+      transparent 60%),
+    radial-gradient(900px 700px at 90% 20%,
+      color-mix(in srgb, var(--neon-magenta) 14%, transparent) 0%,
+      transparent 60%),
+    radial-gradient(1100px 900px at 70% 95%,
+      color-mix(in srgb, var(--neon-purple) 18%, transparent) 0%,
+      transparent 60%),
+    radial-gradient(800px 700px at 10% 90%,
+      color-mix(in srgb, var(--neon-cyan) 10%, transparent) 0%,
+      transparent 60%),
+    linear-gradient(160deg, var(--mesh-1) 0%, var(--mesh-2) 45%, var(--mesh-3) 100%);
+  background-attachment: fixed, fixed, fixed, fixed, fixed;
+  background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 100% 100%;
+  background-position: 0% 0%, 100% 0%, 50% 100%, 0% 100%, 0% 0%;
+  animation: meshDrift 60s ease-in-out infinite alternate;
+}
+@keyframes meshDrift {
+  0%   { background-position:  0%   0%, 100%   0%,  50% 100%,   0% 100%, 0% 0%; }
+  50%  { background-position: 50%  30%,  60%  20%,  20%  60%,  80%  60%, 0% 0%; }
+  100% { background-position: 100% 50%,  20%  60%,  80%  40%,  60%  30%, 0% 0%; }
+}
+
+/* Fine grid overlay — sits over the mesh and inside the hero. Sized 40px
+ * on desktop, 28px on mobile via the wrapper class. */
+.neon-grid-overlay {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at 50% 40%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 30%, transparent 75%);
+}
+
+/* Glassmorphism surfaces. Use .glass for cards/headers; .glass-strong for
+ * elevated chrome (header, mobile nav). Both stack a backdrop-blur over a
+ * semi-transparent fill with a 1px inner-light border. */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(130%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(130%);
+  border: 1px solid var(--glass-border);
+}
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--glass-border-strong);
+}
+
+/* Neon gradient text. The cyan→magenta sweep is the brand "wow" treatment
+ * for hero numbers and section headlines. */
+.neon-text-gradient {
+  background: linear-gradient(
+    100deg,
+    var(--neon-cyan) 0%,
+    #6BE9FF 30%,
+    var(--neon-magenta) 70%,
+    #FF6FC8 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% 100%;
+  animation: gradientSlide 6s ease-in-out infinite alternate;
+}
+@keyframes gradientSlide {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Neon CTA — large, pulsing cyan glow, magenta accent ring on hover.
+ * Used for the hero "Play now" and other primary calls-to-action. */
+.neon-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.95rem 1.6rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #04101A;
+  background: linear-gradient(100deg, var(--neon-cyan), #6BE9FF, var(--neon-magenta));
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.20),
+    0 0 26px -2px color-mix(in srgb, var(--neon-cyan) 60%, transparent),
+    0 18px 50px -16px color-mix(in srgb, var(--neon-magenta) 55%, transparent);
+  transition: transform 180ms ease, box-shadow 220ms ease, background-position 600ms ease;
+  animation: ctaPulse 3.2s ease-in-out infinite;
+}
+.neon-cta:hover {
+  transform: translateY(-2px);
+  background-position: 100% 50%;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.30),
+    0 0 42px -2px color-mix(in srgb, var(--neon-cyan) 80%, transparent),
+    0 24px 60px -16px color-mix(in srgb, var(--neon-magenta) 70%, transparent);
+}
+.neon-cta:active { transform: scale(0.97); }
+@keyframes ctaPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.20),
+      0 0 26px -2px color-mix(in srgb, var(--neon-cyan) 60%, transparent),
+      0 18px 50px -16px color-mix(in srgb, var(--neon-magenta) 55%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.30),
+      0 0 50px -2px color-mix(in srgb, var(--neon-cyan) 90%, transparent),
+      0 22px 64px -14px color-mix(in srgb, var(--neon-magenta) 80%, transparent);
+  }
+}
+
+/* Neon pill — colored chip with glow that picks up `--pill-color` set
+ * inline. Used for category badges on cards and section header chips. */
+.neon-pill {
+  --pill-color: var(--neon-cyan);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pill-color);
+  background: color-mix(in srgb, var(--pill-color) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pill-color) 45%, transparent);
+  box-shadow: 0 0 14px -4px color-mix(in srgb, var(--pill-color) 60%, transparent);
+}
+
+/* Particle field — used by Hero. The wrapper sets up the absolute layer;
+ * each .particle uses inline CSS vars (--p-x, --p-delay, --p-dur, --p-color)
+ * to randomize position, timing and color. Pure CSS, no JS. */
+.particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.particle {
+  position: absolute;
+  left: var(--p-x, 50%);
+  top: 110%;
+  width: var(--p-size, 4px);
+  height: var(--p-size, 4px);
+  border-radius: 50%;
+  background: var(--p-color, var(--neon-cyan));
+  box-shadow:
+    0 0 8px var(--p-color, var(--neon-cyan)),
+    0 0 18px var(--p-color, var(--neon-cyan));
+  opacity: 0;
+  animation: particleRise var(--p-dur, 14s) linear var(--p-delay, 0s) infinite;
+}
+@keyframes particleRise {
+  0%   { transform: translateY(0)      translateX(0)               scale(0.7); opacity: 0; }
+  8%   {                                                                       opacity: 0.85; }
+  50%  { transform: translateY(-60vh)  translateX(var(--p-drift, 30px)) scale(1); }
+  92%  {                                                                       opacity: 0.8; }
+  100% { transform: translateY(-110vh) translateX(var(--p-drift, 30px)) scale(0.6); opacity: 0; }
+}
+
+/* Slow drift for floating background thumbnails — gentle parallax-like
+ * float behind the hero text. Uses transform only so it composites cheap. */
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--rot, 0deg)); }
+  50%      { transform: translate3d(var(--dx, 12px), var(--dy, -16px), 0) rotate(calc(var(--rot, 0deg) + 1.5deg)); }
+}
+.float-drift {
+  animation: drift var(--drift-dur, 18s) ease-in-out infinite;
+  animation-delay: var(--drift-delay, 0s);
+}
+
+/* Scroll-triggered stagger reveal. Uses the modern scroll-driven animations
+ * timeline (Chromium 115+, Safari 26+). On unsupported browsers the elements
+ * are visible immediately — no JS fallback needed. */
+@supports (animation-timeline: view()) {
+  .reveal-on-scroll {
+    animation: revealUp linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+}
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero entrance — title slides down with chromatic glow trail, subtitle
+ * fades in after, CTA pops last. Triggered once on first paint. */
+@keyframes heroIn {
+  0%   { opacity: 0; transform: translateY(28px) scale(0.96); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
+}
+.hero-in {
+  animation: heroIn 800ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+/* Custom scrollbar — slim, neon-cyan, only visible while scrolling. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--neon-cyan) 28%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--neon-cyan) 55%, transparent);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* Display-font headings (h1/h2 default) — Orbitron with tight tracking.
+ * Override per-component when needed via `font-body` on text elements. */
+h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
+body { font-family: var(--font-body); }
 
 /* ─── Premium polish utilities ───────────────────────────────────────── */
 
@@ -336,7 +616,14 @@ a,
   .animate-toast,
   .animate-grid-in,
   .section-icon-glow,
-  .skeleton-shimmer {
+  .skeleton-shimmer,
+  .neon-mesh-bg,
+  .particle,
+  .float-drift,
+  .neon-text-gradient,
+  .neon-cta,
+  .hero-in,
+  .reveal-on-scroll {
     animation: none;
   }
   ::view-transition-old(root),

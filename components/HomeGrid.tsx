@@ -112,9 +112,11 @@ export default function HomeGrid({ games }: HomeGridProps) {
 
   return (
     <section id="games" className="mt-12 scroll-mt-20">
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-bold tracking-tight sm:text-2xl">All games</h2>
-        <span className="text-sm text-neutral-400">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <h2 className="font-display text-2xl font-extrabold uppercase tracking-[0.04em] sm:text-3xl">
+          <span className="neon-text-gradient">All games</span>
+        </h2>
+        <span className="font-display text-xs font-bold uppercase tracking-[0.16em] text-neutral-400">
           {filtered.length.toLocaleString()} of {games.length.toLocaleString()}{' '}
           {isMobile && platformFilter !== 'off' ? 'playable on your device' : 'titles'}
         </span>
@@ -128,20 +130,37 @@ export default function HomeGrid({ games }: HomeGridProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Search games"
-            className="w-full rounded-full border border-neutral-800 bg-neutral-900 px-4 py-2 pr-10 text-sm text-white placeholder:text-neutral-600 focus:border-emerald-500 focus:outline-none"
+            className="glass w-full rounded-full px-5 py-3 pr-12 text-sm text-white placeholder:text-neutral-500 focus:outline-none"
+            style={{
+              border: '1px solid rgba(255,255,255,0.10)',
+              fontFamily: 'var(--font-body)',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--neon-cyan) 60%, transparent)';
+              e.currentTarget.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--neon-cyan) 18%, transparent)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)';
+              e.currentTarget.style.boxShadow = '';
+            }}
           />
-          <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-600">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-lg"
+            style={{ color: 'var(--neon-cyan)' }}
+          >
             ⌕
           </span>
         </div>
 
         <div className="flex items-center justify-end">
-          <label className="inline-flex items-center gap-2 text-xs text-neutral-400">
-            <span className="font-semibold uppercase tracking-wider">Sort</span>
+          <label className="inline-flex items-center gap-2 font-display text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-400">
+            <span>Sort</span>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as Sort)}
-              className="rounded-md border border-neutral-800 bg-neutral-900 px-2 py-1 text-xs text-white focus:border-emerald-500 focus:outline-none"
+              className="glass rounded-full px-3 py-1 text-xs text-white focus:outline-none"
+              style={{ fontFamily: 'var(--font-body)' }}
             >
               <option value="default">Featured</option>
               <option value="most-liked">Most liked 👍</option>
@@ -150,62 +169,40 @@ export default function HomeGrid({ games }: HomeGridProps) {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {/* Platform filter row — mobile-first toggles. The mobile-only
-              pill is the prominent default on phones; the desktop-best
-              pill helps power-users find heavyweight titles on desktop. */}
-          <button
-            type="button"
+          <NeonPill
+            active={platformFilter === 'mobile'}
+            color="var(--neon-cyan)"
             onClick={() => setPlatformFilter(platformFilter === 'mobile' ? 'auto' : 'mobile')}
-            className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider transition ${
-              platformFilter === 'mobile'
-                ? 'bg-cyan-500 text-neutral-950'
-                : 'border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20'
-            }`}
           >
             📱 Mobile only
-          </button>
-          <button
-            type="button"
+          </NeonPill>
+          <NeonPill
+            active={platformFilter === 'desktop'}
+            color="var(--neon-amber)"
             onClick={() => setPlatformFilter(platformFilter === 'desktop' ? 'auto' : 'desktop')}
-            className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider transition ${
-              platformFilter === 'desktop'
-                ? 'bg-amber-400 text-neutral-950'
-                : 'border border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20'
-            }`}
           >
             🖥️ Desktop best
-          </button>
-          {PRIMARY_FILTERS.map((f) => {
-            const isActive = filter === f.id;
-            return (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => setFilter(f.id)}
-                className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider transition ${
-                  isActive
-                    ? 'bg-emerald-500 text-neutral-950'
-                    : 'border border-neutral-800 bg-neutral-900 text-neutral-400 hover:border-neutral-600 hover:text-white'
-                }`}
-              >
-                {f.label}
-              </button>
-            );
-          })}
-          {filter !== 'all' && !PRIMARY_FILTERS.some((f) => f.id === filter) && (
-            <button
-              type="button"
-              onClick={() => setFilter('all')}
-              className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-950"
+          </NeonPill>
+          {PRIMARY_FILTERS.map((f) => (
+            <NeonPill
+              key={f.id}
+              active={filter === f.id}
+              color="var(--neon-purple)"
+              onClick={() => setFilter(f.id)}
             >
+              {f.label}
+            </NeonPill>
+          ))}
+          {filter !== 'all' && !PRIMARY_FILTERS.some((f) => f.id === filter) && (
+            <NeonPill active color="var(--neon-magenta)" onClick={() => setFilter('all')}>
               {CATEGORY_META[filter as GameCategory]?.label ?? filter} ×
-            </button>
+            </NeonPill>
           )}
         </div>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-neutral-800 bg-neutral-900/40 p-12 text-center text-neutral-500">
+        <div className="glass rounded-2xl p-12 text-center font-display text-sm uppercase tracking-[0.16em] text-neutral-500">
           No games match your filters.
         </div>
       ) : (
@@ -226,11 +223,16 @@ export default function HomeGrid({ games }: HomeGridProps) {
           </div>
 
           {hasMore && (
-            <div className="mt-8 flex justify-center">
+            <div className="mt-10 flex justify-center">
               <button
                 type="button"
                 onClick={() => setVisible((n) => n + PAGE_SIZE)}
-                className="rounded-full border border-neutral-700 bg-neutral-900 px-6 py-2 text-sm font-semibold text-white transition hover:border-emerald-500 hover:text-emerald-400"
+                className="glass rounded-full px-7 py-3 font-display text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:scale-[1.03] active:scale-95"
+                style={{
+                  border: '1px solid color-mix(in srgb, var(--neon-cyan) 35%, transparent)',
+                  boxShadow:
+                    '0 0 24px -8px color-mix(in srgb, var(--neon-cyan) 60%, transparent)',
+                }}
               >
                 Load more ({filtered.length - visible} remaining)
               </button>
@@ -239,6 +241,46 @@ export default function HomeGrid({ games }: HomeGridProps) {
         </>
       )}
     </section>
+  );
+}
+
+/**
+ * Filter chip with neon glow when active, glass surface when not.
+ */
+function NeonPill({
+  children,
+  active,
+  color,
+  onClick,
+}: {
+  children: React.ReactNode;
+  active: boolean;
+  color: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-full px-3.5 py-1.5 font-display text-[11px] font-bold uppercase tracking-[0.14em] transition active:scale-95"
+      style={
+        active
+          ? {
+              background: `linear-gradient(120deg, ${color}, color-mix(in srgb, ${color} 60%, white))`,
+              color: '#04101A',
+              boxShadow: `0 0 18px -2px ${color}`,
+              border: '1px solid rgba(255,255,255,0.30)',
+            }
+          : {
+              background: 'rgba(255,255,255,0.04)',
+              color: 'rgba(255,255,255,0.75)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              backdropFilter: 'blur(8px)',
+            }
+      }
+    >
+      {children}
+    </button>
   );
 }
 

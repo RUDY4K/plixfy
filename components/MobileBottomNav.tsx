@@ -28,7 +28,12 @@ export default function MobileBottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-neutral-800 bg-neutral-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 glass-strong border-t pb-[env(safe-area-inset-bottom)] md:hidden"
+      style={{
+        background: 'color-mix(in srgb, var(--mesh-1) 70%, transparent)',
+        borderColor: 'rgba(255,255,255,0.10)',
+        boxShadow: '0 -8px 24px -8px rgba(0,0,0,0.6)',
+      }}
     >
       <ul className="grid grid-cols-4">
         {items.map((it) => (
@@ -36,15 +41,33 @@ export default function MobileBottomNav() {
             <Link
               href={it.href}
               aria-current={it.active ? 'page' : undefined}
-              className={`flex flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-semibold transition active:scale-95 ${
-                it.active
-                  ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(0,200,255,0.45)]'
-                  : 'text-neutral-600 hover:text-cyan-300'
+              className={`relative flex flex-col items-center justify-center gap-1 py-2.5 font-display text-[10px] font-bold uppercase tracking-[0.16em] transition active:scale-95 ${
+                it.active ? 'text-[color:var(--neon-cyan)]' : 'text-neutral-500 hover:text-white'
               }`}
+              style={{
+                textShadow: it.active
+                  ? '0 0 10px color-mix(in srgb, var(--neon-cyan) 55%, transparent)'
+                  : undefined,
+              }}
             >
+              {it.active && (
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-px left-1/2 h-[2px] w-10 -translate-x-1/2 rounded-full"
+                  style={{
+                    background: 'var(--neon-cyan)',
+                    boxShadow: '0 0 12px var(--neon-cyan)',
+                  }}
+                />
+              )}
               <span
                 aria-hidden="true"
-                className={`text-lg leading-none transition ${it.active ? 'scale-110' : ''}`}
+                className={`text-xl leading-none transition ${it.active ? 'scale-110' : ''}`}
+                style={
+                  it.active
+                    ? { filter: 'drop-shadow(0 0 10px color-mix(in srgb, var(--neon-cyan) 70%, transparent))' }
+                    : undefined
+                }
               >
                 {it.icon}
               </span>

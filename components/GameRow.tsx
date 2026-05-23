@@ -41,24 +41,34 @@ export default function GameRow({ title, subtitle, icon, games, href, accent }: 
     : undefined;
 
   return (
-    <section className="mt-10" style={sectionStyle}>
-      <div className="mb-3 flex items-end justify-between gap-3">
+    <section className="mt-12" style={sectionStyle}>
+      <div className="mb-5 flex items-end justify-between gap-3">
         <div>
-          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight sm:text-2xl">
+          <h2 className="flex items-center gap-3 font-display text-2xl font-extrabold uppercase tracking-[0.04em] sm:text-3xl">
             {icon && (
-              <span aria-hidden="true" className="section-icon-glow text-2xl sm:text-3xl">
+              <span
+                aria-hidden="true"
+                className="section-icon-glow grid h-10 w-10 place-items-center rounded-xl text-2xl sm:h-12 sm:w-12 sm:text-3xl"
+                style={{
+                  background:
+                    'linear-gradient(135deg, color-mix(in srgb, var(--section-accent, var(--neon-cyan)) 22%, transparent), color-mix(in srgb, var(--section-accent, var(--neon-cyan)) 6%, transparent))',
+                  border:
+                    '1px solid color-mix(in srgb, var(--section-accent, var(--neon-cyan)) 35%, transparent)',
+                }}
+              >
                 {icon}
               </span>
             )}
-            <span>{title}</span>
+            <span className="text-white">{title}</span>
           </h2>
-          <span aria-hidden="true" className="section-divider mt-1 block" />
-          {subtitle && <p className="mt-1.5 text-xs text-neutral-500">{subtitle}</p>}
+          <span aria-hidden="true" className="section-divider mt-2 block" />
+          {subtitle && <p className="mt-2 text-sm text-neutral-400">{subtitle}</p>}
         </div>
         {href && (
           <a
             href={href}
-            className="text-xs font-semibold text-neutral-400 transition hover:text-cyan-300"
+            className="font-display text-xs font-bold uppercase tracking-[0.18em] text-neutral-400 transition hover:text-white"
+            style={{ color: 'color-mix(in srgb, var(--section-accent, var(--neon-cyan)) 80%, white)' }}
           >
             See all →
           </a>
