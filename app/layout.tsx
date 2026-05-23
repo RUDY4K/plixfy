@@ -10,6 +10,7 @@ import AchievementToast from '@/components/AchievementToast';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import InstallPrompt from '@/components/InstallPrompt';
 import MobileBottomNav from '@/components/MobileBottomNav';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
@@ -163,6 +164,7 @@ export default function RootLayout({
         <ServiceWorkerRegister />
         <InstallPrompt />
         <MobileBottomNav />
+        <GoogleAnalytics />
       </body>
     </html>
   );
