@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# imported catalog data (regenerable from Playgama API)
+/data/playgama-catalog.json

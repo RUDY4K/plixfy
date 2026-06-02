@@ -1,0 +1,418 @@
+{
+  "_meta": {
+    "compiled": "2026-06-02",
+    "purpose": "Per-language market metrics for plixfy.com (Playgama partner, Arabic base) language-addition decision",
+    "source_filter": "January 2024 or later only",
+    "confidence_legend": {
+      "high": "Multiple 2024+ sources converge OR direct operator data",
+      "medium": "Single 2024+ source OR triangulated estimate",
+      "low": "Inferred / sparse data / contradictory signals"
+    },
+    "rpm_note": "RPMs cited reflect REAL operator-reported numbers where available. These are 3-10x LOWER than agency benchmarks. Display/banner only — rewarded video can be 3-5x higher but requires playable inventory."
+  },
+
+  "languages": [
+    {
+      "locale": "ar",
+      "language": "Arabic",
+      "status": "current_base",
+      "speakers_millions": 420,
+      "monthly_search_volume_top5_qualitative": "high - 'العاب', 'العاب اونلاين', 'العاب فلاش', 'العاب جديدة', 'العاب بنات'",
+      "top_competitors": [
+        {"name": "Y8 Arabic locale (y8.com/ar)", "note": "Y8 serves AR via /ar/ subdirectory"},
+        {"name": "العاب فلاش brand sites (legacy)", "note": "Many small portals, fragmented"},
+        {"name": "Poki Arabic (poki.com/ar)", "note": "Poki serves AR but no dedicated MENA push"}
+      ],
+      "competitor_traffic_estimates": "Fragmented; no dominant Arabic-first portal at Poki/CrazyGames scale",
+      "estimated_rpm_2025_usd": "0.40-1.20",
+      "rpm_confidence": "low",
+      "rpm_note": "Zero operator data found 2024+. Gulf CPMs (KSA/AE/KW) higher than Egypt/Maghreb. Triangulated from regional ad-network ranges.",
+      "competition_difficulty": "low_to_medium",
+      "competition_evidence": "No DA 80+ Arabic-first portal. Fragmented incumbents. Real opportunity.",
+      "mobile_split_pct_mobile": 75,
+      "mobile_confidence": "medium",
+      "tiktok_funnel_strength": "high",
+      "tiktok_evidence": "MENA TikTok adoption 100M+; gaming creator scene strong",
+      "translation_feasibility": "current_base_no_translation_needed",
+      "playgama_supports": true,
+      "adsense_supports": true,
+      "cultural_fit_arabic_base": "n/a (is the base)",
+      "verdict": "MAINTAIN - deepen moat; this is the core market",
+      "source_dates": ["2024-2026 various"]
+    },
+
+    {
+      "locale": "id-ID",
+      "language": "Indonesian",
+      "status": "top_candidate",
+      "speakers_millions": 270,
+      "monthly_search_volume_top5_qualitative": "high - 'game online', 'game gratis', 'permainan online', 'main game', 'game flash'",
+      "top_competitors": [
+        {"name": "games.co.id", "traffic_rank_country": "#3350", "category_rank": "#106 Video Games", "date": "2024-11"},
+        {"name": "permainan.co.id", "note": "Top-10 competitor", "date": "2024-2026"},
+        {"name": "crazygames.co.id, girlsgogames.co.id", "note": "Western majors localized; not Indonesian-owned"}
+      ],
+      "competitor_traffic_estimates": "Top dedicated id-ID portal is rank #3,350 nationally - BEATABLE",
+      "estimated_rpm_2025_usd": "0.20-1.00",
+      "rpm_confidence": "medium",
+      "rpm_note": "Country AdSense CPM ~$0.12; gaming/entertainment ~$0.20-1.00. One source cited ID YouTube gaming creators at up to Rp 50M (~$3,200)/month (video, not web).",
+      "competition_difficulty": "low_to_medium",
+      "competition_evidence": "games.co.id ranks only #3,350; SERP not saturated; thin local incumbents",
+      "mobile_split_pct_mobile": 96,
+      "mobile_confidence": "high",
+      "mobile_evidence": "96% mobile preference (Jakarta Globe 2024); 77% of $1.78B gaming revenue is mobile",
+      "tiktok_funnel_strength": "very_high",
+      "tiktok_evidence": "160M TikTok users (#2 globally after US); central to 2025 brainrot meme explosion; Jess No Limit 80M+ followers",
+      "translation_feasibility": "good",
+      "translation_note": "LLM translation acceptable for UI + game descriptions; native review recommended for marketing copy",
+      "playgama_supports": true,
+      "adsense_supports": true,
+      "cultural_fit_arabic_base": "strong - largest Muslim-majority country (87% Muslim); shared values, content sensibilities",
+      "growth_trajectory": "+53.2% YoY gaming time 2024 (Niko Partners SEA-6)",
+      "verdict": "STRONG YES - best 2nd language candidate for plixfy",
+      "source_dates": ["2024-2026"]
+    },
+
+    {
+      "locale": "en",
+      "language": "English (global)",
+      "status": "weak_candidate",
+      "speakers_millions": 1500,
+      "monthly_search_volume_top5_qualitative": "very_high - 'free online games', 'browser games', 'io games', 'play online', 'cool math games'",
+      "top_competitors": [
+        {"name": "Poki", "monthly_players_M": 100, "annual_players_M": 625, "dr": 85, "date": "2025"},
+        {"name": "CrazyGames", "monthly_visits_M": 106, "mau_M_2024": 35, "dr": 80, "date": "2024-2026"},
+        {"name": "Coolmath Games", "monthly_visits_M_jan2026": 12.22, "us_traffic_pct": 82.8, "dr": 72, "date": "2026-01"},
+        {"name": "Y8", "monthly_visits_M_sep2024": 11.2, "decline_mom_pct": -7.4, "date": "2024-09"},
+        {"name": "Friv", "monthly_visits_M_dec2024": 15.7, "date": "2024-12"}
+      ],
+      "competitor_traffic_estimates": "Fortress. 5+ portals at DR 72-85, 10+ years dominance",
+      "estimated_rpm_2025_usd": "0.67-1.60",
+      "rpm_confidence": "high",
+      "rpm_note": "OPERATOR DATA: 3M PV/mo gaming site (15% US + EU/JP/CA) = $0.67 page RPM. 1.2M PV unblocked-games UK = $0.95-1.60 RPM. Far below agency $2-8 claims.",
+      "competition_difficulty": "very_high",
+      "competition_evidence": "Zero founded-2022+ generic portals broke top 10 in 2024-2025. Aleyda Solis 2026 study: CrazyGames -14%, Poki -39%, Arkadium -68% YoY organic. AI Overviews compress SERP CTR (32.76% presence).",
+      "mobile_split_pct_mobile": 28,
+      "mobile_confidence": "high",
+      "mobile_evidence": "Naavik/SimilarWeb: 28% mobile / 72% desktop across top browser-gaming sites. Range 4% Pogo to 52% agame.",
+      "tiktok_funnel_strength": "low_for_organic_paid_works",
+      "tiktok_evidence": "Cloutboost 2026: 'TikTok no longer offers same free organic visibility'. Chicken Road case shows funnel works but for emerging markets (22% IN, 18% US, 15% BR)",
+      "translation_feasibility": "trivial",
+      "playgama_supports": true,
+      "adsense_supports": true,
+      "cultural_fit_arabic_base": "none - global audience",
+      "growth_trajectory": "Declining for incumbents; saturated head terms",
+      "verdict": "SKIP for SEO play. Add ONLY if pursuing TikTok-driven single-game viral strategy.",
+      "source_dates": ["2024-2026"]
+    },
+
+    {
+      "locale": "en-IN",
+      "language": "English (India)",
+      "status": "weak_candidate",
+      "speakers_millions": 130,
+      "estimated_rpm_2025_usd": "0.50-1.00",
+      "rpm_confidence": "medium",
+      "rpm_note": "Tier-2 multiplier: 5-10x lower than Tier-1. India gaming/entertainment AdSense ~$0.50-1 specifically. 90% of new Indian internet users prefer local languages (Hindi).",
+      "competition_difficulty": "high",
+      "competition_evidence": "Poki already monetizes India as #2-3 traffic source. To capture India properly need Hindi, not English.",
+      "mobile_split_pct_mobile": 90,
+      "tiktok_funnel_strength": "n/a_tiktok_banned",
+      "tiktok_evidence": "TikTok banned in India since 2020; Instagram Reels + YouTube Shorts substitute",
+      "playgama_supports": true,
+      "adsense_supports": true,
+      "verdict": "SKIP - Poki already serves; Hindi is the real India play but expensive to localize",
+      "source_dates": ["2024-2025"]
+    },
+
+    {
+      "locale": "tr-TR",
+      "language": "Turkish",
+      "status": "secondary_candidate",
+      "speakers_millions": 85,
+      "monthly_search_volume_top5_qualitative": "high - 'oyun', 'oyun oyna', 'ateş ve su' (262K/mo to oyunskor alone), 'kız oyunları', 'araba oyunları'",
+      "top_competitors": [
+        {"name": "oyunskor.com", "monthly_visits_M_may2025": 1.4, "turkey_pct": 91.3, "dr": 55, "date": "2025-05"},
+        {"name": "rekoroyun.com", "monthly_visits_M_nov2024": 2.9, "date": "2024-11"},
+        {"name": "oyunlar1.com", "note": "Top-tier, traffic not surfaced", "date": "2024"},
+        {"name": "oyunkolu.com", "monthly_visits_K": 825, "date": "2024-12"}
+      ],
+      "estimated_rpm_2025_usd": "0.10-0.50",
+      "rpm_confidence": "low_to_medium",
+      "rpm_note": "Turkey country AdSense CPM ~$0.09. YouTube Turkey RPM $0.69 = 91% below US (lira collapse, Dec 2024 inflation 44%). Brutal monetization.",
+      "competition_difficulty": "medium_to_high",
+      "competition_evidence": "Multiple DR 50+ incumbents with 4K+ referring domains. Head terms locked.",
+      "mobile_split_pct_mobile": 78,
+      "mobile_confidence": "low_medium",
+      "tiktok_funnel_strength": "medium",
+      "tiktok_evidence": "Active gaming creators but mostly drive to mobile titles, not browser portals",
+      "translation_feasibility": "medium",
+      "translation_note": "Turkish has rich morphology; LLM translation good but native review needed",
+      "playgama_supports": true,
+      "adsense_supports": true,
+      "cultural_fit_arabic_base": "strong - secular-Muslim cultural overlap, growing internet, Ottoman-historic ties",
+      "growth_trajectory": "Heavy studio investment (Scopely/Loom $1B+, CVC/Dream $5B) but PORTAL layer sleepy",
+      "verdict": "CONDITIONAL YES (3rd or 4th language) - volume play only; brutal RPM economics",
+      "source_dates": ["2024-2026"]
+    },
+
+    {
+      "locale": "fa-IR",
+      "language": "Persian/Farsi",
+      "status": "DISQUALIFIED",
+      "speakers_millions": 110,
+      "estimated_rpm_2025_usd": "0",
+      "rpm_confidence": "high",
+      "rpm_note": "AdSense BLOCKED for Iran publishers (OFAC). Persian NOT on AdSense supported languages list. Two independent disqualifiers.",
+      "competition_difficulty": "n/a",
+      "tiktok_funnel_strength": "n/a_tiktok_restricted_iran",
+      "playgama_supports": "unclear",
+      "adsense_supports": false,
+      "adsense_blocked_reasons": [
+        "Iran OFAC-sanctioned (no publisher accounts)",
+        "Persian language not on AdSense supported publisher languages list"
+      ],
+      "diaspora_persian_us_eu_millions": "5-8",
+      "diaspora_verdict": "Too small for dedicated portal; bilingual English speakers anyway",
+      "verdict": "HARD NO - do not pursue Persian under any plixfy roadmap",
+      "source_dates": ["2024-2025"]
+    },
+
+    {
+      "locale": "es",
+      "language": "Spanish (one locale serves ES + LATAM)",
+      "status": "tertiary_candidate",
+      "speakers_millions": 500,
+      "top_competitors": [
+        {"name": "minijuegos.com", "monthly_visits_M_apr2026": 3.4, "spain_pct": 16.23, "argentina_pct": 18.95, "owner": "Azerion since 2022-01"},
+        {"name": "1001juegos.com", "spain_pct_desktop": 68.46, "note": "Lost most traffic by 2026", "date": "2026-04"},
+        {"name": "Friv.com (global)", "monthly_visits_M_jun2024": 15.1, "date": "2024-06"},
+        {"name": "Poki Spanish", "note": "Major LATAM presence, country-level not broken out"}
+      ],
+      "es_es_rpm_2025_usd": "2.00-6.00",
+      "es_latam_rpm_2025_usd": "0.80-3.00",
+      "rpm_confidence": "medium",
+      "rpm_note": "Spain EU-tier-2 CPMs. LATAM: AR/MX/CO $0.80-3 range. Games-vertical specifically at low end.",
+      "competition_difficulty": "medium",
+      "competition_evidence": "minijuegos + Friv dominate but no DA 85+ Spanish-first portal. Long-tail accessible.",
+      "spain_mobile_pct": 65,
+      "latam_mobile_pct": 85,
+      "tiktok_funnel_strength": "medium_to_high",
+      "tiktok_evidence": "LATAM TikTok strong, especially MX/CO/AR; Spain modest",
+      "translation_feasibility": "good",
+      "translation_note": "One es locale serves all - minijuegos proves dialect-neutral works for games portals",
+      "playgama_supports": true,
+      "adsense_supports": true,
+      "cultural_fit_arabic_base": "none-to-weak",
+      "verdict": "DEFER (4th language if pursued at all) - lower priority than Indonesian/English given plixfy constraints",
+      "source_dates": ["2024-2026"]
+    },
+
+    {
+      "locale": "pt-BR",
+      "language": "Portuguese (Brazil)",
+      "status": "myth_busted",
+      "speakers_millions": 215,
+      "top_competitors": [
+        {"name": "jogos360.com.br", "monthly_visits_K_apr2026": 961, "brazil_pct": 93.51, "date": "2026-04"},
+        {"name": "minijogos.com.br", "monthly_visits_K_jun2024": 766, "date": "2024-06"},
+        {"name": "clickjogos.com.br", "monthly_visits_K_may2024": 418, "date": "2024-05"},
+        {"name": "Poki Brazil presence", "monthly_visits_M_est": 18.7, "note": "Brazil #2 country for Poki at 10.43%"}
+      ],
+      "estimated_rpm_2025_usd": "0.50-2.00",
+      "rpm_confidence": "medium",
+      "rpm_note": "Brazil display CPM $1-4, RPM $0.50-2 realistic. YouTube BR RPM $2.00 reference.",
+      "competition_difficulty": "medium",
+      "mobile_split_pct_mobile": 55.5,
+      "mobile_confidence": "high",
+      "mobile_evidence": "Statista 2024: 55.5% mobile / 43.8% desktop. 96.5% access via smartphone.",
+      "tiktok_funnel_strength": "high",
+      "tiktok_evidence": "Brazil top-3 TikTok market; gaming-related TikTok very active",
+      "translation_feasibility": "medium",
+      "translation_note": "pt-BR ≠ pt-PT - need Brazilian Portuguese specifically",
+      "playgama_supports": true,
+      "adsense_supports": true,
+      "cultural_fit_arabic_base": "none",
+      "myth_bust_verdict": "Viable but 3-8x lower RPM than Tier-1. Need 5-8x pageviews of equivalent Spanish/EU portal to match revenue. Volume play only.",
+      "verdict": "DEFER (5th+ language if ever) - lower ROI than Spanish single-locale for similar effort",
+      "source_dates": ["2024-2026"]
+    },
+
+    {
+      "locale": "fil-PH",
+      "language": "Filipino/Tagalog",
+      "status": "DISQUALIFIED_low_demand",
+      "speakers_millions": 100,
+      "competitor_landscape": "No dedicated Tagalog HTML5 games portal found. Filipinos consume English portals (Poki, Y8, CrazyGames) directly.",
+      "estimated_rpm_2025_usd": "0.30-1.50",
+      "rpm_confidence": "medium",
+      "rpm_note": "PH country AdSense CPM ~$0.14",
+      "mobile_split_pct_mobile": 98,
+      "tiktok_funnel_strength": "high",
+      "tiktok_evidence": "62.3M TikTok users (80.1% of adults 18+) but gaming funnel mostly to Mobile Legends, not browser portals",
+      "english_bilingual": true,
+      "verdict": "HARD NO - adds zero unlock. Filipinos already use English portals. Add English if you want PH (but see English verdict).",
+      "source_dates": ["2024-2025"]
+    },
+
+    {
+      "locale": "vi-VN",
+      "language": "Vietnamese",
+      "status": "low_priority",
+      "speakers_millions": 97,
+      "top_competitors": [
+        {"name": "gamevui.vn", "monthly_visits_M_nov2024": 3.01, "rank_vietnam": "#217", "date": "2024-11"},
+        {"name": "gamek.vn", "note": "News/esports oriented", "date": "2024"},
+        {"name": "Y8 VN variants (gamevui2, trochoiy8, y81nguoi)", "monthly_visits_K_range": "50-350", "date": "2024-02"}
+      ],
+      "estimated_rpm_2025_usd": "0.20-1.00",
+      "rpm_confidence": "low_medium",
+      "rpm_note": "VN country CPM ~$0.10. One unverified claim of $5+ RPM rejected as inconsistent.",
+      "competition_difficulty": "medium",
+      "competition_evidence": "gamevui.vn at 3M monthly - beatable with effort",
+      "mobile_split_pct_mobile": 86.6,
+      "mobile_evidence": "Antom 2024: 86.6% mobile gamers; mobile ARPU $53.8 vs PC $3.6",
+      "tiktok_funnel_strength": "high",
+      "tiktok_evidence": "70M TikTok users; gaming creators active",
+      "translation_feasibility": "hard",
+      "translation_note": "Vietnamese requires fresh localization; no language adjacency to Arabic; tonal language nuances",
+      "playgama_supports": true,
+      "adsense_supports": true,
+      "cultural_fit_arabic_base": "none",
+      "vietnamese_app_preference": "Strong app-over-web preference - reduces portal addressable market",
+      "verdict": "SKIP unless Vietnamese-speaking partner available",
+      "source_dates": ["2024-2026"]
+    },
+
+    {
+      "locale": "fr",
+      "language": "French",
+      "status": "saturated",
+      "speakers_millions": 280,
+      "estimated_rpm_2025_usd": "1.50-4.00",
+      "rpm_confidence": "low",
+      "competition_difficulty": "high",
+      "competition_evidence": "crazygames.fr leads; jeuxjeux.fr/jeux.fr legacy; no notable founded-2022+ entrants",
+      "verdict": "SKIP - saturated, no cultural fit advantage",
+      "source_dates": ["2024-2026"]
+    },
+
+    {
+      "locale": "de",
+      "language": "German",
+      "status": "saturated",
+      "speakers_millions": 130,
+      "estimated_rpm_2025_usd": "2.00-5.00",
+      "rpm_confidence": "low",
+      "competition_difficulty": "high",
+      "competition_evidence": "spielaffe.de still strong (legacy); no founded-2022+ German entrants observed",
+      "verdict": "SKIP - high RPM but high competition and zero cultural fit",
+      "source_dates": ["2024-2026"]
+    },
+
+    {
+      "locale": "it",
+      "language": "Italian",
+      "status": "moderate_opportunity",
+      "speakers_millions": 65,
+      "estimated_rpm_2025_usd": "1.20-3.00",
+      "rpm_confidence": "low",
+      "competition_difficulty": "medium",
+      "competition_evidence": "Thinner SERP than ES/FR/DE; mostly Poki/CrazyGames localized + legacy giochi.it",
+      "verdict": "SKIP for plixfy specifically (low priority vs ID/EN)",
+      "source_dates": ["2024-2026"]
+    },
+
+    {
+      "locale": "pl",
+      "language": "Polish",
+      "status": "moderate_opportunity",
+      "speakers_millions": 45,
+      "estimated_rpm_2025_usd": "1.00-2.50",
+      "rpm_confidence": "low",
+      "competition_difficulty": "medium",
+      "competition_evidence": "gry.pl + PacoGames dominate; no fresh 2022+ Polish entrants",
+      "verdict": "SKIP - smaller market, no cultural fit, better candidates exist",
+      "source_dates": ["2024-2025"]
+    },
+
+    {
+      "locale": "ru",
+      "language": "Russian",
+      "status": "complex",
+      "speakers_millions": 260,
+      "top_competitors": [
+        {"name": "Yandex Games", "note": "35K games, market leader"},
+        {"name": "Playhop (Yandex spinout)", "note": "Only 2022+ portal in top 10 globally; +40% organic YoY"},
+        {"name": "Pikabu Games, Gamepush", "note": "Newer Russian entrants growing"}
+      ],
+      "estimated_rpm_2025_usd": "0.30-1.20",
+      "rpm_confidence": "low",
+      "rpm_note": "AdSense restrictions on Russia post-2022 sanctions; alternative networks (Yandex.Direct) exist",
+      "competition_difficulty": "medium",
+      "verdict": "SKIP - sanctions complexity, no cultural fit, requires Yandex ecosystem expertise",
+      "source_dates": ["2024-2026"]
+    }
+  ],
+
+  "playgama_partner_data": {
+    "official_partner_revenue_share_pct_to_partner": 50,
+    "lagged_case_study": {
+      "integration_date": "2025-09",
+      "measurement_window": "2025-10 to 2025-11",
+      "median_gcpm_before_usd": 1.65,
+      "median_gcpm_after_usd": 3.11,
+      "uplift_pct": 88,
+      "category_for_girls_uplift_pct": 197,
+      "category_3d_action_uplift_pct": 170,
+      "platform_reach_M": 20,
+      "source": "playgama.com/blog/main April 2026"
+    },
+    "developer_payout_claim_top_tier_usd": "1000+",
+    "developer_payout_claim_source": "Playgama official Reddit Sep 2025",
+    "developer_payout_independent_evidence": "u/crionuke (Feb 2026): zero initial revenue, 'not a major milestone' after 5x reach uplift",
+    "market_growth_h1_2025": {
+      "vs_h1_2024_multiplier": 2.7,
+      "vs_h1_2023_multiplier": 4.9,
+      "new_games_q2_2025": "15000+",
+      "unity_share_pct": 55,
+      "construct_share_pct": 16.5,
+      "phaser_share_pct": 7.1
+    },
+    "rewarded_video_ecpm_2026": {
+      "us": "15-28",
+      "eu": "8-15",
+      "tier_3_india_brazil": "1-3",
+      "source": "playgama.com/blog/main David Sedrakyan Apr 2026",
+      "note": "Rewarded video only; display/banner ~3-5x lower"
+    }
+  },
+
+  "category_trends_2024_2026": {
+    "growing": [
+      {"category": "Hypercasual", "evidence": "CrazyGames internal: #1 category 79% of year (May 2025-May 2026, 1.74B sessions)"},
+      {"category": "Puzzle", "evidence": "CrazyGames internal: #1 for 21% of year (mornings)"},
+      {"category": "Idle", "evidence": "Playhop study Oct 2025: top playtime-per-user"},
+      {"category": "Girls/Dress-up", "evidence": "Lagged Playgama integration: +197% gCPM"},
+      {"category": "3D Action / Simulator", "evidence": "Lagged: +170% gCPM"}
+    ],
+    "declining": [
+      {"category": ".io / agar-style", "evidence": "agar.io ~35K daily (down from peak); slither.io ~24K online; search interest peaked 2018"},
+      {"category": "Flash-legacy mini-games", "evidence": "Newgrounds -1.89% MoM April 2026"}
+    ]
+  },
+
+  "google_algorithm_2024_2026_summary": {
+    "march_2024_core_update": "Game directory subdirectory rentals targeted (SISTRIX)",
+    "march_2024_ai_spam_action": "837 sites deindexed; gaming category called out as decliner",
+    "ai_overviews_serp_presence_2026_pct": 32.76,
+    "ai_overviews_organic_ctr_impact": "1.76% → 0.61% (Seer Sept 2025)",
+    "incumbent_organic_decline_2025_2026": {
+      "crazygames_yoy_pct": -14,
+      "poki_yoy_pct": -39,
+      "arkadium_yoy_pct": -68,
+      "playhop_yoy_pct": "+40 (only gainer)"
+    },
+    "adsense_h5_games_ads_status_2025": "Expanded beta - required for iframe HTML5 monetization; vanilla AdSense rejects thin-text game pages"
+  }
+}
