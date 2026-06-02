@@ -11,7 +11,7 @@ import {
 import GameCard from "@/components/GameCard";
 import GameFrame from "@/components/GameFrame";
 
-const SITE = "https://plixfy.com";
+const SITE = "https://www.plixfy.com";
 
 interface PageParams {
   params: Promise<{ slug: string }>;

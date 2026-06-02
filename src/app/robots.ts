@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/api/",
     },
-    sitemap: "https://plixfy.com/sitemap.xml",
-    host: "https://plixfy.com",
+    sitemap: "https://www.plixfy.com/sitemap.xml",
+    host: "https://www.plixfy.com",
   };
 }

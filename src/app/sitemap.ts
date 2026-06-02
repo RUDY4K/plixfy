@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { allGames, categories } from "@/lib/games";
 
-const SITE = "https://plixfy.com";
+const SITE = "https://www.plixfy.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
