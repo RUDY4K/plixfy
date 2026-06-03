@@ -3,6 +3,7 @@ import { Tajawal, Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const tajawal = Tajawal({
@@ -52,6 +53,7 @@ export default function RootLayout({
         <div className="relative z-10">
           <Header />
           {children}
+          <Footer />
           <BottomNav />
         </div>
         {process.env.NEXT_PUBLIC_GA_ID && (

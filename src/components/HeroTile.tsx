@@ -28,6 +28,8 @@ export default function HeroTile(props: HeroTileProps) {
           className="object-cover transition-transform duration-700 group-hover:scale-105"
           unoptimized
           loading="eager"
+          fetchPriority="high"
+          priority
         />
 
         {/* Bottom gradient (dark fade up from bottom) */}

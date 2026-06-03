@@ -109,9 +109,6 @@ export default function Home() {
         />
       )}
 
-      <div className="text-center text-sm text-text-secondary px-4 pt-8 pb-12">
-        <p>الإصدار التجريبي • المرحلة 5: Home Page</p>
-      </div>
     </main>
   );
 }

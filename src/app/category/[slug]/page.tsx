@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { categories, getCategoryMeta, getCategoryGames } from "@/lib/games";
 import GameCard from "@/components/GameCard";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 interface PageParams {
   params: Promise<{ slug: string }>;
@@ -56,6 +57,13 @@ export default async function CategoryPage({ params }: PageParams) {
 
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      <Breadcrumbs
+        items={[
+          { label: "الرئيسية", href: "/" },
+          { label: meta.name },
+        ]}
+      />
+
       <Link
         href="/categories"
         className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary min-h-12 text-sm mb-2"

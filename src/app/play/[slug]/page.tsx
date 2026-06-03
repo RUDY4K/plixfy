@@ -10,6 +10,7 @@ import {
 } from "@/lib/games";
 import GameCard from "@/components/GameCard";
 import GameFrame from "@/components/GameFrame";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 const SITE = "https://www.plixfy.com";
 
@@ -139,6 +140,13 @@ export default async function PlayPage({ params }: PageParams) {
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      <Breadcrumbs
+        items={[
+          { label: "الرئيسية", href: "/" },
+          { label: genre, href: "/category/" + game.categorySlug },
+          { label: game.title, latin: true },
+        ]}
       />
       <div
         id="play-frame"
