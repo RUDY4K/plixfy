@@ -8,6 +8,7 @@ import {
   getGamesByCategory,
   getCategoryMeta,
 } from "@/lib/games";
+import { getGameContent } from "@/lib/gameContent";
 import GameCard from "@/components/GameCard";
 import GameFrame from "@/components/GameFrame";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -38,9 +39,11 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       alternates: { canonical: "/" },
     };
   }
+  const content = getGameContent(slug);
   const title = game.title + " - العب مجاناً | بليكسفاي";
-  const description =
+  const fallbackDescription =
     "العب " + game.title + " مجاناً على بليكسفاي. " + game.category + " بدون تحميل، من متصفحك مباشرة.";
+  const description = content?.metaDescription ?? fallbackDescription;
   const url = SITE + "/play/" + slug;
   const image = absoluteUrl(game.thumbnail);
   return {
@@ -78,6 +81,8 @@ export default async function PlayPage({ params }: PageParams) {
   const related = getGamesByCategory(game.categorySlug)
     .filter((g) => g.slug !== game.slug)
     .slice(0, 6);
+
+  const content = getGameContent(slug);
 
   const pageUrl = SITE + "/play/" + slug;
   const imageUrl = absoluteUrl(game.thumbnail);
@@ -129,6 +134,26 @@ export default async function PlayPage({ params }: PageParams) {
     ],
   };
 
+  const faqLd =
+    content && content.faq.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: content.faq.map((qa) => ({
+            "@type": "Question",
+            name: qa.question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: qa.answer,
+            },
+          })),
+        }
+      : null;
+
+  const descriptionParagraphs = content
+    ? content.longDescription.split("\n\n").filter((p) => p.trim().length > 0)
+    : [];
+
   return (
     <main className="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
       <script
@@ -141,6 +166,13 @@ export default async function PlayPage({ params }: PageParams) {
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
+      {faqLd ? (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      ) : null}
       <Breadcrumbs
         items={[
           { label: "الرئيسية", href: "/" },
@@ -257,14 +289,91 @@ export default async function PlayPage({ params }: PageParams) {
         </dl>
       </section>
 
-      <section className="mt-6 pt-6 border-t border-surface-elevated pb-4">
+      {content ? (
+        <section className="mt-6 pt-6 border-t border-surface-elevated">
+          <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4">
+            عن اللعبة
+          </h2>
+          <div className="space-y-4 text-text-secondary leading-relaxed">
+            {descriptionParagraphs.map((para, idx) => (
+              <p key={idx}>{para}</p>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section className="mt-6 pt-6 border-t border-surface-elevated">
         <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-3">
-          كيفية اللعب
+          {content ? "كيف تلعب" : "كيفية اللعب"}
         </h2>
-        <p className="text-text-secondary leading-relaxed">
-          استخدم لوحة المفاتيح أو شاشة اللمس للتحكم في اللعبة. استمتع!
-        </p>
+        {content ? (
+          <ol className="space-y-2.5 text-text-secondary leading-relaxed">
+            {content.howToPlay.map((step, idx) => (
+              <li key={idx} className="flex gap-3">
+                <span
+                  className="shrink-0 w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-bold inline-flex items-center justify-center mt-0.5"
+                  aria-hidden="true"
+                >
+                  {idx + 1}
+                </span>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="text-text-secondary leading-relaxed">
+            استخدم لوحة المفاتيح أو شاشة اللمس للتحكم في اللعبة. استمتع!
+          </p>
+        )}
       </section>
+
+      {content && content.tips.length > 0 ? (
+        <section className="mt-6 pt-6 border-t border-surface-elevated">
+          <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4">
+            حيل ونصائح
+          </h2>
+          <ul className="space-y-2.5 text-text-secondary leading-relaxed">
+            {content.tips.map((tip, idx) => (
+              <li key={idx} className="flex gap-3">
+                <span
+                  className="shrink-0 mt-2 w-1.5 h-1.5 rounded-full bg-secondary"
+                  aria-hidden="true"
+                />
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {content && content.faq.length > 0 ? (
+        <section className="mt-6 pt-6 border-t border-surface-elevated pb-4">
+          <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4">
+            أسئلة شائعة
+          </h2>
+          <div className="space-y-3">
+            {content.faq.map((qa, idx) => (
+              <details
+                key={idx}
+                className="group bg-surface rounded-2xl p-4 md:p-5 border border-surface-elevated hover:border-primary/30 transition-colors"
+              >
+                <summary className="cursor-pointer list-none flex items-center justify-between gap-3 text-text-primary font-semibold">
+                  <span>{qa.question}</span>
+                  <span
+                    className="shrink-0 w-6 h-6 rounded-full bg-surface-elevated text-primary text-sm font-bold inline-flex items-center justify-center group-open:rotate-45 transition-transform"
+                    aria-hidden="true"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm md:text-base text-text-secondary leading-relaxed">
+                  {qa.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
