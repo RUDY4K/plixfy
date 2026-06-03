@@ -75,43 +75,47 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Ambient atmosphere glows (apply on body) */
-.ambient-glows::before {
-  content: '';
-  position: fixed;
-  top: -200px;
-  right: -200px;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.24), transparent 65%);
-  filter: blur(90px);
-  pointer-events: none;
-  z-index: 0;
-}
-.ambient-glows::after {
-  content: '';
-  position: fixed;
-  bottom: -180px;
-  left: -200px;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(192, 132, 252, 0.20), transparent 65%);
-  filter: blur(90px);
-  pointer-events: none;
-  z-index: 0;
+/* Ambient atmosphere glows (desktop only — heavy blur is costly on mobile) */
+@media (min-width: 768px) {
+  .ambient-glows::before {
+    content: '';
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.24), transparent 65%);
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .ambient-glows::after {
+    content: '';
+    position: fixed;
+    bottom: -180px;
+    left: -200px;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(192, 132, 252, 0.20), transparent 65%);
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
-/* Subtle noise overlay */
-.noise-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.035;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/></svg>");
+/* Subtle noise overlay (desktop only — mix-blend-mode forces full-viewport compositing) */
+@media (min-width: 768px) {
+  .noise-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/></svg>");
+  }
 }
 
 /* Gradient text utility */
@@ -131,7 +135,7 @@ body {
   display: none;
 }
 
-/* Hero pulse rings */
+/* Hero pulse rings — finite to keep LCP stable */
 @keyframes ringPulse {
   0%   { transform: scale(0.85); opacity: 0.8; }
   100% { transform: scale(1.6);  opacity: 0; }
@@ -141,20 +145,15 @@ body {
   inset: 0;
   border-radius: 50%;
   border: 1.5px solid rgba(34, 211, 238, 0.5);
-  animation: ringPulse 2.4s ease-out infinite;
+  animation: ringPulse 2.4s ease-out 3 forwards;
   pointer-events: none;
+  will-change: transform, opacity;
 }
 .hero-pulse-ring.delayed {
   animation-delay: 1.2s;
 }
-
-/* Badge pulse for "hot" */
-@keyframes badgePulse {
-  0%, 100% { box-shadow: 0 2px 10px rgba(248, 113, 113, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
-  50%      { box-shadow: 0 2px 20px rgba(248, 113, 113, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
-}
-.badge-pulse {
-  animation: badgePulse 2s ease-in-out infinite;
+@media (prefers-reduced-motion: reduce) {
+  .hero-pulse-ring { animation: none; opacity: 0; }
 }
 
 /* BottomNav active dot keyframe */

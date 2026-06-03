@@ -65,7 +65,7 @@ function Badge(props: { type: "hot" | "new" | "top" }) {
       <div
         className={
           baseClass +
-          " bg-gradient-to-br from-[#F87171] to-[#FB923C] text-white badge-pulse"
+          " bg-gradient-to-br from-[#F87171] to-[#FB923C] text-white"
         }
       >
         <Flame className="w-3 h-3" aria-hidden="true" />
