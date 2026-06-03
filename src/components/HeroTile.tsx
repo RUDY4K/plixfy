@@ -26,9 +26,6 @@ export default function HeroTile(props: HeroTileProps) {
           fill
           sizes="(max-width: 768px) 100vw, 1280px"
           className="object-cover transition-transform duration-700 group-hover:scale-105"
-          unoptimized
-          loading="eager"
-          fetchPriority="high"
           priority
         />
 

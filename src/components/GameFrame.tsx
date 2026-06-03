@@ -82,8 +82,7 @@ export default function GameFrame(props: GameFrameProps) {
             fill
             sizes="(max-width: 768px) 100vw, 900px"
             className="object-cover"
-            unoptimized
-            loading="eager"
+            priority
           />
           <span className="absolute inset-0 bg-bg/50 flex items-center justify-center transition group-hover:bg-bg/40">
             <span className="w-20 h-20 md:w-24 md:h-24 min-w-12 min-h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl">

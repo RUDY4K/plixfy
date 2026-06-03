@@ -35,7 +35,6 @@ export default function GameCard(props: GameCardProps) {
           fill
           sizes="(max-width: 768px) 33vw, 180px"
           className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
-          unoptimized
         />
         {badge ? <Badge type={badge} /> : null}
       </div>
