@@ -45,7 +45,6 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     "العب " + game.title + " مجاناً على بليكسفاي. " + game.category + " بدون تحميل، من متصفحك مباشرة.";
   const description = content?.metaDescription ?? fallbackDescription;
   const url = SITE + "/play/" + slug;
-  const image = absoluteUrl(game.thumbnail);
   return {
     title,
     description,
@@ -59,13 +58,11 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       url,
       siteName: "Plixfy",
       locale: "ar_SA",
-      images: [image],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [image],
     },
   };
 }
