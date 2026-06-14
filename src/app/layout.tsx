@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Tajawal, Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import PageViewTracker from "@/components/PageViewTracker";
 
 const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
@@ -57,7 +59,12 @@ export default function RootLayout({
           <BottomNav />
         </div>
         {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+          <>
+            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+            <Suspense fallback={null}>
+              <PageViewTracker />
+            </Suspense>
+          </>
         )}
       </body>
     </html>

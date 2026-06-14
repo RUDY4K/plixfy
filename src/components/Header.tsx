@@ -39,9 +39,10 @@ export default function Header() {
         </Link>
 
         <div className="hidden md:flex flex-1 justify-center">
-          <div className="w-full max-w-md relative">
+          <form action="/search" role="search" className="w-full max-w-md relative">
             <input
               type="search"
+              name="q"
               placeholder="ابحث عن لعبة..."
               className="w-full bg-surface/70 text-text-primary placeholder:text-text-faint rounded-full px-4 py-2.5 ps-10 min-h-12 outline-none border border-white/5 focus:border-primary/40 focus:shadow-[0_0_0_4px_rgba(34,211,238,0.08),0_0_20px_rgba(34,211,238,0.15)] transition-all duration-200"
               aria-label="بحث"
@@ -50,7 +51,7 @@ export default function Header() {
               className="absolute top-1/2 -translate-y-1/2 start-3 w-4 h-4 text-text-faint pointer-events-none"
               aria-hidden="true"
             />
-          </div>
+          </form>
         </div>
 
         <div className="flex-1 md:hidden" />
@@ -78,9 +79,10 @@ export default function Header() {
 
       {searchOpen ? (
         <div className="md:hidden border-t border-white/5 bg-bg/85 backdrop-blur-xl px-4 py-3">
-          <div className="relative">
+          <form action="/search" role="search" className="relative">
             <input
               type="search"
+              name="q"
               placeholder="ابحث عن لعبة..."
               className="w-full bg-surface/70 text-text-primary placeholder:text-text-faint rounded-full px-4 py-3 ps-10 min-h-12 outline-none border border-white/5 focus:border-primary/40 focus:shadow-[0_0_0_4px_rgba(34,211,238,0.08),0_0_20px_rgba(34,211,238,0.15)] transition-all duration-200"
               aria-label="بحث"
@@ -90,7 +92,7 @@ export default function Header() {
               className="absolute top-1/2 -translate-y-1/2 start-3 w-4 h-4 text-text-faint pointer-events-none"
               aria-hidden="true"
             />
-          </div>
+          </form>
         </div>
       ) : null}
     </header>

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import HeroTile from "@/components/HeroTile";
 import CategoryStrip from "@/components/CategoryStrip";
 import {
@@ -8,12 +7,6 @@ import {
   getGamesByCategory,
 } from "@/lib/games";
 import type { Game } from "@/lib/games";
-
-export const metadata: Metadata = {
-  alternates: {
-    canonical: "/",
-  },
-};
 
 export default function Home() {
   const featured = getFeaturedGame();
