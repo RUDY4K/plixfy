@@ -58,13 +58,39 @@ export default function Home() {
 
   const MIN_STRIP = 10;
 
+  const buildItemListLd = (name: string, games: readonly Game[]) => ({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    numberOfItems: Math.min(games.length, 10),
+    itemListElement: games.slice(0, 10).map((g, idx) => ({
+      "@type": "ListItem",
+      position: idx + 1,
+      url: SITE + "/play/" + g.slug,
+      name: g.title,
+      image: g.thumbnail,
+    })),
+  });
+
+  const trendingLd =
+    trending.length >= MIN_STRIP ? buildItemListLd("ألعاب رائجة الآن", trending) : null;
+  const topPicksLd =
+    topPicks.length >= MIN_STRIP ? buildItemListLd("ترشيحات بليكسفاي", topPicks) : null;
+
+  const allLd = [
+    websiteLd,
+    organizationLd,
+    ...(trendingLd ? [trendingLd] : []),
+    ...(topPicksLd ? [topPicksLd] : []),
+  ];
+
   return (
     <main className="max-w-7xl mx-auto py-6 md:py-8 md:px-6">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([websiteLd, organizationLd]),
+          __html: JSON.stringify(allLd),
         }}
       />
 

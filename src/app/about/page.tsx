@@ -18,9 +18,41 @@ export const metadata: Metadata = {
   },
 };
 
+const SITE = "https://www.plixfy.com";
+
+const aboutPageLd = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  name: "من نحن - بليكسفاي",
+  url: SITE + "/about",
+  inLanguage: "ar",
+  description:
+    "بليكسفاي منصة عربية للألعاب المجانية اونلاين — أكثر من 370 لعبة موبايل تعمل مباشرة من المتصفح دون تحميل.",
+  mainEntity: {
+    "@type": "Organization",
+    name: "بليكسفاي",
+    url: SITE,
+    logo: SITE + "/opengraph-image.png",
+  },
+};
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "الرئيسية", item: SITE + "/" },
+    { "@type": "ListItem", position: 2, name: "من نحن", item: SITE + "/about" },
+  ],
+};
+
 export default function AboutPage() {
   return (
     <main className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([aboutPageLd, breadcrumbLd]) }}
+      />
       <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
         من نحن
       </h1>
