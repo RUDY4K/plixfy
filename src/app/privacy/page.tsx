@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         سياسة الخصوصية
       </h1>
       <p className="text-sm text-text-faint mb-8">
-        آخر تحديث: يناير 2026
+        آخر تحديث: يونيو 2026
       </p>
 
       <div className="space-y-5 text-text-secondary leading-relaxed">

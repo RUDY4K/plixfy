@@ -62,7 +62,7 @@ export default function BottomNav() {
               />
             ) : null}
             <item.Icon className={iconClass} aria-hidden="true" />
-            <span className={"text-[10px] " + labelWeight}>{item.label}</span>
+            <span className={"text-[11px] " + labelWeight}>{item.label}</span>
           </Link>
         );
       })}

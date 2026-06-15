@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Heart, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import {
   allGames,
   getGameBySlug,
@@ -232,14 +232,6 @@ export default async function PlayPage({ params }: PageParams) {
         </a>
 
         <div className="mt-4 flex items-center gap-3">
-          <button
-            type="button"
-            className="flex-1 md:flex-none bg-surface text-text-primary px-5 py-3 rounded-xl min-h-12 inline-flex items-center justify-center gap-2 hover:bg-surface-elevated transition"
-            aria-label={"احفظ " + game.title + " في المفضلة"}
-          >
-            <Heart className="w-5 h-5" aria-hidden="true" />
-            <span className="text-sm font-semibold">احفظ</span>
-          </button>
           <ShareButton slug={game.slug} title={game.title} url={pageUrl} />
         </div>
       </div>
