@@ -9,6 +9,7 @@ import {
   getCategoryMeta,
 } from "@/lib/games";
 import { getGameContent } from "@/lib/gameContent";
+import { getGenericGameFaq } from "@/lib/gameFaqFallback";
 import { getGameStats } from "@/lib/gameStats";
 import GameCard from "@/components/GameCard";
 import GameFrame from "@/components/GameFrame";
@@ -139,21 +140,21 @@ export default async function PlayPage({ params }: PageParams) {
     ],
   };
 
-  const faqLd =
-    content && content.faq.length > 0
-      ? {
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: content.faq.map((qa) => ({
-            "@type": "Question",
-            name: qa.question,
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: qa.answer,
-            },
-          })),
-        }
-      : null;
+  const faq =
+    content && content.faq.length > 0 ? content.faq : getGenericGameFaq(game.title);
+
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((qa) => ({
+      "@type": "Question",
+      name: qa.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: qa.answer,
+      },
+    })),
+  };
 
   const descriptionParagraphs = content
     ? content.longDescription.split("\n\n").filter((p) => p.trim().length > 0)
@@ -171,13 +172,11 @@ export default async function PlayPage({ params }: PageParams) {
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
-      {faqLd ? (
-        <script
-          type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-        />
-      ) : null}
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+      />
       <Breadcrumbs
         items={[
           { label: "الرئيسية", href: "/" },
@@ -358,34 +357,32 @@ export default async function PlayPage({ params }: PageParams) {
         </section>
       ) : null}
 
-      {content && content.faq.length > 0 ? (
-        <section className="mt-6 pt-6 border-t border-surface-elevated pb-4">
-          <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4">
-            أسئلة شائعة
-          </h2>
-          <div className="space-y-3">
-            {content.faq.map((qa, idx) => (
-              <details
-                key={idx}
-                className="group bg-surface rounded-2xl p-4 md:p-5 border border-surface-elevated hover:border-primary/30 transition-colors"
-              >
-                <summary className="cursor-pointer list-none flex items-center justify-between gap-3 text-text-primary font-semibold">
-                  <span>{qa.question}</span>
-                  <span
-                    className="shrink-0 w-6 h-6 rounded-full bg-surface-elevated text-primary text-sm font-bold inline-flex items-center justify-center group-open:rotate-45 transition-transform"
-                    aria-hidden="true"
-                  >
-                    +
-                  </span>
-                </summary>
-                <p className="mt-3 text-sm md:text-base text-text-secondary leading-relaxed">
-                  {qa.answer}
-                </p>
-              </details>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <section className="mt-6 pt-6 border-t border-surface-elevated pb-4">
+        <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4">
+          أسئلة شائعة
+        </h2>
+        <div className="space-y-3">
+          {faq.map((qa, idx) => (
+            <details
+              key={idx}
+              className="group bg-surface rounded-2xl p-4 md:p-5 border border-surface-elevated hover:border-primary/30 transition-colors"
+            >
+              <summary className="cursor-pointer list-none flex items-center justify-between gap-3 text-text-primary font-semibold">
+                <span>{qa.question}</span>
+                <span
+                  className="shrink-0 w-6 h-6 rounded-full bg-surface-elevated text-primary text-sm font-bold inline-flex items-center justify-center group-open:rotate-45 transition-transform"
+                  aria-hidden="true"
+                >
+                  +
+                </span>
+              </summary>
+              <p className="mt-3 text-sm md:text-base text-text-secondary leading-relaxed">
+                {qa.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
