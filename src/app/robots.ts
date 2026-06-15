@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: "/api/",
+      disallow: ["/api/", "/dashboard"],
     },
     sitemap: "https://www.plixfy.com/sitemap.xml",
     host: "https://www.plixfy.com",
