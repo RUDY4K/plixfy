@@ -105,6 +105,7 @@ export default function GameFrame(props: GameFrameProps) {
             src={getPlaygamaEmbedUrl(slug)}
             title={title}
             allow="autoplay; encrypted-media; fullscreen"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"
             referrerPolicy="no-referrer-when-downgrade"
             loading="lazy"
             onLoad={() => setIframeLoaded(true)}
