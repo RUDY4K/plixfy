@@ -1,16 +1,16 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 export const config = {
   matcher: ["/dashboard", "/dashboard/:path*"],
 };
 
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) {
-    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return mismatch === 0;
+function sha256(value: string): Buffer {
+  return createHash("sha256").update(value, "utf8").digest();
+}
+
+function safeEqual(a: string, b: string): boolean {
+  return timingSafeEqual(sha256(a), sha256(b));
 }
 
 export function proxy(req: NextRequest) {
@@ -26,12 +26,14 @@ export function proxy(req: NextRequest) {
 
   if (scheme === "Basic" && encoded) {
     try {
-      const decoded = atob(encoded);
+      const decoded = Buffer.from(encoded, "base64").toString("utf8");
       const idx = decoded.indexOf(":");
       if (idx !== -1) {
         const u = decoded.slice(0, idx);
         const p = decoded.slice(idx + 1);
-        if (timingSafeEqual(u, user) && timingSafeEqual(p, pass)) {
+        const userOk = safeEqual(u, user);
+        const passOk = safeEqual(p, pass);
+        if (userOk && passOk) {
           return NextResponse.next();
         }
       }
