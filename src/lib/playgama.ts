@@ -1,14 +1,21 @@
 const CLID = process.env.NEXT_PUBLIC_PLAYGAMA_CLID;
+const HOST = "https://playgama.com";
+
+function buildUrl(path: string): string {
+  const url = new URL(path, HOST);
+  if (CLID) {
+    url.searchParams.set("clid", CLID);
+  }
+  return url.toString();
+}
 
 export function getPlaygamaEmbedUrl(slug: string): string {
   if (!CLID) {
     console.warn("NEXT_PUBLIC_PLAYGAMA_CLID is not set. Using affiliate fallback.");
   }
-  const base = "https://playgama.com/export/game/" + slug;
-  return CLID ? base + "?clid=" + CLID : base;
+  return buildUrl("/export/game/" + slug);
 }
 
 export function getPlaygamaAffiliateUrl(slug: string): string {
-  const base = "https://playgama.com/game/" + slug;
-  return CLID ? base + "?clid=" + CLID : base;
+  return buildUrl("/game/" + slug);
 }
