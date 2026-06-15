@@ -22,7 +22,7 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q = "" } = await searchParams;
-  const query = q.trim();
+  const query = q.slice(0, 200).trim();
   const needle = query.toLowerCase();
 
   const results = needle

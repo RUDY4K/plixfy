@@ -123,6 +123,18 @@ export default async function PlayPage({ params }: PageParams) {
       priceCurrency: "SAR",
       availability: "https://schema.org/InStock",
     },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: Number(stats.rating.toFixed(1)),
+      ratingCount: stats.playsCount,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    interactionStatistic: {
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/PlayAction",
+      userInteractionCount: stats.playsCount,
+    },
   };
 
   const breadcrumbLd = {

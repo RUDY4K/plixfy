@@ -26,7 +26,7 @@ export default function HeroTile(props: HeroTileProps) {
       data-game-slug={slug}
       data-placement={isTopGame ? "hero-top-game" : "hero"}
     >
-      <div className="relative aspect-[16/11] md:aspect-[21/9]">
+      <div className="relative aspect-[16/10] md:aspect-[21/9]">
         <Image
           src={thumbnail}
           alt={title}
@@ -76,7 +76,7 @@ export default function HeroTile(props: HeroTileProps) {
             }}
             aria-hidden="true"
           >
-            <Play className="w-7 h-7 fill-bg text-bg" />
+            <Play className="w-8 h-8 md:w-7 md:h-7 fill-bg text-bg" />
           </div>
         </div>
 
@@ -94,9 +94,9 @@ export default function HeroTile(props: HeroTileProps) {
           >
             {title}
           </h1>
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 text-bg text-xs font-bold shadow-[0_6px_20px_rgba(255,255,255,0.18)]">
+          <span className="inline-flex items-center gap-1.5 md:gap-1.5 px-4 py-2 md:px-3.5 md:py-1.5 rounded-full bg-white/95 text-bg text-sm md:text-xs font-bold shadow-[0_6px_20px_rgba(255,255,255,0.18)]">
             <span>العب الآن</span>
-            <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
+            <ArrowLeft className="w-4 h-4 md:w-3.5 md:h-3.5" aria-hidden="true" />
           </span>
         </div>
       </div>
