@@ -10,6 +10,8 @@ import {
 } from "@/lib/games";
 import { getGameContent } from "@/lib/gameContent";
 import { getGenericGameFaq } from "@/lib/gameFaqFallback";
+import { categoryContent } from "@/lib/categoryContent";
+import type { CategorySlug } from "@/lib/games";
 import { getGameStats } from "@/lib/gameStats";
 import GameCard from "@/components/GameCard";
 import GameFrame from "@/components/GameFrame";
@@ -45,12 +47,20 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   }
   const content = getGameContent(slug);
   const title = game.title + " - العب مجاناً | بليكسفاي";
-  const fallbackDescription =
-    "لعبة " +
-    game.title +
-    " - " +
-    game.category +
-    " مجاناً أونلاين على بليكسفاي. العب بدون تحميل، اجمع نقاط، افتح مستويات، وتحدّ أصدقاءك. متاحة الآن من متصفحك مباشرة!";
+  const categoryHook = categoryContent[game.categorySlug as CategorySlug]?.metaHook;
+  const fallbackDescription = categoryHook
+    ? "لعبة " +
+      game.title +
+      " - " +
+      game.category +
+      " مجاناً أونلاين على بليكسفاي. " +
+      categoryHook +
+      ". تعمل من المتصفح مباشرة بدون تحميل."
+    : "لعبة " +
+      game.title +
+      " - " +
+      game.category +
+      " مجاناً أونلاين على بليكسفاي. العب بدون تحميل من متصفحك مباشرة!";
   const description = content?.metaDescription ?? fallbackDescription;
   const url = SITE + "/play/" + slug;
   return {
