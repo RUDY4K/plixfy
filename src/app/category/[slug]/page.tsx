@@ -179,6 +179,14 @@ export default async function CategoryPage({ params }: PageParams) {
             {content.intro}
           </div>
         ) : null}
+        <div className="mt-4">
+          <Link
+            href={"/best/" + slug}
+            className="inline-flex items-center min-h-12 px-4 rounded-xl bg-primary/15 text-primary text-sm font-bold hover:bg-primary/25 transition"
+          >
+            🏆 أفضل {meta.name} في 2026
+          </Link>
+        </div>
       </header>
 
       <div className="mb-6">

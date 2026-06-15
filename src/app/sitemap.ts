@@ -24,6 +24,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+  const bestRoutes: MetadataRoute.Sitemap = categories.map((c) => ({
+    url: SITE + "/best/" + c.slug,
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
   const gameRoutes: MetadataRoute.Sitemap = allGames.map((g) => ({
     url: SITE + "/play/" + g.slug,
     lastModified: now,
@@ -31,5 +38,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...categoryRoutes, ...gameRoutes];
+  const similarRoutes: MetadataRoute.Sitemap = allGames.map((g) => ({
+    url: SITE + "/play/" + g.slug + "/like",
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
+
+  return [
+    ...staticRoutes,
+    ...categoryRoutes,
+    ...bestRoutes,
+    ...gameRoutes,
+    ...similarRoutes,
+  ];
 }

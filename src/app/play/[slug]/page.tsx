@@ -258,11 +258,11 @@ export default async function PlayPage({ params }: PageParams) {
             ألعاب مشابهة
           </h2>
           <Link
-            href={"/category/" + game.categorySlug}
+            href={"/play/" + game.slug + "/like"}
             className="text-sm md:text-base text-primary hover:underline min-h-12 inline-flex items-center px-2"
-            aria-label={"عرض كل ألعاب " + game.category}
+            aria-label={"شاهد المزيد من ألعاب مثل " + game.title}
           >
-            عرض الكل ←
+            المزيد ←
           </Link>
         </div>
 
