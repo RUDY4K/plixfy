@@ -17,7 +17,7 @@ export default function CategoryStrip(props: CategoryStripProps) {
         <div className="flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="w-1 h-5 rounded-sm shadow-[0_0_12px_rgba(34,211,238,0.5)]"
+            className="w-1 h-5 rounded-sm shadow-[0_0_12px_rgba(255,0,110,0.55)]"
             style={{ background: "var(--gradient-primary)" }}
           />
           <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-text-primary">

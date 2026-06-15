@@ -11,10 +11,10 @@ async function loadTajawalBold(): Promise<Buffer> {
   return readFile(join(process.cwd(), "assets/fonts/Tajawal-Bold.ttf"));
 }
 
-const BG = "#0A0E1A";
-const CYAN = "#22D3EE";
-const INDIGO = "#818CF8";
-const PURPLE = "#C084FC";
+const BG = "#0D001A";
+const CYAN = "#00F0FF";
+const INDIGO = "#FF006E";
+const PURPLE = "#A100F2";
 
 export default async function Image() {
   const tajawal = await loadTajawalBold();
@@ -32,7 +32,7 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: `linear-gradient(135deg, ${BG} 0%, #0F1430 50%, ${BG} 100%)`,
+          background: `linear-gradient(135deg, ${BG} 0%, #1A0F2E 50%, ${BG} 100%)`,
           position: "relative",
           fontFamily: "Tajawal",
         }}
@@ -45,7 +45,7 @@ export default async function Image() {
             width: 700,
             height: 700,
             borderRadius: "50%",
-            background: `radial-gradient(circle at center, rgba(34,211,238,0.35) 0%, rgba(34,211,238,0) 70%)`,
+            background: `radial-gradient(circle at center, rgba(255,0,110,0.40) 0%, rgba(255,0,110,0) 70%)`,
             display: "flex",
           }}
         />
@@ -57,7 +57,7 @@ export default async function Image() {
             width: 800,
             height: 800,
             borderRadius: "50%",
-            background: `radial-gradient(circle at center, rgba(129,140,248,0.30) 0%, rgba(129,140,248,0) 70%)`,
+            background: `radial-gradient(circle at center, rgba(0,240,255,0.32) 0%, rgba(0,240,255,0) 70%)`,
             display: "flex",
           }}
         />
@@ -71,7 +71,7 @@ export default async function Image() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 20px 80px rgba(34, 211, 238, 0.4)",
+            boxShadow: "0 20px 80px rgba(255, 0, 110, 0.45)",
             marginBottom: 52,
           }}
         >
