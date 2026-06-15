@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { categories, getCategoryMeta, getCategoryGames } from "@/lib/games";
+import type { CategorySlug } from "@/lib/games";
+import { categoryContent } from "@/lib/categoryContent";
 import GameCard from "@/components/GameCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TrackOnMount from "@/components/TrackOnMount";
@@ -77,6 +79,7 @@ export default async function CategoryPage({ params }: PageParams) {
   const url = SITE + "/category/" + slug;
   const description = buildCategoryDescription(meta.name, games.length, meta.description);
   const top10 = games.slice(0, 10);
+  const content = categoryContent[slug as CategorySlug] ?? null;
 
   const collectionLd = {
     "@context": "https://schema.org",
@@ -167,6 +170,11 @@ export default async function CategoryPage({ params }: PageParams) {
         <p className="text-sm md:text-base text-text-secondary mt-2 max-w-2xl">
           {meta.description}
         </p>
+        {content ? (
+          <div className="mt-4 text-sm md:text-base text-text-secondary leading-relaxed max-w-3xl">
+            {content.intro}
+          </div>
+        ) : null}
       </header>
 
       <div className="mb-6">
@@ -184,6 +192,35 @@ export default async function CategoryPage({ params }: PageParams) {
           />
         ))}
       </div>
+
+      {content && content.related.length > 0 ? (
+        <section
+          className="mt-12 pt-8 border-t border-border"
+          aria-labelledby="related-cats"
+        >
+          <h2
+            id="related-cats"
+            className="text-lg md:text-xl font-bold text-text-primary mb-4"
+          >
+            تصنيفات ذات صلة
+          </h2>
+          <div className="flex flex-wrap gap-3">
+            {content.related.map((relSlug) => {
+              const rel = getCategoryMeta(relSlug);
+              if (!rel) return null;
+              return (
+                <Link
+                  key={relSlug}
+                  href={"/category/" + relSlug}
+                  className="px-4 py-2 rounded-full bg-surface-secondary text-text-primary hover:bg-primary/15 hover:text-primary transition-colors"
+                >
+                  {rel.name}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
