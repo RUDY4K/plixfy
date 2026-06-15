@@ -14,11 +14,11 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export function proxy(req: NextRequest) {
-  const user = process.env.DASHBOARD_USER;
-  const pass = process.env.DASHBOARD_PASS;
+  const user = process.env.DASHBOARD_USER?.trim();
+  const pass = process.env.DASHBOARD_PASS?.trim();
 
   if (!user || !pass) {
-    return new NextResponse("Dashboard auth not configured", { status: 503 });
+    return new NextResponse("Not found", { status: 404 });
   }
 
   const header = req.headers.get("authorization") ?? "";

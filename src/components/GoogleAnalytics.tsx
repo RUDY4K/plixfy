@@ -73,6 +73,7 @@ export function flushQueuedEvents(): void {
 export function trackEvent(eventName: string, params?: EventParams): void {
   if (typeof window === 'undefined') return;
   if (isBot()) return;
+  if (getConsent() !== 'accept') return;
 
   if (window.gtag) {
     flushQueuedEvents();

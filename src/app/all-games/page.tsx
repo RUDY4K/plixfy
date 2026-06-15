@@ -99,7 +99,7 @@ export default function AllGamesPage() {
           <a
             key={cat.slug}
             href={`#${cat.slug}`}
-            className="px-3 py-2 rounded-full bg-surface-secondary text-sm text-text-primary hover:bg-primary/15 hover:text-primary transition-colors"
+            className="min-h-12 inline-flex items-center px-4 py-2.5 rounded-full bg-surface-secondary text-sm text-text-primary hover:bg-primary/15 hover:text-primary transition-colors"
           >
             {cat.labelAr}
             <span className="text-text-faint mr-1">({games.length})</span>

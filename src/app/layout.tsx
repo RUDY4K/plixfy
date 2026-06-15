@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Tajawal, Inter } from "next/font/google";
 import "./globals.css";
@@ -23,8 +23,16 @@ const inter = Inter({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0D001A",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.plixfy.com"),
+  applicationName: "Plixfy",
   title: "Plixfy | بليكسفاي - ألعاب أونلاين مجانية",
   description: "أكثر من 370 لعبة موبايل عربية مجانية. العب فوراً من متصفحك بدون تحميل.",
   alternates: {
