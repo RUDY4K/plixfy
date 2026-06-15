@@ -5,4 +5,6 @@ self.options = {
 
 self.lary = "";
 
-importScripts('https://5gvci.com/act/files/service-worker.min.js?r=sw');
+// Pinned Monetag SW vendor script (hash: c15bd0fb5c1107ea)
+// Refresh with: node scripts/refresh-monetag-sw.mjs
+importScripts('/monetag-sw-c15bd0fb5c1107ea.js');

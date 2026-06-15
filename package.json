@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "refresh-monetag-sw": "node scripts/refresh-monetag-sw.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",

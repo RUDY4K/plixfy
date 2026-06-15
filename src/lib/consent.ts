@@ -37,6 +37,23 @@ export function setConsent(choice: ConsentChoice): void {
   }
 }
 
+export function clearConsent(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    window.dispatchEvent(new CustomEvent(EVENT_NAME + "-cleared"));
+  } catch {
+    // storage disabled — fail silently
+  }
+}
+
+export function onConsentCleared(callback: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  const handler = () => callback();
+  window.addEventListener(EVENT_NAME + "-cleared", handler);
+  return () => window.removeEventListener(EVENT_NAME + "-cleared", handler);
+}
+
 export function onConsentChange(callback: (choice: ConsentChoice) => void): () => void {
   if (typeof window === "undefined") return () => {};
   const handler = (e: Event) => {

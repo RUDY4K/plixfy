@@ -1,9 +1,12 @@
 import Link from "next/link";
+import CookieSettingsButton from "@/components/CookieSettingsButton";
 
 interface FooterLink {
   href: string;
   label: string;
 }
+
+const CONTACT_EMAIL = "privacy@plixfy.com";
 
 const navLinks: readonly FooterLink[] = [
   { href: "/", label: "الرئيسية" },
@@ -35,7 +38,35 @@ export default function Footer() {
           </div>
 
           <FooterColumn title="روابط" links={navLinks} />
-          <FooterColumn title="قانوني" links={legalLinks} />
+          <div>
+            <h2 className="text-sm font-bold text-text-primary mb-3 tracking-wide">
+              قانوني
+            </h2>
+            <ul className="space-y-2">
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-text-secondary hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <CookieSettingsButton />
+              </li>
+              <li>
+                <a
+                  href={"mailto:" + CONTACT_EMAIL}
+                  className="text-sm text-text-secondary hover:text-primary transition-colors"
+                  dir="ltr"
+                >
+                  {CONTACT_EMAIL}
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="mt-10 pt-6 border-t border-surface-elevated text-center text-xs text-text-faint">

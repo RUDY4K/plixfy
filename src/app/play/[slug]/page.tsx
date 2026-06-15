@@ -47,7 +47,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   }
   const content = getGameContent(slug);
   const title = game.title + " - العب مجاناً | بليكسفاي";
-  const categoryHook = categoryContent[game.categorySlug as CategorySlug]?.metaHook;
+  const hooks = categoryContent[game.categorySlug as CategorySlug]?.metaHooks;
+  // Stable per-slug hash so each game gets a deterministic hook variant
+  let slugHash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    slugHash = (slugHash * 31 + slug.charCodeAt(i)) >>> 0;
+  }
+  const categoryHook = hooks && hooks.length > 0 ? hooks[slugHash % hooks.length] : undefined;
   const fallbackDescription = categoryHook
     ? "لعبة " +
       game.title +
@@ -150,21 +156,25 @@ export default async function PlayPage({ params }: PageParams) {
     ],
   };
 
-  const faq =
-    content && content.faq.length > 0 ? content.faq : getGenericGameFaq(game.title);
-
-  const faqLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faq.map((qa) => ({
-      "@type": "Question",
-      name: qa.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: qa.answer,
-      },
-    })),
-  };
+  const hasRichFaq = !!content && content.faq.length > 0;
+  // Generic fallback FAQs are still shown to users (helpful info) but we do
+  // NOT advertise them as FAQPage schema because they're identical across
+  // 342 games — Google may flag near-duplicate FAQ schema as spam.
+  const faq = hasRichFaq ? content.faq : getGenericGameFaq(game.title);
+  const faqLd = hasRichFaq
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: content.faq.map((qa) => ({
+          "@type": "Question",
+          name: qa.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: qa.answer,
+          },
+        })),
+      }
+    : null;
 
   const descriptionParagraphs = content
     ? content.longDescription.split("\n\n").filter((p) => p.trim().length > 0)
@@ -182,11 +192,13 @@ export default async function PlayPage({ params }: PageParams) {
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-      />
+      {faqLd ? (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      ) : null}
       <Breadcrumbs
         items={[
           { label: "الرئيسية", href: "/" },

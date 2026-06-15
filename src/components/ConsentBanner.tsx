@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Cookie } from "lucide-react";
-import { getConsent, setConsent } from "@/lib/consent";
+import { getConsent, setConsent, onConsentCleared } from "@/lib/consent";
 
 export default function ConsentBanner() {
   const [visible, setVisible] = useState(false);
@@ -11,6 +11,7 @@ export default function ConsentBanner() {
     if (getConsent() === null) {
       setVisible(true);
     }
+    return onConsentCleared(() => setVisible(true));
   }, []);
 
   if (!visible) return null;
