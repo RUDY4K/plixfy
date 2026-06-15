@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Crown, Flame, Sparkles } from "lucide-react";
+import { Crown, Flame, Sparkles, Star } from "lucide-react";
+import { getGameStats } from "@/lib/gameStats";
 
 export type GameBadge = "hot" | "new" | "top" | null;
 
@@ -10,18 +11,25 @@ export interface GameCardProps {
   slug: string;
   badge?: GameBadge;
   category?: string;
+  position?: number;
+  placement?: string;
+  showStats?: boolean;
 }
 
 export default function GameCard(props: GameCardProps) {
-  const { title, thumbnail, slug, badge, category } = props;
+  const { title, thumbnail, slug, badge, category, position, placement, showStats } = props;
 
   const ariaLabel = category ? title + ", " + category : title;
+  const stats = showStats ? getGameStats(slug) : null;
 
   return (
     <Link
       href={"/play/" + slug}
       className="group relative block transition-transform duration-200 hover:-translate-y-1 active:scale-[0.94]"
       aria-label={ariaLabel}
+      data-game-slug={slug}
+      data-position={position}
+      data-placement={placement}
     >
       <div
         className="game-card-glow absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-200 -z-10"
@@ -37,6 +45,20 @@ export default function GameCard(props: GameCardProps) {
           className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
         />
         {badge ? <Badge type={badge} /> : null}
+        {stats ? (
+          <div
+            className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-1 text-[10px] font-bold text-white"
+            aria-hidden="true"
+          >
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/55 backdrop-blur-sm">
+              <Star className="w-2.5 h-2.5 fill-current text-amber-400" />
+              <span>{stats.ratingDisplay}</span>
+            </span>
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-black/55 backdrop-blur-sm">
+              {stats.playsDisplay}
+            </span>
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-2 px-1">

@@ -50,6 +50,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" className={`${tajawal.variable} ${inter.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://playgama.com" />
+        <link rel="dns-prefetch" href="https://playgama.com" />
+      </head>
       <body className="bg-bg text-text-primary antialiased min-h-screen pb-28 md:pb-0 relative ambient-glows overflow-x-hidden">
         <div className="noise-overlay" aria-hidden="true" />
         <div className="relative z-10">

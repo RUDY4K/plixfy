@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Heart, Share2 } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import {
   allGames,
   getGameBySlug,
@@ -9,9 +9,11 @@ import {
   getCategoryMeta,
 } from "@/lib/games";
 import { getGameContent } from "@/lib/gameContent";
+import { getGameStats } from "@/lib/gameStats";
 import GameCard from "@/components/GameCard";
 import GameFrame from "@/components/GameFrame";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import ShareButton from "@/components/ShareButton";
 
 const SITE = "https://www.plixfy.com";
 
@@ -84,6 +86,7 @@ export default async function PlayPage({ params }: PageParams) {
     .slice(0, 6);
 
   const content = getGameContent(slug);
+  const stats = getGameStats(game.slug);
 
   const pageUrl = SITE + "/play/" + slug;
   const imageUrl = absoluteUrl(game.thumbnail);
@@ -196,14 +199,24 @@ export default async function PlayPage({ params }: PageParams) {
         <h1 className="text-2xl md:text-3xl font-bold text-text-primary font-latin">
           {game.title}
         </h1>
-        <p className="text-sm md:text-base text-text-secondary mt-1">
-          {game.category}
-        </p>
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm md:text-base text-text-secondary">
+          <span>{game.category}</span>
+          <span aria-hidden="true">·</span>
+          <span className="inline-flex items-center gap-1">
+            <Star className="w-4 h-4 fill-current text-amber-400" aria-hidden="true" />
+            <span className="font-semibold text-text-primary">{stats.ratingDisplay}</span>
+            <span className="sr-only">من 5</span>
+          </span>
+          <span aria-hidden="true">·</span>
+          <span>{stats.playsDisplay} مرة لعب</span>
+        </div>
 
         <a
           href="#play-frame"
           className="mt-5 bg-primary text-bg font-bold w-full py-4 rounded-2xl text-lg min-h-12 hover:brightness-110 transition inline-flex items-center justify-center gap-2"
           aria-label={"العب " + game.title}
+          data-game-slug={game.slug}
+          data-placement="play-cta"
         >
           العب الآن ▶
         </a>
@@ -217,14 +230,7 @@ export default async function PlayPage({ params }: PageParams) {
             <Heart className="w-5 h-5" aria-hidden="true" />
             <span className="text-sm font-semibold">احفظ</span>
           </button>
-          <button
-            type="button"
-            className="flex-1 md:flex-none bg-surface text-text-primary px-5 py-3 rounded-xl min-h-12 inline-flex items-center justify-center gap-2 hover:bg-surface-elevated transition"
-            aria-label={"شارك " + game.title}
-          >
-            <Share2 className="w-5 h-5" aria-hidden="true" />
-            <span className="text-sm font-semibold">شارك</span>
-          </button>
+          <ShareButton slug={game.slug} title={game.title} url={pageUrl} />
         </div>
       </div>
 
@@ -234,7 +240,7 @@ export default async function PlayPage({ params }: PageParams) {
         </div>
       </div>
 
-      <section className="mt-6 pt-6 border-t border-surface-elevated">
+      <section id="related-games" className="mt-6 pt-6 border-t border-surface-elevated scroll-mt-24">
         <div className="flex items-center justify-between mb-3 md:mb-4">
           <h2 className="text-lg md:text-2xl font-bold text-text-primary">
             ألعاب مشابهة
@@ -253,21 +259,27 @@ export default async function PlayPage({ params }: PageParams) {
             className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 -mx-4 px-4"
             style={{ scrollbarWidth: "none" }}
           >
-            {related.map((g) => (
+            {related.map((g, idx) => (
               <div
                 key={g.slug}
                 className="snap-start shrink-0"
                 style={{ width: "130px" }}
               >
-                <GameCard {...g} />
+                <GameCard {...g} position={idx + 1} placement="related-mobile" showStats />
               </div>
             ))}
           </div>
         </div>
 
         <div className="hidden md:grid md:grid-cols-6 md:gap-6">
-          {related.map((g) => (
-            <GameCard key={g.slug} {...g} />
+          {related.map((g, idx) => (
+            <GameCard
+              key={g.slug}
+              {...g}
+              position={idx + 1}
+              placement="related-desktop"
+              showStats
+            />
           ))}
         </div>
       </section>
@@ -285,6 +297,8 @@ export default async function PlayPage({ params }: PageParams) {
         <dl className="bg-surface rounded-2xl p-5 grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6">
           <InfoRow label="الفئة" value={meta ? meta.icon + " " + meta.name : game.category} />
           <InfoRow label="الاسم" value={game.title} valueLatin />
+          <InfoRow label="التقييم" value={"⭐ " + stats.ratingDisplay + " / 5"} />
+          <InfoRow label="مرات اللعب" value={stats.playsDisplay} />
           <InfoRow label="نوع اللعب" value="متصفح" />
           <InfoRow label="مجانية" value="نعم" />
         </dl>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Play, X } from "lucide-react";
+import { Play, X, ArrowDown } from "lucide-react";
 import { getPlaygamaEmbedUrl } from "@/lib/playgama";
 import { trackEvent, trackEventOnce } from "./GoogleAnalytics";
 
@@ -16,6 +16,8 @@ export interface GameFrameProps {
 export default function GameFrame(props: GameFrameProps) {
   const { slug, title, thumbnail, orientation } = props;
   const [playing, setPlaying] = useState(false);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [justEnded, setJustEnded] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const startedAtRef = useRef<number | null>(null);
 
@@ -23,20 +25,26 @@ export default function GameFrame(props: GameFrameProps) {
     if (startedAtRef.current === null) return;
     const elapsed = Math.round((Date.now() - startedAtRef.current) / 1000);
     startedAtRef.current = null;
-    trackEvent("game_end", {
+    const params = {
       game_slug: slug,
       game_title: title,
       duration_seconds: elapsed,
-    });
+    };
+    trackEvent("game_end", params);
+    trackEvent("playgama_game_end", params);
   }
 
   function start() {
     setPlaying(true);
+    setIframeLoaded(false);
+    setJustEnded(false);
     startedAtRef.current = Date.now();
-    trackEventOnce(`game_start:${slug}`, "game_start", {
+    const params = {
       game_slug: slug,
       game_title: title,
-    });
+    };
+    trackEventOnce(`game_start:${slug}`, "game_start", params);
+    trackEventOnce(`playgama_game_start:${slug}`, "playgama_game_start", params);
 
     const wantsFullscreen =
       typeof window !== "undefined" &&
@@ -62,6 +70,7 @@ export default function GameFrame(props: GameFrameProps) {
   function stop() {
     fireGameEnd();
     setPlaying(false);
+    setJustEnded(true);
     if (typeof document !== "undefined" && document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
     }
@@ -72,11 +81,13 @@ export default function GameFrame(props: GameFrameProps) {
       if (startedAtRef.current === null) return;
       const elapsed = Math.round((Date.now() - startedAtRef.current) / 1000);
       startedAtRef.current = null;
-      trackEvent("game_end", {
+      const params = {
         game_slug: slug,
         game_title: title,
         duration_seconds: elapsed,
-      });
+      };
+      trackEvent("game_end", params);
+      trackEvent("playgama_game_end", params);
     }
     window.addEventListener("beforeunload", onUnload);
     return () => {
@@ -95,8 +106,18 @@ export default function GameFrame(props: GameFrameProps) {
             title={title}
             allow="autoplay; encrypted-media; fullscreen"
             referrerPolicy="no-referrer-when-downgrade"
+            loading="lazy"
+            onLoad={() => setIframeLoaded(true)}
             className="w-full h-full border-0 absolute inset-0"
           />
+          {!iframeLoaded ? (
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 flex items-center justify-center bg-surface animate-pulse pointer-events-none"
+            >
+              <div className="w-12 h-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+            </div>
+          ) : null}
           <button
             type="button"
             onClick={stop}
@@ -107,29 +128,47 @@ export default function GameFrame(props: GameFrameProps) {
           </button>
         </>
       ) : (
-        <button
-          type="button"
-          onClick={start}
-          aria-label={"العب " + title}
-          className="group absolute inset-0 block"
-        >
-          <Image
-            src={thumbnail}
-            alt={title}
-            fill
-            sizes="(max-width: 768px) 100vw, 900px"
-            className="object-cover"
-            priority
-          />
-          <span className="absolute inset-0 bg-bg/50 flex items-center justify-center transition group-hover:bg-bg/40">
-            <span className="w-20 h-20 md:w-24 md:h-24 min-w-12 min-h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl">
-              <Play
-                className="w-10 h-10 md:w-12 md:h-12 text-bg fill-bg ms-1"
-                aria-hidden="true"
-              />
+        <>
+          <button
+            type="button"
+            onClick={start}
+            aria-label={"العب " + title}
+            className="group absolute inset-0 block"
+            data-game-slug={slug}
+            data-placement="game-frame"
+          >
+            <Image
+              src={thumbnail}
+              alt={title}
+              fill
+              sizes="(max-width: 768px) 100vw, 900px"
+              className="object-cover"
+              priority
+            />
+            <span className="absolute inset-0 bg-bg/50 flex items-center justify-center transition group-hover:bg-bg/40">
+              <span className="w-20 h-20 md:w-24 md:h-24 min-w-12 min-h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl">
+                <Play
+                  className="w-10 h-10 md:w-12 md:h-12 text-bg fill-bg ms-1"
+                  aria-hidden="true"
+                />
+              </span>
             </span>
-          </span>
-        </button>
+          </button>
+          {justEnded ? (
+            <a
+              href="#related-games"
+              onClick={() => {
+                trackEvent("playgama_play_more_click", { game_slug: slug });
+                setJustEnded(false);
+              }}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-primary text-bg font-bold px-5 py-3 rounded-2xl min-h-12 inline-flex items-center gap-2 shadow-2xl hover:brightness-110 transition"
+              aria-label="العب ألعاب مشابهة"
+            >
+              <span>العب لعبة تانية</span>
+              <ArrowDown className="w-5 h-5" aria-hidden="true" />
+            </a>
+          ) : null}
+        </>
       )}
     </div>
   );
