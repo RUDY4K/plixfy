@@ -1,3 +1,22 @@
+import { allGames, getGameBySlug, type Game } from "./games";
+
+const FALLBACK_TOP_SLUG = "moto-x3m";
+
+export function getTopGame(): Game {
+  let best: Game | null = null;
+  let bestPlays = -1;
+  for (const g of allGames) {
+    if (typeof g.plays === "number" && g.plays > bestPlays) {
+      bestPlays = g.plays;
+      best = g;
+    }
+  }
+  if (best) return best;
+  const fallback = getGameBySlug(FALLBACK_TOP_SLUG);
+  if (fallback) return fallback;
+  return allGames[0];
+}
+
 function hashSlug(slug: string): number {
   let h = 2166136261;
   for (let i = 0; i < slug.length; i++) {

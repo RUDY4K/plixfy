@@ -8,6 +8,7 @@ export interface Game {
   category: string;
   categorySlug: CategorySlug;
   description?: string;
+  plays?: number;
 }
 
 export type CategorySlug =
@@ -150,6 +151,7 @@ export const allGames: readonly Game[] = [
   {
     title: "Geometry Arrow 2",
     slug: "geometry-arrow-2",
+    plays: 142,
     thumbnail: "https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/a6936bae-0037-4e22-3318-0d625bd84500/enlarged",
     badge: "top",
     category: "خفيف",
@@ -231,6 +233,7 @@ export const allGames: readonly Game[] = [
   {
     title: "Basketball Stars",
     slug: "basketball-stars",
+    plays: 98,
     thumbnail: "https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/f0d31538-ea4f-4efc-3d8e-90a2ef39dc00/enlarged",
     badge: "top",
     category: "رياضة",
@@ -393,6 +396,7 @@ export const allGames: readonly Game[] = [
   {
     title: "Stickman Kombat 2D",
     slug: "stickman-kombat-2d",
+    plays: 128,
     thumbnail: "https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/0c888413-a125-4ef5-56cd-89a6a329e900/enlarged",
     badge: "hot",
     category: "أكشن",
@@ -402,6 +406,7 @@ export const allGames: readonly Game[] = [
   {
     title: "Word Finder",
     slug: "word-finder",
+    plays: 115,
     thumbnail: "https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/fdf0c23e-29af-4fe8-0d7d-5d2e2f5f2700/enlarged",
     badge: "hot",
     category: "ألغاز",
@@ -456,6 +461,7 @@ export const allGames: readonly Game[] = [
   {
     title: "Epic Sword Battle! Fight in the Ragdoll Arena!  ",
     slug: "epic-sword-battle-fight-in-the-ragdoll-arena",
+    plays: 215,
     thumbnail: "https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/693f4050-7f42-4555-bbc8-b7510e476b00/enlarged",
     badge: "hot",
     category: "أكشن",
@@ -582,6 +588,7 @@ export const allGames: readonly Game[] = [
   {
     title: "Moto X3M",
     slug: "moto-x3m",
+    plays: 248,
     thumbnail: "https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/53361cce-791e-4e4a-23dc-528ce9ea1000/enlarged",
     badge: "top",
     category: "سباق",
@@ -753,6 +760,7 @@ export const allGames: readonly Game[] = [
   {
     title: "Motorcycle Racer: Road Mayhem",
     slug: "motorcycle-racer-road-mayhem",
+    plays: 156,
     thumbnail: "https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/77e3c396-0e84-4a2a-e8a7-a5076c76d400/enlarged",
     badge: "top",
     category: "سباق",
@@ -2940,6 +2948,7 @@ export const allGames: readonly Game[] = [
   {
     title: "Snake Slither.io Italian Brainrot",
     slug: "snake-slitherio-italian-brainrot",
+    plays: 189,
     thumbnail: "https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/4f0c127c-f1a0-4ff2-1be1-aa6e49607000/enlarged",
     badge: null,
     category: "آيو",

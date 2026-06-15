@@ -1,18 +1,21 @@
 import HeroTile from "@/components/HeroTile";
 import CategoryStrip from "@/components/CategoryStrip";
 import MonetagAds from "@/components/MonetagAds";
+import TrackOnMount from "@/components/TrackOnMount";
 import {
-  getFeaturedGame,
   getTrendingGames,
   getTopPicks,
   getGamesByCategory,
 } from "@/lib/games";
 import type { Game } from "@/lib/games";
+import { getTopGame } from "@/lib/gameStats";
+
+export const revalidate = 86400;
 
 export default function Home() {
-  const featured = getFeaturedGame();
+  const topGame = getTopGame();
 
-  const used = new Set<string>([featured.slug]);
+  const used = new Set<string>([topGame.slug]);
   const take = <T extends readonly Game[]>(list: T): T => {
     list.forEach((g) => used.add(g.slug));
     return list;
@@ -35,12 +38,18 @@ export default function Home() {
         <MonetagAds type="banner" />
       </div>
 
+      <TrackOnMount
+        eventName="hero_top_game_viewed"
+        dedupKey={`hero:${topGame.slug}`}
+        params={{ game_slug: topGame.slug, plays: topGame.plays ?? 0 }}
+      />
       <HeroTile
-        title={featured.title}
-        slug={featured.slug}
-        thumbnail={featured.thumbnailWide}
-        category={featured.category}
-        description={featured.description}
+        title={topGame.title}
+        slug={topGame.slug}
+        thumbnail={topGame.thumbnail}
+        category={topGame.category}
+        description={topGame.description}
+        isTopGame
       />
 
       {trending.length >= MIN_STRIP && (
