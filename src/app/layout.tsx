@@ -7,6 +7,7 @@ import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PageViewTracker from "@/components/PageViewTracker";
+import MonetagServiceWorker from "@/components/MonetagServiceWorker";
 
 const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
@@ -54,7 +55,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://playgama.com" />
         <link rel="dns-prefetch" href="https://playgama.com" />
       </head>
-      <body className="bg-bg text-text-primary antialiased min-h-screen pb-28 md:pb-0 relative ambient-glows overflow-x-hidden">
+      <body className="bg-bg text-text-primary antialiased min-h-screen pb-32 md:pb-0 relative ambient-glows overflow-x-hidden">
         <div className="noise-overlay" aria-hidden="true" />
         <div className="relative z-10">
           <Header />
@@ -62,6 +63,7 @@ export default function RootLayout({
           <Footer />
           <BottomNav />
         </div>
+        <MonetagServiceWorker />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />

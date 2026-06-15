@@ -14,6 +14,7 @@ import GameCard from "@/components/GameCard";
 import GameFrame from "@/components/GameFrame";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ShareButton from "@/components/ShareButton";
+import MonetagAds from "@/components/MonetagAds";
 
 const SITE = "https://www.plixfy.com";
 
@@ -235,9 +236,7 @@ export default async function PlayPage({ params }: PageParams) {
       </div>
 
       <div className="mt-6 pt-6 border-t border-surface-elevated">
-        <div className="bg-surface border-2 border-dashed border-surface-elevated rounded-2xl h-24 flex items-center justify-center text-text-secondary text-sm">
-          AdSense Slot — Banner 336x90
-        </div>
+        <MonetagAds type="banner" />
       </div>
 
       <section id="related-games" className="mt-6 pt-6 border-t border-surface-elevated scroll-mt-24">
@@ -284,10 +283,8 @@ export default async function PlayPage({ params }: PageParams) {
         </div>
       </section>
 
-      <div className="mt-6 pt-6 border-t border-surface-elevated">
-        <div className="bg-surface border-2 border-dashed border-surface-elevated rounded-2xl h-24 md:h-72 flex items-center justify-center text-text-secondary text-sm">
-          AdSense Slot — Rectangle 336x280
-        </div>
+      <div className="mt-6 pt-6 border-t border-surface-elevated flex justify-center">
+        <MonetagAds type="sidebar" />
       </div>
 
       <section className="mt-6 pt-6 border-t border-surface-elevated">

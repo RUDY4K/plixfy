@@ -6,6 +6,7 @@ import { categories, getCategoryMeta, getCategoryGames } from "@/lib/games";
 import GameCard from "@/components/GameCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TrackOnMount from "@/components/TrackOnMount";
+import MonetagAds from "@/components/MonetagAds";
 
 const SITE = "https://www.plixfy.com";
 
@@ -168,9 +169,19 @@ export default async function CategoryPage({ params }: PageParams) {
         </p>
       </header>
 
+      <div className="mb-6">
+        <MonetagAds type="banner" />
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-6">
-        {games.map((game) => (
-          <GameCard key={game.slug} {...game} />
+        {games.map((game, idx) => (
+          <GameCard
+            key={game.slug}
+            {...game}
+            position={idx + 1}
+            placement={"category-" + slug}
+            showStats
+          />
         ))}
       </div>
     </main>

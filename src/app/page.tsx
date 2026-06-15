@@ -1,5 +1,6 @@
 import HeroTile from "@/components/HeroTile";
 import CategoryStrip from "@/components/CategoryStrip";
+import MonetagAds from "@/components/MonetagAds";
 import {
   getFeaturedGame,
   getTrendingGames,
@@ -30,6 +31,10 @@ export default function Home() {
 
   return (
     <main className="max-w-7xl mx-auto py-6 md:py-8 md:px-6">
+      <div className="px-4 md:px-0 mb-6">
+        <MonetagAds type="banner" />
+      </div>
+
       <HeroTile
         title={featured.title}
         slug={featured.slug}
