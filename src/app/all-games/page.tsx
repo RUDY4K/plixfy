@@ -36,8 +36,43 @@ export default function AllGamesPage() {
     games: allGames.filter((g) => g.categorySlug === c.slug),
   }));
 
+  const orderedGames = sections.flatMap((s) => s.games);
+  const itemListLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "جميع الألعاب على بليكسفاي",
+    description: `كل ${TOTAL} لعبة على بليكسفاي مرتّبة حسب التصنيف`,
+    numberOfItems: orderedGames.length,
+    itemListElement: orderedGames.map((g, idx) => ({
+      "@type": "ListItem",
+      position: idx + 1,
+      url: SITE + "/play/" + g.slug,
+      name: g.title,
+      image: g.thumbnail,
+    })),
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "الرئيسية", item: SITE + "/" },
+      { "@type": "ListItem", position: 2, name: "جميع الألعاب", item: SITE + "/all-games" },
+    ],
+  };
+
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+      />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       <Breadcrumbs
         items={[
           { label: "الرئيسية", href: "/" },
