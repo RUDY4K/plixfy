@@ -9,6 +9,7 @@ import GameCard from "@/components/GameCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TrackOnMount from "@/components/TrackOnMount";
 import MonetagAds from "@/components/MonetagAds";
+import AgeGate from "@/components/AgeGate";
 
 const SITE = "https://www.plixfy.com";
 
@@ -124,8 +125,11 @@ export default async function CategoryPage({ params }: PageParams) {
     ],
   };
 
+  const requiresAgeGate = slug === "shooting";
+
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      {requiresAgeGate ? <AgeGate category={meta.name}>{null}</AgeGate> : null}
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
