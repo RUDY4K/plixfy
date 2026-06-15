@@ -6,7 +6,7 @@ interface StoredConsent {
 }
 
 const STORAGE_KEY = "gdpr-consent-v1";
-const EXPIRY_MS = 7 * 24 * 60 * 60 * 1000;
+const EXPIRY_MS = 180 * 24 * 60 * 60 * 1000;
 const EVENT_NAME = "plixfy:consent-change";
 
 export function getConsent(): ConsentChoice | null {

@@ -36,21 +36,22 @@ export default function AllGamesPage() {
     games: allGames.filter((g) => g.categorySlug === c.slug),
   }));
 
-  const orderedGames = sections.flatMap((s) => s.games);
-  const itemListLd = {
+  const perCategoryItemLists = sections.map(({ cat, games }) => ({
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "جميع الألعاب على بليكسفاي",
-    description: `كل ${TOTAL} لعبة على بليكسفاي مرتّبة حسب التصنيف`,
-    numberOfItems: orderedGames.length,
-    itemListElement: orderedGames.map((g, idx) => ({
+    "@id": SITE + "/all-games#" + cat.slug,
+    name: cat.labelAr + " - بليكسفاي",
+    description: `${games.length} لعبة ${cat.labelAr} مجانية أونلاين على بليكسفاي`,
+    url: SITE + "/all-games#" + cat.slug,
+    numberOfItems: games.length,
+    itemListElement: games.map((g, idx) => ({
       "@type": "ListItem",
       position: idx + 1,
       url: SITE + "/play/" + g.slug,
       name: g.title,
       image: g.thumbnail,
     })),
-  };
+  }));
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -61,17 +62,14 @@ export default function AllGamesPage() {
     ],
   };
 
+  const allLd = [...perCategoryItemLists, breadcrumbLd];
+
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
-      />
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(allLd) }}
       />
       <Breadcrumbs
         items={[

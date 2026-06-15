@@ -1,0 +1,21 @@
+{
+  "name": "بليكسفاي - Plixfy",
+  "short_name": "Plixfy",
+  "description": "ألعاب أونلاين مجانية تعمل من المتصفح بدون تحميل",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0D001A",
+  "theme_color": "#0D001A",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/opengraph-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

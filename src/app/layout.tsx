@@ -33,6 +33,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.plixfy.com"),
   applicationName: "Plixfy",
+  manifest: "/manifest.webmanifest",
   title: "Plixfy | بليكسفاي - ألعاب أونلاين مجانية",
   description: "أكثر من 370 لعبة موبايل عربية مجانية. العب فوراً من متصفحك بدون تحميل.",
   alternates: {
