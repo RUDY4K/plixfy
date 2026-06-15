@@ -26,7 +26,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.plixfy.com"),
   title: "Plixfy | بليكسفاي - ألعاب أونلاين مجانية",
-  description: "أكثر من 100 لعبة موبايل عربية مجانية. العب فوراً من متصفحك بدون تحميل.",
+  description: "أكثر من 370 لعبة موبايل عربية مجانية. العب فوراً من متصفحك بدون تحميل.",
   alternates: {
     canonical: "/",
   },
@@ -35,13 +35,13 @@ export const metadata: Metadata = {
     locale: "ar_SA",
     siteName: "Plixfy",
     title: "Plixfy | بليكسفاي - ألعاب أونلاين مجانية",
-    description: "أكثر من 100 لعبة موبايل عربية مجانية. العب فوراً من متصفحك بدون تحميل.",
+    description: "أكثر من 370 لعبة موبايل عربية مجانية. العب فوراً من متصفحك بدون تحميل.",
     url: "https://www.plixfy.com",
   },
   twitter: {
     card: "summary_large_image",
     title: "Plixfy | بليكسفاي - ألعاب أونلاين مجانية",
-    description: "أكثر من 100 لعبة موبايل عربية مجانية. العب فوراً من متصفحك بدون تحميل.",
+    description: "أكثر من 370 لعبة موبايل عربية مجانية. العب فوراً من متصفحك بدون تحميل.",
   },
 };
 
