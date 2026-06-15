@@ -35,11 +35,13 @@ export default function BottomNav() {
     >
       {items.map((item) => {
         const active = isActive(pathname, item.href);
-        const colorClass = active ? "text-primary" : "text-text-faint";
+        const colorClass = active
+          ? "text-primary"
+          : "text-accent-2/60";
         const labelWeight = active ? "font-semibold" : "font-medium";
         const iconClass = active
-          ? "w-5 h-5 scale-110 drop-shadow-[0_0_8px_var(--color-primary)] transition-transform"
-          : "w-5 h-5 transition-transform";
+          ? "w-5 h-5 scale-110 drop-shadow-[0_0_10px_var(--color-primary)] transition-all duration-200"
+          : "w-5 h-5 transition-all duration-200";
 
         return (
           <Link
@@ -48,7 +50,7 @@ export default function BottomNav() {
             aria-label={item.label}
             aria-current={active ? "page" : undefined}
             className={
-              "relative flex flex-col items-center justify-center gap-1 min-h-12 transition-colors " +
+              "relative flex flex-col items-center justify-center gap-1 min-h-12 transition-all duration-200 " +
               colorClass
             }
           >

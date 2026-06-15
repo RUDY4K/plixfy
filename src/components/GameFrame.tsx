@@ -146,9 +146,9 @@ export default function GameFrame(props: GameFrameProps) {
               priority
             />
             <span className="absolute inset-0 bg-bg/50 flex items-center justify-center transition group-hover:bg-bg/40">
-              <span className="w-20 h-20 md:w-24 md:h-24 min-w-12 min-h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl">
+              <span className="w-20 h-20 md:w-24 md:h-24 min-w-12 min-h-12 rounded-full bg-primary flex items-center justify-center glow-pink group-hover:scale-110 transition-transform duration-200">
                 <Play
-                  className="w-10 h-10 md:w-12 md:h-12 text-bg fill-bg ms-1"
+                  className="w-10 h-10 md:w-12 md:h-12 text-white fill-white ms-1"
                   aria-hidden="true"
                 />
               </span>
@@ -161,7 +161,7 @@ export default function GameFrame(props: GameFrameProps) {
                 trackEvent("playgama_play_more_click", { game_slug: slug });
                 setJustEnded(false);
               }}
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-primary text-bg font-bold px-5 py-3 rounded-2xl min-h-12 inline-flex items-center gap-2 shadow-2xl hover:brightness-110 transition"
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-primary text-white font-bold px-5 py-3 rounded-2xl min-h-12 inline-flex items-center gap-2 glow-pink hover:scale-105 hover:brightness-110 transition-all duration-200"
               aria-label="العب ألعاب مشابهة"
             >
               <span>العب لعبة تانية</span>

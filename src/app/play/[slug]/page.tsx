@@ -214,7 +214,7 @@ export default async function PlayPage({ params }: PageParams) {
 
         <a
           href="#play-frame"
-          className="mt-5 bg-primary text-bg font-bold w-full py-4 rounded-2xl text-lg min-h-12 hover:brightness-110 transition inline-flex items-center justify-center gap-2"
+          className="mt-5 bg-primary text-white font-bold w-full py-4 rounded-2xl text-lg min-h-12 inline-flex items-center justify-center gap-2 glow-pink hover:scale-[1.02] hover:brightness-110 transition-all duration-200"
           aria-label={"العب " + game.title}
           data-game-slug={game.slug}
           data-placement="play-cta"

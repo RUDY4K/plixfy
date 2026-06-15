@@ -18,7 +18,7 @@ export default function Header() {
   }, []);
 
   const headerClass = scrolled
-    ? "sticky top-0 z-50 bg-bg/72 backdrop-blur-xl border-b border-white/5 shadow-[0_1px_0_0_rgba(34,211,238,0.08)] transition-colors duration-300"
+    ? "sticky top-0 z-50 bg-bg/72 backdrop-blur-xl border-b border-white/5 shadow-[0_1px_0_0_rgba(255,0,110,0.10)] transition-colors duration-300"
     : "sticky top-0 z-50 bg-transparent border-b border-transparent transition-colors duration-300";
 
   return (
@@ -44,7 +44,7 @@ export default function Header() {
               type="search"
               name="q"
               placeholder="ابحث عن لعبة..."
-              className="w-full bg-surface/70 text-text-primary placeholder:text-text-faint rounded-full px-4 py-2.5 ps-10 min-h-12 outline-none border border-white/5 focus:border-primary/40 focus:shadow-[0_0_0_4px_rgba(34,211,238,0.08),0_0_20px_rgba(34,211,238,0.15)] transition-all duration-200"
+              className="w-full bg-surface/70 text-text-primary placeholder:text-text-faint rounded-full px-4 py-2.5 ps-10 min-h-12 outline-none border border-white/5 focus:border-primary/40 focus:shadow-[0_0_0_4px_rgba(255,0,110,0.18),0_0_24px_rgba(255,0,110,0.45)] transition-all duration-200"
               aria-label="بحث"
             />
             <Search
@@ -68,7 +68,7 @@ export default function Header() {
 
         <Link
           href="/profile"
-          className="relative p-[2px] rounded-full bg-gradient-to-br from-[#22D3EE] via-[#818CF8] to-[#C084FC] shadow-[0_4px_14px_rgba(34,211,238,0.25)]"
+          className="relative p-[2px] rounded-full bg-gradient-to-br from-[#FF006E] via-[#00F0FF] to-[#A100F2] shadow-[0_4px_14px_rgba(255,0,110,0.35)]"
           aria-label="الملف الشخصي"
         >
           <div className="w-9 h-9 rounded-full bg-surface grid place-items-center">
@@ -84,7 +84,7 @@ export default function Header() {
               type="search"
               name="q"
               placeholder="ابحث عن لعبة..."
-              className="w-full bg-surface/70 text-text-primary placeholder:text-text-faint rounded-full px-4 py-3 ps-10 min-h-12 outline-none border border-white/5 focus:border-primary/40 focus:shadow-[0_0_0_4px_rgba(34,211,238,0.08),0_0_20px_rgba(34,211,238,0.15)] transition-all duration-200"
+              className="w-full bg-surface/70 text-text-primary placeholder:text-text-faint rounded-full px-4 py-3 ps-10 min-h-12 outline-none border border-white/5 focus:border-primary/40 focus:shadow-[0_0_0_4px_rgba(255,0,110,0.18),0_0_24px_rgba(255,0,110,0.45)] transition-all duration-200"
               aria-label="بحث"
               autoFocus
             />
