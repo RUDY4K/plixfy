@@ -7,12 +7,26 @@ import GameCard from "@/components/GameCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TrackOnMount from "@/components/TrackOnMount";
 
+const SITE = "https://www.plixfy.com";
+
 interface PageParams {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
   return categories.map((c) => ({ slug: c.slug }));
+}
+
+function buildCategoryDescription(name: string, count: number, tagline: string): string {
+  return (
+    "فئة " +
+    name +
+    " - " +
+    count +
+    " لعبة مجانية أونلاين على بليكسفاي. " +
+    tagline +
+    " بدون تحميل، من متصفحك مباشرة. العب الآن!"
+  );
 }
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
@@ -24,25 +38,28 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       alternates: { canonical: "/categories" },
     };
   }
-  const url = "https://plixfy.com/category/" + slug;
+  const games = getCategoryGames(slug);
+  const title = meta.name + " - " + games.length + " لعبة مجاناً | بليكسفاي";
+  const description = buildCategoryDescription(meta.name, games.length, meta.description);
+  const url = SITE + "/category/" + slug;
   return {
-    title: meta.name + " | بليكسفاي",
-    description: meta.description,
+    title,
+    description,
     alternates: {
       canonical: "/category/" + slug,
     },
     openGraph: {
       type: "website",
-      title: meta.name + " | بليكسفاي",
-      description: meta.description,
+      title,
+      description,
       url,
       siteName: "Plixfy",
       locale: "ar_SA",
     },
     twitter: {
       card: "summary_large_image",
-      title: meta.name + " | بليكسفاي",
-      description: meta.description,
+      title,
+      description,
     },
   };
 }
@@ -56,8 +73,65 @@ export default async function CategoryPage({ params }: PageParams) {
     notFound();
   }
 
+  const url = SITE + "/category/" + slug;
+  const description = buildCategoryDescription(meta.name, games.length, meta.description);
+  const top10 = games.slice(0, 10);
+
+  const collectionLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: meta.name,
+    description,
+    url,
+    inLanguage: "ar",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Plixfy",
+      url: SITE,
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: games.length,
+      itemListElement: top10.map((g, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        url: SITE + "/play/" + g.slug,
+        name: g.title,
+      })),
+    },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "الرئيسية",
+        item: SITE + "/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: meta.name,
+        item: url,
+      },
+    ],
+  };
+
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+      />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       <TrackOnMount
         eventName="category_view"
         dedupKey={`category_view:${slug}`}

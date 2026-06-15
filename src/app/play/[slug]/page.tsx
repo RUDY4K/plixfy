@@ -42,7 +42,11 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const content = getGameContent(slug);
   const title = game.title + " - العب مجاناً | بليكسفاي";
   const fallbackDescription =
-    "العب " + game.title + " مجاناً على بليكسفاي. " + game.category + " بدون تحميل، من متصفحك مباشرة.";
+    "لعبة " +
+    game.title +
+    " - " +
+    game.category +
+    " مجاناً أونلاين على بليكسفاي. العب بدون تحميل، اجمع نقاط، افتح مستويات، وتحدّ أصدقاءك. متاحة الآن من متصفحك مباشرة!";
   const description = content?.metaDescription ?? fallbackDescription;
   const url = SITE + "/play/" + slug;
   return {
