@@ -1,3 +1,4 @@
+import Link from "next/link";
 import HeroTile from "@/components/HeroTile";
 import CategoryStrip from "@/components/CategoryStrip";
 import MonetagAds from "@/components/MonetagAds";
@@ -6,9 +7,34 @@ import {
   getTrendingGames,
   getTopPicks,
   getGamesByCategory,
+  allGames,
 } from "@/lib/games";
 import type { Game } from "@/lib/games";
 import { getTopGame } from "@/lib/gameStats";
+import { HOME_H1, HOME_INTRO } from "@/lib/siteContent";
+
+const SITE = "https://www.plixfy.com";
+
+const websiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "بليكسفاي",
+  url: SITE,
+  inLanguage: "ar",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: SITE + "/search?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const organizationLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "بليكسفاي",
+  url: SITE,
+  logo: SITE + "/opengraph-image.png",
+};
 
 export const revalidate = 86400;
 
@@ -34,6 +60,23 @@ export default function Home() {
 
   return (
     <main className="max-w-7xl mx-auto py-6 md:py-8 md:px-6">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([websiteLd, organizationLd]),
+        }}
+      />
+
+      <header className="px-4 md:px-0 mb-6">
+        <h1 className="text-2xl md:text-4xl font-bold text-text-primary mb-3">
+          {HOME_H1}
+        </h1>
+        <p className="text-sm md:text-base text-text-secondary max-w-3xl leading-relaxed">
+          {HOME_INTRO}
+        </p>
+      </header>
+
       <div className="px-4 md:px-0 mb-6">
         <MonetagAds type="banner" />
       </div>
@@ -116,6 +159,19 @@ export default function Home() {
         />
       )}
 
+      <div className="mt-12 px-4 md:px-0">
+        <Link
+          href="/all-games"
+          className="block rounded-2xl bg-gradient-to-r from-primary/20 to-accent/20 p-6 md:p-8 text-center hover:from-primary/30 hover:to-accent/30 transition-colors border border-primary/30"
+        >
+          <p className="text-xl md:text-2xl font-bold text-text-primary mb-1">
+            تصفّح كل {allGames.length} لعبة
+          </p>
+          <p className="text-sm text-text-secondary">
+            مرتّبة حسب التصنيف، بدون تحميل
+          </p>
+        </Link>
+      </div>
     </main>
   );
 }
