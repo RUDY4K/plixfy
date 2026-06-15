@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import Script from 'next/script';
+import { getConsent, onConsentChange } from '@/lib/consent';
 
 declare global {
   interface Window {
@@ -13,6 +15,20 @@ const QUEUE_KEY = 'plixfy_ga_queue';
 const DEDUP_PREFIX = 'plixfy_ga_once:';
 const MAX_QUEUE = 50;
 const BOT_REGEX = /bot|crawl|spider|headless|lighthouse|pingdom|gtmetrix|preview|insights/i;
+
+function applyConsent(choice: 'accept' | 'reject'): void {
+  if (typeof window === 'undefined' || !window.gtag) return;
+  const granted = choice === 'accept';
+  window.gtag('consent', 'update', {
+    ad_storage: granted ? 'granted' : 'denied',
+    ad_user_data: granted ? 'granted' : 'denied',
+    ad_personalization: granted ? 'granted' : 'denied',
+    analytics_storage: granted ? 'granted' : 'denied',
+  });
+  if (granted) {
+    window.gtag('event', 'consent_accept', { source: 'banner' });
+  }
+}
 
 type EventParams = Record<string, unknown>;
 type QueuedEvent = { name: string; params?: EventParams };
@@ -85,6 +101,14 @@ export function trackEventOnce(
 }
 
 export default function GoogleAnalytics({ gaId }: { gaId: string }) {
+  useEffect(() => {
+    const existing = getConsent();
+    if (existing) {
+      applyConsent(existing);
+    }
+    return onConsentChange(applyConsent);
+  }, []);
+
   if (!gaId) return null;
 
   return (
@@ -101,6 +125,13 @@ export default function GoogleAnalytics({ gaId }: { gaId: string }) {
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
+          gtag('consent', 'default', {
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            analytics_storage: 'denied',
+            wait_for_update: 500,
+          });
           gtag('js', new Date());
           gtag('config', '${gaId}', {
             send_page_view: false,

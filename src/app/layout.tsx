@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PageViewTracker from "@/components/PageViewTracker";
 import MonetagServiceWorker from "@/components/MonetagServiceWorker";
+import ConsentBanner from "@/components/ConsentBanner";
 
 const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
@@ -72,6 +73,7 @@ export default function RootLayout({
             </Suspense>
           </>
         )}
+        <ConsentBanner />
       </body>
     </html>
   );

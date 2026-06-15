@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { trackEvent } from "./GoogleAnalytics";
+import { getConsent, onConsentChange } from "@/lib/consent";
 
 export type MonetagAdType = "banner" | "sidebar" | "footer";
 
@@ -24,8 +25,15 @@ export default function MonetagAds({ type, zoneId = DEFAULT_ZONE_ID, className }
   const containerRef = useRef<HTMLDivElement>(null);
   const reactId = useId();
   const slotId = "monetag-" + type + "-" + reactId.replace(/[^a-zA-Z0-9_-]/g, "");
+  const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
+    setAllowed(getConsent() === "accept");
+    return onConsentChange((choice) => setAllowed(choice === "accept"));
+  }, []);
+
+  useEffect(() => {
+    if (!allowed) return;
     const container = containerRef.current;
     if (!container) return;
 
@@ -67,7 +75,7 @@ export default function MonetagAds({ type, zoneId = DEFAULT_ZONE_ID, className }
         // ignore
       }
     };
-  }, [type, zoneId]);
+  }, [type, zoneId, allowed]);
 
   const size = SIZE_BY_TYPE[type];
 
