@@ -8,10 +8,29 @@ export default function ConsentBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (getConsent() === null) {
+    const hasGoogleCMP = () =>
+      typeof window !== "undefined" && "__tcfapi" in window;
+
+    const evaluate = () => {
+      if (hasGoogleCMP()) {
+        setVisible(false);
+        return;
+      }
+      if (getConsent() === null) {
+        setVisible(true);
+      }
+    };
+
+    const timer = window.setTimeout(evaluate, 2000);
+    const unsubscribe = onConsentCleared(() => {
+      if (hasGoogleCMP()) return;
       setVisible(true);
-    }
-    return onConsentCleared(() => setVisible(true));
+    });
+
+    return () => {
+      window.clearTimeout(timer);
+      unsubscribe();
+    };
   }, []);
 
   if (!visible) return null;
