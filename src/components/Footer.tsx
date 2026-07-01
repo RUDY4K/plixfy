@@ -12,6 +12,7 @@ const navLinks: readonly FooterLink[] = [
   { href: "/", label: "الرئيسية" },
   { href: "/categories", label: "التصنيفات" },
   { href: "/favorites", label: "المفضلة" },
+  { href: "/blog", label: "المدوّنة" },
 ];
 
 const legalLinks: readonly FooterLink[] = [
