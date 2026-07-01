@@ -8,8 +8,11 @@ export interface CategoryStripProps {
   games: readonly GameCardProps[];
 }
 
+const STRIP_LIMIT = 12;
+
 export default function CategoryStrip(props: CategoryStripProps) {
   const { title, viewAllHref, games } = props;
+  const visibleGames = games.slice(0, STRIP_LIMIT);
 
   return (
     <section className="mb-8 md:mb-12">
@@ -49,7 +52,7 @@ export default function CategoryStrip(props: CategoryStripProps) {
           className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none"
         />
         <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory px-4 pb-2 scrollbar-hide">
-          {games.map((game) => (
+          {visibleGames.map((game) => (
             <div
               key={game.slug}
               className="snap-start shrink-0"
@@ -62,7 +65,7 @@ export default function CategoryStrip(props: CategoryStripProps) {
       </div>
 
       <div className="hidden md:grid md:grid-cols-6 md:gap-6">
-        {games.slice(0, 12).map((game) => (
+        {visibleGames.map((game) => (
           <GameCard key={game.slug} {...game} />
         ))}
       </div>
