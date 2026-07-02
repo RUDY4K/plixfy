@@ -42,32 +42,25 @@ export default function CategoryStrip(props: CategoryStripProps) {
         ) : null}
       </div>
 
-      <div className="md:hidden relative">
+      <div className="relative">
         <div
           aria-hidden="true"
-          className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none"
+          className="md:hidden absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none"
         />
         <div
           aria-hidden="true"
-          className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none"
+          className="md:hidden absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none"
         />
-        <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory px-4 pb-2 scrollbar-hide">
+        <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory px-4 pb-2 scrollbar-hide md:grid md:grid-cols-6 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
           {visibleGames.map((game) => (
             <div
               key={game.slug}
-              className="snap-start shrink-0"
-              style={{ width: "130px" }}
+              className="snap-start shrink-0 w-[130px] md:w-auto"
             >
               <GameCard {...game} />
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="hidden md:grid md:grid-cols-6 md:gap-6">
-        {visibleGames.map((game) => (
-          <GameCard key={game.slug} {...game} />
-        ))}
       </div>
     </section>
   );
