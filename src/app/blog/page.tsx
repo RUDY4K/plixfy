@@ -12,7 +12,10 @@ export const metadata: Metadata = {
   title: `المدوّنة - ${BRAND_AR} | أدلّة ونصائح الألعاب`,
   description:
     "مقالات وأدلّة عن أفضل الألعاب المجانية أونلاين: ألعاب سباق، بنات، آيو، وأكثر. نصائح للّعب وترشيحات مختارة من بليكسفاي.",
-  alternates: { canonical: "/blog" },
+  alternates: {
+    canonical: "/blog",
+    types: { "application/rss+xml": "/blog/rss.xml" },
+  },
   openGraph: {
     type: "website",
     title: `المدوّنة - ${BRAND_AR}`,
