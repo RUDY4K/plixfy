@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Breadcrumbs from "@/components/Breadcrumbs";
 import { getAllNews, getNewsBySlug, getNewsSlugs, formatNewsDate } from "@/lib/news";
 import { BRAND_AR } from "@/lib/siteContent";
 
@@ -75,75 +74,97 @@ export default async function NewsItemPage({ params }: PageParams) {
   };
 
   return (
-    <main className="max-w-3xl mx-auto px-4 md:px-6 py-6 md:py-8">
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([articleLd, breadcrumbLd]) }}
-      />
-      <Breadcrumbs
-        items={[
-          { label: "الرئيسية", href: "/" },
-          { label: "أخبار الألعاب", href: "/news" },
-          { label: item.title },
-        ]}
-      />
+    // قسم الأخبار يستخدم ثيماً فاتحاً «صحفياً» مقصوداً — مختلف عن بقية الموقع
+    <div className="bg-[#f4f6f9] min-h-screen">
+      <main className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12">
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([articleLd, breadcrumbLd]) }}
+        />
 
-      <article>
-        <header className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary leading-snug">
-            {item.title}
-          </h1>
-          <div className="flex items-center gap-3 mt-3 text-sm text-text-secondary">
-            <time dateTime={item.publishedAt}>{formatNewsDate(item.publishedAt)}</time>
+        <nav aria-label="مسار التنقل" className="mb-6 text-sm text-slate-500">
+          <Link href="/" className="hover:text-blue-700 transition-colors">
+            الرئيسية
+          </Link>
+          <span className="mx-2" aria-hidden="true">
+            ‹
+          </span>
+          <Link href="/news" className="hover:text-blue-700 transition-colors">
+            أخبار الألعاب
+          </Link>
+        </nav>
+
+        <article className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
+          <div aria-hidden="true" className="h-1.5 bg-blue-700" />
+          <div className="p-6 md:p-8">
+            <header className="mb-6 border-b border-slate-100 pb-6">
+              <div className="flex items-center gap-2 mb-4 text-xs">
+                <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-bold">
+                  {item.sourceName}
+                </span>
+                <time dateTime={item.publishedAt} className="text-slate-500">
+                  {formatNewsDate(item.publishedAt)}
+                </time>
+              </div>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 leading-snug tracking-tight">
+                {item.title}
+              </h1>
+            </header>
+
+            <div className="text-base text-slate-700 leading-loose whitespace-pre-line">
+              {item.summary}
+            </div>
+
+            <p className="mt-8 pt-5 border-t border-slate-100 text-sm text-slate-500">
+              المصدر الأصلي:{" "}
+              <a
+                href={item.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="text-blue-700 font-semibold hover:underline"
+              >
+                {item.sourceName}
+              </a>
+            </p>
           </div>
-        </header>
+        </article>
 
-        <div className="text-sm md:text-base text-text-secondary leading-loose whitespace-pre-line">
-          {item.summary}
+        <div className="mt-8 rounded-2xl bg-gradient-to-l from-[#1a1030] to-[#2a1245] p-6 text-center shadow-md">
+          <p className="text-base font-bold text-white mb-1">
+            خذ استراحة من الأخبار والعب مجاناً 🎮
+          </p>
+          <Link
+            href="/"
+            className="text-pink-400 hover:text-pink-300 text-sm font-semibold transition-colors"
+          >
+            تصفّح مئات الألعاب بدون تحميل على بليكسفاي
+          </Link>
         </div>
 
-        <p className="mt-6 text-sm text-text-secondary">
-          المصدر الأصلي:{" "}
-          <a
-            href={item.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            className="text-primary hover:underline"
-          >
-            {item.sourceName}
-          </a>
-        </p>
-      </article>
-
-      <div className="mt-10 rounded-2xl bg-gradient-to-r from-primary/15 to-accent/15 p-5 border border-primary/25 text-center">
-        <p className="text-base font-bold text-text-primary mb-1">
-          خذ استراحة من الأخبار والعب مجاناً 🎮
-        </p>
-        <Link href="/" className="text-primary hover:underline text-sm font-semibold">
-          تصفّح مئات الألعاب بدون تحميل على بليكسفاي
-        </Link>
-      </div>
-
-      {otherNews.length > 0 && (
-        <section className="mt-10 border-t border-white/10 pt-6">
-          <h2 className="text-lg md:text-xl font-bold text-text-primary mb-4">
-            أخبار أخرى
-          </h2>
-          <ul className="space-y-2">
-            {otherNews.map((n) => (
-              <li key={n.slug}>
-                <Link
-                  href={"/news/" + n.slug}
-                  className="text-primary hover:underline text-sm md:text-base"
+        {otherNews.length > 0 && (
+          <section className="mt-10">
+            <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-4">
+              أخبار أخرى
+            </h2>
+            <ul className="space-y-3">
+              {otherNews.map((n) => (
+                <li
+                  key={n.slug}
+                  className="rounded-xl bg-white border border-slate-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all"
                 >
-                  {n.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-    </main>
+                  <Link
+                    href={"/news/" + n.slug}
+                    className="text-slate-800 hover:text-blue-800 font-semibold text-sm md:text-base transition-colors"
+                  >
+                    {n.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </main>
+    </div>
   );
 }
