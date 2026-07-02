@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { allGames, categories } from "@/lib/games";
 import { getAllPosts } from "@/lib/blog";
+import { getAllNews } from "@/lib/news";
 
 const SITE = "https://www.plixfy.com";
 
@@ -14,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE + "/category/top", lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: SITE + "/category/trending", lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: SITE + "/blog", lastModified: now, changeFrequency: "weekly", priority: 0.6 },
+    { url: SITE + "/news", lastModified: now, changeFrequency: "daily", priority: 0.7 },
     { url: SITE + "/about", lastModified: now, changeFrequency: "monthly", priority: 0.3 },
     { url: SITE + "/privacy", lastModified: now, changeFrequency: "monthly", priority: 0.3 },
     { url: SITE + "/terms", lastModified: now, changeFrequency: "monthly", priority: 0.3 },
@@ -54,8 +56,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  const newsRoutes: MetadataRoute.Sitemap = getAllNews().map((n) => ({
+    url: SITE + "/news/" + n.slug,
+    lastModified: new Date(n.publishedAt),
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }));
+
   return [
     ...staticRoutes,
+    ...newsRoutes,
     ...blogRoutes,
     ...categoryRoutes,
     ...bestRoutes,

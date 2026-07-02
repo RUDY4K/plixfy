@@ -9,6 +9,7 @@
     "refresh-monetag-sw": "node scripts/refresh-monetag-sw.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.109.1",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",
     "react": "19.2.4",
