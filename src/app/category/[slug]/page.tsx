@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { categories, getCategoryMeta, getCategoryGames } from "@/lib/games";
 import type { CategorySlug } from "@/lib/games";
 import { categoryContent } from "@/lib/categoryContent";
+import { getPostsByCategory } from "@/lib/blog";
 import GameCard from "@/components/GameCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TrackOnMount from "@/components/TrackOnMount";
@@ -81,6 +82,7 @@ export default async function CategoryPage({ params }: PageParams) {
   const description = buildCategoryDescription(meta.name, games.length, meta.description);
   const top10 = games.slice(0, 10);
   const content = categoryContent[slug as CategorySlug] ?? null;
+  const relatedPosts = getPostsByCategory(slug as CategorySlug);
 
   const collectionLd = {
     "@context": "https://schema.org",
@@ -179,13 +181,22 @@ export default async function CategoryPage({ params }: PageParams) {
             {content.intro}
           </div>
         ) : null}
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-3">
           <Link
             href={"/best/" + slug}
             className="inline-flex items-center min-h-12 px-4 rounded-xl bg-primary/15 text-primary text-sm font-bold hover:bg-primary/25 transition"
           >
             🏆 أفضل {meta.name} في 2026
           </Link>
+          {relatedPosts.map((post) => (
+            <Link
+              key={post.slug}
+              href={"/blog/" + post.slug}
+              className="inline-flex items-center min-h-12 px-4 rounded-xl bg-surface-secondary text-text-primary text-sm font-bold hover:bg-primary/15 hover:text-primary transition"
+            >
+              📖 {post.h1}
+            </Link>
+          ))}
         </div>
       </header>
 

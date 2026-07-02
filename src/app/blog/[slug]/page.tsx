@@ -53,7 +53,11 @@ export default async function BlogPostPage({ params }: PageParams) {
   if (!post) notFound();
 
   const relatedGames = getGamesByCategory(post.relatedCategory).slice(0, 12);
-  const otherPosts = getAllPosts().filter((p) => p.slug !== post.slug).slice(0, 3);
+  const others = getAllPosts().filter((p) => p.slug !== post.slug);
+  const otherPosts = [
+    ...others.filter((p) => p.relatedCategory === post.relatedCategory),
+    ...others.filter((p) => p.relatedCategory !== post.relatedCategory),
+  ].slice(0, 3);
 
   const articleLd = {
     "@context": "https://schema.org",

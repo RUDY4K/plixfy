@@ -711,3 +711,8 @@ export function getPostBySlug(slug: string): BlogPost | undefined {
 export function getPostSlugs(): readonly string[] {
   return POSTS.map((p) => p.slug);
 }
+
+/** مقالات مرتبطة بتصنيف معيّن — تُعرض في صفحة التصنيف كروابط داخلية */
+export function getPostsByCategory(category: CategorySlug): readonly BlogPost[] {
+  return getAllPosts().filter((p) => p.relatedCategory === category);
+}
