@@ -17,6 +17,8 @@ const tajawal = Tajawal({
   display: "swap",
 });
 
+const ADSENSE_CLIENT = "ca-pub-5387661711080146";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -64,6 +66,11 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://playgama.com" />
         <link rel="dns-prefetch" href="https://playgama.com" />
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="bg-bg text-text-primary antialiased min-h-screen pb-32 md:pb-0 relative ambient-glows overflow-x-hidden">
         <div className="noise-overlay" aria-hidden="true" />
