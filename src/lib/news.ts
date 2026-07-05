@@ -19,8 +19,18 @@ export function getAllNews(): readonly NewsItem[] {
   return [...ITEMS].sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
 }
 
+/** الـ slug يصل من الرابط مُرمَّزًا (percent-encoded) للعناوين العربية — نفكّ الترميز قبل المقارنة */
+function normalizeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
 export function getNewsBySlug(slug: string): NewsItem | undefined {
-  return ITEMS.find((n) => n.slug === slug);
+  const decoded = normalizeSlug(slug);
+  return ITEMS.find((n) => n.slug === decoded);
 }
 
 export function getNewsSlugs(): readonly string[] {
