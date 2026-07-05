@@ -214,6 +214,8 @@ export default async function PlayPage({ params }: PageParams) {
           slug={game.slug}
           title={game.title}
           thumbnail={game.thumbnail}
+          source={game.source}
+          gdId={game.gdId}
         />
       </div>
 

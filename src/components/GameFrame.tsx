@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Play, X, ArrowDown } from "lucide-react";
 import { getPlaygamaEmbedUrl } from "@/lib/playgama";
+import { getGdEmbedUrl } from "@/lib/gamedistribution";
 import { trackEvent, trackEventOnce } from "./GoogleAnalytics";
 
 export interface GameFrameProps {
@@ -11,10 +12,15 @@ export interface GameFrameProps {
   title: string;
   thumbnail: string;
   orientation?: "landscape" | "portrait" | "both";
+  source?: "playgama" | "gd";
+  gdId?: string;
 }
 
 export default function GameFrame(props: GameFrameProps) {
-  const { slug, title, thumbnail, orientation } = props;
+  const { slug, title, thumbnail, orientation, source, gdId } = props;
+  const sourceName = source === "gd" ? "gd" : "playgama";
+  const embedSrc =
+    source === "gd" && gdId ? getGdEmbedUrl(gdId, slug) : getPlaygamaEmbedUrl(slug);
   const [playing, setPlaying] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [justEnded, setJustEnded] = useState(false);
@@ -31,7 +37,7 @@ export default function GameFrame(props: GameFrameProps) {
       duration_seconds: elapsed,
     };
     trackEvent("game_end", params);
-    trackEvent("playgama_game_end", params);
+    trackEvent(sourceName + "_game_end", params);
   }
 
   function start() {
@@ -44,7 +50,7 @@ export default function GameFrame(props: GameFrameProps) {
       game_title: title,
     };
     trackEventOnce(`game_start:${slug}`, "game_start", params);
-    trackEventOnce(`playgama_game_start:${slug}`, "playgama_game_start", params);
+    trackEventOnce(`${sourceName}_game_start:${slug}`, `${sourceName}_game_start`, params);
 
     const wantsFullscreen =
       typeof window !== "undefined" &&
@@ -87,14 +93,14 @@ export default function GameFrame(props: GameFrameProps) {
         duration_seconds: elapsed,
       };
       trackEvent("game_end", params);
-      trackEvent("playgama_game_end", params);
+      trackEvent(sourceName + "_game_end", params);
     }
     window.addEventListener("beforeunload", onUnload);
     return () => {
       window.removeEventListener("beforeunload", onUnload);
       onUnload();
     };
-  }, [slug, title]);
+  }, [slug, title, sourceName]);
 
   return (
     <div className="relative aspect-video md:aspect-[21/9] overflow-hidden rounded-2xl bg-surface">
@@ -102,7 +108,7 @@ export default function GameFrame(props: GameFrameProps) {
         <>
           <iframe
             ref={iframeRef}
-            src={getPlaygamaEmbedUrl(slug)}
+            src={embedSrc}
             title={title}
             allow="autoplay; encrypted-media; fullscreen"
             sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"

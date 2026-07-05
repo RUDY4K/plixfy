@@ -1,4 +1,7 @@
 import type { GameBadge } from "@/components/GameCard";
+import gdGamesData from "@/data/gd-games.json";
+
+export type GameSource = "playgama" | "gd";
 
 export interface Game {
   title: string;
@@ -9,6 +12,10 @@ export interface Game {
   categorySlug: CategorySlug;
   description?: string;
   plays?: number;
+  /** مصدر اللعبة — غيابه يعني playgama (الكتالوج الأصلي) */
+  source?: GameSource;
+  /** معرّف اللعبة (Md5) في كتالوج GameDistribution — مطلوب عندما source === "gd" */
+  gdId?: string;
 }
 
 export type CategorySlug =
@@ -39,7 +46,7 @@ export const categories: readonly Category[] = [
   { slug: "shooting", labelAr: "تصويب", labelEn: "Shooting", iconSeed: "shooting-icon" },
 ];
 
-export const allGames: readonly Game[] = [
+const playgamaGames: readonly Game[] = [
   {
     title: "Piece of Cake: Merge & Bake",
     slug: "piece-of-cake-merge--bake",
@@ -3398,7 +3405,31 @@ export const allGames: readonly Game[] = [
   },
 ];
 
-const gamesByCategoryMap: Record<CategorySlug, readonly string[]> = {
+interface GdGameData {
+  title: string;
+  slug: string;
+  gdId: string;
+  thumbnail: string;
+  category: string;
+  categorySlug: string;
+  description?: string;
+}
+
+const gdGames: readonly Game[] = (gdGamesData as GdGameData[]).map((g) => ({
+  title: g.title,
+  slug: g.slug,
+  thumbnail: g.thumbnail,
+  badge: null,
+  category: g.category,
+  categorySlug: g.categorySlug as CategorySlug,
+  description: g.description,
+  source: "gd" as const,
+  gdId: g.gdId,
+}));
+
+export const allGames: readonly Game[] = [...playgamaGames, ...gdGames];
+
+const gamesByCategoryStatic: Record<CategorySlug, readonly string[]> = {
   racing: ["deadly-descent", "mr-racer-car-racing", "car-destruction-king", "moto-x3m", "drive-quest", "motorcycle-racer-road-mayhem", "realistic-car-crash-king", "crime-and-vice-city-police", "obby-1-speed-car-escape", "bus-parking-out", "crazy-motorcycle", "online-car-destruction", "police-chase-simulator", "road-chase-shooter-realistic-guns", "car-smash-simulator-crash--tune", "soda-sandbox", "steal-car-duel", "bmg-ragdoll-car-race", "race-on-cars-in-moscow", "crash-test-simulator-3d", "eggy-car", "bus-escape-clear-jam", "mr-racer-stunt-mania", "shape-transforming-shifting-run", "bmg-crash-test", "car-wash-diy", "draw-bridge--brain-game", "hills-of-steel", "car-crash-sandbox", "demolition-car--rope-and-hook", "car-parking-3d", "bobr-turbo-craft-cars", "moto-x3m-spooky-land", "police-car-simulator-game-criminal-case", "long-drive-to-horizons-sim", "summer-rider-3d", "buggy-simulator-sandbox-3d", "car-crash-test-abandoned-city", "car-stunt-racing-game-3d--car-games", "monster-truck-stunt-game-racing-games", "mad-truck-challenge-special", "carvivor-ops", "drifting-car-master", "tiny-cars", "drag-racing-club", "smash-speed", "tank-1944", "turbo-stunt-racing", "zombie-derby", "monster-truck-racing-game-truck-race", "super-car-soccer-arena", "streetracer-realistic-destruction", "drift-idle-drift-earn-upgrade", "obby-but-youre-on-a-motorcycle", "bouncy-motors", "break-the-car-completely", "transport-run", "road-madness", "scale-the-wheels", "playmusic"],
   action: ["plants-vs-zombies-fusion-edition", "hidden-object-street-of-secrets", "hidden-object-clues-and-mysteries", "cat-and-granny", "plants-vs-zombies-fusion-mode", "gym-simulator-online-escape", "rivals-fps-online-shooter", "kick-a-lucky-block-tsunami-waves", "hidden-object-my-hotel", "1-speed-escape-school", "obby-climb-and-slide", "wild-love", "mr-racer-car-racing", "barry-prison-parkour-escape", "stickman-kombat-2d", "epic-sword-battle-fight-in-the-ragdoll-arena", "rooftop-run", "car-destruction-king", "hedgies", "aod--art-of-defense", "1-speed-escape-prison", "gym-boss", "obby-minigames-vs-1000", "animal-evolution-simulator", "basket-random", "moto-x3m", "ragdoll-racing-extreme-downhill", "the-aesthetic-world-of-obby", "fun-ragdoll-challenge-mini-games-collection", "age-of-tanks-warriors-td-war", "dogs-vs-aliens", "imposter-3d-online-horror", "drive-quest", "king-rugni-tower-defense", "break-a-lucky-egg-brainrots", "brawl-simulator-3d", "your-obby-escape", "millionaire-life", "escape-tsunami-for-brainrots", "survive-the-disasters-obby", "hidden-objects-island", "lucky-brainrot-blocks-online", "obby-minigames", "crime-and-vice-city-police", "age-of-heroes", "obby-online-with-friends-draw-and-jump", "rise-of-the-dead", "blackriver-mystery-hidden-objects", "ragdoll-crashtest-throw-and-break", "obby-1-speed-car-escape", "mine-mining-islands-skyblock-village", "solitaire-crime-stories", "weapon-upgrade", "break-stick-completely", "last-play-ragdoll-sandbox", "man-runner-2048", "your-obby-size", "Italian-brainrot-hunting-3D", "obby-parkour-sleeping-brainrots", "zombie-space-episode-ii"],
   puzzle: ["piece-of-cake-merge--bake", "hidden-object-street-of-secrets", "hidden-object-clues-and-mysteries", "hidden-objects-island-secrets", "good-sort-master", "fruit-merge-playgama", "nuts-puzzle-sort-by-color", "hidden-object-my-hotel", "mahjong-classic", "chess-online-multiplayer", "tap-3d-wood-block-away", "word-finder", "mahjong-lines", "yarn-fever-unravel-puzzle", "find-the-frog--hidden-objects", "master-chess", "mahjong-unlimited", "poppy-playtime-5-merge-all-characters", "block-blast-2048", "bubble-pop-legend", "screw-match", "favorite-puzzles", "chess-online-playing", "break-a-lucky-egg-brainrots", "burger-restaurant-simulator-3d", "vega-mix-2-adventure", "arrows-out", "block-blast-master", "word-search-hidden-words", "hidden-objects-island", "hidden-objects-home-sweet-home", "home-design-decorate-house", "obby-online-with-friends-draw-and-jump", "blackriver-mystery-hidden-objects", "solitaire-crime-stories", "trend-family-merge-arena", "man-runner-2048", "wood-blocks-jam", "ball-sort-puzzle", "find-out-hidden-object", "blocks-shooter-3d-run-shoot-merge-weapons", "hexa-master-3d-sort-puzzle", "bus-parking-out", "tile-valley", "emerland-solitaire", "word-solitaire", "money-cutter-idle", "merge-world", "diamant-match-3-sky-story", "watermelon-game", "chicken-merge", "word-string", "word-associations-solitaire", "draw-or-delete-lovestory", "neon-maze", "mystery-of-the-old-house-hidden-objects", "the-queens-jewels", "cannon-basket", "schoolboy-runaway-room-escape", "bubble-pop-fairyland"],
@@ -3408,6 +3439,20 @@ const gamesByCategoryMap: Record<CategorySlug, readonly string[]> = {
   sports: ["golf-orbit", "basketball-stars", "gym-boss", "basket-random", "moto-x3m", "ragdoll-soccer", "snow-rush-3d", "soccer-legends-2026", "cannon-basket", "figure-skating-on-ice", "soccer-strike", "volley-beans", "dunkin-beanz", "school-of-basketball", "darts-pro-3cf1-1", "soccer-dash", "archery-ragdoll", "dummy-world-cup-playgama", "soccer-random", "bowling-stars", "robby-mini-games", "football--soccer", "super-bowling-mania", "flippee-ball", "penalty-shooter", "mini-golf-battle", "obby-football-soccer-3d", "penalty-challenge-64c5-1", "super-car-soccer-arena", "gibbets-bow-master", "shape-transform-race", "archer-trial-by-fate", "cricket-mania", "finger-soccer-tournament", "golf-invaders", "sky-golf", "draw--drop", "3d-pool-mania", "billiards-3d-russian-pyramid-04bf-1", "hit--knock-down", "power-ball-soccer", "pool-8", "stickman-archer-kick", "basketball-tap", "shadow-stick-ninja", "mrtung-shoot-zombie", "precise-shooting", "neon-goal", "cubby-soccer-league", "animal-basketball", "super-fruit-runner-hyper-casual", "bow-brawls", "Soccer-training", "on-fire-basketball-shots", "archery-master--castle-battle", "pongoal", "revoxel-3d--voxel-rpg-shooter", "keepie-uppie-paddle-pong", "archer-defense", "love-archer-hero"],
   shooting: ["rivals-fps-online-shooter", "sorter-ragdoll-playground-shooter", "brawl-simulator-3d", "rise-of-the-dead", "weapon-upgrade", "Italian-brainrot-hunting-3D", "zombie-space-episode-ii", "blocks-shooter-3d-run-shoot-merge-weapons", "sniper-attack2", "road-chase-shooter-realistic-guns", "snake-of-bullets-collect-and-shoot", "soda-sandbox", "zombie-terminator", "99-nights-in-the-forest-horror-multiplayer", "red-and-blue-snipers", "wild-hunting-clash", "ninja-vs-ragdolls-sharp-knife-throw", "far-island-tactical-warfare", "hills-of-steel", "mafia-wars-addd-1", "ragdoll-gun-shooter-cannon-spinner-playground", "aliens-hunter", "frontline-commando-shooting-gun-games", "zombie-rage-merge-3d", "sniper-shootersave-the-fish", "modern-sniper-gun-game-sniper-3d", "tank-1944", "mr-shooter", "zombie-hunter-survival", "gun-blast", "cannon-balls", "road-madness", "gun-craft-and-fight", "mister-bullet-arcade-shooter", "color-brawls", "nubik-in-the-monster-world", "mad-day-special", "gun-baron", "space-craft-ship-war", "party-games-mini-shooter-battle", "swat-force-vs-terrorists", "highway-car-shooting-3d-action-game-2025", "battle-hamsters", "duck-hunter", "tank-fury-boss-battle-2d", "buttons", "drakkar-strike", "camel-destroyer", "one-man-army-battle-game", "echolocation-shooter", "squid-game-tower-defense", "planet-404-episode-1", "blocky-guns", "star-wing", "mad-day-2-special", "shoot--sprint-warfare", "shadow-stick-ninja", "mrtung-shoot-zombie", "skebob-gun", "brainrot-hunters-shooter-3d"],
 };
+
+// دمج ألعاب GameDistribution في خريطة التصنيفات بعد القائمة المنسّقة يدويًا
+const gamesByCategoryMap: Record<CategorySlug, readonly string[]> = (
+  Object.keys(gamesByCategoryStatic) as CategorySlug[]
+).reduce(
+  (acc, cat) => ({
+    ...acc,
+    [cat]: [
+      ...gamesByCategoryStatic[cat],
+      ...gdGames.filter((g) => g.categorySlug === cat).map((g) => g.slug),
+    ],
+  }),
+  {} as Record<CategorySlug, readonly string[]>,
+);
 
 const slugToGame: Map<string, Game> = new Map(allGames.map((g) => [g.slug, g]));
 
