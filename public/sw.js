@@ -1,10 +1,19 @@
-self.options = {
-  "domain": "5gvci.com",
-  "zoneId": 11150632
-};
+// Monetag SW معطّل مؤقتاً أثناء مراجعة AdSense (2026-07-06).
+// هذا stub يلغي تسجيل نفسه عند أول تحديث في متصفحات الزوار القدامى.
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
 
-self.lary = "";
-
-// Pinned Monetag SW vendor script (hash: c15bd0fb5c1107ea)
-// Refresh with: node scripts/refresh-monetag-sw.mjs
-importScripts('/monetag-sw-c15bd0fb5c1107ea.js');
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    self.registration
+      .unregister()
+      .then(() => self.clients.matchAll())
+      .then((clients) => {
+        clients.forEach((client) => {
+          if (client instanceof WindowClient) client.navigate(client.url).catch(() => {});
+        });
+      })
+      .catch(() => {})
+  );
+});

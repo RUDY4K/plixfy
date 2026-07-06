@@ -70,9 +70,9 @@ export default function PrivacyPage() {
               الاستخدام بشكل مجمّع.
             </li>
             <li>
-              <strong className="text-text-primary">معرّف إعلاني (Monetag):
-              </strong>{" "}
-              يُستخدم لعرض الإعلانات وتقدير الأداء، ويعتمد على موافقتك الصريحة.
+              <strong className="text-text-primary">معرّفات إعلانية (Google
+              AdSense):</strong>{" "}
+              تُستخدم لعرض الإعلانات وقياس أدائها، وتعتمد على موافقتك الصريحة.
             </li>
             <li>
               <strong className="text-text-primary">التخزين المحلي
@@ -98,8 +98,8 @@ export default function PrivacyPage() {
             </li>
             <li>
               <strong className="text-text-primary">موافقة المستخدم:</strong>{" "}
-              التحليلات (GA4) والإعلانات (Monetag) لا تعمل إلّا بعد موافقتك
-              الصريحة عبر إشعار ملفات تعريف الارتباط.
+              التحليلات (GA4) والإعلانات (Google AdSense) لا تعمل إلّا بعد
+              موافقتك الصريحة عبر إشعار ملفات تعريف الارتباط.
             </li>
             <li>
               <strong className="text-text-primary">تنفيذ خدمة طلبتها:</strong>{" "}
@@ -128,15 +128,15 @@ export default function PrivacyPage() {
               .
             </li>
             <li>
-              <strong className="text-text-primary">Monetag</strong> — عرض
-              الإعلانات + إشعارات الويب عبر Service Worker مُضمّن في الموقع.{" "}
+              <strong className="text-text-primary">Google AdSense</strong> —
+              عرض الإعلانات على صفحات الموقع (Google LLC، الولايات المتحدة).{" "}
               <a
-                href="https://monetag.com/privacy-policy/"
+                href="https://policies.google.com/technologies/ads"
                 className="text-primary underline hover:brightness-110"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                سياسة Monetag
+                سياسة إعلانات Google
               </a>
               .
             </li>
@@ -155,6 +155,20 @@ export default function PrivacyPage() {
               .
             </li>
             <li>
+              <strong className="text-text-primary">GameDistribution</strong> —
+              تستضيف بعض الألعاب وتعرضها داخل إطار (iframe) معزول، وقد تعرض
+              إعلانات داخل اللعبة وفق سياستها.{" "}
+              <a
+                href="https://gamedistribution.com/privacy-policy"
+                className="text-primary underline hover:brightness-110"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                سياسة GameDistribution
+              </a>
+              .
+            </li>
+            <li>
               <strong className="text-text-primary">Vercel</strong> — مزوّد
               الاستضافة الذي تُقدَّم منه صفحات الموقع.
             </li>
@@ -166,7 +180,7 @@ export default function PrivacyPage() {
             5. نقل البيانات خارج المملكة العربية السعودية
           </h2>
           <p>
-            الأطراف المذكورة أعلاه (Google، Monetag، Playgama، Vercel) لديها
+            الأطراف المذكورة أعلاه (Google، Playgama، Vercel) لديها
             بنية تحتية خارج المملكة العربية السعودية. عند موافقتك على التحليلات
             أو الإعلانات، يتمّ نقل البيانات المرتبطة بها إلى دول قد تشمل
             الولايات المتحدة والاتحاد الأوروبي. يطبّق هؤلاء المعالجون ضوابط

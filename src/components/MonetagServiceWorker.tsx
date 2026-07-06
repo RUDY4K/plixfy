@@ -1,21 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { getConsent, onConsentChange } from "@/lib/consent";
 
-function register(): void {
-  if (typeof navigator === "undefined") return;
-  if (!("serviceWorker" in navigator)) return;
-  navigator.serviceWorker
-    .register("/sw.js", { scope: "/" })
-    .catch((err) => {
-      if (process.env.NODE_ENV !== "production") {
-        console.warn("[MonetagServiceWorker] registration failed:", err);
-      }
-    });
-}
-
-async function unregister(): Promise<void> {
+// Monetag معطّل مؤقتاً أثناء مراجعة AdSense (2026-07-06).
+// المكوّن الآن يلغي تسجيل أي service worker سابق عند الزوار العائدين فقط.
+// للاستعادة: git log -- src/components/MonetagServiceWorker.tsx
+async function unregisterAll(): Promise<void> {
   if (typeof navigator === "undefined") return;
   if (!("serviceWorker" in navigator)) return;
   try {
@@ -28,15 +18,7 @@ async function unregister(): Promise<void> {
 
 export default function MonetagServiceWorker() {
   useEffect(() => {
-    if (getConsent() === "accept") {
-      register();
-    } else if (getConsent() === "reject") {
-      void unregister();
-    }
-    return onConsentChange((choice) => {
-      if (choice === "accept") register();
-      else void unregister();
-    });
+    void unregisterAll();
   }, []);
 
   return null;

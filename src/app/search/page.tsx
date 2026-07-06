@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { allGames } from "@/lib/games";
 import GameCard from "@/components/GameCard";
 import TrackOnMount from "@/components/TrackOnMount";
-import MonetagAds from "@/components/MonetagAds";
 
 export const metadata: Metadata = {
   title: "بحث | بليكسفاي",
@@ -38,10 +37,6 @@ export default async function SearchPage({
       <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-6">
         بحث
       </h1>
-
-      <div className="mb-6">
-        <MonetagAds type="banner" />
-      </div>
 
       <form action="/search" role="search" className="bg-surface rounded-2xl p-4 mb-6">
         <input

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import HeroTile from "@/components/HeroTile";
 import CategoryStrip from "@/components/CategoryStrip";
-import MonetagAds from "@/components/MonetagAds";
 import TrackOnMount from "@/components/TrackOnMount";
 import {
   getTrendingGames,
@@ -102,10 +101,6 @@ export default function Home() {
           {HOME_INTRO}
         </p>
       </header>
-
-      <div className="px-4 md:px-0 mb-6">
-        <MonetagAds type="banner" />
-      </div>
 
       <TrackOnMount
         eventName="hero_top_game_viewed"
