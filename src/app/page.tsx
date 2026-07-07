@@ -10,6 +10,8 @@ import {
 } from "@/lib/games";
 import type { Game } from "@/lib/games";
 import { getTopGame } from "@/lib/gameStats";
+import { getAllPosts } from "@/lib/blog";
+import { getAllNews, formatNewsDate } from "@/lib/news";
 import { HOME_H1, HOME_INTRO } from "@/lib/siteContent";
 
 const SITE = "https://www.plixfy.com";
@@ -179,6 +181,71 @@ export default function Home() {
           games={casual}
         />
       )}
+
+      <section className="mt-12 px-4 md:px-0">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg md:text-2xl font-bold text-text-primary">
+            من المدونة
+          </h2>
+          <Link
+            href="/blog"
+            className="text-sm text-primary hover:underline"
+          >
+            كل المقالات ←
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {getAllPosts()
+            .slice(0, 4)
+            .map((post) => (
+              <Link
+                key={post.slug}
+                href={`/blog/${post.slug}`}
+                className="block rounded-2xl border border-primary/20 bg-surface/60 p-4 hover:border-primary/50 transition-colors"
+              >
+                <h3 className="text-sm font-bold text-text-primary mb-2 leading-snug">
+                  {post.h1}
+                </h3>
+                <p className="text-xs text-text-secondary leading-relaxed line-clamp-3">
+                  {post.description}
+                </p>
+              </Link>
+            ))}
+        </div>
+      </section>
+
+      <section className="mt-10 px-4 md:px-0">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg md:text-2xl font-bold text-text-primary">
+            آخر أخبار الألعاب
+          </h2>
+          <Link
+            href="/news"
+            className="text-sm text-primary hover:underline"
+          >
+            كل الأخبار ←
+          </Link>
+        </div>
+        <ul className="space-y-2">
+          {getAllNews()
+            .slice(0, 3)
+            .map((item) => (
+              <li key={item.slug}>
+                <Link
+                  href={`/news/${item.slug}`}
+                  className="flex items-baseline gap-3 rounded-xl border border-primary/10 bg-surface/40 px-4 py-3 hover:border-primary/40 transition-colors"
+                >
+                  <span className="text-xs text-text-secondary shrink-0">
+                    {formatNewsDate(item.publishedAt)}
+                  </span>
+                  <span className="text-sm text-text-primary leading-snug">
+                    {item.title}
+                  </span>
+                </Link>
+              </li>
+            ))}
+        </ul>
+      </section>
 
       <div className="mt-12 px-4 md:px-0">
         <Link
