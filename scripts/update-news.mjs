@@ -1,9 +1,9 @@
 // يجلب أحدث أخبار الألعاب من مصادر RSS، يختار أهمها ويعيد صياغتها بالعربية
-// عبر Claude Haiku، ثم يحدّث src/data/news.json.
-// يعمل عبر GitHub Action كل 12 ساعة. يتطلب ANTHROPIC_API_KEY في البيئة.
+// عبر Claude Code CLI (اشتراك محلي، بدون API)، ثم يحدّث src/data/news.json.
+// يعمل عبر Task Scheduler على جهاز المستخدم كل 12 ساعة (scripts/news-cron.cmd).
 import fs from "node:fs";
 import path from "node:path";
-import Anthropic from "@anthropic-ai/sdk";
+import { runClaude, extractJson } from "./claude-cli.mjs";
 
 const NEWS_FILE = path.join(process.cwd(), "src", "data", "news.json");
 const MAX_STORED = 60;
@@ -75,38 +75,7 @@ function loadExisting() {
   }
 }
 
-const NEWS_SCHEMA = {
-  type: "object",
-  additionalProperties: false,
-  required: ["items"],
-  properties: {
-    items: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["slug", "title", "summary", "sourceName", "sourceUrl"],
-        properties: {
-          slug: { type: "string", description: "kebab-case Latin slug, Arabic transliteration ok" },
-          title: { type: "string", description: "عنوان عربي أصلي جذاب" },
-          summary: {
-            type: "string",
-            description: "ملخّص عربي أصلي مُعاد صياغته بالكامل، 100-180 كلمة، ليس ترجمة حرفية",
-          },
-          sourceName: { type: "string" },
-          sourceUrl: { type: "string" },
-        },
-      },
-    },
-  },
-};
-
 async function main() {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.error("ANTHROPIC_API_KEY is not set");
-    process.exit(1);
-  }
-
   const existing = loadExisting();
   const knownUrls = new Set(existing.map((n) => n.sourceUrl));
   const knownSlugs = new Set(existing.map((n) => n.slug));
@@ -128,8 +97,6 @@ async function main() {
     return;
   }
 
-  const client = new Anthropic();
-
   const prompt = [
     "أنت محرر أخبار ألعاب فيديو محترف في موقع بليكسفاي العربي (plixfy.com).",
     `أمامك قائمة أخبار إنجليزية حديثة. اختر أهم ${MAX_NEW_PER_RUN} أخبار (الأوسع اهتماماً لجمهور عربي: إصدارات كبرى، قرارات المنصات، ألعاب شهيرة)، واكتب لكل خبر:`,
@@ -143,31 +110,16 @@ async function main() {
     "",
     "الأخبار المرشّحة (JSON):",
     JSON.stringify(candidates, null, 1),
+    "",
+    'أخرج JSON خاماً فقط — بدون أي تعليق أو سياج أكواد — بهذه البنية بالضبط:',
+    '{"items":[{"slug":"kebab-case-latin","title":"عنوان عربي","summary":"ملخص عربي 100-180 كلمة","sourceName":"اسم المصدر","sourceUrl":"رابط الخبر الأصلي"}]}',
   ].join("\n");
-
-  const response = await client.messages.create({
-    model: "claude-haiku-4-5",
-    max_tokens: 8000,
-    output_config: { format: { type: "json_schema", schema: NEWS_SCHEMA } },
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  if (response.stop_reason === "refusal") {
-    console.error("Model refused the request — aborting without changes.");
-    process.exit(1);
-  }
-
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock) {
-    console.error("No text block in response — aborting.");
-    process.exit(1);
-  }
 
   let parsed;
   try {
-    parsed = JSON.parse(textBlock.text);
+    parsed = extractJson(runClaude({ prompt }));
   } catch (err) {
-    console.error(`Model output is not valid JSON: ${err.message}`);
+    console.error(`Claude CLI run failed: ${err.message}`);
     process.exit(1);
   }
 

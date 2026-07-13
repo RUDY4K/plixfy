@@ -1,11 +1,11 @@
 // يولّد يومياً محتوى نشر اجتماعي جاهز (X + TikTok/Instagram) مبنياً على ألعاب
 // وأخبار الموقع الفعلية، ويقترح فرصتي باكلينكس من قائمة مُنتقاة مع رسالة تواصل
 // جاهزة، ثم يرسل الكل إلى تلقرام.
-// يعمل عبر GitHub Action يومياً. يتطلب: ANTHROPIC_API_KEY,
-// TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID في البيئة.
+// يعمل عبر Task Scheduler على جهاز المستخدم يومياً (scripts/social-cron.cmd).
+// يتطلب TELEGRAM_BOT_TOKEN و TELEGRAM_CHAT_ID في البيئة أو .env.local.
 import fs from "node:fs";
 import path from "node:path";
-import Anthropic from "@anthropic-ai/sdk";
+import { runClaude, extractJson, loadEnvLocal } from "./claude-cli.mjs";
 
 const ROOT = process.cwd();
 const GAMES_TS = path.join(ROOT, "src", "lib", "games.ts");
@@ -93,46 +93,7 @@ function pickDailyContent() {
   return { categorySlug, games: picked, news, blogPost, backlinks };
 }
 
-const OUTPUT_SCHEMA = {
-  type: "object",
-  additionalProperties: false,
-  required: ["posts", "outreach"],
-  properties: {
-    posts: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["platform", "text"],
-        properties: {
-          platform: { type: "string", description: "X أو TikTok/Instagram أو WhatsApp/Telegram" },
-          text: {
-            type: "string",
-            description: "نص المنشور كاملاً بالعربي جاهز للنسخ، مع الرابط والهاشتاقات",
-          },
-        },
-      },
-    },
-    outreach: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["targetName", "message"],
-        properties: {
-          targetName: { type: "string" },
-          message: {
-            type: "string",
-            description: "رسالة/منشور تواصل جاهز للنسخ مخصص لهذه المنصة، طبيعي وغير سبامي",
-          },
-        },
-      },
-    },
-  },
-};
-
 async function generate(content) {
-  const client = new Anthropic();
   const gameLines = content.games
     .map((g) => `- ${g.title} (${g.plays} لعبة): ${SITE}/play/${g.slug}`)
     .join("\n");
@@ -160,21 +121,12 @@ async function generate(content) {
     ...content.backlinks.map(
       (t, i) => `${i + 1}. ${t.name} (${t.type}) — ${t.url} — إرشادات: ${t.tips}`,
     ),
+    "",
+    'أخرج JSON خاماً فقط — بدون أي تعليق أو سياج أكواد — بهذه البنية بالضبط:',
+    '{"posts":[{"platform":"X أو TikTok/Instagram أو WhatsApp/Telegram","text":"نص المنشور كاملاً بالعربي مع الرابط والهاشتاقات"}],"outreach":[{"targetName":"اسم الهدف كما ورد أعلاه","message":"رسالة التواصل الجاهزة"}]}',
   ].join("\n");
 
-  const response = await client.messages.create({
-    model: "claude-haiku-4-5",
-    max_tokens: 4000,
-    output_config: { format: { type: "json_schema", schema: OUTPUT_SCHEMA } },
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  if (response.stop_reason === "refusal") {
-    throw new Error("Model refused the request");
-  }
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock) throw new Error("No text block in model response");
-  return JSON.parse(textBlock.text);
+  return extractJson(runClaude({ prompt }));
 }
 
 async function sendTelegram(text) {
@@ -226,9 +178,10 @@ function formatBacklinksMessage(generated, content) {
 }
 
 async function main() {
-  for (const name of ["ANTHROPIC_API_KEY", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"]) {
+  loadEnvLocal();
+  for (const name of ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"]) {
     if (!process.env[name]) {
-      console.error(`${name} is not set`);
+      console.error(`${name} is not set (env or .env.local)`);
       process.exit(1);
     }
   }

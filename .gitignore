@@ -46,3 +46,6 @@ next-env.d.ts
 .vercel
 .env*
 *.bak
+
+# local cron logs
+scripts/*.log
