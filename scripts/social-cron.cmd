@@ -1,6 +1,7 @@
 @echo off
-rem تشغيل محلي عبر Task Scheduler (يومياً 18:00) — بديل GitHub Action بعد نفاد رصيد API.
-rem يولّد منشورات اليوم + مسودات الباكلينكس ويرسلها إلى تلقرام.
+rem Local run via Task Scheduler (daily 18:00 Riyadh) - replaces GitHub Action after API credit ran out.
+rem Generates daily posts + backlink drafts via Claude Code CLI (subscription), sends to Telegram.
+rem NOTE: keep this file ASCII-only - cmd.exe misparses UTF-8 Arabic comments.
 cd /d "%~dp0.."
 echo ==== %date% %time% social run ==== >> "%~dp0social-cron.log"
 git pull --rebase --autostash >> "%~dp0social-cron.log" 2>&1

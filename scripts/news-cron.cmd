@@ -1,6 +1,7 @@
 @echo off
-rem تشغيل محلي عبر Task Scheduler (كل 12 ساعة) — بديل GitHub Action بعد نفاد رصيد API.
-rem يسحب آخر التغييرات، يولّد الأخبار عبر Claude CLI، ويدفع news.json إن تغيّر.
+rem Local run via Task Scheduler (every 12h) - replaces GitHub Action after API credit ran out.
+rem Pulls latest, generates news via Claude Code CLI (subscription), pushes news.json if changed.
+rem NOTE: keep this file ASCII-only - cmd.exe misparses UTF-8 Arabic comments.
 cd /d "%~dp0.."
 echo ==== %date% %time% news run ==== >> "%~dp0news-cron.log"
 git pull --rebase --autostash >> "%~dp0news-cron.log" 2>&1
