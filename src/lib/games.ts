@@ -1,7 +1,8 @@
 import type { GameBadge } from "@/components/GameCard";
 import gdGamesData from "@/data/gd-games.json";
+import gmGamesData from "@/data/gm-games.json";
 
-export type GameSource = "playgama" | "gd";
+export type GameSource = "playgama" | "gd" | "gm";
 
 export interface Game {
   title: string;
@@ -16,6 +17,8 @@ export interface Game {
   source?: GameSource;
   /** معرّف اللعبة (Md5) في كتالوج GameDistribution — مطلوب عندما source === "gd" */
   gdId?: string;
+  /** معرّف اللعبة في كتالوج GameMonetize — مطلوب عندما source === "gm" */
+  gmId?: string;
 }
 
 export type CategorySlug =
@@ -3427,7 +3430,29 @@ const gdGames: readonly Game[] = (gdGamesData as GdGameData[]).map((g) => ({
   gdId: g.gdId,
 }));
 
-export const allGames: readonly Game[] = [...playgamaGames, ...gdGames];
+interface GmGameData {
+  title: string;
+  slug: string;
+  gmId: string;
+  thumbnail: string;
+  category: string;
+  categorySlug: string;
+  description?: string;
+}
+
+const gmGames: readonly Game[] = (gmGamesData as GmGameData[]).map((g) => ({
+  title: g.title,
+  slug: g.slug,
+  thumbnail: g.thumbnail,
+  badge: null,
+  category: g.category,
+  categorySlug: g.categorySlug as CategorySlug,
+  description: g.description,
+  source: "gm" as const,
+  gmId: g.gmId,
+}));
+
+export const allGames: readonly Game[] = [...playgamaGames, ...gdGames, ...gmGames];
 
 const gamesByCategoryStatic: Record<CategorySlug, readonly string[]> = {
   racing: ["deadly-descent", "mr-racer-car-racing", "car-destruction-king", "moto-x3m", "drive-quest", "motorcycle-racer-road-mayhem", "realistic-car-crash-king", "crime-and-vice-city-police", "obby-1-speed-car-escape", "bus-parking-out", "crazy-motorcycle", "online-car-destruction", "police-chase-simulator", "road-chase-shooter-realistic-guns", "car-smash-simulator-crash--tune", "soda-sandbox", "steal-car-duel", "bmg-ragdoll-car-race", "race-on-cars-in-moscow", "crash-test-simulator-3d", "eggy-car", "bus-escape-clear-jam", "mr-racer-stunt-mania", "shape-transforming-shifting-run", "bmg-crash-test", "car-wash-diy", "draw-bridge--brain-game", "hills-of-steel", "car-crash-sandbox", "demolition-car--rope-and-hook", "car-parking-3d", "bobr-turbo-craft-cars", "moto-x3m-spooky-land", "police-car-simulator-game-criminal-case", "long-drive-to-horizons-sim", "summer-rider-3d", "buggy-simulator-sandbox-3d", "car-crash-test-abandoned-city", "car-stunt-racing-game-3d--car-games", "monster-truck-stunt-game-racing-games", "mad-truck-challenge-special", "carvivor-ops", "drifting-car-master", "tiny-cars", "drag-racing-club", "smash-speed", "tank-1944", "turbo-stunt-racing", "zombie-derby", "monster-truck-racing-game-truck-race", "super-car-soccer-arena", "streetracer-realistic-destruction", "drift-idle-drift-earn-upgrade", "obby-but-youre-on-a-motorcycle", "bouncy-motors", "break-the-car-completely", "transport-run", "road-madness", "scale-the-wheels", "playmusic"],
@@ -3449,6 +3474,7 @@ const gamesByCategoryMap: Record<CategorySlug, readonly string[]> = (
     [cat]: [
       ...gamesByCategoryStatic[cat],
       ...gdGames.filter((g) => g.categorySlug === cat).map((g) => g.slug),
+      ...gmGames.filter((g) => g.categorySlug === cat).map((g) => g.slug),
     ],
   }),
   {} as Record<CategorySlug, readonly string[]>,
