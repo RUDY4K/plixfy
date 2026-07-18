@@ -51,6 +51,17 @@ const nextConfig: NextConfig = {
         destination: "https://www.plixfy.com/:path*",
         statusCode: 301,
       },
+      // بنية الموقع القديم كانت /games/<slug> — لا شيء منها موجود في الكتالوج الحالي
+      {
+        source: "/games/:path*",
+        destination: "/all-games",
+        statusCode: 301,
+      },
+      {
+        source: "/play/car-games",
+        destination: "/category/racing",
+        statusCode: 301,
+      },
     ];
   },
   async headers() {

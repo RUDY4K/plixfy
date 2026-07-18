@@ -1,3 +1,5 @@
+import { generatedGameContent } from "@/lib/gameContentData";
+
 export interface GameContentFAQ {
   question: string;
   answer: string;
@@ -1510,9 +1512,9 @@ export const gameContent: Record<string, GameContent> = {
 };
 
 export function getGameContent(slug: string): GameContent | null {
-  return gameContent[slug] ?? null;
+  return gameContent[slug] ?? generatedGameContent[slug] ?? null;
 }
 
 export function hasGameContent(slug: string): boolean {
-  return slug in gameContent;
+  return slug in gameContent || slug in generatedGameContent;
 }

@@ -108,7 +108,8 @@ export default async function PlayPage({ params }: PageParams) {
   const pageUrl = SITE + "/play/" + slug;
   const imageUrl = absoluteUrl(game.thumbnail);
   const genre = meta ? meta.name : game.category;
-  const ldDescription = game.description ?? game.title;
+  const ldDescription =
+    content?.metaDescription ?? game.description ?? game.title;
 
   const videoGameLd = {
     "@context": "https://schema.org",
