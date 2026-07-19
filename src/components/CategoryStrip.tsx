@@ -1,17 +1,21 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import GameCard, { type GameCardProps } from "@/components/GameCard";
+import { getDict, defaultLocale, type Locale } from "@/lib/i18n";
 
 export interface CategoryStripProps {
   title: string;
   viewAllHref?: string;
   games: readonly GameCardProps[];
+  locale?: Locale;
 }
 
 const STRIP_LIMIT = 12;
 
 export default function CategoryStrip(props: CategoryStripProps) {
   const { title, viewAllHref, games } = props;
+  const locale = props.locale ?? defaultLocale;
+  const t = getDict(locale);
   const visibleGames = games.slice(0, STRIP_LIMIT);
 
   return (
@@ -31,11 +35,11 @@ export default function CategoryStrip(props: CategoryStripProps) {
           <Link
             href={viewAllHref}
             className="group inline-flex items-center gap-1 text-primary hover:text-accent-2 transition-colors text-sm font-semibold min-h-12 px-2"
-            aria-label={"عرض الكل: " + title}
+            aria-label={t.common.viewAllAria + title}
           >
-            <span>عرض الكل</span>
+            <span>{t.common.viewAll}</span>
             <ArrowLeft
-              className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"
+              className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1"
               aria-hidden="true"
             />
           </Link>
@@ -57,7 +61,7 @@ export default function CategoryStrip(props: CategoryStripProps) {
               key={game.slug}
               className="snap-start shrink-0 w-[130px] md:w-auto"
             >
-              <GameCard {...game} />
+              <GameCard {...game} locale={locale} />
             </div>
           ))}
         </div>

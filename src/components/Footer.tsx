@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CookieSettingsButton from "@/components/CookieSettingsButton";
+import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 
 interface FooterLink {
   href: string;
@@ -8,41 +9,43 @@ interface FooterLink {
 
 const CONTACT_EMAIL = "privacy@plixfy.com";
 
-const navLinks: readonly FooterLink[] = [
-  { href: "/", label: "الرئيسية" },
-  { href: "/categories", label: "التصنيفات" },
-  { href: "/favorites", label: "المفضلة" },
-  { href: "/blog", label: "المدوّنة" },
-  { href: "/news", label: "أخبار الألعاب" },
-];
+export default function Footer({ locale = defaultLocale }: { locale?: Locale }) {
+  const t = getDict(locale);
 
-const legalLinks: readonly FooterLink[] = [
-  { href: "/privacy", label: "سياسة الخصوصية" },
-  { href: "/terms", label: "شروط الاستخدام" },
-  { href: "/about", label: "من نحن" },
-];
+  const navLinks: readonly FooterLink[] = [
+    { href: localeHref(locale, "/"), label: t.nav.home },
+    { href: localeHref(locale, "/categories"), label: t.nav.categories },
+    { href: localeHref(locale, "/favorites"), label: t.nav.favorites },
+    { href: "/blog", label: t.footer.blog },
+    { href: "/news", label: t.footer.news },
+  ];
 
-export default function Footer() {
+  const legalLinks: readonly FooterLink[] = [
+    { href: localeHref(locale, "/privacy"), label: t.footer.privacy },
+    { href: localeHref(locale, "/terms"), label: t.footer.terms },
+    { href: localeHref(locale, "/about"), label: t.footer.about },
+  ];
+
   return (
     <footer
       className="mt-16 border-t border-surface-elevated bg-surface/40 pb-28 md:pb-0"
-      aria-label="تذييل الصفحة"
+      aria-label={t.footer.footerAria}
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
           <div>
             <div className="text-2xl font-extrabold gradient-text mb-2 font-latin">
-              بليكسفاي
+              {t.brand}
             </div>
             <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
-              منصة الألعاب المجانية اونلاين
+              {t.footer.tagline}
             </p>
           </div>
 
-          <FooterColumn title="روابط" links={navLinks} />
+          <FooterColumn title={t.footer.linksTitle} links={navLinks} />
           <div>
             <h2 className="text-sm font-bold text-text-primary mb-3 tracking-wide">
-              قانوني
+              {t.footer.legalTitle}
             </h2>
             <ul className="space-y-2">
               {legalLinks.map((link) => (
@@ -72,7 +75,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-surface-elevated text-center text-xs text-text-faint">
-          © 2026 بليكسفاي — جميع الحقوق محفوظة
+          {t.footer.rights}
         </div>
       </div>
     </footer>

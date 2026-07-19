@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
+import { localeFromPathname, localeHref, getDict } from "@/lib/i18n";
 
 const STORAGE_KEY = "plixfy-age-confirmed-13";
 
@@ -13,6 +15,8 @@ interface AgeGateProps {
 
 export default function AgeGate({ children, category }: AgeGateProps) {
   const [confirmed, setConfirmed] = useState<boolean | null>(null);
+  const locale = localeFromPathname(usePathname());
+  const t = getDict(locale);
 
   useEffect(() => {
     try {
@@ -48,13 +52,13 @@ export default function AgeGate({ children, category }: AgeGateProps) {
             <AlertTriangle className="w-6 h-6" aria-hidden="true" />
           </div>
           <h2 id="age-gate-title" className="text-lg md:text-xl font-bold text-text-primary">
-            تأكيد العمر مطلوب
+            {t.ageGate.title}
           </h2>
         </div>
         <p className="text-sm md:text-base text-text-secondary leading-relaxed mb-6">
-          ألعاب <span className="font-semibold text-text-primary">{category}</span> قد
-          تحتوي على محتوى موجّه للفئة العمرية <strong>13 سنة فأكثر</strong>. الرجاء
-          تأكيد عمرك للمتابعة.
+          {t.ageGate.bodyPrefix}{" "}
+          <span className="font-semibold text-text-primary">{category}</span>{" "}
+          {t.ageGate.bodyAgeNote} <strong>13+</strong>. {t.ageGate.bodyConfirm}
         </p>
         <div className="flex flex-col md:flex-row gap-3">
           <button
@@ -62,13 +66,13 @@ export default function AgeGate({ children, category }: AgeGateProps) {
             onClick={confirm}
             className="flex-1 min-h-12 bg-primary text-white font-bold py-3 rounded-xl hover:brightness-110 transition"
           >
-            أنا فوق 13 سنة — متابعة
+            {t.ageGate.confirm}
           </button>
           <Link
-            href="/"
+            href={localeHref(locale, "/")}
             className="flex-1 min-h-12 bg-surface-elevated text-text-primary font-semibold py-3 rounded-xl text-center inline-flex items-center justify-center hover:bg-surface transition"
           >
-            العودة للرئيسية
+            {t.ageGate.backHome}
           </Link>
         </div>
       </div>

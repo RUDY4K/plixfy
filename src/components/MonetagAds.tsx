@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { localeFromPathname, getDict } from "@/lib/i18n";
 import { trackEvent } from "./GoogleAnalytics";
 import { getConsent, onConsentChange } from "@/lib/consent";
 
@@ -23,6 +25,7 @@ const SIZE_BY_TYPE: Record<MonetagAdType, { width: string; height: string; maxWi
 
 export default function MonetagAds({ type, zoneId = DEFAULT_ZONE_ID, className }: MonetagAdsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const t = getDict(localeFromPathname(usePathname()));
   const reactId = useId();
   const slotId = "monetag-" + type + "-" + reactId.replace(/[^a-zA-Z0-9_-]/g, "");
   const [allowed, setAllowed] = useState(false);
@@ -111,7 +114,7 @@ export default function MonetagAds({ type, zoneId = DEFAULT_ZONE_ID, className }
     return (
       <aside
         className={"hidden lg:block " + (className ?? "")}
-        aria-label="إعلان"
+        aria-label={t.misc.adLabel}
       >
         <div
           ref={containerRef}
@@ -132,7 +135,7 @@ export default function MonetagAds({ type, zoneId = DEFAULT_ZONE_ID, className }
   return (
     <div
       className={"w-full flex justify-center " + (className ?? "")}
-      aria-label="إعلان"
+      aria-label={t.misc.adLabel}
     >
       <div
         ref={containerRef}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, LayoutGrid, Search, Heart, User, type LucideIcon } from "lucide-react";
+import { localeFromPathname, localeHref, getDict } from "@/lib/i18n";
 
 interface NavItem {
   href: string;
@@ -10,29 +11,31 @@ interface NavItem {
   Icon: LucideIcon;
 }
 
-const items: readonly NavItem[] = [
-  { href: "/", label: "الرئيسية", Icon: Home },
-  { href: "/categories", label: "الفئات", Icon: LayoutGrid },
-  { href: "/search", label: "بحث", Icon: Search },
-  { href: "/favorites", label: "المفضلة", Icon: Heart },
-  { href: "/profile", label: "الملف", Icon: User },
-];
-
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") {
-    return pathname === "/";
+    return pathname === "/" || pathname === "/en";
   }
   return pathname === href || pathname.startsWith(href + "/");
 }
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const t = getDict(locale);
+
+  const items: readonly NavItem[] = [
+    { href: localeHref(locale, "/"), label: t.nav.home, Icon: Home },
+    { href: localeHref(locale, "/categories"), label: t.nav.categories, Icon: LayoutGrid },
+    { href: localeHref(locale, "/search"), label: t.nav.search, Icon: Search },
+    { href: localeHref(locale, "/favorites"), label: t.nav.favorites, Icon: Heart },
+    { href: localeHref(locale, "/profile"), label: t.nav.profile, Icon: User },
+  ];
 
   return (
     <nav
       className="md:hidden fixed inset-x-3 z-50 glass rounded-3xl px-1.5 py-2 shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)] grid grid-cols-5"
       style={{ bottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
-      aria-label="التنقل الرئيسي"
+      aria-label={t.nav.mainNavAria}
     >
       {items.map((item) => {
         const active = isActive(pathname, item.href);

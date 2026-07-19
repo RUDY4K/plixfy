@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Play, X, ArrowDown } from "lucide-react";
+import { localeFromPathname, getDict } from "@/lib/i18n";
 import { getPlaygamaEmbedUrl } from "@/lib/playgama";
 import { getGdEmbedUrl } from "@/lib/gamedistribution";
 import { getGmEmbedUrl } from "@/lib/gamemonetize";
@@ -20,6 +22,7 @@ export interface GameFrameProps {
 
 export default function GameFrame(props: GameFrameProps) {
   const { slug, title, thumbnail, orientation, source, gdId, gmId } = props;
+  const t = getDict(localeFromPathname(usePathname()));
   const sourceName = source === "gd" ? "gd" : source === "gm" ? "gm" : "playgama";
   const embedSrc =
     source === "gd" && gdId
@@ -134,7 +137,7 @@ export default function GameFrame(props: GameFrameProps) {
           <button
             type="button"
             onClick={stop}
-            aria-label="خروج من ملء الشاشة"
+            aria-label={t.gameFrame.exitFullscreen}
             className="absolute top-3 left-3 z-10 w-12 h-12 inline-flex items-center justify-center bg-bg/80 backdrop-blur text-text-primary rounded-xl hover:bg-bg transition"
           >
             <X className="w-5 h-5" aria-hidden="true" />
@@ -145,7 +148,7 @@ export default function GameFrame(props: GameFrameProps) {
           <button
             type="button"
             onClick={start}
-            aria-label={"العب " + title}
+            aria-label={t.common.playAria + title}
             className="group absolute inset-0 block"
             data-game-slug={slug}
             data-placement="game-frame"
@@ -175,9 +178,9 @@ export default function GameFrame(props: GameFrameProps) {
                 setJustEnded(false);
               }}
               className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-primary text-white font-bold px-5 py-3 rounded-2xl min-h-12 inline-flex items-center gap-2 glow-pink hover:scale-105 hover:brightness-110 transition-all duration-200"
-              aria-label="العب ألعاب مشابهة"
+              aria-label={t.gameFrame.similarHeading}
             >
-              <span>العب لعبة تانية</span>
+              <span>{t.gameFrame.playAnother}</span>
               <ArrowDown className="w-5 h-5" aria-hidden="true" />
             </a>
           ) : null}

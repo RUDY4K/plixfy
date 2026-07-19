@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Cookie } from "lucide-react";
 import { getConsent, setConsent, onConsentCleared } from "@/lib/consent";
+import { localeFromPathname, localeHref, getDict } from "@/lib/i18n";
 
 export default function ConsentBanner() {
   const [visible, setVisible] = useState(false);
+  const locale = localeFromPathname(usePathname());
+  const t = getDict(locale);
 
   useEffect(() => {
     const hasGoogleCMP = () =>
@@ -49,7 +53,7 @@ export default function ConsentBanner() {
     <div
       role="dialog"
       aria-live="polite"
-      aria-label="إشعار ملفات تعريف الارتباط"
+      aria-label={t.consent.notice}
       className="fixed bottom-20 md:bottom-4 inset-x-3 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-30 max-w-3xl mx-auto"
     >
       <div className="glass bg-bg/95 backdrop-blur border border-surface-elevated rounded-2xl shadow-2xl p-4 md:p-5 flex flex-col md:flex-row gap-3 md:items-center">
@@ -59,13 +63,12 @@ export default function ConsentBanner() {
             aria-hidden="true"
           />
           <div className="text-sm md:text-base text-text-primary leading-relaxed">
-            نستخدم ملفات تعريف الارتباط لتحليلات الموقع والإعلانات.
-            بالموافقة، توافق على معالجة بياناتك حسب{" "}
+            {t.consent.body} {t.consent.agreeNote}{" "}
             <a
-              href="/privacy"
+              href={localeHref(locale, "/privacy")}
               className="underline text-primary hover:brightness-110"
             >
-              سياسة الخصوصية
+              {t.consent.privacyPolicy}
             </a>
             .
           </div>
@@ -75,17 +78,17 @@ export default function ConsentBanner() {
             type="button"
             onClick={onReject}
             className="flex-1 md:flex-none px-4 py-2.5 rounded-xl min-h-12 bg-accent-2 text-bg text-sm font-bold neon-glow-cyan hover:scale-105 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-accent-2 focus:ring-offset-2 focus:ring-offset-bg transition-all duration-200"
-            aria-label="رفض"
+            aria-label={t.consent.decline}
           >
-            رفض
+            {t.consent.decline}
           </button>
           <button
             type="button"
             onClick={onAccept}
             className="flex-1 md:flex-none px-5 py-2.5 rounded-xl min-h-12 bg-primary text-white text-sm font-bold neon-glow-pink hover:scale-105 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-bg transition-all duration-200"
-            aria-label="موافقة"
+            aria-label={t.consent.accept}
           >
-            موافقة
+            {t.consent.accept}
           </button>
         </div>
       </div>

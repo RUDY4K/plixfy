@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Crown, Flame, Sparkles, Star } from "lucide-react";
 import { getGameStats } from "@/lib/gameStats";
+import { categories } from "@/lib/games";
+import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 
 export type GameBadge = "hot" | "new" | "top" | null;
 
@@ -11,20 +13,30 @@ export interface GameCardProps {
   slug: string;
   badge?: GameBadge;
   category?: string;
+  categorySlug?: string;
   position?: number;
   placement?: string;
   showStats?: boolean;
+  locale?: Locale;
 }
 
 export default function GameCard(props: GameCardProps) {
-  const { title, thumbnail, slug, badge, category, position, placement, showStats } = props;
+  const { title, thumbnail, slug, badge, position, placement, showStats } = props;
+  const locale = props.locale ?? defaultLocale;
+  const t = getDict(locale);
+
+  const category =
+    locale === "en" && props.categorySlug
+      ? categories.find((c) => c.slug === props.categorySlug)?.labelEn ??
+        props.category
+      : props.category;
 
   const ariaLabel = category ? title + ", " + category : title;
   const stats = showStats ? getGameStats(slug) : null;
 
   return (
     <Link
-      href={"/play/" + slug}
+      href={localeHref(locale, "/play/" + slug)}
       className="group relative block transition-transform duration-200 hover:-translate-y-1 active:scale-[0.94]"
       aria-label={ariaLabel}
       data-game-slug={slug}
@@ -44,7 +56,7 @@ export default function GameCard(props: GameCardProps) {
           sizes="(max-width: 768px) 33vw, 180px"
           className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
         />
-        {badge ? <Badge type={badge} /> : null}
+        {badge ? <Badge type={badge} newLabel={t.common.newBadge} /> : null}
         {stats ? (
           <div
             className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-1 text-[10px] font-bold text-white"
@@ -64,12 +76,12 @@ export default function GameCard(props: GameCardProps) {
       <div className="mt-2 px-1">
         <h3
           dir="ltr"
-          className="block text-[15px] font-semibold text-text-primary truncate font-latin tracking-tight text-right group-hover:text-primary transition-colors"
+          className="block text-[15px] font-semibold text-text-primary truncate font-latin tracking-tight text-start group-hover:text-primary transition-colors"
         >
           {title}
         </h3>
         {category ? (
-          <p dir="rtl" className="text-xs text-text-faint truncate mt-0.5 text-right">
+          <p dir="auto" className="text-xs text-text-faint truncate mt-0.5 text-start">
             {category}
           </p>
         ) : null}
@@ -78,7 +90,7 @@ export default function GameCard(props: GameCardProps) {
   );
 }
 
-function Badge(props: { type: "hot" | "new" | "top" }) {
+function Badge(props: { type: "hot" | "new" | "top"; newLabel: string }) {
   const baseClass =
     "absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold shadow-[0_2px_10px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.3)]";
 
@@ -104,7 +116,7 @@ function Badge(props: { type: "hot" | "new" | "top" }) {
         }
       >
         <Sparkles className="w-3 h-3" aria-hidden="true" />
-        <span>جديد</span>
+        <span>{props.newLabel}</span>
       </div>
     );
   }

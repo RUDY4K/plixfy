@@ -2,7 +2,8 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 export const config = {
-  matcher: ["/dashboard", "/dashboard/:path*"],
+  // كل المسارات عدا ملفات Next الداخلية وواجهات API والملفات الثابتة ذات الامتداد
+  matcher: ["/((?!_next|api|.*\\..*).*)"],
 };
 
 function sha256(value: string): Buffer {
@@ -13,7 +14,12 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(sha256(a), sha256(b));
 }
 
-export function proxy(req: NextRequest) {
+function isDashboardPath(pathname: string): boolean {
+  const stripped = pathname.replace(/^\/(ar|en)(?=\/|$)/, "");
+  return stripped === "/dashboard" || stripped.startsWith("/dashboard/");
+}
+
+function dashboardAuth(req: NextRequest): NextResponse | null {
   const user = process.env.DASHBOARD_USER?.trim();
   const pass = process.env.DASHBOARD_PASS?.trim();
 
@@ -34,7 +40,7 @@ export function proxy(req: NextRequest) {
         const userOk = safeEqual(u, user);
         const passOk = safeEqual(p, pass);
         if (userOk && passOk) {
-          return NextResponse.next();
+          return null;
         }
       }
     } catch {
@@ -48,4 +54,34 @@ export function proxy(req: NextRequest) {
       "WWW-Authenticate": 'Basic realm="Plixfy Dashboard", charset="UTF-8"',
     },
   });
+}
+
+/**
+ * توجيه اللغات:
+ * - العربي (الافتراضي) يبقى بدون بادئة: ‎/play/x → يُعاد كتابته داخليًا إلى ‎/ar/play/x
+ * - الإنجليزي تحت ‎/en ويمرّ كما هو
+ * - الوصول المباشر لـ ‎/ar/* يُحوَّل 301 للرابط بدون بادئة لمنع المحتوى المكرر
+ */
+export function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  if (isDashboardPath(pathname)) {
+    const denied = dashboardAuth(req);
+    if (denied) return denied;
+  }
+
+  if (pathname === "/en" || pathname.startsWith("/en/")) {
+    return NextResponse.next();
+  }
+
+  if (pathname === "/ar" || pathname.startsWith("/ar/")) {
+    const stripped = pathname === "/ar" ? "/" : pathname.slice(3);
+    const url = req.nextUrl.clone();
+    url.pathname = stripped;
+    return NextResponse.redirect(url, 301);
+  }
+
+  const url = req.nextUrl.clone();
+  url.pathname = "/ar" + pathname;
+  return NextResponse.rewrite(url);
 }

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Crown, Flame, Play } from "lucide-react";
+import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 
 export interface HeroTileProps {
   title: string;
@@ -9,10 +10,13 @@ export interface HeroTileProps {
   category?: string;
   description?: string;
   isTopGame?: boolean;
+  locale?: Locale;
 }
 
 export default function HeroTile(props: HeroTileProps) {
   const { title, slug, thumbnail, category, isTopGame } = props;
+  const locale = props.locale ?? defaultLocale;
+  const t = getDict(locale);
 
   const wrapperClass = isTopGame
     ? "group relative block overflow-hidden rounded-3xl bg-surface mb-8 md:mb-12 mx-4 md:mx-0 shadow-[0_20px_60px_rgba(0,0,0,0.45),0_0_0_2px_rgba(255,0,110,0.6)] glow-pink transition-transform duration-200 active:scale-[0.99]"
@@ -20,9 +24,9 @@ export default function HeroTile(props: HeroTileProps) {
 
   return (
     <Link
-      href={"/play/" + slug}
+      href={localeHref(locale, "/play/" + slug)}
       className={wrapperClass}
-      aria-label={"العب " + title}
+      aria-label={t.common.playAria + title}
       data-game-slug={slug}
       data-placement={isTopGame ? "hero-top-game" : "hero"}
     >
@@ -54,12 +58,12 @@ export default function HeroTile(props: HeroTileProps) {
         {isTopGame ? (
           <div className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/90 backdrop-blur border border-primary text-white text-xs font-extrabold neon-glow-pink">
             <Flame className="w-3.5 h-3.5 fill-white" aria-hidden="true" />
-            <span>الأكثر لعباً</span>
+            <span>{t.common.mostPlayed}</span>
           </div>
         ) : (
           <div className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full glass border border-secondary/40 text-secondary text-xs font-bold shadow-[0_4px_16px_rgba(212,255,0,0.18)]">
             <Crown className="w-3 h-3" aria-hidden="true" />
-            <span>مميز</span>
+            <span>{t.common.featured}</span>
           </div>
         )}
 
@@ -95,8 +99,8 @@ export default function HeroTile(props: HeroTileProps) {
             {title}
           </h2>
           <span className="inline-flex items-center gap-1.5 md:gap-1.5 px-4 py-2 md:px-3.5 md:py-1.5 rounded-full bg-white/95 text-bg text-sm md:text-xs font-bold shadow-[0_6px_20px_rgba(255,255,255,0.18)]">
-            <span>العب الآن</span>
-            <ArrowLeft className="w-4 h-4 md:w-3.5 md:h-3.5" aria-hidden="true" />
+            <span>{t.common.playNow}</span>
+            <ArrowLeft className="w-4 h-4 md:w-3.5 md:h-3.5 ltr:rotate-180" aria-hidden="true" />
           </span>
         </div>
       </div>
