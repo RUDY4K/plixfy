@@ -12,20 +12,26 @@ function targetFor(pathname: string): { href: string; label: string } {
     const stripped = pathname === "/en" ? "/" : pathname.slice(3);
     return { href: stripped, label: "العربية" };
   }
-  if (pathname.startsWith("/blog") || pathname.startsWith("/news")) {
+  // أثناء الـ prerender يحمل المسار العربي بادئة /ar رغم أن المتصفح يعرضه بدونها
+  const path =
+    pathname === "/ar" ? "/" : pathname.startsWith("/ar/") ? pathname.slice(3) : pathname;
+  if (path.startsWith("/blog") || path.startsWith("/news")) {
     return { href: "/en", label: "English" };
   }
-  return { href: pathname === "/" ? "/en" : "/en" + pathname, label: "English" };
+  return { href: path === "/" ? "/en" : "/en" + path, label: "English" };
 }
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ className }: { className?: string }) {
   const pathname = usePathname();
   const { href, label } = targetFor(pathname);
 
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-primary transition-colors min-h-12"
+      className={
+        className ??
+        "inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-primary transition-colors min-h-12"
+      }
       rel="alternate"
     >
       <Globe className="w-4 h-4" aria-hidden="true" />

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search, User, X } from "lucide-react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { localeFromPathname, localeHref, getDict } from "@/lib/i18n";
 
 export default function Header() {
@@ -64,6 +65,8 @@ export default function Header() {
         </div>
 
         <div className="flex-1 md:hidden" />
+
+        <LanguageSwitcher className="shrink-0 inline-flex items-center gap-1.5 px-2.5 md:px-3 h-12 rounded-full text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface/60 transition-colors" />
 
         <button
           type="button"
