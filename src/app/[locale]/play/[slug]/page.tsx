@@ -48,6 +48,8 @@ function buildDescription(
   slug: string,
   content: GameContent | null
 ): string {
+  if (content?.metaDescription) return content.metaDescription;
+
   if (locale === "en") {
     const meta = getLocalizedCategoryMeta(game.categorySlug, "en");
     const catName = meta ? meta.name : game.categorySlug;
@@ -59,8 +61,6 @@ function buildDescription(
       " game that runs right in your browser on mobile and desktop. No download, no sign-up."
     );
   }
-
-  if (content?.metaDescription) return content.metaDescription;
 
   const hooks = categoryContent[game.categorySlug as CategorySlug]?.metaHooks;
   // Stable per-slug hash so each game gets a deterministic hook variant
@@ -97,7 +97,7 @@ export async function generateMetadata({
       alternates: { canonical: localeHref(locale, "/") },
     };
   }
-  const content = locale === "ar" ? getGameContent(slug) : null;
+  const content = getGameContent(slug, locale);
   const title = game.title + t.play.metaTitleSuffix;
   const description = buildDescription(locale, game, slug, content);
   const path = "/play/" + slug;
@@ -139,7 +139,7 @@ export default async function PlayPage({
     .filter((g) => g.slug !== game.slug)
     .slice(0, 6);
 
-  const content = locale === "ar" ? getGameContent(slug) : null;
+  const content = getGameContent(slug, locale);
   const stats = getGameStats(game.slug);
 
   const pageUrl = SITE + href("/play/" + slug);

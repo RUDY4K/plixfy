@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CookieSettingsButton from "@/components/CookieSettingsButton";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 
 interface FooterLink {
@@ -69,6 +70,9 @@ export default function Footer({ locale = defaultLocale }: { locale?: Locale }) 
                 >
                   {CONTACT_EMAIL}
                 </a>
+              </li>
+              <li>
+                <LanguageSwitcher />
               </li>
             </ul>
           </div>

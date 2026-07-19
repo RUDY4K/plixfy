@@ -1,4 +1,6 @@
 import { generatedGameContent } from "@/lib/gameContentData";
+import { topEnContent } from "@/lib/gameContentDataEn/top";
+import type { Locale } from "@/lib/i18n";
 
 export interface GameContentFAQ {
   question: string;
@@ -1511,7 +1513,11 @@ export const gameContent: Record<string, GameContent> = {
   },
 };
 
-export function getGameContent(slug: string): GameContent | null {
+export function getGameContent(
+  slug: string,
+  locale: Locale = "ar"
+): GameContent | null {
+  if (locale === "en") return topEnContent[slug] ?? null;
   return gameContent[slug] ?? generatedGameContent[slug] ?? null;
 }
 
