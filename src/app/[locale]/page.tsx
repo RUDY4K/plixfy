@@ -147,6 +147,28 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         locale={locale}
       />
 
+      <section className="mx-4 mt-8 md:mx-0" aria-labelledby="game-lab-heading">
+        <Link
+          href={href("/lab")}
+          className="group flex flex-col gap-5 overflow-hidden rounded-3xl border border-accent-2/25 bg-gradient-to-r from-primary/20 via-accent-3/15 to-accent-2/20 p-6 md:flex-row md:items-center md:justify-between md:p-8"
+        >
+          <div>
+            <p className="mb-2 text-sm font-bold text-accent-2">
+              {locale === "ar" ? "جديد: مختبر Plixfy" : "New: Plixfy Lab"}
+            </p>
+            <h2 id="game-lab-heading" className="text-xl font-black text-white md:text-3xl">
+              {locale === "ar" ? "جرّب ألعابنا الأصلية واختر الأفضل" : "Try our original games and pick the winner"}
+            </h2>
+            <p className="mt-2 text-sm text-text-secondary">
+              {locale === "ar" ? "ثلاث ألعاب قصيرة صُممت للجوال — رأيك يحدد أيها تتحول إلى تطبيق." : "Three mobile-first prototypes — your play decides which becomes an app."}
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full bg-white px-6 py-3 text-center font-bold text-bg transition-transform group-hover:scale-105">
+            {locale === "ar" ? "ابدأ التجربة" : "Start testing"}
+          </span>
+        </Link>
+      </section>
+
       {strips.map((strip) =>
         strip.games.length >= MIN_STRIP ? (
           <CategoryStrip
