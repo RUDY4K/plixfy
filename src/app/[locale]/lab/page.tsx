@@ -20,6 +20,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/lab">): 
   const copy = metadataByLocale[locale];
   return {
     ...copy,
+    robots: { index: false, follow: false },
     alternates: pageAlternates(locale, "/lab"),
     openGraph: {
       type: "website",
