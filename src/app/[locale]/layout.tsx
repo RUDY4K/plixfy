@@ -24,7 +24,7 @@ const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
   weight: ["400", "500", "700"],
   variable: "--font-tajawal",
-  display: "swap",
+  display: "optional",
 });
 
 const ADSENSE_CLIENT = "ca-pub-5387661711080146";
@@ -32,7 +32,7 @@ const ADSENSE_CLIENT = "ca-pub-5387661711080146";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  display: "swap",
+  display: "optional",
 });
 
 export const viewport: Viewport = {
