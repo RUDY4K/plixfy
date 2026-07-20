@@ -10,6 +10,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PageViewTracker from "@/components/PageViewTracker";
 import MonetagServiceWorker from "@/components/MonetagServiceWorker";
 import ConsentBanner from "@/components/ConsentBanner";
+import InstallAppPrompt from "@/components/InstallAppPrompt";
 import {
   locales,
   hasLocale,
@@ -133,6 +134,7 @@ export default async function RootLayout({
           </>
         )}
         <ConsentBanner />
+        <InstallAppPrompt locale={locale} />
       </body>
     </html>
   );
