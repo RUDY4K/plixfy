@@ -18,6 +18,7 @@ import {
   pageAlternates,
   type Locale,
 } from "@/lib/i18n";
+import { allGames } from "@/lib/games";
 
 const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
@@ -47,8 +48,8 @@ const titles: Record<Locale, string> = {
 };
 
 const descriptions: Record<Locale, string> = {
-  ar: "أكثر من 370 لعبة موبايل عربية مجانية. العب فوراً من متصفحك بدون تحميل.",
-  en: "Play 370+ free mobile games instantly in your browser. No download, no sign-up.",
+  ar: `${allGames.length.toLocaleString("ar-SA")} لعبة مجانية تعمل على الجوال والكمبيوتر. العب فوراً من متصفحك بدون تحميل أو تسجيل.`,
+  en: `Play ${allGames.length.toLocaleString("en-US")} free games on mobile and desktop. No download, no sign-up.`,
 };
 
 export function generateStaticParams() {
@@ -65,6 +66,14 @@ export async function generateMetadata({
     metadataBase: new URL("https://www.plixfy.com"),
     applicationName: "Plixfy",
     manifest: "/manifest.webmanifest",
+    icons: {
+      icon: [
+        { url: "/favicon.ico", sizes: "256x256", type: "image/x-icon" },
+        { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      ],
+      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    },
     title: titles[locale],
     description: descriptions[locale],
     alternates: pageAlternates(locale, "/"),

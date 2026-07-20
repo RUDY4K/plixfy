@@ -54,6 +54,7 @@ export default function GameCard(props: GameCardProps) {
           alt={title}
           fill
           sizes="(max-width: 768px) 33vw, 180px"
+          quality={60}
           className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
         />
         {badge ? <Badge type={badge} newLabel={t.common.newBadge} /> : null}

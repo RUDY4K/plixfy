@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, localeHref, ogLocaleFor, pageAlternates } from "@/lib/i18n";
+import { allGames } from "@/lib/games";
 
 const SITE = "https://www.plixfy.com";
+const AR_GAME_COUNT = allGames.length.toLocaleString("ar-SA");
+const EN_GAME_COUNT = allGames.length.toLocaleString("en-US");
 
 const copyByLocale = {
   ar: {
     title: "من نحن | بليكسفاي",
     description:
-      "بليكسفاي منصة عربية للألعاب المجانية اونلاين — أكثر من 370 لعبة موبايل تعمل مباشرة من المتصفح دون تحميل.",
+      `بليكسفاي منصة عربية للألعاب المجانية اونلاين — ${AR_GAME_COUNT} لعبة تعمل مباشرة من المتصفح دون تحميل.`,
     ldName: "من نحن - بليكسفاي",
     brand: "بليكسفاي",
     h1: "من نحن",
@@ -16,14 +19,14 @@ const copyByLocale = {
     homeLabel: "الرئيسية",
     paragraphs: [
       "بليكسفاي منصة عربية متخصصة في تقديم الألعاب المجانية اونلاين، صُمّمت لتمنح اللاعب العربي تجربة سريعة وسلسة من متصفحه دون الحاجة إلى أي تنزيلات أو تسجيلات. هدفنا أن تكون الوجهة الأولى للترفيه الخفيف والممتع لكل أفراد العائلة.",
-      "نختار لك بعناية أكثر من 370 لعبة موبايل تغطي تصنيفات متنوّعة: السباق، الأكشن، الألغاز، الرياضة، ألعاب البنات، والألعاب الخفيفة. نُحدّث المكتبة باستمرار لإضافة أحدث وأشهر الألعاب، مع التركيز على الجودة وسرعة الأداء على الأجهزة المحمولة.",
+      `نختار لك بعناية ${AR_GAME_COUNT} لعبة تغطي تصنيفات متنوّعة: السباق، الأكشن، الألغاز، الرياضة، ألعاب البنات، والألعاب الخفيفة. نُحدّث المكتبة باستمرار لإضافة أحدث وأشهر الألعاب، مع التركيز على الجودة وسرعة الأداء على الجوال والكمبيوتر.`,
       "نؤمن بأن الألعاب يجب أن تكون متاحة للجميع ومجانية، لذلك تعتمد المنصة على عرض الإعلانات بشكل مدروس لا يُخلّ بتجربة اللعب. شكراً لاختيارك بليكسفاي، ونتمنى لك أوقاتاً ممتعة!",
     ],
   },
   en: {
     title: "About Us | Plixfy",
     description:
-      "Plixfy is a free online gaming platform — 370+ mobile games that run directly in your browser with no download.",
+      `Plixfy is a free online gaming platform — ${EN_GAME_COUNT} games that run directly in your browser with no download.`,
     ldName: "About Us - Plixfy",
     brand: "Plixfy",
     h1: "About Us",
@@ -31,7 +34,7 @@ const copyByLocale = {
     homeLabel: "Home",
     paragraphs: [
       "Plixfy is a platform dedicated to free online games, built to give players a fast, smooth experience straight from the browser — no downloads, no sign-ups. Our goal is to be the go-to destination for light, fun entertainment for the whole family.",
-      "We hand-pick more than 370 mobile games covering a wide range of categories: racing, action, puzzle, sports, girls games, and casual titles. The library is updated constantly with the newest and most popular games, with a focus on quality and fast performance on mobile devices.",
+      `We hand-pick ${EN_GAME_COUNT} games covering a wide range of categories: racing, action, puzzle, sports, girls games, and casual titles. The library is updated constantly with the newest and most popular games, with a focus on quality and fast performance on mobile and desktop.`,
       "We believe games should be free and accessible to everyone, so the platform is supported by carefully placed ads that never get in the way of gameplay. Thanks for choosing Plixfy — have fun!",
     ],
   },
@@ -77,7 +80,7 @@ export default async function AboutPage({
       "@type": "Organization",
       name: copy.brand,
       url: SITE,
-      logo: SITE + "/opengraph-image.png",
+      logo: SITE + "/icon-512.png",
     },
   };
 

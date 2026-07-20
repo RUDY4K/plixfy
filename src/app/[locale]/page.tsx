@@ -25,6 +25,16 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   if (!hasLocale(locale)) notFound();
   const t = getDict(locale);
   const href = (path: string) => localeHref(locale, path);
+  const homeIntro = t.home.intro.replace(
+    /(?:أكثر من|more than)\s+380/i,
+    locale === "ar"
+      ? `${allGames.length.toLocaleString("ar-SA")}`
+      : `${allGames.length.toLocaleString("en-US")}`
+  );
+  const homeSummary =
+    locale === "ar"
+      ? `العب ${allGames.length.toLocaleString("ar-SA")} لعبة مجانية فوراً من المتصفح، بدون تحميل أو تسجيل.`
+      : `Play ${allGames.length.toLocaleString("en-US")} free games instantly in your browser, with no download or sign-up.`;
 
   const websiteLd = {
     "@context": "https://schema.org",
@@ -44,7 +54,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     "@type": "Organization",
     name: t.brand,
     url: SITE,
-    logo: SITE + "/opengraph-image.png",
+    logo: SITE + "/icon-512.png",
   };
 
   const topGame = getTopGame();
@@ -118,7 +128,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           {t.home.h1}
         </h1>
         <p className="text-sm md:text-base text-text-secondary max-w-3xl leading-relaxed">
-          {t.home.intro}
+          {homeSummary}
         </p>
       </header>
 
@@ -217,6 +227,18 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </section>
         </>
       ) : null}
+
+      <section className="mt-10 px-4 md:px-0" aria-labelledby="about-plixfy-heading">
+        <h2
+          id="about-plixfy-heading"
+          className="text-lg md:text-2xl font-bold text-text-primary mb-3"
+        >
+          {locale === "ar" ? "ألعاب مجانية لكل الأجهزة" : "Free games for every device"}
+        </h2>
+        <p className="text-sm md:text-base text-text-secondary max-w-4xl leading-relaxed">
+          {homeIntro}
+        </p>
+      </section>
 
       <div className="mt-12 px-4 md:px-0">
         <Link

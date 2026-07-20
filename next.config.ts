@@ -20,6 +20,7 @@ const csp = [
 const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
   images: {
+    qualities: [60, 70, 75],
     remotePatterns: [
       {
         protocol: "https",
