@@ -18,4 +18,5 @@ if %errorlevel%==0 (
 git add src/data/news.json
 git commit -m "chore(news): auto-update gaming news" >> "%~dp0news-cron.log" 2>&1
 git push >> "%~dp0news-cron.log" 2>&1
+node scripts\submit-indexnow.mjs --recent-news >> "%~dp0news-cron.log" 2>&1
 echo pushed >> "%~dp0news-cron.log"
