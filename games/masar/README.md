@@ -8,6 +8,7 @@ A calm one-touch arrow puzzle prototype designed for quick, satisfying sessions.
 - No life penalty for a blocked tap; the tile only gives gentle feedback.
 - Large touch targets, quick exit effects, flow combos, and a gradual difficulty curve.
 - An immersive level portal and one signature color per stage, cycling across five handcrafted game themes.
+- Direct-to-board launch, clear difficulty and clean-run status, plus restart and hint tools sized for touch.
 - Abstract theme-aware backgrounds with no location-specific photography.
 - Manrope typography bundled under its Open Font License for a consistent handcrafted interface.
 - Instant visual rewards, a progress bar, and a three-diamond performance rating.

@@ -64,7 +64,7 @@ func _ready() -> void:
     elif "--preview-result" in OS.get_cmdline_user_args():
         _show_result()
     else:
-        _show_home()
+        _show_game("journey")
 
 
 func _process(_delta: float) -> void:
@@ -208,11 +208,12 @@ func _show_home() -> void:
 func _show_game(mode_name := "journey") -> void:
     game_mode = mode_name
     _apply_level_theme(daily_day if game_mode == "daily" else current_level)
+    var profile := _daily_profile_for_day(daily_day) if game_mode == "daily" else _level_profile(current_level)
     var margin := _reset_content()
-    margin.add_theme_constant_override("margin_top", 34)
-    margin.add_theme_constant_override("margin_bottom", 42)
+    margin.add_theme_constant_override("margin_top", 30)
+    margin.add_theme_constant_override("margin_bottom", 34)
     var column := VBoxContainer.new()
-    column.add_theme_constant_override("separation", 15)
+    column.add_theme_constant_override("separation", 14)
     margin.add_child(column)
 
     var top := HBoxContainer.new()
@@ -221,20 +222,37 @@ func _show_game(mode_name := "journey") -> void:
     var top_space := Control.new()
     top_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top.add_child(top_space)
-    var title := "DAILY RUN" if game_mode == "daily" else "ROUTE %02d" % current_level
-    top.add_child(_label(title, 31, TEXT, true))
+    var title := "DAILY CHALLENGE" if game_mode == "daily" else "LEVEL %02d" % current_level
+    top.add_child(_label(title, 34, TEXT, true))
     var top_space_two := Control.new()
     top_space_two.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top.add_child(top_space_two)
     if game_mode == "daily":
-        run_timer_label = _right_label("00:00.0", 28, ACCENT, true)
+        run_timer_label = _right_label("00:00.0", 27, PRIMARY, true)
     else:
-        run_timer_label = _right_label("0  ◆", 28, ACCENT, true)
+        run_timer_label = _right_label("◆  0", 27, PRIMARY, true)
     run_timer_label.custom_minimum_size.x = 190
     top.add_child(run_timer_label)
 
-    var status_label := _left_label("Choose an arrow with an open path", 25, MUTED)
-    column.add_child(status_label)
+    var game_status := HBoxContainer.new()
+    game_status.add_theme_constant_override("separation", 18)
+    column.add_child(game_status)
+    var difficulty := Label.new()
+    difficulty.text = _difficulty_text(int(profile.target))
+    difficulty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    difficulty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    difficulty.custom_minimum_size = Vector2(170, 54)
+    difficulty.add_theme_font_override("font", _ui_font(700))
+    difficulty.add_theme_font_size_override("font_size", 18)
+    difficulty.add_theme_color_override("font_color", INK)
+    difficulty.add_theme_stylebox_override("normal", _panel_style(PRIMARY, Color.TRANSPARENT, 27, 0))
+    game_status.add_child(difficulty)
+    var status_label := _label("Find an open path", 22, MUTED)
+    status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    game_status.add_child(status_label)
+    var clean_label := _right_label("◆ ◆ ◆", 22, TEXT, true)
+    clean_label.custom_minimum_size.x = 180
+    game_status.add_child(clean_label)
     var progress := _progress_bar()
     column.add_child(progress)
 
@@ -245,18 +263,19 @@ func _show_game(mode_name := "journey") -> void:
     var board: ArrowBoard = ArrowBoardScript.new()
     board.name = "ArrowBoard"
     board.apply_palette(active_theme)
-    var profile := _daily_profile_for_day(daily_day) if game_mode == "daily" else _level_profile(current_level)
     board.configure(profile.columns, profile.rows, profile.target, profile.seed)
     board.progress_changed.connect(func(remaining: int, total: int, combo: int, score: int) -> void:
         if game_mode != "daily":
-            run_timer_label.text = "%d  ◆" % score
+            run_timer_label.text = "◆  %d" % score
         progress.value = float(total - remaining) / float(maxi(1, total)) * 100.0
-        status_label.text = "%d arrows remaining" % remaining
+        status_label.text = "%d LEFT" % remaining
         if combo >= 3:
-            status_label.text = "FLOW ×%d   /   %d remaining" % [combo, remaining]
+            status_label.text = "FLOW ×%d  •  %d LEFT" % [combo, remaining]
     )
     board.blocked_tap.connect(func() -> void:
-        status_label.text = "Blocked path — try another arrow"
+        status_label.text = "BLOCKED  •  TRY ANOTHER"
+        var clean_count := maxi(0, 3 - board.get_mistakes())
+        clean_label.text = "◆ ".repeat(clean_count).strip_edges() + " ◇".repeat(3 - clean_count)
         analytics.record("blocked_tap", {"mode": game_mode, "level": current_level})
     )
     board.hint_used.connect(func() -> void:
@@ -271,11 +290,24 @@ func _show_game(mode_name := "journey") -> void:
     )
     board_frame.add_child(board)
 
-    var hint_text := "HINT   +10 SEC" if game_mode == "daily" else "HINT   SHOW OPEN PATH"
-    var hint := _button(hint_text, 23, PANEL_SOFT, TEXT)
-    hint.custom_minimum_size.y = 72
+    var tools := HBoxContainer.new()
+    tools.alignment = BoxContainer.ALIGNMENT_CENTER
+    tools.add_theme_constant_override("separation", 22)
+    column.add_child(tools)
+    var restart := _button("↻  RESTART", 22, PANEL_SOFT, TEXT)
+    restart.custom_minimum_size = Vector2(300, 86)
+    restart.pressed.connect(func() -> void:
+        board.new_level()
+        run_started_ms = Time.get_ticks_msec()
+        clean_label.text = "◆ ◆ ◆"
+        analytics.record("run_restart", {"mode": game_mode, "level": current_level})
+    )
+    tools.add_child(restart)
+    var hint_text := "?  HINT +10s" if game_mode == "daily" else "?  HINT"
+    var hint := _button(hint_text, 22, PRIMARY, INK)
+    hint.custom_minimum_size = Vector2(300, 86)
     hint.pressed.connect(board.show_hint)
-    column.add_child(hint)
+    tools.add_child(hint)
     run_started_ms = Time.get_ticks_msec()
     analytics.record("run_start", {
         "mode": game_mode,
@@ -395,6 +427,16 @@ func _show_daily_result(score: int, elapsed_ms: int, mistakes: int, hints: int, 
 
 func calculate_daily_score(elapsed_ms: int, mistakes: int, hints: int) -> int:
     return maxi(100, 10000 - int(elapsed_ms / 10.0) - mistakes * 500 - hints * 1000)
+
+
+func _difficulty_text(target: int) -> String:
+    if target <= 10:
+        return "EASY"
+    if target <= 18:
+        return "NORMAL"
+    if target <= 24:
+        return "HARD"
+    return "EXPERT"
 
 
 func _level_profile(level: int) -> Dictionary:
