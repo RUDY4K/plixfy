@@ -4,6 +4,7 @@ extends Control
 signal progress_changed(remaining: int, total: int, combo: int, score: int)
 signal level_cleared(score: int, best_combo: int)
 signal blocked_tap
+signal hint_used
 
 const DIRECTIONS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
 const ARROWS := ["→", "↓", "←", "↑"]
@@ -24,6 +25,7 @@ var combo := 0
 var best_combo := 0
 var score := 0
 var mistakes := 0
+var hints_used := 0
 var input_locked := false
 var rng := RandomNumberGenerator.new()
 
@@ -44,6 +46,7 @@ func new_level() -> void:
     best_combo = 0
     score = 0
     mistakes = 0
+    hints_used = 0
     input_locked = false
     rng.seed = level_seed
 
@@ -67,8 +70,10 @@ func configure(columns: int, rows: int, target: int, seed_value: int) -> void:
 
 func apply_palette(palette: Dictionary) -> void:
     TILE_COLORS.clear()
-    for color in palette.tiles:
-        TILE_COLORS.append(color)
+    TILE_COLORS.append(palette.primary)
+    TILE_COLORS.append(palette.accent)
+    TILE_COLORS.append(palette.primary.lerp(palette.text, 0.28))
+    TILE_COLORS.append(palette.accent.lerp(palette.primary, 0.36))
     INK = palette.ink
     BOARD_BG = palette.panel.darkened(0.18)
     BOARD_LINE = Color(palette.primary, 0.66)
@@ -81,6 +86,8 @@ func apply_palette(palette: Dictionary) -> void:
 func show_hint() -> void:
     for tile in tiles:
         if _is_free(tile):
+            hints_used += 1
+            hint_used.emit()
             tile.pivot_offset = tile.size * 0.5
             var tween := create_tween()
             tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -103,6 +110,10 @@ func get_remaining() -> int:
 
 func get_mistakes() -> int:
     return mistakes
+
+
+func get_hints_used() -> int:
+    return hints_used
 
 
 func solve_step_for_test() -> bool:
@@ -353,10 +364,10 @@ func _tile_style(background: Color, border: Color, highlighted: bool) -> StyleBo
     var style := StyleBoxFlat.new()
     style.bg_color = background
     style.border_color = border
-    style.set_border_width_all(4 if highlighted else 2)
-    style.set_corner_radius_all(22)
-    style.shadow_color = Color(border, 0.20) if highlighted else Color(0, 0, 0, 0.28)
-    style.shadow_size = 12 if highlighted else 6
+    style.set_border_width_all(3 if highlighted else 1)
+    style.set_corner_radius_all(13)
+    style.shadow_color = Color(border, 0.14) if highlighted else Color(0, 0, 0, 0.22)
+    style.shadow_size = 7 if highlighted else 3
     return style
 
 
@@ -368,18 +379,16 @@ func _draw() -> void:
     var panel := StyleBoxFlat.new()
     panel.bg_color = BOARD_BG
     panel.border_color = BOARD_LINE
-    panel.set_border_width_all(4)
-    panel.set_corner_radius_all(38)
-    panel.shadow_color = Color(0, 0, 0, 0.42)
-    panel.shadow_size = 18
+    panel.set_border_width_all(2)
+    panel.set_corner_radius_all(20)
+    panel.shadow_color = Color(0, 0, 0, 0.34)
+    panel.shadow_size = 10
     draw_style_box(panel, Rect2(Vector2.ZERO, size))
 
-    var spacing := 68.0
-    var dot_color := Color(0.39, 0.61, 0.68, 0.075)
-    var y := spacing
-    while y < size.y - spacing:
-        var x := spacing
-        while x < size.x - spacing:
-            draw_circle(Vector2(x, y), 2.2, dot_color)
-            x += spacing
-        y += spacing
+    var grid_color := Color(FREE_GLOW, 0.035)
+    for column in range(1, grid_columns):
+        var x := size.x * float(column) / float(grid_columns)
+        draw_line(Vector2(x, 28), Vector2(x, size.y - 28), grid_color, 1.0)
+    for row in range(1, grid_rows):
+        var y := size.y * float(row) / float(grid_rows)
+        draw_line(Vector2(28, y), Vector2(size.x - 28, y), grid_color, 1.0)

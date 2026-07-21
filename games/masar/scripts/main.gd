@@ -2,6 +2,8 @@ extends Control
 
 const ArrowBoardScript = preload("res://scripts/arrow_board.gd")
 const AbstractBackdropScript = preload("res://scripts/abstract_backdrop.gd")
+const LocalAnalyticsScript = preload("res://scripts/local_analytics.gd")
+const UI_FONT = preload("res://assets/fonts/Manrope.ttf")
 const SAVE_PATH := "user://masar_progress.cfg"
 
 const PALETTES := [
@@ -15,7 +17,6 @@ const PALETTES := [
         "text": Color("#F8FAFC"),
         "muted": Color("#A8BACB"),
         "ink": Color("#092033"),
-        "tiles": [Color("#67E8F9"), Color("#5EEAD4"), Color("#93C5FD"), Color("#A7F3D0")],
     },
     {
         "name": "Aurora",
@@ -27,7 +28,6 @@ const PALETTES := [
         "text": Color("#FAF8FF"),
         "muted": Color("#BBB8D2"),
         "ink": Color("#17162C"),
-        "tiles": [Color("#C4B5FD"), Color("#A78BFA"), Color("#67E8F9"), Color("#A5B4FC")],
     },
     {
         "name": "Sunset",
@@ -39,7 +39,6 @@ const PALETTES := [
         "text": Color("#FFF8F5"),
         "muted": Color("#D3B8C4"),
         "ink": Color("#2B1724"),
-        "tiles": [Color("#FDA4AF"), Color("#F9A8D4"), Color("#FCD34D"), Color("#C4B5FD")],
     },
 ]
 
@@ -54,6 +53,8 @@ var INK := Color("#092033")
 
 var content: Control
 var backdrop: AbstractBackdrop
+var analytics: LocalAnalytics
+var run_timer_label: Label
 var current_palette := 0
 var current_level := 1
 var total_score := 0
@@ -62,23 +63,39 @@ var last_combo := 0
 var last_mistakes := 0
 var return_streak := 1
 var last_play_day := -1
+var game_mode := "home"
+var run_started_ms := 0
+var daily_day := -1
+var daily_best_score := 0
+var daily_best_time_ms := 0
+var daily_best_mistakes := 0
 
 
 func _ready() -> void:
     layout_direction = Control.LAYOUT_DIRECTION_LTR
+    analytics = LocalAnalyticsScript.new()
     _load_progress()
+    _refresh_daily_state()
     for argument in OS.get_cmdline_user_args():
         if argument.begins_with("--palette="):
             current_palette = clampi(int(argument.trim_prefix("--palette=")), 0, PALETTES.size() - 1)
     _apply_palette(current_palette)
     _register_daily_return()
     _build_backdrop()
+    analytics.record("session_start", {"palette": current_palette, "level": current_level})
     if "--preview-game" in OS.get_cmdline_user_args():
-        _show_game()
+        _show_game("journey")
+    elif "--preview-daily" in OS.get_cmdline_user_args():
+        _show_game("daily")
     elif "--preview-result" in OS.get_cmdline_user_args():
         _show_result()
     else:
         _show_home()
+
+
+func _process(_delta: float) -> void:
+    if game_mode == "daily" and run_started_ms > 0 and is_instance_valid(run_timer_label):
+        run_timer_label.text = _format_time(Time.get_ticks_msec() - run_started_ms)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -113,6 +130,7 @@ func _apply_palette(index: int) -> void:
 func _select_palette(index: int) -> void:
     _apply_palette(index)
     _save_progress()
+    analytics.record("theme_selected", {"palette": str(PALETTES[current_palette].name)})
     _show_home()
 
 
@@ -122,178 +140,326 @@ func _reset_content() -> MarginContainer:
     var margin := MarginContainer.new()
     margin.name = "ScreenContent"
     margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    margin.add_theme_constant_override("margin_left", 58)
-    margin.add_theme_constant_override("margin_right", 58)
-    margin.add_theme_constant_override("margin_top", 48)
-    margin.add_theme_constant_override("margin_bottom", 48)
+    margin.add_theme_constant_override("margin_left", 64)
+    margin.add_theme_constant_override("margin_right", 64)
+    margin.add_theme_constant_override("margin_top", 54)
+    margin.add_theme_constant_override("margin_bottom", 54)
     margin.modulate.a = 0.0
     add_child(margin)
     content = margin
     var tween := create_tween()
     tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-    tween.tween_property(margin, "modulate:a", 1.0, 0.20)
+    tween.tween_property(margin, "modulate:a", 1.0, 0.18)
     return margin
 
 
 func _show_home() -> void:
+    game_mode = "home"
+    run_started_ms = 0
+    run_timer_label = null
+    _refresh_daily_state()
+    analytics.record("home_view", {"level": current_level, "daily_complete": daily_best_score > 0})
     var margin := _reset_content()
     var column := VBoxContainer.new()
-    column.alignment = BoxContainer.ALIGNMENT_CENTER
-    column.add_theme_constant_override("separation", 18)
+    column.add_theme_constant_override("separation", 22)
     margin.add_child(column)
 
-    column.add_child(_label("MASAR", 84, PRIMARY, true))
-    column.add_child(_label("Clear your mind. Open the path.", 31, MUTED))
+    var header := HBoxContainer.new()
+    header.add_child(_left_label("MASAR", 56, TEXT, true))
+    var header_space := Control.new()
+    header_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    header.add_child(header_space)
+    var route_mark := _right_label("PATH / %03d" % current_level, 22, PRIMARY, true)
+    route_mark.custom_minimum_size.x = 260
+    header.add_child(route_mark)
+    column.add_child(header)
 
-    var journey := HBoxContainer.new()
-    journey.alignment = BoxContainer.ALIGNMENT_CENTER
-    journey.add_theme_constant_override("separation", 16)
-    column.add_child(journey)
-    journey.add_child(_pill("Journey %d" % _journey_number(), PRIMARY))
-    journey.add_child(_pill("Daily streak %d" % return_streak, ACCENT))
+    var rule := HSeparator.new()
+    rule.add_theme_constant_override("separation", 2)
+    rule.add_theme_stylebox_override("separator", _bar_style(Color(PRIMARY, 0.38)))
+    column.add_child(rule)
 
-    column.add_child(_label("CHOOSE YOUR LOOK", 22, Color(MUTED, 0.86), true))
+    column.add_child(_left_label("Find the\nopen path.", 72, TEXT, true))
+    column.add_child(_left_label("A quiet puzzle. A fair daily race.", 29, MUTED))
+
+    var metrics := HBoxContainer.new()
+    metrics.add_theme_constant_override("separation", 14)
+    metrics.add_child(_metric_box("JOURNEY", "%02d / 05" % ((current_level - 1) % 5 + 1), PRIMARY))
+    metrics.add_child(_metric_box("DAILY STREAK", "%02d DAYS" % return_streak, ACCENT))
+    column.add_child(metrics)
+
+    var route_card := PanelContainer.new()
+    route_card.custom_minimum_size.y = 360
+    route_card.add_theme_stylebox_override("panel", _panel_style(Color(PANEL, 0.94), Color(PRIMARY, 0.66), 22, 2))
+    column.add_child(route_card)
+    var route_column := VBoxContainer.new()
+    route_column.add_theme_constant_override("separation", 18)
+    route_card.add_child(route_column)
+    route_column.add_child(_left_label("CURRENT ROUTE", 20, PRIMARY, true))
+    var level_row := HBoxContainer.new()
+    level_row.add_child(_left_label("LEVEL %02d" % current_level, 54, TEXT, true))
+    var level_space := Control.new()
+    level_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    level_row.add_child(level_space)
+    level_row.add_child(_right_label("%d GLOW" % total_score, 25, ACCENT, true))
+    route_column.add_child(level_row)
+    route_column.add_child(_journey_progress())
+    var play := _button("START ROUTE   →", 35, PRIMARY, INK)
+    play.custom_minimum_size.y = 94
+    play.pressed.connect(_show_game.bind("journey"))
+    route_column.add_child(play)
+
+    var daily_card := PanelContainer.new()
+    daily_card.custom_minimum_size.y = 230
+    daily_card.add_theme_stylebox_override("panel", _panel_style(Color(PANEL_SOFT, 0.88), Color(ACCENT, 0.48), 18, 1))
+    column.add_child(daily_card)
+    var daily_row := HBoxContainer.new()
+    daily_row.add_theme_constant_override("separation", 22)
+    daily_card.add_child(daily_row)
+    var daily_copy := VBoxContainer.new()
+    daily_copy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    daily_copy.add_theme_constant_override("separation", 9)
+    daily_copy.add_child(_left_label("TODAY'S PATH", 20, ACCENT, true))
+    daily_copy.add_child(_left_label(_daily_date_text(), 37, TEXT, true))
+    var best_text := "NO RUN YET" if daily_best_score <= 0 else "BEST  %s  •  %d" % [_format_time(daily_best_time_ms), daily_best_score]
+    daily_copy.add_child(_left_label(best_text, 22, MUTED))
+    daily_row.add_child(daily_copy)
+    var daily_play := _button("PLAY\nDAILY", 26, ACCENT, INK)
+    daily_play.custom_minimum_size = Vector2(230, 130)
+    daily_play.pressed.connect(_show_game.bind("daily"))
+    daily_row.add_child(daily_play)
+
     var palette_row := HBoxContainer.new()
-    palette_row.alignment = BoxContainer.ALIGNMENT_CENTER
     palette_row.add_theme_constant_override("separation", 12)
-    column.add_child(palette_row)
+    palette_row.add_child(_left_label("COLOR", 19, MUTED, true))
+    var palette_space := Control.new()
+    palette_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    palette_row.add_child(palette_space)
     for index in range(PALETTES.size()):
-        palette_row.add_child(_palette_button(index))
-
-    var card := PanelContainer.new()
-    card.custom_minimum_size = Vector2(0, 560)
-    card.add_theme_stylebox_override("panel", _panel_style(Color(PANEL, 0.96), Color(PRIMARY, 0.58), 42, 3))
-    column.add_child(card)
-    var card_column := VBoxContainer.new()
-    card_column.alignment = BoxContainer.ALIGNMENT_CENTER
-    card_column.add_theme_constant_override("separation", 24)
-    card.add_child(card_column)
-    card_column.add_child(_label("LEVEL %d" % current_level, 50, TEXT, true))
-    card_column.add_child(_label("Tap an arrow with an open path\nand build a perfect flow.", 31, MUTED))
-    card_column.add_child(_journey_progress())
-    var play := _button("PLAY NOW", 44, PRIMARY, INK)
-    play.custom_minimum_size = Vector2(0, 106)
-    play.pressed.connect(_show_game)
-    card_column.add_child(play)
-
-    column.add_child(_label("%d  TOTAL GLOW" % total_score, 29, ACCENT, true))
-    column.add_child(_label("Short sessions  •  Calm motion  •  No penalties", 23, Color(MUTED, 0.82)))
+        palette_row.add_child(_swatch_button(index))
+    column.add_child(palette_row)
 
 
-func _show_game() -> void:
+func _show_game(mode_name := "journey") -> void:
+    game_mode = mode_name
     var margin := _reset_content()
     margin.add_theme_constant_override("margin_top", 34)
-    margin.add_theme_constant_override("margin_bottom", 44)
+    margin.add_theme_constant_override("margin_bottom", 42)
     var column := VBoxContainer.new()
-    column.add_theme_constant_override("separation", 17)
+    column.add_theme_constant_override("separation", 15)
     margin.add_child(column)
 
     var top := HBoxContainer.new()
     column.add_child(top)
-    top.add_child(_round_button("×", 58, _show_home))
-    var spacer := Control.new()
-    spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    top.add_child(spacer)
-    top.add_child(_label("LEVEL %d" % current_level, 38, TEXT, true))
-    var spacer_two := Control.new()
-    spacer_two.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    top.add_child(spacer_two)
-    var score_label := _label("0  ◆", 30, ACCENT, true)
-    score_label.custom_minimum_size.x = 180
-    top.add_child(score_label)
+    top.add_child(_compact_button("←", _show_home))
+    var top_space := Control.new()
+    top_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    top.add_child(top_space)
+    var title := "DAILY RUN" if game_mode == "daily" else "ROUTE %02d" % current_level
+    top.add_child(_label(title, 31, TEXT, true))
+    var top_space_two := Control.new()
+    top_space_two.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    top.add_child(top_space_two)
+    if game_mode == "daily":
+        run_timer_label = _right_label("00:00.0", 28, ACCENT, true)
+    else:
+        run_timer_label = _right_label("0  ◆", 28, ACCENT, true)
+    run_timer_label.custom_minimum_size.x = 190
+    top.add_child(run_timer_label)
 
-    var status_label := _label("Choose an arrow with an open path", 27, MUTED)
+    var status_label := _left_label("Choose an arrow with an open path", 25, MUTED)
     column.add_child(status_label)
     var progress := _progress_bar()
     column.add_child(progress)
 
     var board_frame := PanelContainer.new()
     board_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
-    board_frame.add_theme_stylebox_override("panel", _panel_style(Color.TRANSPARENT, Color.TRANSPARENT, 38, 0))
+    board_frame.add_theme_stylebox_override("panel", _panel_style(Color.TRANSPARENT, Color.TRANSPARENT, 18, 0))
     column.add_child(board_frame)
     var board: ArrowBoard = ArrowBoardScript.new()
     board.name = "ArrowBoard"
     board.apply_palette(PALETTES[current_palette])
-    var profile := _level_profile(current_level)
-    board.configure(profile.columns, profile.rows, profile.target, current_level * 104729)
+    var profile := _daily_profile_for_day(daily_day) if game_mode == "daily" else _level_profile(current_level)
+    board.configure(profile.columns, profile.rows, profile.target, profile.seed)
     board.progress_changed.connect(func(remaining: int, total: int, combo: int, score: int) -> void:
-        score_label.text = "%d  ◆" % score
+        if game_mode != "daily":
+            run_timer_label.text = "%d  ◆" % score
         progress.value = float(total - remaining) / float(maxi(1, total)) * 100.0
-        status_label.text = "%d remaining" % remaining
+        status_label.text = "%d arrows remaining" % remaining
         if combo >= 3:
-            status_label.text = "FLOW ×%d   •   %d remaining" % [combo, remaining]
+            status_label.text = "FLOW ×%d   /   %d remaining" % [combo, remaining]
     )
     board.blocked_tap.connect(func() -> void:
         status_label.text = "Blocked path — try another arrow"
+        analytics.record("blocked_tap", {"mode": game_mode, "level": current_level})
+    )
+    board.hint_used.connect(func() -> void:
+        analytics.record("hint_used", {"mode": game_mode, "level": current_level})
     )
     board.level_cleared.connect(func(score: int, best_combo: int) -> void:
-        _complete_level(score, best_combo, board.get_mistakes())
+        var elapsed_ms := maxi(1, Time.get_ticks_msec() - run_started_ms)
+        if game_mode == "daily":
+            _complete_daily(elapsed_ms, board.get_mistakes(), board.get_hints_used(), best_combo)
+        else:
+            _complete_level(score, best_combo, board.get_mistakes(), elapsed_ms, board.get_hints_used())
     )
     board_frame.add_child(board)
 
-    var hint := _button("SHOW AN OPEN PATH", 27, PANEL_SOFT, PRIMARY)
-    hint.custom_minimum_size.y = 78
+    var hint_text := "HINT   +10 SEC" if game_mode == "daily" else "HINT   SHOW OPEN PATH"
+    var hint := _button(hint_text, 23, PANEL_SOFT, PRIMARY)
+    hint.custom_minimum_size.y = 72
     hint.pressed.connect(board.show_hint)
     column.add_child(hint)
+    run_started_ms = Time.get_ticks_msec()
+    analytics.record("run_start", {
+        "mode": game_mode,
+        "level": current_level,
+        "daily_day": daily_day if game_mode == "daily" else 0,
+        "tiles": int(profile.target),
+    })
 
 
-func _complete_level(score: int, best_combo: int, mistakes: int) -> void:
+func _complete_level(score: int, best_combo: int, mistakes: int, elapsed_ms: int, hints: int) -> void:
     last_score = score
     last_combo = best_combo
     last_mistakes = mistakes
     total_score += score
+    analytics.record("run_complete", {
+        "mode": "journey",
+        "level": current_level,
+        "score": score,
+        "elapsed_ms": elapsed_ms,
+        "mistakes": mistakes,
+        "hints": hints,
+    })
     current_level += 1
+    run_started_ms = 0
     _save_progress()
     _show_result()
 
 
+func _complete_daily(elapsed_ms: int, mistakes: int, hints: int, best_combo: int) -> void:
+    var score := calculate_daily_score(elapsed_ms, mistakes, hints)
+    var is_new_best := score > daily_best_score
+    if is_new_best:
+        daily_best_score = score
+        daily_best_time_ms = elapsed_ms
+        daily_best_mistakes = mistakes
+        _save_progress()
+    analytics.record("run_complete", {
+        "mode": "daily",
+        "daily_day": daily_day,
+        "score": score,
+        "elapsed_ms": elapsed_ms,
+        "mistakes": mistakes,
+        "hints": hints,
+        "new_best": is_new_best,
+    })
+    run_started_ms = 0
+    _show_daily_result(score, elapsed_ms, mistakes, hints, best_combo, is_new_best)
+
+
 func _show_result() -> void:
+    game_mode = "result"
     var margin := _reset_content()
     var column := VBoxContainer.new()
     column.alignment = BoxContainer.ALIGNMENT_CENTER
-    column.add_theme_constant_override("separation", 26)
+    column.add_theme_constant_override("separation", 24)
     margin.add_child(column)
-    column.add_child(_label("BEAUTIFUL FLOW", 70, PRIMARY, true))
+    column.add_child(_left_label("ROUTE CLEAR", 24, PRIMARY, true))
+    column.add_child(_left_label("Beautiful\nflow.", 72, TEXT, true))
 
     var medal_count := 3 if last_mistakes == 0 else (2 if last_mistakes <= 2 else 1)
     var medal_text := ""
     for index in range(3):
         medal_text += "◆  " if index < medal_count else "◇  "
-    column.add_child(_label(medal_text.strip_edges(), 62, ACCENT))
+    column.add_child(_left_label(medal_text.strip_edges(), 54, ACCENT))
 
     var card := PanelContainer.new()
-    card.custom_minimum_size = Vector2(0, 500)
-    card.add_theme_stylebox_override("panel", _panel_style(PANEL, Color(PRIMARY, 0.58), 40, 3))
+    card.custom_minimum_size = Vector2(0, 430)
+    card.add_theme_stylebox_override("panel", _panel_style(PANEL, Color(PRIMARY, 0.56), 20, 2))
     column.add_child(card)
     var stats := VBoxContainer.new()
-    stats.alignment = BoxContainer.ALIGNMENT_CENTER
-    stats.add_theme_constant_override("separation", 27)
+    stats.add_theme_constant_override("separation", 24)
     card.add_child(stats)
-    stats.add_child(_label("+%d GLOW" % last_score, 54, ACCENT, true))
-    stats.add_child(_label("Best flow ×%d" % last_combo, 36, TEXT))
-    stats.add_child(_label(_result_message(medal_count), 28, MUTED))
+    stats.add_child(_left_label("+%d GLOW" % last_score, 50, ACCENT, true))
+    stats.add_child(_left_label("BEST FLOW  ×%d" % last_combo, 27, TEXT))
+    stats.add_child(_left_label(_result_message(medal_count), 25, MUTED))
     stats.add_child(_journey_progress())
 
-    var next := _button("NEXT LEVEL", 42, PRIMARY, INK)
-    next.custom_minimum_size.y = 108
-    next.pressed.connect(_show_game)
+    var next := _button("NEXT ROUTE   →", 34, PRIMARY, INK)
+    next.custom_minimum_size.y = 96
+    next.pressed.connect(_show_game.bind("journey"))
     column.add_child(next)
+
+
+func _show_daily_result(score: int, elapsed_ms: int, mistakes: int, hints: int, best_combo: int, is_new_best: bool) -> void:
+    game_mode = "daily_result"
+    var margin := _reset_content()
+    var column := VBoxContainer.new()
+    column.alignment = BoxContainer.ALIGNMENT_CENTER
+    column.add_theme_constant_override("separation", 24)
+    margin.add_child(column)
+    column.add_child(_left_label("TODAY'S PATH", 24, ACCENT, true))
+    column.add_child(_left_label("%d" % score, 104, TEXT, true))
+    column.add_child(_left_label("NEW PERSONAL BEST" if is_new_best else "RUN COMPLETE", 27, PRIMARY, true))
+
+    var card := PanelContainer.new()
+    card.custom_minimum_size = Vector2(0, 410)
+    card.add_theme_stylebox_override("panel", _panel_style(PANEL, Color(ACCENT, 0.52), 20, 2))
+    column.add_child(card)
+    var stats := VBoxContainer.new()
+    stats.add_theme_constant_override("separation", 22)
+    card.add_child(stats)
+    stats.add_child(_stat_row("TIME", _format_time(elapsed_ms)))
+    stats.add_child(_stat_row("MISTAKES", "%d" % mistakes))
+    stats.add_child(_stat_row("HINTS", "%d" % hints))
+    stats.add_child(_stat_row("BEST FLOW", "×%d" % best_combo))
+
+    var replay := _button("RUN IT AGAIN", 32, ACCENT, INK)
+    replay.custom_minimum_size.y = 92
+    replay.pressed.connect(_show_game.bind("daily"))
+    column.add_child(replay)
+    var home := _button("BACK HOME", 25, PANEL_SOFT, PRIMARY)
+    home.custom_minimum_size.y = 76
+    home.pressed.connect(_show_home)
+    column.add_child(home)
+
+
+func calculate_daily_score(elapsed_ms: int, mistakes: int, hints: int) -> int:
+    return maxi(100, 10000 - int(elapsed_ms / 10.0) - mistakes * 500 - hints * 1000)
 
 
 func _level_profile(level: int) -> Dictionary:
     var columns := mini(6, 4 + (level - 1) / 4)
     var rows := columns + 2
-    var gentle_target := 6 + (level - 1) * 2
-    var target := mini(26, mini(columns * rows - 2, gentle_target))
-    return {"columns": columns, "rows": rows, "target": target}
+    var target := 26
+    if level <= 4:
+        target = 6 + (level - 1) * 2
+    elif level <= 8:
+        target = 18 + (level - 5) * 2
+    target = mini(target, columns * rows - 2)
+    return {"columns": columns, "rows": rows, "target": target, "seed": level * 104729}
+
+
+func _daily_profile_for_day(day: int) -> Dictionary:
+    return {"columns": 5, "rows": 7, "target": 24, "seed": day * 104729 + 7001}
 
 
 func get_level_profile_for_test(level: int) -> Dictionary:
     return _level_profile(level)
 
 
+func get_daily_profile_for_test(day: int) -> Dictionary:
+    return _daily_profile_for_day(day)
+
+
 func get_palette_count_for_test() -> int:
     return PALETTES.size()
+
+
+func get_analytics_path_for_test() -> String:
+    return analytics.get_dev_path()
 
 
 func _journey_number() -> int:
@@ -302,18 +468,24 @@ func _journey_number() -> int:
 
 func _result_message(medals: int) -> String:
     if medals == 3:
-        return "Perfect run — keep the streak alive"
+        return "Perfect route. No wasted moves."
     if medals == 2:
-        return "So close — collect all three diamonds"
-    return "Path cleared — the next run will be better"
+        return "One more clean run for all three diamonds."
+    return "Route cleared. The next one will feel sharper."
 
 
 func _journey_progress() -> VBoxContainer:
     var wrap := VBoxContainer.new()
-    wrap.custom_minimum_size = Vector2(640, 72)
-    wrap.add_theme_constant_override("separation", 8)
+    wrap.custom_minimum_size = Vector2(600, 58)
+    wrap.add_theme_constant_override("separation", 7)
     var within := (current_level - 1) % 5
-    wrap.add_child(_label("JOURNEY PROGRESS  %d / 5" % within, 22, MUTED))
+    var copy := HBoxContainer.new()
+    copy.add_child(_left_label("JOURNEY %d" % _journey_number(), 19, MUTED, true))
+    var copy_space := Control.new()
+    copy_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    copy.add_child(copy_space)
+    copy.add_child(_right_label("%d / 5" % within, 19, PRIMARY, true))
+    wrap.add_child(copy)
     var bar := _progress_bar()
     bar.value = float(within) / 5.0 * 100.0
     wrap.add_child(bar)
@@ -322,35 +494,52 @@ func _journey_progress() -> VBoxContainer:
 
 func _progress_bar() -> ProgressBar:
     var bar := ProgressBar.new()
-    bar.custom_minimum_size = Vector2(0, 18)
+    bar.custom_minimum_size = Vector2(0, 12)
     bar.show_percentage = false
     bar.min_value = 0
     bar.max_value = 100
-    bar.add_theme_stylebox_override("background", _bar_style(Color(PANEL_SOFT, 0.78)))
+    bar.add_theme_stylebox_override("background", _bar_style(Color(PANEL_SOFT, 0.82)))
     bar.add_theme_stylebox_override("fill", _bar_style(PRIMARY))
     return bar
 
 
-func _pill(value: String, color: Color) -> Label:
-    var pill := _label(value, 23, color, true)
-    pill.custom_minimum_size = Vector2(280, 58)
-    pill.add_theme_stylebox_override("normal", _panel_style(Color(PANEL, 0.88), Color(color, 0.45), 24, 2))
-    return pill
+func _metric_box(title: String, value: String, color: Color) -> PanelContainer:
+    var box := PanelContainer.new()
+    box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    box.custom_minimum_size.y = 94
+    box.add_theme_stylebox_override("panel", _panel_style(Color(PANEL, 0.76), Color(color, 0.32), 14, 1))
+    var copy := VBoxContainer.new()
+    copy.add_theme_constant_override("separation", 4)
+    copy.add_child(_left_label(title, 17, MUTED, true))
+    copy.add_child(_left_label(value, 25, color, true))
+    box.add_child(copy)
+    return box
 
 
-func _palette_button(index: int) -> Button:
+func _stat_row(title: String, value: String) -> HBoxContainer:
+    var row := HBoxContainer.new()
+    row.add_child(_left_label(title, 22, MUTED, true))
+    var space := Control.new()
+    space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    row.add_child(space)
+    row.add_child(_right_label(value, 28, TEXT, true))
+    return row
+
+
+func _swatch_button(index: int) -> Button:
     var palette: Dictionary = PALETTES[index]
     var selected := index == current_palette
     var button := Button.new()
-    button.text = ("✓  " if selected else "") + str(palette.name)
+    button.text = "✓" if selected else ""
+    button.tooltip_text = str(palette.name)
     button.focus_mode = Control.FOCUS_NONE
-    button.custom_minimum_size = Vector2(220, 72)
-    button.add_theme_font_size_override("font_size", 24)
+    button.custom_minimum_size = Vector2(66, 52)
+    button.add_theme_font_override("font", _ui_font(700))
+    button.add_theme_font_size_override("font_size", 20)
     button.add_theme_color_override("font_color", palette.ink)
-    button.add_theme_color_override("font_pressed_color", palette.ink)
-    button.add_theme_stylebox_override("normal", _panel_style(palette.primary, Color.WHITE if selected else palette.accent, 24, 4 if selected else 2))
-    button.add_theme_stylebox_override("hover", _panel_style(palette.primary.lightened(0.06), Color.WHITE, 24, 4))
-    button.add_theme_stylebox_override("pressed", _panel_style(palette.primary.darkened(0.08), Color.WHITE, 24, 4))
+    button.add_theme_stylebox_override("normal", _panel_style(palette.primary, Color.WHITE if selected else palette.accent, 10, 4 if selected else 1))
+    button.add_theme_stylebox_override("hover", _panel_style(palette.primary.lightened(0.08), Color.WHITE, 10, 3))
+    button.add_theme_stylebox_override("pressed", _panel_style(palette.primary.darkened(0.08), Color.WHITE, 10, 3))
     button.pressed.connect(_select_palette.bind(index))
     return button
 
@@ -361,11 +550,22 @@ func _label(value: String, font_size: int, color: Color, bold := false) -> Label
     label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     label.autowrap_mode = TextServer.AUTOWRAP_OFF
+    label.add_theme_font_override("font", _ui_font(700 if bold else 400))
     label.add_theme_font_size_override("font_size", font_size)
     label.add_theme_color_override("font_color", color)
-    if bold:
-        label.add_theme_constant_override("outline_size", 2)
-        label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.34))
+    return label
+
+
+func _left_label(value: String, font_size: int, color: Color, bold := false) -> Label:
+    var label := _label(value, font_size, color, bold)
+    label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+    label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    return label
+
+
+func _right_label(value: String, font_size: int, color: Color, bold := false) -> Label:
+    var label := _label(value, font_size, color, bold)
+    label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
     return label
 
 
@@ -373,19 +573,27 @@ func _button(value: String, font_size: int, background: Color, foreground: Color
     var button := Button.new()
     button.text = value
     button.focus_mode = Control.FOCUS_NONE
-    button.custom_minimum_size = Vector2(220, 88)
+    button.custom_minimum_size = Vector2(220, 82)
+    button.add_theme_font_override("font", _ui_font(650))
     button.add_theme_font_size_override("font_size", font_size)
     button.add_theme_color_override("font_color", foreground)
     button.add_theme_color_override("font_pressed_color", foreground.darkened(0.10))
-    button.add_theme_stylebox_override("normal", _panel_style(background, Color(ACCENT, 0.48), 30, 3))
-    button.add_theme_stylebox_override("hover", _panel_style(background.lightened(0.06), Color.WHITE, 30, 3))
-    button.add_theme_stylebox_override("pressed", _panel_style(background.darkened(0.06), ACCENT, 30, 4))
+    button.add_theme_stylebox_override("normal", _panel_style(background, Color(ACCENT, 0.38), 14, 1))
+    button.add_theme_stylebox_override("hover", _panel_style(background.lightened(0.06), Color.WHITE, 14, 2))
+    button.add_theme_stylebox_override("pressed", _panel_style(background.darkened(0.06), ACCENT, 14, 2))
     return button
 
 
-func _round_button(value: String, font_size: int, action: Callable) -> Button:
-    var button := _button(value, font_size, PANEL, PRIMARY)
-    button.custom_minimum_size = Vector2(82, 82)
+func _ui_font(weight: int) -> FontVariation:
+    var font := FontVariation.new()
+    font.base_font = UI_FONT
+    font.variation_opentype = {"wght": weight}
+    return font
+
+
+func _compact_button(value: String, action: Callable) -> Button:
+    var button := _button(value, 38, PANEL, PRIMARY)
+    button.custom_minimum_size = Vector2(76, 70)
     button.pressed.connect(action)
     return button
 
@@ -396,18 +604,43 @@ func _panel_style(background: Color, border: Color, radius: int, border_width: i
     style.border_color = border
     style.set_border_width_all(border_width)
     style.set_corner_radius_all(radius)
-    style.content_margin_left = 28
-    style.content_margin_right = 28
-    style.content_margin_top = 24
-    style.content_margin_bottom = 24
+    style.content_margin_left = 24
+    style.content_margin_right = 24
+    style.content_margin_top = 20
+    style.content_margin_bottom = 20
     return style
 
 
 func _bar_style(color: Color) -> StyleBoxFlat:
     var style := StyleBoxFlat.new()
     style.bg_color = color
-    style.set_corner_radius_all(9)
+    style.set_corner_radius_all(4)
     return style
+
+
+func _format_time(elapsed_ms: int) -> String:
+    var total_tenths := maxi(0, elapsed_ms) / 100
+    var minutes := int(total_tenths / 600)
+    var seconds := int(total_tenths / 10) % 60
+    var tenths := int(total_tenths % 10)
+    return "%02d:%02d.%d" % [minutes, seconds, tenths]
+
+
+func _daily_date_text() -> String:
+    var date := Time.get_date_dict_from_unix_time(daily_day * 86400)
+    var months := ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+    return "%s %02d" % [months[int(date.month) - 1], int(date.day)]
+
+
+func _refresh_daily_state() -> void:
+    var today := int(Time.get_unix_time_from_system() / 86400.0)
+    if daily_day == today:
+        return
+    daily_day = today
+    daily_best_score = 0
+    daily_best_time_ms = 0
+    daily_best_mistakes = 0
+    _save_progress()
 
 
 func _register_daily_return() -> void:
@@ -431,6 +664,10 @@ func _load_progress() -> void:
     return_streak = maxi(1, int(config.get_value("player", "return_streak", 1)))
     last_play_day = int(config.get_value("player", "last_play_day", -1))
     current_palette = clampi(int(config.get_value("player", "palette", 0)), 0, PALETTES.size() - 1)
+    daily_day = int(config.get_value("daily", "day", -1))
+    daily_best_score = maxi(0, int(config.get_value("daily", "best_score", 0)))
+    daily_best_time_ms = maxi(0, int(config.get_value("daily", "best_time_ms", 0)))
+    daily_best_mistakes = maxi(0, int(config.get_value("daily", "best_mistakes", 0)))
 
 
 func _save_progress() -> void:
@@ -440,4 +677,8 @@ func _save_progress() -> void:
     config.set_value("player", "return_streak", return_streak)
     config.set_value("player", "last_play_day", last_play_day)
     config.set_value("player", "palette", current_palette)
+    config.set_value("daily", "day", daily_day)
+    config.set_value("daily", "best_score", daily_best_score)
+    config.set_value("daily", "best_time_ms", daily_best_time_ms)
+    config.set_value("daily", "best_mistakes", daily_best_mistakes)
     config.save(SAVE_PATH)

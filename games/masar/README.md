@@ -9,6 +9,10 @@ A calm one-touch arrow puzzle prototype designed for quick, satisfying sessions.
 - Large touch targets, quick exit effects, flow combos, and a gradual difficulty curve.
 - Three saved visual themes: Ocean, Aurora, and Sunset.
 - Abstract theme-aware backgrounds with no location-specific photography.
+- Manrope typography bundled under its Open Font License for a consistent handcrafted interface.
 - Instant visual rewards, a progress bar, and a three-diamond performance rating.
 - Five-level journeys and a daily return streak.
+- One deterministic UTC daily puzzle shared by every player.
+- Competitive scoring based on clear time, mistakes, and hint usage.
+- Privacy-first development analytics stored locally without personal data.
 - No ads in the prototype.
