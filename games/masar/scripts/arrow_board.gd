@@ -8,11 +8,11 @@ signal hint_used
 
 const DIRECTIONS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
 const ARROWS := ["→", "↓", "←", "↑"]
-var TILE_COLORS: Array[Color] = [Color("#E7F36B")]
-var INK := Color("#11140D")
-var BOARD_BG := Color("#101419")
-var BOARD_LINE := Color("#E7F36B")
-var FREE_GLOW := Color("#E7F36B")
+var TILE_COLORS: Array[Color] = [Color("#315CF5")]
+var INK := Color.WHITE
+var BOARD_BG := Color("#E5E1D7")
+var BOARD_LINE := Color("#17191C")
+var FREE_GLOW := Color("#17191C")
 
 @export_range(4, 7, 1) var grid_columns := 4
 @export_range(5, 9, 1) var grid_rows := 6
@@ -72,9 +72,9 @@ func apply_palette(palette: Dictionary) -> void:
     TILE_COLORS.clear()
     TILE_COLORS.append(palette.primary)
     INK = palette.ink
-    BOARD_BG = palette.panel.darkened(0.18)
-    BOARD_LINE = Color(palette.primary, 0.66)
-    FREE_GLOW = palette.primary
+    BOARD_BG = palette.panel
+    BOARD_LINE = palette.text
+    FREE_GLOW = palette.text
     if is_node_ready():
         _refresh_tile_states()
         queue_redraw()
@@ -267,9 +267,9 @@ func _refresh_tile_states() -> void:
             continue
         var base: Color = TILE_COLORS[int(tile.get_meta("color_index"))]
         var free := _is_free(tile)
-        tile.modulate = Color.WHITE if free else Color(0.82, 0.86, 0.92, 1.0)
-        tile.add_theme_stylebox_override("normal", _tile_style(base if free else base.darkened(0.12), FREE_GLOW if free else base.lightened(0.08), free))
-        tile.add_theme_stylebox_override("hover", _tile_style(base.lightened(0.06), Color.WHITE, true))
+        tile.modulate = Color.WHITE if free else Color(0.86, 0.86, 0.86, 1.0)
+        tile.add_theme_stylebox_override("normal", _tile_style(base if free else base.lightened(0.12), FREE_GLOW if free else Color(FREE_GLOW, 0.64), free))
+        tile.add_theme_stylebox_override("hover", _tile_style(base.lightened(0.06), FREE_GLOW, true))
         tile.add_theme_stylebox_override("pressed", _tile_style(base.darkened(0.08), FREE_GLOW, true))
 
 
@@ -361,10 +361,11 @@ func _tile_style(background: Color, border: Color, highlighted: bool) -> StyleBo
     var style := StyleBoxFlat.new()
     style.bg_color = background
     style.border_color = border
-    style.set_border_width_all(3 if highlighted else 1)
-    style.set_corner_radius_all(13)
-    style.shadow_color = Color(border, 0.14) if highlighted else Color(0, 0, 0, 0.22)
-    style.shadow_size = 7 if highlighted else 3
+    style.set_border_width_all(7 if highlighted else 4)
+    style.set_corner_radius_all(8)
+    style.shadow_color = Color(0, 0, 0, 0.22)
+    style.shadow_size = 5
+    style.shadow_offset = Vector2(0, 5)
     return style
 
 
@@ -376,16 +377,6 @@ func _draw() -> void:
     var panel := StyleBoxFlat.new()
     panel.bg_color = BOARD_BG
     panel.border_color = BOARD_LINE
-    panel.set_border_width_all(2)
-    panel.set_corner_radius_all(20)
-    panel.shadow_color = Color(0, 0, 0, 0.34)
-    panel.shadow_size = 10
+    panel.set_border_width_all(5)
+    panel.set_corner_radius_all(8)
     draw_style_box(panel, Rect2(Vector2.ZERO, size))
-
-    var grid_color := Color(FREE_GLOW, 0.035)
-    for column in range(1, grid_columns):
-        var x := size.x * float(column) / float(grid_columns)
-        draw_line(Vector2(x, 28), Vector2(x, size.y - 28), grid_color, 1.0)
-    for row in range(1, grid_rows):
-        var y := size.y * float(row) / float(grid_rows)
-        draw_line(Vector2(28, y), Vector2(size.x - 28, y), grid_color, 1.0)
