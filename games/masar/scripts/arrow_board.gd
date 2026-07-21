@@ -7,9 +7,11 @@ signal blocked_tap
 
 const DIRECTIONS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
 const ARROWS := ["→", "↓", "←", "↑"]
-const TILE_COLORS := [Color("#E9B95C"), Color("#1FD6D0"), Color("#D88C4A"), Color("#88C7B7")]
-const BOARD_BG := Color("#071225")
-const BOARD_LINE := Color("#9B672A")
+const TILE_COLORS := [Color("#F3C96B"), Color("#6FD2C7"), Color("#E69A68"), Color("#A9CFC2")]
+const INK := Color("#102039")
+const BOARD_BG := Color("#08172B")
+const BOARD_LINE := Color("#7A5A2B")
+const FREE_GLOW := Color("#FFF0B2")
 
 @export_range(4, 7, 1) var grid_columns := 4
 @export_range(5, 9, 1) var grid_rows := 6
@@ -21,12 +23,14 @@ var total_tiles := 0
 var combo := 0
 var best_combo := 0
 var score := 0
+var mistakes := 0
 var input_locked := false
 var rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
     custom_minimum_size = Vector2(820, 1080)
+    clip_contents = true
     resized.connect(_layout_tiles)
     new_level()
 
@@ -39,6 +43,7 @@ func new_level() -> void:
     combo = 0
     best_combo = 0
     score = 0
+    mistakes = 0
     input_locked = false
     rng.seed = level_seed
 
@@ -47,6 +52,8 @@ func new_level() -> void:
         _create_tile(item.cell, item.direction, item.color_index)
     total_tiles = tiles.size()
     _layout_tiles()
+    _refresh_tile_states()
+    _play_board_entrance()
     _emit_progress()
     queue_redraw()
 
@@ -61,12 +68,12 @@ func configure(columns: int, rows: int, target: int, seed_value: int) -> void:
 func show_hint() -> void:
     for tile in tiles:
         if _is_free(tile):
-            var original_scale := tile.scale
             tile.pivot_offset = tile.size * 0.5
             var tween := create_tween()
-            tween.set_loops(2)
-            tween.tween_property(tile, "scale", original_scale * 1.1, 0.16)
-            tween.tween_property(tile, "scale", original_scale, 0.16)
+            tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+            tween.tween_property(tile, "scale", Vector2.ONE * 1.08, 0.14)
+            tween.tween_property(tile, "scale", Vector2.ONE, 0.16)
+            _floating_feedback(tile.position + tile.size * 0.5, "هذا المسار مفتوح", Color("#FFF0B2"))
             return
 
 
@@ -79,6 +86,10 @@ func has_free_move() -> bool:
 
 func get_remaining() -> int:
     return tiles.size()
+
+
+func get_mistakes() -> int:
+    return mistakes
 
 
 func solve_step_for_test() -> bool:
@@ -137,14 +148,12 @@ func _create_tile(cell: Vector2i, direction_index: int, color_index: int) -> voi
     tile.layout_direction = Control.LAYOUT_DIRECTION_LTR
     tile.focus_mode = Control.FOCUS_NONE
     tile.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-    tile.add_theme_font_size_override("font_size", 58)
-    tile.add_theme_color_override("font_color", Color("#071225"))
-    tile.add_theme_color_override("font_pressed_color", Color("#071225"))
-    tile.add_theme_stylebox_override("normal", _tile_style(TILE_COLORS[color_index], TILE_COLORS[color_index].lightened(0.22)))
-    tile.add_theme_stylebox_override("hover", _tile_style(TILE_COLORS[color_index].lightened(0.08), Color.WHITE))
-    tile.add_theme_stylebox_override("pressed", _tile_style(TILE_COLORS[color_index].darkened(0.08), Color("#FFF7E7")))
+    tile.add_theme_font_size_override("font_size", 60)
+    tile.add_theme_color_override("font_color", INK)
+    tile.add_theme_color_override("font_pressed_color", INK)
     tile.set_meta("cell", cell)
     tile.set_meta("direction_index", direction_index)
+    tile.set_meta("color_index", color_index)
     tile.pressed.connect(_on_tile_pressed.bind(tile))
     add_child(tile)
     tiles.append(tile)
@@ -155,32 +164,44 @@ func _on_tile_pressed(tile: Button) -> void:
         return
     if not _is_free(tile):
         combo = 0
+        mistakes += 1
         blocked_tap.emit()
         _emit_progress()
-        _shake(tile)
-        Input.vibrate_handheld(22)
+        _soft_nudge(tile)
+        Input.vibrate_handheld(18)
         return
 
     input_locked = true
     combo += 1
     best_combo = maxi(best_combo, combo)
-    score += 10 + mini(combo, 10) * 2
+    var gained := 10 + mini(combo, 10) * 2
+    score += gained
     tiles.erase(tile)
     _emit_progress()
-    Input.vibrate_handheld(14)
+    Input.vibrate_handheld(12)
 
     var direction := DIRECTIONS[int(tile.get_meta("direction_index"))]
+    var tile_center := tile.position + tile.size * 0.5
+    _create_light_trail(tile_center, direction, TILE_COLORS[int(tile.get_meta("color_index"))])
+    _spark_burst(tile_center, TILE_COLORS[int(tile.get_meta("color_index"))])
+    if combo >= 3:
+        _floating_feedback(tile_center, "انسياب ×%d" % combo, FREE_GLOW)
+    else:
+        _floating_feedback(tile_center, "+%d" % gained, Color("#8FE4D8"))
+
     var distance := maxf(size.x, size.y) * 1.25
     var tween := create_tween().set_parallel(true)
     tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
     tween.tween_property(tile, "position", tile.position + Vector2(direction) * distance, 0.22)
-    tween.tween_property(tile, "modulate:a", 0.0, 0.18)
-    tween.tween_property(tile, "scale", Vector2.ONE * 0.82, 0.22)
+    tween.tween_property(tile, "modulate:a", 0.0, 0.17)
+    tween.tween_property(tile, "scale", Vector2.ONE * 0.88, 0.22)
     await tween.finished
     tile.queue_free()
     input_locked = false
+    _refresh_tile_states()
     if tiles.is_empty():
-        Input.vibrate_handheld(90)
+        Input.vibrate_handheld(70)
+        await get_tree().create_timer(0.16).timeout
         level_cleared.emit(score, best_combo)
 
 
@@ -203,12 +224,12 @@ func _inside(cell: Vector2i) -> bool:
 func _layout_tiles() -> void:
     if size.x <= 1.0 or size.y <= 1.0:
         return
-    var padding := 28.0
+    var padding := 34.0
     var available := size - Vector2.ONE * padding * 2.0
     var cell_side := minf(available.x / grid_columns, available.y / grid_rows)
     var board_size := Vector2(grid_columns, grid_rows) * cell_side
     var origin := (size - board_size) * 0.5
-    var gap := maxf(7.0, cell_side * 0.055)
+    var gap := maxf(8.0, cell_side * 0.06)
     for tile in tiles:
         if not is_instance_valid(tile):
             continue
@@ -219,23 +240,110 @@ func _layout_tiles() -> void:
     queue_redraw()
 
 
-func _shake(tile: Button) -> void:
+func _refresh_tile_states() -> void:
+    for tile in tiles:
+        if not is_instance_valid(tile):
+            continue
+        var base: Color = TILE_COLORS[int(tile.get_meta("color_index"))]
+        var free := _is_free(tile)
+        tile.modulate = Color.WHITE if free else Color(0.82, 0.86, 0.92, 1.0)
+        tile.add_theme_stylebox_override("normal", _tile_style(base if free else base.darkened(0.12), FREE_GLOW if free else base.lightened(0.08), free))
+        tile.add_theme_stylebox_override("hover", _tile_style(base.lightened(0.06), Color.WHITE, true))
+        tile.add_theme_stylebox_override("pressed", _tile_style(base.darkened(0.08), FREE_GLOW, true))
+
+
+func _play_board_entrance() -> void:
+    for index in range(tiles.size()):
+        var tile := tiles[index]
+        tile.modulate.a = 0.0
+        tile.scale = Vector2.ONE * 0.88
+        var tween := create_tween().set_parallel(true)
+        tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+        var delay := minf(index * 0.018, 0.16)
+        tween.tween_property(tile, "scale", Vector2.ONE, 0.22).set_delay(delay)
+        tween.tween_property(tile, "modulate:a", 1.0, 0.16).set_delay(delay)
+
+
+func _soft_nudge(tile: Button) -> void:
     var origin := tile.position
     var tween := create_tween()
-    tween.tween_property(tile, "position", origin + Vector2(12, 0), 0.05)
-    tween.tween_property(tile, "position", origin - Vector2(12, 0), 0.06)
-    tween.tween_property(tile, "position", origin + Vector2(7, 0), 0.05)
-    tween.tween_property(tile, "position", origin, 0.05)
+    tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+    tween.tween_property(tile, "position", origin + Vector2(6, 0), 0.055)
+    tween.tween_property(tile, "position", origin - Vector2(5, 0), 0.07)
+    tween.tween_property(tile, "position", origin, 0.065)
 
 
-func _tile_style(background: Color, border: Color) -> StyleBoxFlat:
+func _create_light_trail(start: Vector2, direction: Vector2i, color: Color) -> void:
+    var end := start + Vector2(direction) * maxf(size.x, size.y) * 0.75
+    var glow := Line2D.new()
+    glow.points = PackedVector2Array([start, end])
+    glow.width = 18
+    glow.default_color = Color(color, 0.18)
+    glow.antialiased = true
+    add_child(glow)
+    move_child(glow, 0)
+    var line := Line2D.new()
+    line.points = PackedVector2Array([start, end])
+    line.width = 4
+    line.default_color = Color(FREE_GLOW, 0.65)
+    line.antialiased = true
+    add_child(line)
+    move_child(line, 1)
+    var tween := create_tween().set_parallel(true)
+    tween.tween_property(glow, "modulate:a", 0.0, 0.28)
+    tween.tween_property(line, "modulate:a", 0.0, 0.22)
+    tween.finished.connect(func() -> void:
+        glow.queue_free()
+        line.queue_free()
+    )
+
+
+func _spark_burst(center: Vector2, color: Color) -> void:
+    for index in range(6):
+        var spark := ColorRect.new()
+        spark.color = color.lightened(0.12)
+        spark.size = Vector2(8, 8)
+        spark.position = center - spark.size * 0.5
+        spark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        add_child(spark)
+        var angle := TAU * float(index) / 6.0
+        var target := spark.position + Vector2.from_angle(angle) * 42.0
+        var tween := create_tween().set_parallel(true)
+        tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+        tween.tween_property(spark, "position", target, 0.26)
+        tween.tween_property(spark, "modulate:a", 0.0, 0.26)
+        tween.tween_property(spark, "scale", Vector2.ONE * 0.35, 0.26)
+        tween.finished.connect(spark.queue_free)
+
+
+func _floating_feedback(center: Vector2, value: String, color: Color) -> void:
+    var label := Label.new()
+    label.text = value
+    label.position = center - Vector2(135, 42)
+    label.size = Vector2(270, 84)
+    label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    label.add_theme_font_size_override("font_size", 30)
+    label.add_theme_color_override("font_color", color)
+    label.add_theme_constant_override("outline_size", 6)
+    label.add_theme_color_override("font_outline_color", Color(0.02, 0.06, 0.12, 0.82))
+    label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    add_child(label)
+    var tween := create_tween().set_parallel(true)
+    tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+    tween.tween_property(label, "position:y", label.position.y - 58.0, 0.42)
+    tween.tween_property(label, "modulate:a", 0.0, 0.42).set_delay(0.12)
+    tween.finished.connect(label.queue_free)
+
+
+func _tile_style(background: Color, border: Color, highlighted: bool) -> StyleBoxFlat:
     var style := StyleBoxFlat.new()
     style.bg_color = background
     style.border_color = border
-    style.set_border_width_all(3)
-    style.set_corner_radius_all(18)
-    style.shadow_color = Color(0, 0, 0, 0.35)
-    style.shadow_size = 8
+    style.set_border_width_all(4 if highlighted else 2)
+    style.set_corner_radius_all(22)
+    style.shadow_color = Color(border, 0.20) if highlighted else Color(0, 0, 0, 0.28)
+    style.shadow_size = 12 if highlighted else 6
     return style
 
 
@@ -247,8 +355,18 @@ func _draw() -> void:
     var panel := StyleBoxFlat.new()
     panel.bg_color = BOARD_BG
     panel.border_color = BOARD_LINE
-    panel.set_border_width_all(5)
-    panel.set_corner_radius_all(34)
-    panel.shadow_color = Color(0, 0, 0, 0.5)
+    panel.set_border_width_all(4)
+    panel.set_corner_radius_all(38)
+    panel.shadow_color = Color(0, 0, 0, 0.42)
     panel.shadow_size = 18
     draw_style_box(panel, Rect2(Vector2.ZERO, size))
+
+    var spacing := 68.0
+    var dot_color := Color(0.39, 0.61, 0.68, 0.075)
+    var y := spacing
+    while y < size.y - spacing:
+        var x := spacing
+        while x < size.x - spacing:
+            draw_circle(Vector2(x, y), 2.2, dot_color)
+            x += spacing
+        y += spacing

@@ -14,7 +14,7 @@ func _run() -> void:
     await process_frame
     assert(game.get_node_or_null("ScreenContent") != null, "Home screen should be created")
     var first_profile: Dictionary = game.get_level_profile_for_test(1)
-    assert(first_profile.columns == 4 and first_profile.target == 8, "First level must be immediate and easy")
+    assert(first_profile.columns == 4 and first_profile.target == 6, "First level must be immediate and easy")
 
     var board := ArrowBoard.new()
     root.add_child(board)
