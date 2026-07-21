@@ -14,7 +14,7 @@ func _run() -> void:
     await process_frame
     assert(game.get_node_or_null("ScreenContent") != null, "Home screen should be created")
     assert(game.get_node_or_null("AbstractBackdrop") != null, "Abstract background should be created")
-    assert(game.get_palette_count_for_test() == 3, "Three selectable palettes should be available")
+    assert(game.get_brand_color_for_test() == Color("#E7F36B"), "The game must keep one signature color")
     assert(game.get_analytics_path_for_test().begins_with("user://"), "Development analytics must stay local")
     var first_profile: Dictionary = game.get_level_profile_for_test(1)
     assert(first_profile.columns == 4 and first_profile.target == 6, "First level must be immediate and easy")
@@ -32,6 +32,7 @@ func _run() -> void:
     var board := ArrowBoard.new()
     root.add_child(board)
     await process_frame
+    assert(board.TILE_COLORS.size() == 1, "Every arrow must use one signature color family")
     for level in [1, 5, 10, 20]:
         var profile: Dictionary = game.get_level_profile_for_test(level)
         board.configure(profile.columns, profile.rows, profile.target, level * 104729)

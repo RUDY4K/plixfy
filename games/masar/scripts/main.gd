@@ -6,56 +6,31 @@ const LocalAnalyticsScript = preload("res://scripts/local_analytics.gd")
 const UI_FONT = preload("res://assets/fonts/Manrope.ttf")
 const SAVE_PATH := "user://masar_progress.cfg"
 
-const PALETTES := [
-    {
-        "name": "Ocean",
-        "bg": Color("#071A2B"),
-        "panel": Color("#0E2638"),
-        "panel_soft": Color("#17364A"),
-        "primary": Color("#5EEAD4"),
-        "accent": Color("#93C5FD"),
-        "text": Color("#F8FAFC"),
-        "muted": Color("#A8BACB"),
-        "ink": Color("#092033"),
-    },
-    {
-        "name": "Aurora",
-        "bg": Color("#101126"),
-        "panel": Color("#1A1C3A"),
-        "panel_soft": Color("#292953"),
-        "primary": Color("#A78BFA"),
-        "accent": Color("#67E8F9"),
-        "text": Color("#FAF8FF"),
-        "muted": Color("#BBB8D2"),
-        "ink": Color("#17162C"),
-    },
-    {
-        "name": "Sunset",
-        "bg": Color("#21131F"),
-        "panel": Color("#332031"),
-        "panel_soft": Color("#482A3E"),
-        "primary": Color("#FB7185"),
-        "accent": Color("#FBBF7A"),
-        "text": Color("#FFF8F5"),
-        "muted": Color("#D3B8C4"),
-        "ink": Color("#2B1724"),
-    },
-]
+const BRAND := {
+    "name": "Signal",
+    "bg": Color("#0B0D10"),
+    "panel": Color("#12161B"),
+    "panel_soft": Color("#1A2027"),
+    "primary": Color("#E7F36B"),
+    "accent": Color("#E7F36B"),
+    "text": Color("#F4F1E8"),
+    "muted": Color("#929992"),
+    "ink": Color("#11140D"),
+}
 
-var BG := Color("#071A2B")
-var PANEL := Color("#0E2638")
-var PANEL_SOFT := Color("#17364A")
-var PRIMARY := Color("#5EEAD4")
-var ACCENT := Color("#93C5FD")
-var TEXT := Color("#F8FAFC")
-var MUTED := Color("#A8BACB")
-var INK := Color("#092033")
+var BG := Color("#0B0D10")
+var PANEL := Color("#12161B")
+var PANEL_SOFT := Color("#1A2027")
+var PRIMARY := Color("#E7F36B")
+var ACCENT := Color("#E7F36B")
+var TEXT := Color("#F4F1E8")
+var MUTED := Color("#929992")
+var INK := Color("#11140D")
 
 var content: Control
 var backdrop: AbstractBackdrop
 var analytics: LocalAnalytics
 var run_timer_label: Label
-var current_palette := 0
 var current_level := 1
 var total_score := 0
 var last_score := 0
@@ -76,13 +51,9 @@ func _ready() -> void:
     analytics = LocalAnalyticsScript.new()
     _load_progress()
     _refresh_daily_state()
-    for argument in OS.get_cmdline_user_args():
-        if argument.begins_with("--palette="):
-            current_palette = clampi(int(argument.trim_prefix("--palette=")), 0, PALETTES.size() - 1)
-    _apply_palette(current_palette)
     _register_daily_return()
     _build_backdrop()
-    analytics.record("session_start", {"palette": current_palette, "level": current_level})
+    analytics.record("session_start", {"visual_system": str(BRAND.name), "level": current_level})
     if "--preview-game" in OS.get_cmdline_user_args():
         _show_game("journey")
     elif "--preview-daily" in OS.get_cmdline_user_args():
@@ -107,31 +78,9 @@ func _build_backdrop() -> void:
     backdrop = AbstractBackdropScript.new()
     backdrop.name = "AbstractBackdrop"
     backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    backdrop.configure(PALETTES[current_palette])
+    backdrop.configure(BRAND)
     add_child(backdrop)
     move_child(backdrop, 0)
-
-
-func _apply_palette(index: int) -> void:
-    current_palette = clampi(index, 0, PALETTES.size() - 1)
-    var palette: Dictionary = PALETTES[current_palette]
-    BG = palette.bg
-    PANEL = palette.panel
-    PANEL_SOFT = palette.panel_soft
-    PRIMARY = palette.primary
-    ACCENT = palette.accent
-    TEXT = palette.text
-    MUTED = palette.muted
-    INK = palette.ink
-    if is_instance_valid(backdrop):
-        backdrop.configure(palette)
-
-
-func _select_palette(index: int) -> void:
-    _apply_palette(index)
-    _save_progress()
-    analytics.record("theme_selected", {"palette": str(PALETTES[current_palette].name)})
-    _show_home()
 
 
 func _reset_content() -> MarginContainer:
@@ -229,17 +178,6 @@ func _show_home() -> void:
     daily_play.pressed.connect(_show_game.bind("daily"))
     daily_row.add_child(daily_play)
 
-    var palette_row := HBoxContainer.new()
-    palette_row.add_theme_constant_override("separation", 12)
-    palette_row.add_child(_left_label("COLOR", 19, MUTED, true))
-    var palette_space := Control.new()
-    palette_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    palette_row.add_child(palette_space)
-    for index in range(PALETTES.size()):
-        palette_row.add_child(_swatch_button(index))
-    column.add_child(palette_row)
-
-
 func _show_game(mode_name := "journey") -> void:
     game_mode = mode_name
     var margin := _reset_content()
@@ -278,7 +216,7 @@ func _show_game(mode_name := "journey") -> void:
     column.add_child(board_frame)
     var board: ArrowBoard = ArrowBoardScript.new()
     board.name = "ArrowBoard"
-    board.apply_palette(PALETTES[current_palette])
+    board.apply_palette(BRAND)
     var profile := _daily_profile_for_day(daily_day) if game_mode == "daily" else _level_profile(current_level)
     board.configure(profile.columns, profile.rows, profile.target, profile.seed)
     board.progress_changed.connect(func(remaining: int, total: int, combo: int, score: int) -> void:
@@ -454,8 +392,8 @@ func get_daily_profile_for_test(day: int) -> Dictionary:
     return _daily_profile_for_day(day)
 
 
-func get_palette_count_for_test() -> int:
-    return PALETTES.size()
+func get_brand_color_for_test() -> Color:
+    return BRAND.primary
 
 
 func get_analytics_path_for_test() -> String:
@@ -524,24 +462,6 @@ func _stat_row(title: String, value: String) -> HBoxContainer:
     row.add_child(space)
     row.add_child(_right_label(value, 28, TEXT, true))
     return row
-
-
-func _swatch_button(index: int) -> Button:
-    var palette: Dictionary = PALETTES[index]
-    var selected := index == current_palette
-    var button := Button.new()
-    button.text = "✓" if selected else ""
-    button.tooltip_text = str(palette.name)
-    button.focus_mode = Control.FOCUS_NONE
-    button.custom_minimum_size = Vector2(66, 52)
-    button.add_theme_font_override("font", _ui_font(700))
-    button.add_theme_font_size_override("font_size", 20)
-    button.add_theme_color_override("font_color", palette.ink)
-    button.add_theme_stylebox_override("normal", _panel_style(palette.primary, Color.WHITE if selected else palette.accent, 10, 4 if selected else 1))
-    button.add_theme_stylebox_override("hover", _panel_style(palette.primary.lightened(0.08), Color.WHITE, 10, 3))
-    button.add_theme_stylebox_override("pressed", _panel_style(palette.primary.darkened(0.08), Color.WHITE, 10, 3))
-    button.pressed.connect(_select_palette.bind(index))
-    return button
 
 
 func _label(value: String, font_size: int, color: Color, bold := false) -> Label:
@@ -663,7 +583,6 @@ func _load_progress() -> void:
     total_score = maxi(0, int(config.get_value("player", "score", 0)))
     return_streak = maxi(1, int(config.get_value("player", "return_streak", 1)))
     last_play_day = int(config.get_value("player", "last_play_day", -1))
-    current_palette = clampi(int(config.get_value("player", "palette", 0)), 0, PALETTES.size() - 1)
     daily_day = int(config.get_value("daily", "day", -1))
     daily_best_score = maxi(0, int(config.get_value("daily", "best_score", 0)))
     daily_best_time_ms = maxi(0, int(config.get_value("daily", "best_time_ms", 0)))
@@ -676,7 +595,6 @@ func _save_progress() -> void:
     config.set_value("player", "score", total_score)
     config.set_value("player", "return_streak", return_streak)
     config.set_value("player", "last_play_day", last_play_day)
-    config.set_value("player", "palette", current_palette)
     config.set_value("daily", "day", daily_day)
     config.set_value("daily", "best_score", daily_best_score)
     config.set_value("daily", "best_time_ms", daily_best_time_ms)

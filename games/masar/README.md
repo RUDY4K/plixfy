@@ -7,7 +7,7 @@ A calm one-touch arrow puzzle prototype designed for quick, satisfying sessions.
 - Procedurally generated levels that always have a complete solution.
 - No life penalty for a blocked tap; the tile only gives gentle feedback.
 - Large touch targets, quick exit effects, flow combos, and a gradual difficulty curve.
-- Three saved visual themes: Ocean, Aurora, and Sunset.
+- One unified Signal visual system: neutral charcoal surfaces and a single signature color.
 - Abstract theme-aware backgrounds with no location-specific photography.
 - Manrope typography bundled under its Open Font License for a consistent handcrafted interface.
 - Instant visual rewards, a progress bar, and a three-diamond performance rating.

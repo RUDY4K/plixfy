@@ -8,11 +8,11 @@ signal hint_used
 
 const DIRECTIONS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
 const ARROWS := ["→", "↓", "←", "↑"]
-var TILE_COLORS: Array[Color] = [Color("#67E8F9"), Color("#5EEAD4"), Color("#93C5FD"), Color("#A7F3D0")]
-var INK := Color("#092033")
-var BOARD_BG := Color("#0E2638")
-var BOARD_LINE := Color("#5EEAD4")
-var FREE_GLOW := Color("#DFFFFA")
+var TILE_COLORS: Array[Color] = [Color("#E7F36B")]
+var INK := Color("#11140D")
+var BOARD_BG := Color("#101419")
+var BOARD_LINE := Color("#E7F36B")
+var FREE_GLOW := Color("#E7F36B")
 
 @export_range(4, 7, 1) var grid_columns := 4
 @export_range(5, 9, 1) var grid_rows := 6
@@ -71,13 +71,10 @@ func configure(columns: int, rows: int, target: int, seed_value: int) -> void:
 func apply_palette(palette: Dictionary) -> void:
     TILE_COLORS.clear()
     TILE_COLORS.append(palette.primary)
-    TILE_COLORS.append(palette.accent)
-    TILE_COLORS.append(palette.primary.lerp(palette.text, 0.28))
-    TILE_COLORS.append(palette.accent.lerp(palette.primary, 0.36))
     INK = palette.ink
     BOARD_BG = palette.panel.darkened(0.18)
     BOARD_LINE = Color(palette.primary, 0.66)
-    FREE_GLOW = palette.text
+    FREE_GLOW = palette.primary
     if is_node_ready():
         _refresh_tile_states()
         queue_redraw()
