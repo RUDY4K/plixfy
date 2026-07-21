@@ -7,11 +7,11 @@ signal blocked_tap
 
 const DIRECTIONS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
 const ARROWS := ["→", "↓", "←", "↑"]
-const TILE_COLORS := [Color("#F3C96B"), Color("#6FD2C7"), Color("#E69A68"), Color("#A9CFC2")]
-const INK := Color("#102039")
-const BOARD_BG := Color("#08172B")
-const BOARD_LINE := Color("#7A5A2B")
-const FREE_GLOW := Color("#FFF0B2")
+var TILE_COLORS: Array[Color] = [Color("#67E8F9"), Color("#5EEAD4"), Color("#93C5FD"), Color("#A7F3D0")]
+var INK := Color("#092033")
+var BOARD_BG := Color("#0E2638")
+var BOARD_LINE := Color("#5EEAD4")
+var FREE_GLOW := Color("#DFFFFA")
 
 @export_range(4, 7, 1) var grid_columns := 4
 @export_range(5, 9, 1) var grid_rows := 6
@@ -65,6 +65,19 @@ func configure(columns: int, rows: int, target: int, seed_value: int) -> void:
     level_seed = seed_value
 
 
+func apply_palette(palette: Dictionary) -> void:
+    TILE_COLORS.clear()
+    for color in palette.tiles:
+        TILE_COLORS.append(color)
+    INK = palette.ink
+    BOARD_BG = palette.panel.darkened(0.18)
+    BOARD_LINE = Color(palette.primary, 0.66)
+    FREE_GLOW = palette.text
+    if is_node_ready():
+        _refresh_tile_states()
+        queue_redraw()
+
+
 func show_hint() -> void:
     for tile in tiles:
         if _is_free(tile):
@@ -73,7 +86,7 @@ func show_hint() -> void:
             tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
             tween.tween_property(tile, "scale", Vector2.ONE * 1.08, 0.14)
             tween.tween_property(tile, "scale", Vector2.ONE, 0.16)
-            _floating_feedback(tile.position + tile.size * 0.5, "هذا المسار مفتوح", Color("#FFF0B2"))
+            _floating_feedback(tile.position + tile.size * 0.5, "OPEN PATH", FREE_GLOW)
             return
 
 
@@ -185,9 +198,9 @@ func _on_tile_pressed(tile: Button) -> void:
     _create_light_trail(tile_center, direction, TILE_COLORS[int(tile.get_meta("color_index"))])
     _spark_burst(tile_center, TILE_COLORS[int(tile.get_meta("color_index"))])
     if combo >= 3:
-        _floating_feedback(tile_center, "انسياب ×%d" % combo, FREE_GLOW)
+        _floating_feedback(tile_center, "FLOW ×%d" % combo, FREE_GLOW)
     else:
-        _floating_feedback(tile_center, "+%d" % gained, Color("#8FE4D8"))
+        _floating_feedback(tile_center, "+%d" % gained, FREE_GLOW)
 
     var distance := maxf(size.x, size.y) * 1.25
     var tween := create_tween().set_parallel(true)

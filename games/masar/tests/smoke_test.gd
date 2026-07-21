@@ -13,6 +13,8 @@ func _run() -> void:
     await process_frame
     await process_frame
     assert(game.get_node_or_null("ScreenContent") != null, "Home screen should be created")
+    assert(game.get_node_or_null("AbstractBackdrop") != null, "Abstract background should be created")
+    assert(game.get_palette_count_for_test() == 3, "Three selectable palettes should be available")
     var first_profile: Dictionary = game.get_level_profile_for_test(1)
     assert(first_profile.columns == 4 and first_profile.target == 6, "First level must be immediate and easy")
 

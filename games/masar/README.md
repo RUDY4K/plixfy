@@ -1,13 +1,14 @@
-# مَسار
+# MASAR
 
-نموذج مستقل للعبة ألغاز عربية بلمسة واحدة، مستوحى من فئة ألعاب إخراج الأسهم المتصدرة مع هوية بصرية عربية وتحسينات للّمس والتجربة.
+A calm one-touch arrow puzzle prototype designed for quick, satisfying sessions.
 
-## ما يميز النموذج
+## Prototype highlights
 
-- مستويات مولدة بخوارزمية تضمن وجود حل كامل.
-- لا تُخصم حياة عند اللمسة الخاطئة؛ القطعة تهتز فقط.
-- مساحات لمس كبيرة، مؤثرات خروج سريعة، Combo وتدرج هادئ.
-- لوحة أكثر راحة للعين تميّز المسارات المفتوحة بإضاءة لطيفة بدل الألوان الصاخبة.
-- أثر ضوء ومكافأة فورية لكل حركة صحيحة، مع شريط تقدّم وتقييم من ثلاث ماسات.
-- رحلة من خمس مراحل وسلسلة عودة يومية تمنح اللاعب سببًا واضحًا للرجوع.
-- لا إعلانات في النموذج الأولي.
+- Procedurally generated levels that always have a complete solution.
+- No life penalty for a blocked tap; the tile only gives gentle feedback.
+- Large touch targets, quick exit effects, flow combos, and a gradual difficulty curve.
+- Three saved visual themes: Ocean, Aurora, and Sunset.
+- Abstract theme-aware backgrounds with no location-specific photography.
+- Instant visual rewards, a progress bar, and a three-diamond performance rating.
+- Five-level journeys and a daily return streak.
+- No ads in the prototype.

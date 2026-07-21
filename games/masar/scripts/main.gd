@@ -1,19 +1,60 @@
 extends Control
 
 const ArrowBoardScript = preload("res://scripts/arrow_board.gd")
-const BACKGROUND: Texture2D = preload("res://assets/hegra.png")
+const AbstractBackdropScript = preload("res://scripts/abstract_backdrop.gd")
 const SAVE_PATH := "user://masar_progress.cfg"
 
-const BG := Color("#061326")
-const PANEL := Color("#0B1D35")
-const PANEL_SOFT := Color("#112B48")
-const GOLD := Color("#F0C568")
-const GOLD_DARK := Color("#8B642F")
-const TURQUOISE := Color("#75D8CD")
-const TEXT := Color("#FFF7E7")
-const MUTED := Color("#B8C6D8")
+const PALETTES := [
+    {
+        "name": "Ocean",
+        "bg": Color("#071A2B"),
+        "panel": Color("#0E2638"),
+        "panel_soft": Color("#17364A"),
+        "primary": Color("#5EEAD4"),
+        "accent": Color("#93C5FD"),
+        "text": Color("#F8FAFC"),
+        "muted": Color("#A8BACB"),
+        "ink": Color("#092033"),
+        "tiles": [Color("#67E8F9"), Color("#5EEAD4"), Color("#93C5FD"), Color("#A7F3D0")],
+    },
+    {
+        "name": "Aurora",
+        "bg": Color("#101126"),
+        "panel": Color("#1A1C3A"),
+        "panel_soft": Color("#292953"),
+        "primary": Color("#A78BFA"),
+        "accent": Color("#67E8F9"),
+        "text": Color("#FAF8FF"),
+        "muted": Color("#BBB8D2"),
+        "ink": Color("#17162C"),
+        "tiles": [Color("#C4B5FD"), Color("#A78BFA"), Color("#67E8F9"), Color("#A5B4FC")],
+    },
+    {
+        "name": "Sunset",
+        "bg": Color("#21131F"),
+        "panel": Color("#332031"),
+        "panel_soft": Color("#482A3E"),
+        "primary": Color("#FB7185"),
+        "accent": Color("#FBBF7A"),
+        "text": Color("#FFF8F5"),
+        "muted": Color("#D3B8C4"),
+        "ink": Color("#2B1724"),
+        "tiles": [Color("#FDA4AF"), Color("#F9A8D4"), Color("#FCD34D"), Color("#C4B5FD")],
+    },
+]
+
+var BG := Color("#071A2B")
+var PANEL := Color("#0E2638")
+var PANEL_SOFT := Color("#17364A")
+var PRIMARY := Color("#5EEAD4")
+var ACCENT := Color("#93C5FD")
+var TEXT := Color("#F8FAFC")
+var MUTED := Color("#A8BACB")
+var INK := Color("#092033")
 
 var content: Control
+var backdrop: AbstractBackdrop
+var current_palette := 0
 var current_level := 1
 var total_score := 0
 var last_score := 0
@@ -24,8 +65,12 @@ var last_play_day := -1
 
 
 func _ready() -> void:
-    layout_direction = Control.LAYOUT_DIRECTION_RTL
+    layout_direction = Control.LAYOUT_DIRECTION_LTR
     _load_progress()
+    for argument in OS.get_cmdline_user_args():
+        if argument.begins_with("--palette="):
+            current_palette = clampi(int(argument.trim_prefix("--palette=")), 0, PALETTES.size() - 1)
+    _apply_palette(current_palette)
     _register_daily_return()
     _build_backdrop()
     if "--preview-game" in OS.get_cmdline_user_args():
@@ -42,27 +87,33 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _build_backdrop() -> void:
-    var background := TextureRect.new()
-    background.texture = BACKGROUND
-    background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-    background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-    background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    background.modulate = Color(0.28, 0.34, 0.44, 1.0)
-    background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    add_child(background)
+    backdrop = AbstractBackdropScript.new()
+    backdrop.name = "AbstractBackdrop"
+    backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    backdrop.configure(PALETTES[current_palette])
+    add_child(backdrop)
+    move_child(backdrop, 0)
 
-    var shade := ColorRect.new()
-    shade.color = Color(0.012, 0.035, 0.078, 0.80)
-    shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    add_child(shade)
 
-    var upper_glow := ColorRect.new()
-    upper_glow.color = Color(0.19, 0.48, 0.50, 0.055)
-    upper_glow.position = Vector2(0, 0)
-    upper_glow.size = Vector2(1080, 420)
-    upper_glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    add_child(upper_glow)
+func _apply_palette(index: int) -> void:
+    current_palette = clampi(index, 0, PALETTES.size() - 1)
+    var palette: Dictionary = PALETTES[current_palette]
+    BG = palette.bg
+    PANEL = palette.panel
+    PANEL_SOFT = palette.panel_soft
+    PRIMARY = palette.primary
+    ACCENT = palette.accent
+    TEXT = palette.text
+    MUTED = palette.muted
+    INK = palette.ink
+    if is_instance_valid(backdrop):
+        backdrop.configure(palette)
+
+
+func _select_palette(index: int) -> void:
+    _apply_palette(index)
+    _save_progress()
+    _show_home()
 
 
 func _reset_content() -> MarginContainer:
@@ -73,14 +124,14 @@ func _reset_content() -> MarginContainer:
     margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     margin.add_theme_constant_override("margin_left", 58)
     margin.add_theme_constant_override("margin_right", 58)
-    margin.add_theme_constant_override("margin_top", 64)
-    margin.add_theme_constant_override("margin_bottom", 64)
+    margin.add_theme_constant_override("margin_top", 48)
+    margin.add_theme_constant_override("margin_bottom", 48)
     margin.modulate.a = 0.0
     add_child(margin)
     content = margin
     var tween := create_tween()
     tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-    tween.tween_property(margin, "modulate:a", 1.0, 0.22)
+    tween.tween_property(margin, "modulate:a", 1.0, 0.20)
     return margin
 
 
@@ -88,37 +139,45 @@ func _show_home() -> void:
     var margin := _reset_content()
     var column := VBoxContainer.new()
     column.alignment = BoxContainer.ALIGNMENT_CENTER
-    column.add_theme_constant_override("separation", 24)
+    column.add_theme_constant_override("separation", 18)
     margin.add_child(column)
 
-    column.add_child(_label("مَسار", 98, GOLD, true))
-    column.add_child(_label("صفِّ ذهنك… وافتح الطريق", 36, MUTED))
+    column.add_child(_label("MASAR", 84, PRIMARY, true))
+    column.add_child(_label("Clear your mind. Open the path.", 31, MUTED))
 
     var journey := HBoxContainer.new()
     journey.alignment = BoxContainer.ALIGNMENT_CENTER
-    journey.add_theme_constant_override("separation", 18)
+    journey.add_theme_constant_override("separation", 16)
     column.add_child(journey)
-    journey.add_child(_pill("رحلة %d" % _journey_number(), GOLD))
-    journey.add_child(_pill("سلسلة العودة %d" % return_streak, TURQUOISE))
+    journey.add_child(_pill("Journey %d" % _journey_number(), PRIMARY))
+    journey.add_child(_pill("Daily streak %d" % return_streak, ACCENT))
+
+    column.add_child(_label("CHOOSE YOUR LOOK", 22, Color(MUTED, 0.86), true))
+    var palette_row := HBoxContainer.new()
+    palette_row.alignment = BoxContainer.ALIGNMENT_CENTER
+    palette_row.add_theme_constant_override("separation", 12)
+    column.add_child(palette_row)
+    for index in range(PALETTES.size()):
+        palette_row.add_child(_palette_button(index))
 
     var card := PanelContainer.new()
-    card.custom_minimum_size = Vector2(0, 680)
-    card.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.09, 0.17, 0.96), Color(0.47, 0.35, 0.18, 0.85), 42, 3))
+    card.custom_minimum_size = Vector2(0, 560)
+    card.add_theme_stylebox_override("panel", _panel_style(Color(PANEL, 0.96), Color(PRIMARY, 0.58), 42, 3))
     column.add_child(card)
     var card_column := VBoxContainer.new()
     card_column.alignment = BoxContainer.ALIGNMENT_CENTER
-    card_column.add_theme_constant_override("separation", 28)
+    card_column.add_theme_constant_override("separation", 24)
     card.add_child(card_column)
-    card_column.add_child(_label("المستوى %d" % current_level, 54, TEXT, true))
-    card_column.add_child(_label("المس النقوش ذات الطريق المفتوح\nواصنع سلسلة انسياب كاملة", 34, MUTED))
+    card_column.add_child(_label("LEVEL %d" % current_level, 50, TEXT, true))
+    card_column.add_child(_label("Tap an arrow with an open path\nand build a perfect flow.", 31, MUTED))
     card_column.add_child(_journey_progress())
-    var play := _button("ابدأ الرحلة", 46, GOLD, BG)
-    play.custom_minimum_size = Vector2(0, 116)
+    var play := _button("PLAY NOW", 44, PRIMARY, INK)
+    play.custom_minimum_size = Vector2(0, 106)
     play.pressed.connect(_show_game)
     card_column.add_child(play)
 
-    column.add_child(_label("%d  مجموع النور" % total_score, 32, TURQUOISE, true))
-    column.add_child(_label("جلسات قصيرة  •  حركة هادئة  •  بلا عقوبة", 26, Color(MUTED, 0.82)))
+    column.add_child(_label("%d  TOTAL GLOW" % total_score, 29, ACCENT, true))
+    column.add_child(_label("Short sessions  •  Calm motion  •  No penalties", 23, Color(MUTED, 0.82)))
 
 
 func _show_game() -> void:
@@ -130,49 +189,49 @@ func _show_game() -> void:
     margin.add_child(column)
 
     var top := HBoxContainer.new()
-    top.layout_direction = Control.LAYOUT_DIRECTION_LTR
     column.add_child(top)
     top.add_child(_round_button("×", 58, _show_home))
     var spacer := Control.new()
     spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top.add_child(spacer)
-    top.add_child(_label("المستوى %d" % current_level, 40, TEXT, true))
+    top.add_child(_label("LEVEL %d" % current_level, 38, TEXT, true))
     var spacer_two := Control.new()
     spacer_two.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top.add_child(spacer_two)
-    var score_label := _label("0  ◈", 32, TURQUOISE, true)
+    var score_label := _label("0  ◆", 30, ACCENT, true)
     score_label.custom_minimum_size.x = 180
     top.add_child(score_label)
 
-    var status_label := _label("اختر نقشًا طريقه مفتوح", 28, MUTED)
+    var status_label := _label("Choose an arrow with an open path", 27, MUTED)
     column.add_child(status_label)
     var progress := _progress_bar()
     column.add_child(progress)
 
     var board_frame := PanelContainer.new()
     board_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
-    board_frame.add_theme_stylebox_override("panel", _panel_style(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 38, 0))
+    board_frame.add_theme_stylebox_override("panel", _panel_style(Color.TRANSPARENT, Color.TRANSPARENT, 38, 0))
     column.add_child(board_frame)
     var board: ArrowBoard = ArrowBoardScript.new()
     board.name = "ArrowBoard"
+    board.apply_palette(PALETTES[current_palette])
     var profile := _level_profile(current_level)
     board.configure(profile.columns, profile.rows, profile.target, current_level * 104729)
     board.progress_changed.connect(func(remaining: int, total: int, combo: int, score: int) -> void:
-        score_label.text = "%d  ◈" % score
+        score_label.text = "%d  ◆" % score
         progress.value = float(total - remaining) / float(maxi(1, total)) * 100.0
-        status_label.text = "باقي %d" % remaining
+        status_label.text = "%d remaining" % remaining
         if combo >= 3:
-            status_label.text = "انسياب ×%d   •   باقي %d" % [combo, remaining]
+            status_label.text = "FLOW ×%d   •   %d remaining" % [combo, remaining]
     )
     board.blocked_tap.connect(func() -> void:
-        status_label.text = "هذا المسار مغلق — اختر سهمًا آخر"
+        status_label.text = "Blocked path — try another arrow"
     )
     board.level_cleared.connect(func(score: int, best_combo: int) -> void:
         _complete_level(score, best_combo, board.get_mistakes())
     )
     board_frame.add_child(board)
 
-    var hint := _button("أظهر مسارًا مفتوحًا", 28, PANEL_SOFT, GOLD)
+    var hint := _button("SHOW AN OPEN PATH", 27, PANEL_SOFT, PRIMARY)
     hint.custom_minimum_size.y = 78
     hint.pressed.connect(board.show_hint)
     column.add_child(hint)
@@ -194,28 +253,28 @@ func _show_result() -> void:
     column.alignment = BoxContainer.ALIGNMENT_CENTER
     column.add_theme_constant_override("separation", 26)
     margin.add_child(column)
-    column.add_child(_label("انسياب رائع", 78, GOLD, true))
+    column.add_child(_label("BEAUTIFUL FLOW", 70, PRIMARY, true))
 
     var medal_count := 3 if last_mistakes == 0 else (2 if last_mistakes <= 2 else 1)
     var medal_text := ""
     for index in range(3):
         medal_text += "◆  " if index < medal_count else "◇  "
-    column.add_child(_label(medal_text.strip_edges(), 64, TURQUOISE))
+    column.add_child(_label(medal_text.strip_edges(), 62, ACCENT))
 
     var card := PanelContainer.new()
     card.custom_minimum_size = Vector2(0, 500)
-    card.add_theme_stylebox_override("panel", _panel_style(PANEL, Color(0.47, 0.35, 0.18, 0.85), 40, 3))
+    card.add_theme_stylebox_override("panel", _panel_style(PANEL, Color(PRIMARY, 0.58), 40, 3))
     column.add_child(card)
     var stats := VBoxContainer.new()
     stats.alignment = BoxContainer.ALIGNMENT_CENTER
     stats.add_theme_constant_override("separation", 27)
     card.add_child(stats)
-    stats.add_child(_label("+%d نور" % last_score, 56, TURQUOISE, true))
-    stats.add_child(_label("أفضل انسياب ×%d" % last_combo, 38, TEXT))
-    stats.add_child(_label(_result_message(medal_count), 30, MUTED))
+    stats.add_child(_label("+%d GLOW" % last_score, 54, ACCENT, true))
+    stats.add_child(_label("Best flow ×%d" % last_combo, 36, TEXT))
+    stats.add_child(_label(_result_message(medal_count), 28, MUTED))
     stats.add_child(_journey_progress())
 
-    var next := _button("المستوى التالي", 44, TURQUOISE, BG)
+    var next := _button("NEXT LEVEL", 42, PRIMARY, INK)
     next.custom_minimum_size.y = 108
     next.pressed.connect(_show_game)
     column.add_child(next)
@@ -233,16 +292,20 @@ func get_level_profile_for_test(level: int) -> Dictionary:
     return _level_profile(level)
 
 
+func get_palette_count_for_test() -> int:
+    return PALETTES.size()
+
+
 func _journey_number() -> int:
     return int((current_level - 1) / 5) + 1
 
 
 func _result_message(medals: int) -> String:
     if medals == 3:
-        return "لمسة مثالية — حافظ على السلسلة"
+        return "Perfect run — keep the streak alive"
     if medals == 2:
-        return "قريب من المثالية — حاول جمع ثلاث ماسات"
-    return "أكملت الطريق — الجولة القادمة ستكون أفضل"
+        return "So close — collect all three diamonds"
+    return "Path cleared — the next run will be better"
 
 
 func _journey_progress() -> VBoxContainer:
@@ -250,7 +313,7 @@ func _journey_progress() -> VBoxContainer:
     wrap.custom_minimum_size = Vector2(640, 72)
     wrap.add_theme_constant_override("separation", 8)
     var within := (current_level - 1) % 5
-    wrap.add_child(_label("تقدّم الرحلة  %d من 5" % within, 24, MUTED))
+    wrap.add_child(_label("JOURNEY PROGRESS  %d / 5" % within, 22, MUTED))
     var bar := _progress_bar()
     bar.value = float(within) / 5.0 * 100.0
     wrap.add_child(bar)
@@ -263,16 +326,33 @@ func _progress_bar() -> ProgressBar:
     bar.show_percentage = false
     bar.min_value = 0
     bar.max_value = 100
-    bar.add_theme_stylebox_override("background", _bar_style(Color(0.035, 0.09, 0.17, 0.86)))
-    bar.add_theme_stylebox_override("fill", _bar_style(TURQUOISE))
+    bar.add_theme_stylebox_override("background", _bar_style(Color(PANEL_SOFT, 0.78)))
+    bar.add_theme_stylebox_override("fill", _bar_style(PRIMARY))
     return bar
 
 
 func _pill(value: String, color: Color) -> Label:
-    var pill := _label(value, 25, color, true)
-    pill.custom_minimum_size = Vector2(280, 62)
-    pill.add_theme_stylebox_override("normal", _panel_style(Color(0.035, 0.09, 0.17, 0.90), Color(color, 0.46), 24, 2))
+    var pill := _label(value, 23, color, true)
+    pill.custom_minimum_size = Vector2(280, 58)
+    pill.add_theme_stylebox_override("normal", _panel_style(Color(PANEL, 0.88), Color(color, 0.45), 24, 2))
     return pill
+
+
+func _palette_button(index: int) -> Button:
+    var palette: Dictionary = PALETTES[index]
+    var selected := index == current_palette
+    var button := Button.new()
+    button.text = ("✓  " if selected else "") + str(palette.name)
+    button.focus_mode = Control.FOCUS_NONE
+    button.custom_minimum_size = Vector2(220, 72)
+    button.add_theme_font_size_override("font_size", 24)
+    button.add_theme_color_override("font_color", palette.ink)
+    button.add_theme_color_override("font_pressed_color", palette.ink)
+    button.add_theme_stylebox_override("normal", _panel_style(palette.primary, Color.WHITE if selected else palette.accent, 24, 4 if selected else 2))
+    button.add_theme_stylebox_override("hover", _panel_style(palette.primary.lightened(0.06), Color.WHITE, 24, 4))
+    button.add_theme_stylebox_override("pressed", _panel_style(palette.primary.darkened(0.08), Color.WHITE, 24, 4))
+    button.pressed.connect(_select_palette.bind(index))
+    return button
 
 
 func _label(value: String, font_size: int, color: Color, bold := false) -> Label:
@@ -285,7 +365,7 @@ func _label(value: String, font_size: int, color: Color, bold := false) -> Label
     label.add_theme_color_override("font_color", color)
     if bold:
         label.add_theme_constant_override("outline_size", 2)
-        label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.42))
+        label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.34))
     return label
 
 
@@ -297,14 +377,14 @@ func _button(value: String, font_size: int, background: Color, foreground: Color
     button.add_theme_font_size_override("font_size", font_size)
     button.add_theme_color_override("font_color", foreground)
     button.add_theme_color_override("font_pressed_color", foreground.darkened(0.10))
-    button.add_theme_stylebox_override("normal", _panel_style(background, Color(GOLD_DARK, 0.78), 30, 3))
-    button.add_theme_stylebox_override("hover", _panel_style(background.lightened(0.06), GOLD, 30, 3))
-    button.add_theme_stylebox_override("pressed", _panel_style(background.darkened(0.06), TURQUOISE, 30, 4))
+    button.add_theme_stylebox_override("normal", _panel_style(background, Color(ACCENT, 0.48), 30, 3))
+    button.add_theme_stylebox_override("hover", _panel_style(background.lightened(0.06), Color.WHITE, 30, 3))
+    button.add_theme_stylebox_override("pressed", _panel_style(background.darkened(0.06), ACCENT, 30, 4))
     return button
 
 
 func _round_button(value: String, font_size: int, action: Callable) -> Button:
-    var button := _button(value, font_size, PANEL, GOLD)
+    var button := _button(value, font_size, PANEL, PRIMARY)
     button.custom_minimum_size = Vector2(82, 82)
     button.pressed.connect(action)
     return button
@@ -350,6 +430,7 @@ func _load_progress() -> void:
     total_score = maxi(0, int(config.get_value("player", "score", 0)))
     return_streak = maxi(1, int(config.get_value("player", "return_streak", 1)))
     last_play_day = int(config.get_value("player", "last_play_day", -1))
+    current_palette = clampi(int(config.get_value("player", "palette", 0)), 0, PALETTES.size() - 1)
 
 
 func _save_progress() -> void:
@@ -358,4 +439,5 @@ func _save_progress() -> void:
     config.set_value("player", "score", total_score)
     config.set_value("player", "return_streak", return_streak)
     config.set_value("player", "last_play_day", last_play_day)
+    config.set_value("player", "palette", current_palette)
     config.save(SAVE_PATH)
