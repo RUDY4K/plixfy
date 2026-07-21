@@ -1,8 +1,19 @@
 extends Control
 
 const PuzzleBoardScript = preload("res://scripts/puzzle_board.gd")
-const LEVEL_ART: Texture2D = preload("res://assets/levels/hegra_01.png")
 const SAVE_PATH := "user://progress.cfg"
+const LEVELS := [
+    {"name": "الحِجر", "texture": preload("res://assets/levels/hegra_01.png")},
+    {"name": "الدرعية", "texture": preload("res://assets/levels/diriyah_02.png")},
+    {"name": "جدة التاريخية", "texture": preload("res://assets/levels/jeddah_03.png")},
+    {"name": "رجال ألمع", "texture": preload("res://assets/levels/rijal_almaa_04.png")},
+    {"name": "جزر فرسان", "texture": preload("res://assets/levels/farasan_05.png")},
+    {"name": "واحة الأحساء", "texture": preload("res://assets/levels/alahsa_06.png")},
+    {"name": "حافة العالم", "texture": preload("res://assets/levels/edge_world_07.png")},
+    {"name": "قصر المصمك", "texture": preload("res://assets/levels/masmak_08.png")},
+    {"name": "ورد الطائف", "texture": preload("res://assets/levels/taif_09.png")},
+    {"name": "جبال السودة", "texture": preload("res://assets/levels/soudah_10.png")},
+]
 
 const BG := Color("#071225")
 const PANEL := Color("#0B1A32")
@@ -14,8 +25,11 @@ const TEXT := Color("#FFF7E7")
 const MUTED := Color("#B9C4D8")
 
 var content: Control
+var backdrop: TextureRect
 var currency := 720
 var current_level := 1
+var selected_level := 0
+var completed_level := 0
 var last_reward := 120
 var reward_doubled := false
 
@@ -23,6 +37,7 @@ var reward_doubled := false
 func _ready() -> void:
     layout_direction = Control.LAYOUT_DIRECTION_RTL
     _load_progress()
+    selected_level = clampi(current_level - 1, 0, LEVELS.size() - 1)
     _build_backdrop()
     if "--preview-game" in OS.get_cmdline_user_args():
         _show_game()
@@ -39,13 +54,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _build_backdrop() -> void:
     var background := TextureRect.new()
-    background.texture = LEVEL_ART
+    background.texture = _level_texture(selected_level)
     background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
     background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     background.modulate = Color(0.45, 0.48, 0.58, 1.0)
     background.mouse_filter = Control.MOUSE_FILTER_IGNORE
     add_child(background)
+    backdrop = background
 
     var shade := ColorRect.new()
     shade.color = Color(0.015, 0.035, 0.09, 0.72)
@@ -70,6 +86,7 @@ func _reset_content() -> MarginContainer:
 
 
 func _show_home() -> void:
+    _set_backdrop(_level_texture(selected_level))
     var margin := _reset_content()
     var column := VBoxContainer.new()
     column.add_theme_constant_override("separation", 32)
@@ -94,7 +111,7 @@ func _show_home() -> void:
     column.add_child(subtitle)
 
     var card := PanelContainer.new()
-    card.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
     card.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.08, 0.16, 0.94), GOLD, 36, 5))
     column.add_child(card)
 
@@ -102,7 +119,7 @@ func _show_home() -> void:
     card_column.add_theme_constant_override("separation", 24)
     card.add_child(card_column)
 
-    var daily := _label("تحدي اليوم", 50, GOLD, true)
+    var daily := _label(LEVELS[selected_level].name, 50, GOLD, true)
     daily.add_theme_constant_override("outline_size", 8)
     daily.add_theme_color_override("font_outline_color", BG)
     card_column.add_child(daily)
@@ -112,12 +129,12 @@ func _show_home() -> void:
     preview_frame.add_theme_stylebox_override("panel", _panel_style(PANEL, TURQUOISE.darkened(0.2), 24, 4))
     card_column.add_child(preview_frame)
     var preview := TextureRect.new()
-    preview.texture = LEVEL_ART
+    preview.texture = _level_texture(selected_level)
     preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
     preview_frame.add_child(preview)
 
-    var progress := _label("◆  ◆  ◇  ◇  ◇", 36, GOLD)
+    var progress := _label("المرحلة %d من %d" % [selected_level + 1, LEVELS.size()], 34, GOLD)
     card_column.add_child(progress)
 
     var play := _button("ابدأ", 52, GOLD, BG)
@@ -129,10 +146,23 @@ func _show_home() -> void:
     chapters.alignment = BoxContainer.ALIGNMENT_CENTER
     chapters.add_theme_constant_override("separation", 22)
     column.add_child(chapters)
-    for index in range(5):
-        var marker := _round_button(str(index + 1) if index <= current_level else "🔒", 54, func() -> void: pass)
-        marker.disabled = index > current_level
-        chapters.add_child(marker)
+    var level_grid := GridContainer.new()
+    level_grid.columns = 5
+    level_grid.add_theme_constant_override("h_separation", 16)
+    level_grid.add_theme_constant_override("v_separation", 14)
+    chapters.add_child(level_grid)
+    for index in range(LEVELS.size()):
+        var unlocked := index < current_level
+        var marker := _button(
+            str(index + 1) if unlocked else "🔒",
+            38,
+            TURQUOISE if index == selected_level else PANEL,
+            BG if index == selected_level else GOLD
+        )
+        marker.custom_minimum_size = Vector2(140, 74)
+        marker.disabled = not unlocked
+        marker.pressed.connect(_select_level.bind(index))
+        level_grid.add_child(marker)
 
     var nav := HBoxContainer.new()
     nav.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -143,9 +173,11 @@ func _show_home() -> void:
 
 
 func _show_game() -> void:
+    _set_backdrop(_level_texture(selected_level))
     var margin := _reset_content()
     margin.add_theme_constant_override("margin_top", 46)
     var column := VBoxContainer.new()
+    column.alignment = BoxContainer.ALIGNMENT_CENTER
     column.add_theme_constant_override("separation", 28)
     margin.add_child(column)
 
@@ -156,7 +188,7 @@ func _show_game() -> void:
     var spacer := Control.new()
     spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top.add_child(spacer)
-    top.add_child(_label("المستوى %d" % current_level, 42, GOLD, true))
+    top.add_child(_label("المستوى %d" % (selected_level + 1), 42, GOLD, true))
     var spacer_two := Control.new()
     spacer_two.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     top.add_child(spacer_two)
@@ -164,10 +196,10 @@ func _show_game() -> void:
     moves_label.custom_minimum_size.x = 170
     top.add_child(moves_label)
 
-    column.add_child(_label("حرّك القطعة نحو الفراغ، واضغط البعيدة لتدويرها", 30, MUTED))
+    column.add_child(_label(LEVELS[selected_level].name + " — حرّك القطعة نحو الفراغ واضغط البعيدة لتدويرها", 28, MUTED))
 
     var board_frame := PanelContainer.new()
-    board_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    board_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
     board_frame.add_theme_stylebox_override("panel", _panel_style(Color(0.02, 0.05, 0.11, 0.94), GOLD_DARK, 30, 5))
     column.add_child(board_frame)
 
@@ -177,7 +209,8 @@ func _show_game() -> void:
     board_frame.add_child(aspect)
     var board: PuzzleBoard = PuzzleBoardScript.new()
     board.name = "PuzzleBoard"
-    board.puzzle_texture = LEVEL_ART
+    board.puzzle_texture = _level_texture(selected_level)
+    board.difficulty = selected_level + 1
     board.moves_changed.connect(func(value: int) -> void: moves_label.text = "%d حركة" % value)
     board.puzzle_solved.connect(_complete_level)
     aspect.add_child(board)
@@ -198,15 +231,19 @@ func _show_game() -> void:
 
 
 func _complete_level() -> void:
-    last_reward = 120
+    completed_level = selected_level
+    last_reward = 80 + (completed_level + 1) * 20
     reward_doubled = false
     currency += last_reward
-    current_level += 1
+    if completed_level + 1 >= current_level and current_level < LEVELS.size():
+        current_level += 1
+    selected_level = mini(completed_level + 1, LEVELS.size() - 1)
     _save_progress()
     _show_result()
 
 
 func _show_result() -> void:
+    _set_backdrop(_level_texture(completed_level))
     var margin := _reset_content()
     var column := VBoxContainer.new()
     column.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -222,7 +259,7 @@ func _show_result() -> void:
     art_frame.add_theme_stylebox_override("panel", _panel_style(PANEL, GOLD, 30, 6))
     column.add_child(art_frame)
     var art := TextureRect.new()
-    art.texture = LEVEL_ART
+    art.texture = _level_texture(completed_level)
     art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
     art_frame.add_child(art)
@@ -232,7 +269,7 @@ func _show_result() -> void:
 
     var next := _button("التالي", 48, TURQUOISE, BG)
     next.custom_minimum_size.y = 112
-    next.pressed.connect(_show_home)
+    next.pressed.connect(_show_game if completed_level < LEVELS.size() - 1 else _show_home)
     column.add_child(next)
 
     var double_reward := _button("▶ ضاعف المكافأة", 32, PANEL_SOFT, GOLD)
@@ -247,6 +284,24 @@ func _show_result() -> void:
         double_reward.disabled = true
     )
     column.add_child(double_reward)
+
+
+func _select_level(index: int) -> void:
+    selected_level = clampi(index, 0, current_level - 1)
+    _show_home()
+
+
+func _level_texture(index: int) -> Texture2D:
+    return LEVELS[clampi(index, 0, LEVELS.size() - 1)].texture
+
+
+func _set_backdrop(texture: Texture2D) -> void:
+    if is_instance_valid(backdrop):
+        backdrop.texture = texture
+
+
+func get_level_count() -> int:
+    return LEVELS.size()
 
 
 func _currency_badge() -> PanelContainer:
@@ -314,7 +369,7 @@ func _load_progress() -> void:
     if config.load(SAVE_PATH) != OK:
         return
     currency = int(config.get_value("player", "currency", 720))
-    current_level = int(config.get_value("player", "level", 1))
+    current_level = clampi(int(config.get_value("player", "level", 1)), 1, LEVELS.size())
 
 
 func _save_progress() -> void:

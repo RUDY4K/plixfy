@@ -11,6 +11,7 @@ const TURQUOISE := Color("#1FD6D0")
 const BOARD_BG := Color("#071225")
 
 @export var puzzle_texture: Texture2D
+@export_range(1, 10, 1) var difficulty := 1
 
 var order: Array[int] = []
 var rotations: Array[int] = []
@@ -41,7 +42,8 @@ func reset_and_shuffle() -> void:
     order.append(-1)
 
     var previous_empty := -1
-    for _step in range(90):
+    var shuffle_steps := 24 + difficulty * 8
+    for _step in range(shuffle_steps):
         var empty := order.find(-1)
         var neighbours := _neighbours(empty).filter(func(pos: int) -> bool: return pos != previous_empty)
         if neighbours.is_empty():
@@ -51,8 +53,9 @@ func reset_and_shuffle() -> void:
         order[empty] = order[chosen]
         order[chosen] = -1
 
+    var rotation_chance := minf(1.0, 0.15 + difficulty * 0.085)
     for tile in range(TILE_COUNT - 1):
-        rotations[tile] = randi_range(0, 3)
+        rotations[tile] = randi_range(1, 3) if randf() <= rotation_chance else 0
     if _is_solved():
         rotations[0] = 1
 

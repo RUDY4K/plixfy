@@ -13,6 +13,7 @@ func _run() -> void:
     await process_frame
     await process_frame
     assert(game.get_node_or_null("ScreenContent") != null, "Home screen should be created")
+    assert(game.get_level_count() == 10, "The first chapter must contain ten distinct levels")
 
     var board := PuzzleBoard.new()
     board.puzzle_texture = load("res://assets/levels/hegra_01.png")
