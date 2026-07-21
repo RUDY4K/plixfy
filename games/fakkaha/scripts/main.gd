@@ -3,16 +3,16 @@ extends Control
 const PuzzleBoardScript = preload("res://scripts/puzzle_board.gd")
 const SAVE_PATH := "user://progress.cfg"
 const LEVELS := [
-    {"name": "الحِجر", "texture": preload("res://assets/levels/hegra_01.png")},
-    {"name": "الدرعية", "texture": preload("res://assets/levels/diriyah_02.png")},
-    {"name": "جدة التاريخية", "texture": preload("res://assets/levels/jeddah_03.png")},
-    {"name": "رجال ألمع", "texture": preload("res://assets/levels/rijal_almaa_04.png")},
-    {"name": "جزر فرسان", "texture": preload("res://assets/levels/farasan_05.png")},
-    {"name": "واحة الأحساء", "texture": preload("res://assets/levels/alahsa_06.png")},
-    {"name": "حافة العالم", "texture": preload("res://assets/levels/edge_world_07.png")},
-    {"name": "قصر المصمك", "texture": preload("res://assets/levels/masmak_08.png")},
-    {"name": "ورد الطائف", "texture": preload("res://assets/levels/taif_09.png")},
-    {"name": "جبال السودة", "texture": preload("res://assets/levels/soudah_10.png")},
+    {"name": "الحِجر", "texture": preload("res://assets/levels/hegra_01.png"), "grid": 3, "shuffle": 3, "rotations": 0},
+    {"name": "الدرعية", "texture": preload("res://assets/levels/diriyah_02.png"), "grid": 3, "shuffle": 6, "rotations": 0},
+    {"name": "جدة التاريخية", "texture": preload("res://assets/levels/jeddah_03.png"), "grid": 3, "shuffle": 10, "rotations": 1},
+    {"name": "رجال ألمع", "texture": preload("res://assets/levels/rijal_almaa_04.png"), "grid": 3, "shuffle": 14, "rotations": 2},
+    {"name": "جزر فرسان", "texture": preload("res://assets/levels/farasan_05.png"), "grid": 4, "shuffle": 8, "rotations": 0},
+    {"name": "واحة الأحساء", "texture": preload("res://assets/levels/alahsa_06.png"), "grid": 4, "shuffle": 14, "rotations": 1},
+    {"name": "حافة العالم", "texture": preload("res://assets/levels/edge_world_07.png"), "grid": 4, "shuffle": 22, "rotations": 2},
+    {"name": "قصر المصمك", "texture": preload("res://assets/levels/masmak_08.png"), "grid": 4, "shuffle": 32, "rotations": 4},
+    {"name": "ورد الطائف", "texture": preload("res://assets/levels/taif_09.png"), "grid": 4, "shuffle": 46, "rotations": 7},
+    {"name": "جبال السودة", "texture": preload("res://assets/levels/soudah_10.png"), "grid": 4, "shuffle": 60, "rotations": 10},
 ]
 
 const BG := Color("#071225")
@@ -196,7 +196,12 @@ func _show_game() -> void:
     moves_label.custom_minimum_size.x = 170
     top.add_child(moves_label)
 
-    column.add_child(_label(LEVELS[selected_level].name + " — حرّك القطعة نحو الفراغ واضغط البعيدة لتدويرها", 28, MUTED))
+    var guidance := "اضغط القطعة المضيئة لتحريكها نحو الفراغ"
+    if selected_level == 1:
+        guidance = "رتّب الصورة بتحريك القطع المجاورة نحو الفراغ"
+    elif selected_level >= 2:
+        guidance = "حرّك القطع، واضغط القطعة البعيدة لتدويرها"
+    column.add_child(_label(LEVELS[selected_level].name + " — " + guidance, 28, MUTED))
 
     var board_frame := PanelContainer.new()
     board_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -210,7 +215,10 @@ func _show_game() -> void:
     var board: PuzzleBoard = PuzzleBoardScript.new()
     board.name = "PuzzleBoard"
     board.puzzle_texture = _level_texture(selected_level)
-    board.difficulty = selected_level + 1
+    board.grid_size = int(LEVELS[selected_level].grid)
+    board.shuffle_steps = int(LEVELS[selected_level].shuffle)
+    board.rotated_tile_count = int(LEVELS[selected_level].rotations)
+    board.tutorial_enabled = selected_level == 0
     board.moves_changed.connect(func(value: int) -> void: moves_label.text = "%d حركة" % value)
     board.puzzle_solved.connect(_complete_level)
     aspect.add_child(board)
