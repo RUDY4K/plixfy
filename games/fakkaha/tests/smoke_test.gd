@@ -17,7 +17,6 @@ func _run() -> void:
 
     var board := PuzzleBoard.new()
     board.puzzle_texture = load("res://assets/levels/hegra_01.png")
-    board.rotated_tile_count = 2
     root.add_child(board)
     await process_frame
     assert(board.get_tile_order().size() == 16, "Puzzle must have 16 board positions")
@@ -32,12 +31,10 @@ func _run() -> void:
     beginner.puzzle_texture = load("res://assets/levels/hegra_01.png")
     beginner.grid_size = 3
     beginner.shuffle_steps = 3
-    beginner.rotated_tile_count = 0
     beginner.tutorial_enabled = true
     root.add_child(beginner)
     await process_frame
     assert(beginner.get_tile_order().size() == 9, "The first level must use a 3 by 3 board")
-    assert(beginner.get_rotated_tile_count() == 0, "The first level must not rotate any tiles")
     assert(beginner.tutorial_position >= 0, "The first level must highlight a helpful opening move")
     print("FAKKAHA_SMOKE_OK")
     quit(0)

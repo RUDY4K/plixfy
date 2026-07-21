@@ -11,7 +11,6 @@ const BOARD_BG := Color("#071225")
 @export var puzzle_texture: Texture2D
 @export_range(3, 4, 1) var grid_size := 4
 @export_range(1, 100, 1) var shuffle_steps := 24
-@export_range(0, 15, 1) var rotated_tile_count := 0
 @export var tutorial_enabled := false
 
 var order: Array[int] = []
@@ -59,14 +58,6 @@ func reset_and_shuffle() -> void:
         previous_empty = empty
         order[empty] = order[chosen]
         order[chosen] = -1
-
-    var rotation_candidates: Array[int] = []
-    for tile in range(tile_count - 1):
-        rotation_candidates.append(tile)
-    rotation_candidates.shuffle()
-    for index in range(mini(rotated_tile_count, rotation_candidates.size())):
-        var tile := rotation_candidates[index]
-        rotations[tile] = randi_range(1, 3)
 
     if _is_solved():
         var empty := order.find(-1)
@@ -120,14 +111,6 @@ func get_tile_order() -> Array[int]:
     return order.duplicate()
 
 
-func get_rotated_tile_count() -> int:
-    var count := 0
-    for rotation in rotations:
-        if rotation != 0:
-            count += 1
-    return count
-
-
 func _gui_input(event: InputEvent) -> void:
     if locked:
         return
@@ -151,17 +134,17 @@ func _press_at(point: Vector2) -> void:
     if order[position] < 0:
         return
 
+    var empty := order.find(-1)
+    if position not in _neighbours(empty):
+        _pulse(empty)
+        Input.vibrate_handheld(10)
+        return
+
     tutorial_position = -1
     _remember_state()
-    var empty := order.find(-1)
-    if position in _neighbours(empty):
-        order[empty] = order[position]
-        order[position] = -1
-        _finish_action(empty)
-    else:
-        var tile := order[position]
-        rotations[tile] = (rotations[tile] + 1) % 4
-        _finish_action(position)
+    order[empty] = order[position]
+    order[position] = -1
+    _finish_action(empty)
 
 
 func _remember_state() -> void:
