@@ -7,7 +7,7 @@ A calm one-touch arrow puzzle prototype designed for quick, satisfying sessions.
 - Procedurally generated levels that always have a complete solution.
 - No life penalty for a blocked tap; the tile only gives gentle feedback.
 - Large touch targets, quick exit effects, flow combos, and a gradual difficulty curve.
-- A warm paper interface with one signature color per level, cycling across five handcrafted stage themes.
+- An immersive level portal and one signature color per stage, cycling across five handcrafted game themes.
 - Abstract theme-aware backgrounds with no location-specific photography.
 - Manrope typography bundled under its Open Font License for a consistent handcrafted interface.
 - Instant visual rewards, a progress bar, and a three-diamond performance rating.

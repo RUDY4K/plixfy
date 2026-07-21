@@ -7,26 +7,24 @@ const UI_FONT = preload("res://assets/fonts/Manrope.ttf")
 const SAVE_PATH := "user://masar_progress.cfg"
 
 const LEVEL_THEMES := [
-    {"name": "Cobalt", "primary": Color("#315CF5"), "ink": Color.WHITE},
-    {"name": "Coral", "primary": Color("#D94F45"), "ink": Color.WHITE},
-    {"name": "Forest", "primary": Color("#168866"), "ink": Color.WHITE},
-    {"name": "Violet", "primary": Color("#7652D6"), "ink": Color.WHITE},
-    {"name": "Ochre", "primary": Color("#B66D00"), "ink": Color.WHITE},
+    {"name": "Cobalt", "primary": Color("#5B7CFF")},
+    {"name": "Coral", "primary": Color("#FF6B5F")},
+    {"name": "Forest", "primary": Color("#35C997")},
+    {"name": "Violet", "primary": Color("#A57AF5")},
+    {"name": "Amber", "primary": Color("#F4B84A")},
 ]
-const PAPER := Color("#F2EFE7")
-const SURFACE := Color("#E5E1D7")
-const SURFACE_STRONG := Color("#D8D3C7")
-const TYPE := Color("#17191C")
-const TYPE_MUTED := Color("#6F716D")
+const TYPE := Color("#F8FAFC")
+const TYPE_MUTED := Color("#B9C2CF")
+const DARK_INK := Color("#10131A")
 
-var BG := PAPER
-var PANEL := SURFACE
-var PANEL_SOFT := SURFACE_STRONG
-var PRIMARY := Color("#315CF5")
-var ACCENT := Color("#315CF5")
+var BG := Color("#101735")
+var PANEL := Color("#172249")
+var PANEL_SOFT := Color("#213268")
+var PRIMARY := Color("#5B7CFF")
+var ACCENT := Color("#5B7CFF")
 var TEXT := TYPE
 var MUTED := TYPE_MUTED
-var INK := Color.WHITE
+var INK := DARK_INK
 var active_theme: Dictionary = LEVEL_THEMES[0]
 
 var content: Control
@@ -90,12 +88,13 @@ func _build_backdrop() -> void:
 
 func _theme_for_level(level: int) -> Dictionary:
     var theme: Dictionary = LEVEL_THEMES[posmod(level - 1, LEVEL_THEMES.size())].duplicate()
-    theme.bg = PAPER
-    theme.panel = SURFACE
-    theme.panel_soft = SURFACE_STRONG
+    theme.bg = theme.primary.darkened(0.76)
+    theme.panel = theme.primary.darkened(0.66)
+    theme.panel_soft = theme.primary.darkened(0.54)
     theme.accent = theme.primary
     theme.text = TYPE
     theme.muted = TYPE_MUTED
+    theme.ink = DARK_INK
     return theme
 
 
@@ -145,65 +144,64 @@ func _show_home() -> void:
     margin.add_child(column)
 
     var header := HBoxContainer.new()
-    header.add_child(_left_label("MASAR", 42, TEXT, true))
+    header.add_child(_left_label("MASAR", 46, TEXT, true))
     var header_space := Control.new()
     header_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     header.add_child(header_space)
-    header.add_child(_right_label("%d GLOW" % total_score, 20, MUTED, true))
+    header.add_child(_right_label("◆  %d     STREAK  %d" % [total_score, return_streak], 20, TEXT, true))
     column.add_child(header)
-    column.add_child(_vertical_space(62))
-    column.add_child(_left_label("JOURNEY %02d  /  ROUTE %02d" % [_journey_number(), (current_level - 1) % 5 + 1], 19, MUTED, true))
-    column.add_child(_vertical_space(12))
-    column.add_child(_left_label("Make one\nclear move.", 70, TEXT, true))
-    column.add_child(_vertical_space(36))
+    column.add_child(_vertical_space(38))
+    column.add_child(_label("JOURNEY %02d" % _journey_number(), 21, MUTED, true))
 
-    var level_block := PanelContainer.new()
-    level_block.custom_minimum_size.y = 470
-    level_block.add_theme_stylebox_override("panel", _panel_style(PRIMARY, Color.TRANSPARENT, 6, 0))
-    column.add_child(level_block)
-    var level_column := VBoxContainer.new()
-    level_column.add_theme_constant_override("separation", 12)
-    level_block.add_child(level_column)
-    var level_meta := HBoxContainer.new()
-    level_meta.add_child(_left_label("NEXT LEVEL", 19, Color(INK, 0.76), true))
-    var level_meta_space := Control.new()
-    level_meta_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    level_meta.add_child(level_meta_space)
-    level_meta.add_child(_right_label("%02d / 05" % ((current_level - 1) % 5 + 1), 19, Color(INK, 0.76), true))
-    level_column.add_child(level_meta)
-    var number_row := HBoxContainer.new()
-    number_row.add_child(_left_label("%02d" % current_level, 112, INK, true))
-    var number_space := Control.new()
-    number_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    number_row.add_child(number_space)
-    number_row.add_child(_right_label("→", 82, INK, false))
-    level_column.add_child(number_row)
-    level_column.add_child(_journey_marks())
-    var play := _button("PLAY LEVEL %02d" % current_level, 31, TEXT, BG)
-    play.custom_minimum_size.y = 92
+    var portal_wrap := CenterContainer.new()
+    portal_wrap.custom_minimum_size.y = 690
+    column.add_child(portal_wrap)
+    var outer_portal := PanelContainer.new()
+    outer_portal.custom_minimum_size = Vector2(620, 620)
+    outer_portal.add_theme_stylebox_override("panel", _panel_style(Color(PRIMARY, 0.10), Color(PRIMARY, 0.34), 310, 8))
+    portal_wrap.add_child(outer_portal)
+    var portal_center := CenterContainer.new()
+    outer_portal.add_child(portal_center)
+    var inner_portal := PanelContainer.new()
+    inner_portal.custom_minimum_size = Vector2(470, 470)
+    inner_portal.add_theme_stylebox_override("panel", _panel_style(PRIMARY, Color(TEXT, 0.52), 235, 8))
+    portal_center.add_child(inner_portal)
+    var portal_copy := VBoxContainer.new()
+    portal_copy.alignment = BoxContainer.ALIGNMENT_CENTER
+    portal_copy.add_theme_constant_override("separation", 2)
+    portal_copy.add_child(_label("LEVEL", 21, Color(INK, 0.70), true))
+    portal_copy.add_child(_label("%02d" % current_level, 136, INK, true))
+    portal_copy.add_child(_label(str(active_theme.name).to_upper(), 19, Color(INK, 0.70), true))
+    inner_portal.add_child(portal_copy)
+
+    column.add_child(_level_nodes())
+    column.add_child(_vertical_space(28))
+    var play := _button("PLAY  ▶", 38, PRIMARY, INK)
+    play.custom_minimum_size.y = 110
     play.pressed.connect(_show_game.bind("journey"))
-    level_column.add_child(play)
+    column.add_child(play)
+    var event_space := Control.new()
+    event_space.custom_minimum_size.y = 30
+    event_space.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    column.add_child(event_space)
 
-    var home_fill := Control.new()
-    home_fill.size_flags_vertical = Control.SIZE_EXPAND_FILL
-    column.add_child(home_fill)
-    var daily_rule := HSeparator.new()
-    daily_rule.add_theme_stylebox_override("separator", _bar_style(Color(TEXT, 0.42)))
-    column.add_child(daily_rule)
-    column.add_child(_vertical_space(22))
+    var daily_event := PanelContainer.new()
+    daily_event.custom_minimum_size.y = 170
+    daily_event.add_theme_stylebox_override("panel", _panel_style(Color(PANEL, 0.94), Color(PRIMARY, 0.26), 18, 3))
+    column.add_child(daily_event)
     var daily_row := HBoxContainer.new()
     daily_row.add_theme_constant_override("separation", 24)
-    column.add_child(daily_row)
+    daily_event.add_child(daily_row)
     var daily_copy := VBoxContainer.new()
     daily_copy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     daily_copy.add_theme_constant_override("separation", 7)
-    daily_copy.add_child(_left_label("DAILY", 18, MUTED, true))
-    daily_copy.add_child(_left_label(_daily_date_text(), 35, TEXT, true))
+    daily_copy.add_child(_left_label("⚡  DAILY CHALLENGE", 20, PRIMARY, true))
+    daily_copy.add_child(_left_label(_daily_date_text(), 34, TEXT, true))
     var best_text := "NO RUN YET" if daily_best_score <= 0 else "BEST  %s  •  %d" % [_format_time(daily_best_time_ms), daily_best_score]
     daily_copy.add_child(_left_label(best_text, 19, MUTED))
     daily_row.add_child(daily_copy)
-    var daily_play := _button("DAILY  →", 23, PRIMARY, INK)
-    daily_play.custom_minimum_size = Vector2(260, 116)
+    var daily_play := _button("GO", 28, PRIMARY, INK)
+    daily_play.custom_minimum_size = Vector2(190, 112)
     daily_play.pressed.connect(_show_game.bind("daily"))
     daily_row.add_child(daily_play)
 
@@ -274,7 +272,7 @@ func _show_game(mode_name := "journey") -> void:
     board_frame.add_child(board)
 
     var hint_text := "HINT   +10 SEC" if game_mode == "daily" else "HINT   SHOW OPEN PATH"
-    var hint := _button(hint_text, 23, PANEL_SOFT, PRIMARY)
+    var hint := _button(hint_text, 23, PANEL_SOFT, TEXT)
     hint.custom_minimum_size.y = 72
     hint.pressed.connect(board.show_hint)
     column.add_child(hint)
@@ -375,7 +373,7 @@ func _show_daily_result(score: int, elapsed_ms: int, mistakes: int, hints: int, 
 
     var card := PanelContainer.new()
     card.custom_minimum_size = Vector2(0, 410)
-    card.add_theme_stylebox_override("panel", _panel_style(SURFACE, Color.TRANSPARENT, 6, 0))
+    card.add_theme_stylebox_override("panel", _panel_style(PANEL, Color.TRANSPARENT, 16, 0))
     column.add_child(card)
     var stats := VBoxContainer.new()
     stats.add_theme_constant_override("separation", 22)
@@ -441,16 +439,20 @@ func _vertical_space(height: int) -> Control:
     return space
 
 
-func _journey_marks() -> HBoxContainer:
+func _level_nodes() -> HBoxContainer:
     var marks := HBoxContainer.new()
-    marks.add_theme_constant_override("separation", 10)
+    marks.alignment = BoxContainer.ALIGNMENT_CENTER
+    marks.add_theme_constant_override("separation", 24)
     var route := (current_level - 1) % 5
     for index in range(5):
         var mark := PanelContainer.new()
-        mark.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-        mark.custom_minimum_size.y = 16
-        var fill := INK if index <= route else Color(INK, 0.18)
-        mark.add_theme_stylebox_override("panel", _bar_style(fill))
+        var node_size := 78 if index == route else 58
+        mark.custom_minimum_size = Vector2(node_size, node_size)
+        var fill := PRIMARY if index < route else (TEXT if index == route else PANEL_SOFT)
+        var border := TEXT if index == route else Color(PRIMARY, 0.62)
+        mark.add_theme_stylebox_override("panel", _panel_style(fill, border, node_size / 2, 5))
+        var number_color := BG if index <= route else MUTED
+        mark.add_child(_label("%d" % (index + 1), 21, number_color, true))
         marks.add_child(mark)
     return marks
 

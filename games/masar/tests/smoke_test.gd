@@ -14,7 +14,7 @@ func _run() -> void:
     await process_frame
     assert(game.get_node_or_null("ScreenContent") != null, "Home screen should be created")
     assert(game.get_node_or_null("AbstractBackdrop") != null, "Abstract background should be created")
-    assert(game.get_level_color_for_test(1) == Color("#315CF5"), "The first level must use the cobalt theme")
+    assert(game.get_level_color_for_test(1) == Color("#5B7CFF"), "The first level must use the cobalt theme")
     assert(game.get_level_color_for_test(1) != game.get_level_color_for_test(2), "Each level must change its signature color")
     assert(game.get_level_color_for_test(1) == game.get_level_color_for_test(6), "The five-color journey must cycle consistently")
     assert(game.get_analytics_path_for_test().begins_with("user://"), "Development analytics must stay local")
