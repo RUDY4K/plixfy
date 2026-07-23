@@ -1,50 +1,42 @@
 [
   {
-    "slug": "hasbro-cancels-games-loses-56-million",
-    "title": "Hasbro تخسر 56 مليون دولار وتلغي مشاريع ألعاب كبرى",
-    "summary": "Hasbro أعلنت عن خسارة مالية كبيرة بقيمة 56 مليون دولار بسبب إلغاء عدة مشاريع ألعاب فيديو كانت مخطط إطلاقها في 2028 وما بعده. الشركة تعترف بأن توسعها السابق في قطاع الألعاب كان طموحاً جداً وغير منطقي من الناحية المالية. الرئيس التنفيذي كريس كوكس أوضح أن الشركة ستركز من الآن فصاعداً على الامتيازات الكبرى والشهيرة حيث ترى فرصة حقيقية للنجاح، بدلاً من المراهنة على كل اتجاه جديد. هذا التصحيح الاستراتيجي يعكس الحاجة الماسة في الصناعة إلى الاستثمار الحكيم والمركز بدلاً من التوسع العشوائي الذي قد يؤدي إلى خسائر فادحة.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/hasbro-is-betting-on-fewer-bigger-video-games-after-56-million-write-down/",
-    "publishedAt": "2026-07-22"
-  },
-  {
-    "slug": "nintendo-confirms-splatoon-4-coming",
-    "title": "Nintendo تؤكد رسمياً قدوم Splatoon 4 في المستقبل",
-    "summary": "بعد سنوات من الانتظار والتكهنات، أكدت Nintendo أخيراً أن Splatoon 4 قيد التطوير الفعلي. المُنتج Seita Inoue شرح في مقابلة رسمية أن لعبة Splatoon Raiders الحالية ليست بديلاً عن الجزء الرابع، بل هي توسعة تجريبية تقدم تجربة لعب مختلفة. السلسلة ستستمر في الحصول على ألعاب تنافسية مستقبلاً، لأن Nintendo تؤمن بأهمية تقديم أنماط لعب متنوعة تجذب فئات مختلفة. بعد أكثر من 11 سنة من النجاح الاستثنائي للسلسلة وثلاث ألعاب رئيسية، تطمئن Nintendo مجتمعها العالمي بأن الامتياز لن يتوقف عن النمو والابتكار.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/nintendo-basically-says-that-splatoon-4-will-happen/",
-    "publishedAt": "2026-07-22"
-  },
-  {
-    "slug": "darkest-dungeon-dlc-six-years-later",
-    "title": "Darkest Dungeon تحصل على DLC جديد بعد 6 سنوات",
-    "summary": "استوديو Red Hook يفاجئ المجتمع بإطلاق DLC جديد لـ Darkest Dungeon الأصلية بعنوان 'The Fire's Edge'، وهي أول إضافة محتوى كبيرة منذ عام 2020. هذا الإعلان يأتي احتفالاً بالذكرى العاشرة لإحدى أكثر الألعاب المستقلة تأثيراً وتفرداً. العودة إلى اللعبة الأصلية بدلاً من Darkest Dungeon 2 تعكس تقدير الاستوديو لحب المجتمع الاستثنائي للجزء الأول وتصميمه المظلم والجذاب. هذه خطوة جريئة تؤكد التزام Red Hook بدعم إرثها الأصلي وإسعاد المعجبين الوفيين الذين ظلوا يترقبون هذا الخبر بشغف.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/darkest-dungeon-the-fires-edge-dlc-reveal",
-    "publishedAt": "2026-07-22"
-  },
-  {
-    "slug": "marathon-pve-mode-triples-players",
-    "title": "وضع PvE في Marathon يثلث عدد اللاعبين بين عشية وضحاها",
-    "summary": "لعبة Marathon من Bungie حققت نجاحاً مذهلاً بعد إطلاق وضع PvE جديد يُدعى 'Vault Breaker' كجزء من تحديث منتصف الموسم الثاني. الوضع الجديد، وهو تجربة roguelite محدودة الوقت تعمل بشكل منفصل عن أوضاع اللعب التنافسية التقليدية، ثلّث عدد لاعبي اللعبة اليوميين في ساعات قليلة. هذا الارتفاع الحاد يشير إلى أن قطاعاً كبيراً من المجتمع كان ينتظر محتوى تعاوني، وأن التركيز الحصري على اللعب التنافسي قد لا يكون كافياً لجذب اللاعبين الجدد. استجابة Bungie السريعة لطلبات مجتمعها تثبت قيمة الاستماع إلى اللاعبين.",
+    "slug": "halo-campaign-evolved-العودة-المنتظرة",
+    "title": "Halo: Campaign Evolved يعود بعد ربع قرن: عودة الأسطورة إلى الحلبة",
+    "summary": "بعد 25 سنة من إطلاق اللعبة الأصلية التي غيّرت صناعة ألعاب الفضاء الأول، يعود Halo مع عنوان جديد: Halo: Campaign Evolved. يأتي العودة بحملة مفردة جديدة مصممة للاعبين الراغبين في إعادة الاكتشاف أو الخوض في تجربة Halo الكلاسيكية بصيغة حديثة. اللعبة متاحة حالياً للوصول المبكر عبر Xbox Game Pass وعلى أجهزة الحاسوب. نينتندو لم تصرح بتفاصيل شاملة عن القصة أو الميكانيكا الجديدة، لكنها أكدت أن التجربة تركز على الحملة الفردية. الإصدار يمثل محاولة إحياء إرث Halo الذي كان أحد أعظم ألعاب منصة Xbox على الإطلاق. معظم اللاعبين الذين تابعوا السلسلة عبر السنين ينتظرون بفارغ الصبر رؤية كيفية تطور الفرنشايز في هذا الجيل الجديد من الأجهزة.",
     "sourceName": "PC Gamer",
-    "sourceUrl": "https://www.pcgamer.com/games/fps/marathons-experimental-pve-mode-is-live-immediately-tripling-its-daily-player-count/",
-    "publishedAt": "2026-07-22"
+    "sourceUrl": "https://www.pcgamer.com/games/halo/campaign-evolved-release-date-launch-times-early-access/",
+    "publishedAt": "2026-07-23"
   },
   {
-    "slug": "runescape-ambition-topple-warcraft",
-    "title": "الطموح الكبير: RuneScape تسعى لتجاوز World of Warcraft خلال 5 سنوات",
-    "summary": "أعلن الرئيس التنفيذي لشركة Jagex، جون بيلامي، عن طموح استراتيجي بجعل لعبة RuneScape الكلاسيكية أكبر لعبة MMORPG في العالم خلال السنوات الخمس القادمة، منهياً بذلك هيمنة World of Warcraft على الصناعة. تستند الطموحات إلى خطة تطوير محسّنة وتحديثات مستمرة للعبة الموروثة. يعكس الهدف ثقة Jagex بأن RuneScape بتاريخها العريق وشعبيتها قادرة على جذب أجيال جديدة من اللاعبين واستعادة اللاعبين السابقين. نجاح هذا الطموح سيُحدث نقلة جوهرية في المشهد التنافسي لـ MMORPG عالمياً وإعادة تشكيل قيادة الأنواع.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/jagex-runescape-bigger-than-world-of-warcraft",
-    "publishedAt": "2026-07-22"
+    "slug": "فضيحة-blizzard-مدير-مباراة-يخالف-القوانين",
+    "title": "فضيحة في عالم Warcraft: تحقيق بليزارد ضد مدير لعبة انتهك القوانين",
+    "summary": "دخلت بليزارد في تحقيق جديد بعد تسريب فيديو يظهر أحد مديري اللعبة وهو ينتهك قواعس اللعب في World of Warcraft. المدير، الذي يحمل لقب Game Master، استخدم صلاحياته لمساعدة أصدقائه بطريقة غير قانونية في اللعبة، محققاً انتصارات وهمية. ما يزيد تعقيد الموقف أن المدير لم يكن يدرك أنه يتم تسجيل تصرفاته. لاحقاً، قام أحد اللاعبين بنشر الفيديو على منصة Twitch، مما أثار موجة غضب من مجتمع اللعبة. كشف الحادث عن انتهاك صارخ لسياسات بليزارد بشأن عدم إساءة استخدام السلطات الإدارية. هذا ليس أول حادث من نوعه، لكنه يبرز أهمية الإشراف المستمر على الموظفين وضمان الامتثال للقواعس. بليزارد لم تصدر بعد تصريحاً نهائياً بشأن عقوبات محتملة.",
+    "sourceName": "PC Gamer",
+    "sourceUrl": "https://www.pcgamer.com/games/world-of-warcraft/blizzard-is-investigating-a-world-of-warcraft-cheating-scandal-after-game-master-death-touched-bosses-for-friends-without-realizing-it-was-being-recorded/",
+    "publishedAt": "2026-07-23"
   },
   {
-    "slug": "sony-kills-playstation-discs",
-    "title": "نهاية الأقراص الفيزيائية: سوني تلغي PlayStation المادية بحلول 2028",
-    "summary": "أعلنت سوني عن قرار استراتيجي بإنهاء إنتاج الأقراص الفيزيائية لـ PlayStation بحلول يناير 2028، ممثلة تحولاً كاملاً نحو التوزيع الرقمي. يحمل هذا القرار آثاراً اقتصادية كبيرة على سوق الألعاب المستعملة والمشاركة بين اللاعبين، المقدرة بـ 7.2 مليار دولار عالمياً. الخطوة أثارت غضباً واسعاً بين اللاعبين الذين يفضلون امتلاك نسخ فيزيائية وإعادة بيعها. التحليلات تحذر من احتمالية تدمير السوق الثانوية بالكامل، مما سيقلل خيارات اللاعبين ويؤثر مباشرة على الجدوى الاقتصادية للاستثمار في الألعاب المادية.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/used-video-game-market-at-risk-sony-killing-playstation-discs",
+    "slug": "zelda-ocarina-time-يعود-switch-2-الريميك",
+    "title": "ريميك أوكارينا أوف تايم على Switch 2: دفاع ياموت عن فن إحياء الكلاسيكيات",
+    "summary": "مع اقتراب إطلاق ريميك The Legend of Zelda: Ocarina of Time على Switch 2، دخل الأسطورة الياباني شيجيرو ميياموتو على خط الدفاع عن استراتيجية إعادة إصدار الألعاب الكلاسيكية. في تصريحات لمجلة Famitsu، شرح ميياموتو أن الريميكات تخدم هدفاً مهماً في الصناعة. كثير من الجيل الحالي لم يختبروا ألعاب عمرها عشر سنوات أو أكثر، مما يجعل إعادة إصدارها بجودة محسّنة طريقة فعّالة للوصول إلى جمهور جديد. بالإضافة إلى ذلك، يؤكد ميياموتو أن النجاح التجاري للريميك يسمح للشركات بتخصيص موارد أكثر للمشاريع الجديدة. يعتقد ميياموتو أن الريميكات تقدم قيمة ثقافية أيضاً، حيث تعرّف الجيل الجديد بالألعاب الأصلية وتساهم في تطور المشاريع المستقبلية. هذه التصريحات تأتي قبل إطلاق الريميك المنتظر للعبة الفنتازيا الأسطورية على منصة نينتندو الجديدة.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/nintendos-shigeru-miyamoto-defends-remakes-ahead-of-ocarina-of-time-switch-2-remake/",
+    "publishedAt": "2026-07-23"
+  },
+  {
+    "slug": "xbox-يحضر-ألعاب-جنة-الأصلية-للكمبيوتر",
+    "title": "إكس بوكس يجلب الكلاسيكيات إلى الحاسوب: عصر جديد من التوافقية العكسية",
+    "summary": "أطلقت مايكروسوفت مبادرة طال انتظارها لإحضار ألعاب إكس بوكس الأصلية إلى أنظمة الكمبيوتر الشخصي. البداية حدثت اليوم مع أربع ألعاب كلاسيكية: Blinx: The Time Sweeper وFuzion Frenzy وConker: Live and Reloaded وCrimson Skies: High Road to Revenge. المالكون السابقون أو المشتركون في Game Pass سيجدون هذه الألعاب متاحة مباشرة في مكتبتهم عبر تطبيق Xbox. تأتي الإصدارات محسّنة بدقة أربعة أضعاف الأصلية وخيارات رسومية قابلة للتخصيص وأنماط شاشة متعددة. كشفت مايكروسوفت أن هذا ليس سوى البداية، مع خطط لإضافة عدد أكبر من الألعاب الكلاسيكية تدريجياً. البرنامج يعمل على معظم أجهزة ويندوز، بما فيها أجهزة محمولة مثل ROG Ally. تمثل هذه الخطوة قفزة كبيرة في جهود مايكروسوفت لإحياء مكتبتها الكلاسيكية وإعادة الاهتمام بتاريخ الأنظمة الأصلية.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/xbox-brings-backwards-compatibility-to-pc-starting-with-four-classics/",
+    "publishedAt": "2026-07-23"
+  },
+  {
+    "slug": "xbox-sales-doubled-june-2026",
+    "title": "انطلاقة Xbox الحاسمة: مبيعات تتضاعف وتتصدر السوق الأمريكية",
+    "summary": "حققت أجهزة Xbox Series X|S نمواً ملحوظاً في يونيو 2026، مستحوذة على لقب المنصة الوحيدة التي نمت في السوق الأمريكية. ارتفعت مبيعات الوحدات بنسبة 86% مقارنة بيونيو 2025، وسجلت أفضل أداء للعام حتى الآن. الأهم، تضاعفت الإيرادات بالدولار، بينما شهدت منصات أخرى انهيارات كبيرة: Nintendo Switch 2 انخفضت 78%، وPlayStation 5 تراجعت 43%. هذا النمو يعكس استعادة قوية لـ Xbox بعد تأثر العام الماضي برفع الأسعار، مما أظهر أن استراتيجية المنصة بدأت تحقق نتائج ملموسة في السوق الرئيسية.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/xbox-sales-more-than-doubled-in-june-2026-in-the-us-while-ps5-and-switch-2-dropped/",
     "publishedAt": "2026-07-22"
   },
   {
@@ -56,59 +48,59 @@
     "publishedAt": "2026-07-22"
   },
   {
-    "slug": "xbox-sales-doubled-june-2026",
-    "title": "انطلاقة Xbox الحاسمة: مبيعات تتضاعف وتتصدر السوق الأمريكية",
-    "summary": "حققت أجهزة Xbox Series X|S نمواً ملحوظاً في يونيو 2026، مستحوذة على لقب المنصة الوحيدة التي نمت في السوق الأمريكية. ارتفعت مبيعات الوحدات بنسبة 86% مقارنة بيونيو 2025، وسجلت أفضل أداء للعام حتى الآن. الأهم، تضاعفت الإيرادات بالدولار، بينما شهدت منصات أخرى انهيارات كبيرة: Nintendo Switch 2 انخفضت 78%، وPlayStation 5 تراجعت 43%. هذا النمو يعكس استعادة قوية لـ Xbox بعد تأثر العام الماضي برفع الأسعار، مما أظهر أن استراتيجية المنصة بدأت تحقق نتائج ملموسة في السوق الرئيسية.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/xbox-sales-more-than-doubled-in-june-2026-in-the-us-while-ps5-and-switch-2-dropped/",
+    "slug": "sony-kills-playstation-discs",
+    "title": "نهاية الأقراص الفيزيائية: سوني تلغي PlayStation المادية بحلول 2028",
+    "summary": "أعلنت سوني عن قرار استراتيجي بإنهاء إنتاج الأقراص الفيزيائية لـ PlayStation بحلول يناير 2028، ممثلة تحولاً كاملاً نحو التوزيع الرقمي. يحمل هذا القرار آثاراً اقتصادية كبيرة على سوق الألعاب المستعملة والمشاركة بين اللاعبين، المقدرة بـ 7.2 مليار دولار عالمياً. الخطوة أثارت غضباً واسعاً بين اللاعبين الذين يفضلون امتلاك نسخ فيزيائية وإعادة بيعها. التحليلات تحذر من احتمالية تدمير السوق الثانوية بالكامل، مما سيقلل خيارات اللاعبين ويؤثر مباشرة على الجدوى الاقتصادية للاستثمار في الألعاب المادية.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/used-video-game-market-at-risk-sony-killing-playstation-discs",
     "publishedAt": "2026-07-22"
   },
   {
-    "slug": "game-pass-fasha-fi-janb-xbox",
-    "title": "الحلم الأزرق انهار: Xbox Game Pass لم يحقق الأرقام المطلوبة",
-    "summary": "اعترف مدير Creative Director في Forza Horizon 5 بأن Xbox Game Pass، رغم كونه فكرة جيدة الهدف، فشل في جذب عدد مشتركين كافٍ لتحقيق الربحية. كانت Microsoft تتوقع 77 مليون مشترك، لكن العدد الفعلي وصل فقط إلى 30 مليون. هذا الفشل ساهم مباشرة في الأزمة الحالية لـ Xbox، والتي أسفرت عن إغلاق استوديوهات وتسريح آلاف الموظفين. يؤكد براون أن Game Pass كانت محاولة صادقة لخدمة اللاعبين، لكن العملية لم تنجح كما هو مخطط، مما أدى إلى آثار مأساوية على الصناعة والعاملين بها.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/game-pass-was-a-good-idea-but-it-didnt-work-forza-horizon-5-creative-director-says/",
-    "publishedAt": "2026-07-21"
-  },
-  {
-    "slug": "modern-warfare-4-beta-agosto",
-    "title": "عودة Call of Duty الضخمة: بيتا Modern Warfare 4 تنطلق في أغسطس",
-    "summary": "أعلنت Activision عن مواعيد البيتا لـ Call of Duty: Modern Warfare 4، حيث ستبدأ فترة البيتا المبكرة في 21-25 أغسطس للمنصات PC و PS5 و Xbox Series X|S. بعد ذلك، ستفتح البيتا المفتوحة للجميع من 28 أغسطس إلى 1 سبتمبر، وستشمل أيضاً Switch 2 للمرة الأولى. يحصل اللاعبون الذين قاموا بحجز اللعبة على 5 أيام إضافية من الوصول المبكر. ستضم البيتا خرائط متعددة، أوضاع لعب متنوعة بما فيها Search & Destroy وKill Block، وحوالي 19 سلاحاً مختلفاً يمكن للاعبين تجربتها.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/call-of-duty-modern-warfare-4-beta-dates-revealed-heres-how-to-get-in/",
-    "publishedAt": "2026-07-21"
-  },
-  {
-    "slug": "call-of-duty-film-modern-warfare-universe",
-    "title": "هوليوود تقتحم الحرب الحديثة: فيلم Call of Duty سيدور في عالم Modern Warfare",
-    "summary": "كشف مخرج الفيلم Peter Berg عن تفصيل حاسم حول فيلم Call of Duty القادم، حيث سيدور الفيلم في عالم Modern Warfare وليس في أي كون آخر من امتيازات السلسلة. يأتي الفيلم من Paramount ويجمع بين خبرة Berg في الأفلام الحربية والعمل مع الكاتب Taylor Sheridan. يُتوقع وصول الفيلم إلى دور السينما في يونيو 2028. اختيار عالم Modern Warfare يشير إلى رغبة Activision والاستوديو في تقديم نسخة حديثة وعملية من الامتياز الضخم.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/call-of-duty-movie-gets-a-key-update-about-its-setting/",
-    "publishedAt": "2026-07-21"
-  },
-  {
-    "slug": "id-software-azma-tasrih-microsoft",
-    "title": "ظل مظلم على Doom: استوديو id Software يواجه تداعيات التسريحات",
-    "summary": "بعد أسبوعين من إعلان Microsoft عن 3,200 تسريح وموجة من الإجراءات الحادة ضد قسم Xbox، لم تسلم حتى استوديوهات عريقة مثل id Software من الآثار السلبية. رغم محاولة مدير Doom Hugo Martin تهدئة المخاوف بالقول إن الاستوديو لم يتحول إلى قسم دعم بحت، إلا أن الموظفين الحاليين والسابقين يختلفون عن تفاؤله. يعكس الموقف الأزمة الأعمق التي تضرب صناعة الألعاب، حيث حتى الاستوديوهات الموقرة والمشهورة عالمياً لا تستطيع الهروب من التأثيرات الاقتصادية القاسية.",
+    "slug": "runescape-ambition-topple-warcraft",
+    "title": "الطموح الكبير: RuneScape تسعى لتجاوز World of Warcraft خلال 5 سنوات",
+    "summary": "أعلن الرئيس التنفيذي لشركة Jagex، جون بيلامي، عن طموح استراتيجي بجعل لعبة RuneScape الكلاسيكية أكبر لعبة MMORPG في العالم خلال السنوات الخمس القادمة، منهياً بذلك هيمنة World of Warcraft على الصناعة. تستند الطموحات إلى خطة تطوير محسّنة وتحديثات مستمرة للعبة الموروثة. يعكس الهدف ثقة Jagex بأن RuneScape بتاريخها العريق وشعبيتها قادرة على جذب أجيال جديدة من اللاعبين واستعادة اللاعبين السابقين. نجاح هذا الطموح سيُحدث نقلة جوهرية في المشهد التنافسي لـ MMORPG عالمياً وإعادة تشكيل قيادة الأنواع.",
     "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/id-software-developers-comments-hugo-martin-layoffs",
-    "publishedAt": "2026-07-21"
+    "sourceUrl": "https://www.eurogamer.net/jagex-runescape-bigger-than-world-of-warcraft",
+    "publishedAt": "2026-07-22"
   },
   {
-    "slug": "ghost-recon-wildlands-definitive",
-    "title": "جنود الظل يعودون: نسخة محسّنة من Ghost Recon Wildlands",
-    "summary": "بينما يقترب الاحتفال بالذكرى العاشرة لـ Tom Clancy's Ghost Recon Wildlands تكشف التسريبات عن أن Ubisoft تعد نسخة Definitive Edition من لعبة الحرب الشهيرة لأجهزة الجيل الحالي. الإصدار الجديد سيتوفر على PS5 و Xbox Series X|S مما يعطي اللعبة الكلاسيكية فرصة جديدة للوصول إلى جمهور عريض. التفاصيل الدقيقة عن ما إذا كانت نسخة محسّنة مع تحديثات بصرية أم إعادة إصدار للعبة الأصلية لم تُوضح بعد لكن الخبر يضيف حماساً لعشاق الألعاب التكتيكية والعمليات التخفية الذين ينتظرون عودة اللعبة.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/ghost-recon-wildlands-definitive-edition-leak",
-    "publishedAt": "2026-07-21"
+    "slug": "marathon-pve-mode-triples-players",
+    "title": "وضع PvE في Marathon يثلث عدد اللاعبين بين عشية وضحاها",
+    "summary": "لعبة Marathon من Bungie حققت نجاحاً مذهلاً بعد إطلاق وضع PvE جديد يُدعى 'Vault Breaker' كجزء من تحديث منتصف الموسم الثاني. الوضع الجديد، وهو تجربة roguelite محدودة الوقت تعمل بشكل منفصل عن أوضاع اللعب التنافسية التقليدية، ثلّث عدد لاعبي اللعبة اليوميين في ساعات قليلة. هذا الارتفاع الحاد يشير إلى أن قطاعاً كبيراً من المجتمع كان ينتظر محتوى تعاوني، وأن التركيز الحصري على اللعب التنافسي قد لا يكون كافياً لجذب اللاعبين الجدد. استجابة Bungie السريعة لطلبات مجتمعها تثبت قيمة الاستماع إلى اللاعبين.",
+    "sourceName": "PC Gamer",
+    "sourceUrl": "https://www.pcgamer.com/games/fps/marathons-experimental-pve-mode-is-live-immediately-tripling-its-daily-player-count/",
+    "publishedAt": "2026-07-22"
   },
   {
-    "slug": "star-wars-kotor-remake-revealed",
-    "title": "من عمق الجاليكسي: Star Wars KOTOR الريميك قد يظهر قريباً",
-    "summary": "بعد سنوات من الغموض والانتظار قد يكون هناك ضوء في النهاية بخصوص ريميك Star Wars: Knights of the Old Republic الشهير. اللعبة الأسطورية التي استحوذت على قلوب ملايين المعجبين ستعود بنسخة حديثة وتشير التقارير إلى احتمالية الكشف عنها رسمياً هذا العام. الريميك كان معلناً عام 2021 أولاً لكنه انتقل بين استوديوهات مختلفة مما أدى إلى تأخيرات كبيرة في التطوير. إذا تأكدت هذه الشائعات فسيكون خبراً مفرحاً لعشاق الفرنچايز الذين ينتظرون عودة هذه الكلاسيكية بتقنية حديثة وجرافيكس متقدمة.",
+    "slug": "darkest-dungeon-dlc-six-years-later",
+    "title": "Darkest Dungeon تحصل على DLC جديد بعد 6 سنوات",
+    "summary": "استوديو Red Hook يفاجئ المجتمع بإطلاق DLC جديد لـ Darkest Dungeon الأصلية بعنوان 'The Fire's Edge'، وهي أول إضافة محتوى كبيرة منذ عام 2020. هذا الإعلان يأتي احتفالاً بالذكرى العاشرة لإحدى أكثر الألعاب المستقلة تأثيراً وتفرداً. العودة إلى اللعبة الأصلية بدلاً من Darkest Dungeon 2 تعكس تقدير الاستوديو لحب المجتمع الاستثنائي للجزء الأول وتصميمه المظلم والجذاب. هذه خطوة جريئة تؤكد التزام Red Hook بدعم إرثها الأصلي وإسعاد المعجبين الوفيين الذين ظلوا يترقبون هذا الخبر بشغف.",
     "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/star-wars-kotor-remake-reveal-rumours",
+    "sourceUrl": "https://www.eurogamer.net/darkest-dungeon-the-fires-edge-dlc-reveal",
+    "publishedAt": "2026-07-22"
+  },
+  {
+    "slug": "nintendo-confirms-splatoon-4-coming",
+    "title": "Nintendo تؤكد رسمياً قدوم Splatoon 4 في المستقبل",
+    "summary": "بعد سنوات من الانتظار والتكهنات، أكدت Nintendo أخيراً أن Splatoon 4 قيد التطوير الفعلي. المُنتج Seita Inoue شرح في مقابلة رسمية أن لعبة Splatoon Raiders الحالية ليست بديلاً عن الجزء الرابع، بل هي توسعة تجريبية تقدم تجربة لعب مختلفة. السلسلة ستستمر في الحصول على ألعاب تنافسية مستقبلاً، لأن Nintendo تؤمن بأهمية تقديم أنماط لعب متنوعة تجذب فئات مختلفة. بعد أكثر من 11 سنة من النجاح الاستثنائي للسلسلة وثلاث ألعاب رئيسية، تطمئن Nintendo مجتمعها العالمي بأن الامتياز لن يتوقف عن النمو والابتكار.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/nintendo-basically-says-that-splatoon-4-will-happen/",
+    "publishedAt": "2026-07-22"
+  },
+  {
+    "slug": "hasbro-cancels-games-loses-56-million",
+    "title": "Hasbro تخسر 56 مليون دولار وتلغي مشاريع ألعاب كبرى",
+    "summary": "Hasbro أعلنت عن خسارة مالية كبيرة بقيمة 56 مليون دولار بسبب إلغاء عدة مشاريع ألعاب فيديو كانت مخطط إطلاقها في 2028 وما بعده. الشركة تعترف بأن توسعها السابق في قطاع الألعاب كان طموحاً جداً وغير منطقي من الناحية المالية. الرئيس التنفيذي كريس كوكس أوضح أن الشركة ستركز من الآن فصاعداً على الامتيازات الكبرى والشهيرة حيث ترى فرصة حقيقية للنجاح، بدلاً من المراهنة على كل اتجاه جديد. هذا التصحيح الاستراتيجي يعكس الحاجة الماسة في الصناعة إلى الاستثمار الحكيم والمركز بدلاً من التوسع العشوائي الذي قد يؤدي إلى خسائر فادحة.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/hasbro-is-betting-on-fewer-bigger-video-games-after-56-million-write-down/",
+    "publishedAt": "2026-07-22"
+  },
+  {
+    "slug": "witcher-3-songs-of-past",
+    "title": "أسطورة الساحر تعود: CD Projekt تجهز توسعة ضخمة لـ Witcher 3",
+    "summary": "بعد انتظار طويل، استوديو CD Projekt Red يستعد للإعلان عن فصل جديد من ملحمة The Witcher 3. التوسعة الثالثة بعنوان \"Songs of the Past\" ستركز على مغامرة جديدة للساحر جيرالت، وستُكشف عنها رسمياً خلال حفل Gamescom Opening Night Live في 23 أغسطس المقبل. الجديد أن الاستوديو قرر التعاون مع فريق Fool's Theory المكون من مطورين قدامى عملوا على اللعبة الأصلية قبل اثني عشر سنة. اللعبة ستصل إلى أجهزة الحاسب والـ PS5 و Xbox Series X|S في 2027، لكن CD Projekt اتخذت قراراً مثيراً للجدل بإيقاف دعم نظام Windows 10.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/well-finally-see-the-witcher-3-new-expansion-next-month/",
     "publishedAt": "2026-07-21"
   },
   {
@@ -120,59 +112,59 @@
     "publishedAt": "2026-07-21"
   },
   {
-    "slug": "witcher-3-songs-of-past",
-    "title": "أسطورة الساحر تعود: CD Projekt تجهز توسعة ضخمة لـ Witcher 3",
-    "summary": "بعد انتظار طويل، استوديو CD Projekt Red يستعد للإعلان عن فصل جديد من ملحمة The Witcher 3. التوسعة الثالثة بعنوان \"Songs of the Past\" ستركز على مغامرة جديدة للساحر جيرالت، وستُكشف عنها رسمياً خلال حفل Gamescom Opening Night Live في 23 أغسطس المقبل. الجديد أن الاستوديو قرر التعاون مع فريق Fool's Theory المكون من مطورين قدامى عملوا على اللعبة الأصلية قبل اثني عشر سنة. اللعبة ستصل إلى أجهزة الحاسب والـ PS5 و Xbox Series X|S في 2027، لكن CD Projekt اتخذت قراراً مثيراً للجدل بإيقاف دعم نظام Windows 10.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/well-finally-see-the-witcher-3-new-expansion-next-month/",
+    "slug": "star-wars-kotor-remake-revealed",
+    "title": "من عمق الجاليكسي: Star Wars KOTOR الريميك قد يظهر قريباً",
+    "summary": "بعد سنوات من الغموض والانتظار قد يكون هناك ضوء في النهاية بخصوص ريميك Star Wars: Knights of the Old Republic الشهير. اللعبة الأسطورية التي استحوذت على قلوب ملايين المعجبين ستعود بنسخة حديثة وتشير التقارير إلى احتمالية الكشف عنها رسمياً هذا العام. الريميك كان معلناً عام 2021 أولاً لكنه انتقل بين استوديوهات مختلفة مما أدى إلى تأخيرات كبيرة في التطوير. إذا تأكدت هذه الشائعات فسيكون خبراً مفرحاً لعشاق الفرنچايز الذين ينتظرون عودة هذه الكلاسيكية بتقنية حديثة وجرافيكس متقدمة.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/star-wars-kotor-remake-reveal-rumours",
     "publishedAt": "2026-07-21"
   },
   {
-    "slug": "game-of-thrones-war-westeros-rts-delayed-2027",
-    "title": "تأجيل حرب الحديقة الصغيرة: لعبة Game of Thrones الاستراتيجية تنتظر إلى 2027",
-    "summary": "أعلنت استوديو PlaySide Studios عن تأجيل موعد إطلاق لعبة Game of Thrones: War for Westeros RTS إلى عام 2027. يأتي هذا القرار في سياق التزام الفريق بضمان وصول اللعبة إلى معايير الجودة العالية التي يسعى إليها. كانت اللعبة المبنية على أساس سلسلة الكتب والمسلسل التلفازي الشهيرة من بين أكثر الألعاب المتوقعة من قبل المعجبين حول العالم. التأجيل يعكس الاتجاه المتزايد في الصناعة نحو منح الفرق المزيد من الوقت لتطوير منتجات متقنة بدلاً من الإطلاق المسرع. هذا القرار يشير إلى أن الاستوديو يفضل تحقيق رؤيته الكاملة حتى لو استغرق ذلك وقتاً أطول.",
+    "slug": "ghost-recon-wildlands-definitive",
+    "title": "جنود الظل يعودون: نسخة محسّنة من Ghost Recon Wildlands",
+    "summary": "بينما يقترب الاحتفال بالذكرى العاشرة لـ Tom Clancy's Ghost Recon Wildlands تكشف التسريبات عن أن Ubisoft تعد نسخة Definitive Edition من لعبة الحرب الشهيرة لأجهزة الجيل الحالي. الإصدار الجديد سيتوفر على PS5 و Xbox Series X|S مما يعطي اللعبة الكلاسيكية فرصة جديدة للوصول إلى جمهور عريض. التفاصيل الدقيقة عن ما إذا كانت نسخة محسّنة مع تحديثات بصرية أم إعادة إصدار للعبة الأصلية لم تُوضح بعد لكن الخبر يضيف حماساً لعشاق الألعاب التكتيكية والعمليات التخفية الذين ينتظرون عودة اللعبة.",
     "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/game-of-thrones-war-for-westeros-rts-game-delayed-to-2027",
-    "publishedAt": "2026-07-20"
+    "sourceUrl": "https://www.eurogamer.net/ghost-recon-wildlands-definitive-edition-leak",
+    "publishedAt": "2026-07-21"
   },
   {
-    "slug": "palworld-dominates-steam-million-concurrent",
-    "title": "بالوورلد تحافظ على عرشها: الظاهرة الألعاب تحقق مليون لاعب متزامن مجدداً",
-    "summary": "واصلت لعبة Palworld هيمنتها على منصة Steam خلال نهاية الأسبوع، حيث وصلت إلى ما يقارب مليون لاعب متزامن. هذا الإنجاز المتكرر يؤكد الجاذبية المستمرة للعبة التي تمكنت من الحفاظ على اهتمام المجتمع العالمي. تجمع Palworld بشكل فريد بين عناصر جمع المخلوقات والبقاء على قيد الحياة والحرف اليدوية، مما خلق صيغة تجذب فئات متنوعة من اللاعبين. استمرار اللعبة في تحطيم الأرقام القياسية من حيث عدد اللاعبين المتزامنين يعكس تفاني المجتمع وقوة الجاذبية الدائمة للمشروع. النجاح المستمر يضع Palworld في صفوف أكثر الألعاب حضوراً وتأثيراً على منصة Steam.",
+    "slug": "id-software-azma-tasrih-microsoft",
+    "title": "ظل مظلم على Doom: استوديو id Software يواجه تداعيات التسريحات",
+    "summary": "بعد أسبوعين من إعلان Microsoft عن 3,200 تسريح وموجة من الإجراءات الحادة ضد قسم Xbox، لم تسلم حتى استوديوهات عريقة مثل id Software من الآثار السلبية. رغم محاولة مدير Doom Hugo Martin تهدئة المخاوف بالقول إن الاستوديو لم يتحول إلى قسم دعم بحت، إلا أن الموظفين الحاليين والسابقين يختلفون عن تفاؤله. يعكس الموقف الأزمة الأعمق التي تضرب صناعة الألعاب، حيث حتى الاستوديوهات الموقرة والمشهورة عالمياً لا تستطيع الهروب من التأثيرات الاقتصادية القاسية.",
     "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/palworld-almost-hits-1-million-concurrents-again",
-    "publishedAt": "2026-07-20"
+    "sourceUrl": "https://www.eurogamer.net/id-software-developers-comments-hugo-martin-layoffs",
+    "publishedAt": "2026-07-21"
   },
   {
-    "slug": "riot-reverses-paid-classic-skins-decision",
-    "title": "حنين بدون ثمن: Riot تستسلم لضغط المجتمع وتلغي تسعير الـ Skins القديمة",
-    "summary": "تراجعت شركة Riot Games بسرعة عن قرار جعل الجلود الكلاسيكية في League of Legends Classic مدفوعة الأجر، وذلك استجابة لموجة انتقادات قوية من مجتمع اللاعبين. اعتبر المجتمع القرار محاولة تجارية متطفلة على الحنين والذكريات التي يرتبط بها اللاعبون بهذه الجلود. تجسد هذه الحادثة التوتر المستمر بين الشركات الكبرى والمجتمعات حول استراتيجيات تحقيق الإيرادات والحفاظ على رضا اللاعبين. استجابة Riot السريعة والحازمة تعكس فهماً متزايداً بأهمية الاستماع الجدي إلى صوت المجتمع، خاصة عندما يتعلق الأمر بالعناصر التي تحمل قيمة عاطفية عميقة للاعبين. القرار يظهر أن ضغط المجتمع الموحد يمكن أن يؤدي إلى تغييرات فورية.",
-    "sourceName": "PC Gamer",
-    "sourceUrl": "https://www.pcgamer.com/games/moba/riot-quickly-backpedals-on-paid-old-school-skins-in-league-of-legends-classic-after-backlash/",
-    "publishedAt": "2026-07-20"
+    "slug": "call-of-duty-film-modern-warfare-universe",
+    "title": "هوليوود تقتحم الحرب الحديثة: فيلم Call of Duty سيدور في عالم Modern Warfare",
+    "summary": "كشف مخرج الفيلم Peter Berg عن تفصيل حاسم حول فيلم Call of Duty القادم، حيث سيدور الفيلم في عالم Modern Warfare وليس في أي كون آخر من امتيازات السلسلة. يأتي الفيلم من Paramount ويجمع بين خبرة Berg في الأفلام الحربية والعمل مع الكاتب Taylor Sheridan. يُتوقع وصول الفيلم إلى دور السينما في يونيو 2028. اختيار عالم Modern Warfare يشير إلى رغبة Activision والاستوديو في تقديم نسخة حديثة وعملية من الامتياز الضخم.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/call-of-duty-movie-gets-a-key-update-about-its-setting/",
+    "publishedAt": "2026-07-21"
   },
   {
-    "slug": "007-first-light-ensemble-concept",
-    "title": "جيمس بوند وزملاؤه: صانعو أول فيلم 007 كادوا يختارون مساراً مختلفاً تماماً",
-    "summary": "كشفت تفاصيل جديدة عن تطوير لعبة 007: First Light أن فريق الإبداع كان يفكر في مفهوم بديل يركز على فريق متكامل من وكلاء المخابرات بدلاً من التركيز الحصري على شخصية جيمس بوند. كان المفهوم الأصلي يتصور لعبة ensemble حيث يعمل جميع الوكلاء معاً في تعاون ديناميكي. هذا الكشف يوفر نظرة ثمينة خلف الكواليس على عملية القرارات الإبداعية الصعبة التي تواجه الفرق الإنتاجية. اختيار الاستوديو في النهاية التركيز على جيمس بوند وحده يعكس فهماً استراتيجياً للعلامة التجارية والتوقعات التقليدية للمعجبين. القرار يسلط الضوء على كيفية أن العناصر الأساسية للفرانشايز يمكن أن تؤثر بشكل جوهري على اتجاه المشروع.",
-    "sourceName": "PC Gamer",
-    "sourceUrl": "https://www.pcgamer.com/games/action/007-first-light-was-originally-going-to-be-less-about-james-bond-and-more-of-an-ensemble-piece-with-all-the-00s-working-together-as-they-do-in-slovakia/",
-    "publishedAt": "2026-07-20"
+    "slug": "modern-warfare-4-beta-agosto",
+    "title": "عودة Call of Duty الضخمة: بيتا Modern Warfare 4 تنطلق في أغسطس",
+    "summary": "أعلنت Activision عن مواعيد البيتا لـ Call of Duty: Modern Warfare 4، حيث ستبدأ فترة البيتا المبكرة في 21-25 أغسطس للمنصات PC و PS5 و Xbox Series X|S. بعد ذلك، ستفتح البيتا المفتوحة للجميع من 28 أغسطس إلى 1 سبتمبر، وستشمل أيضاً Switch 2 للمرة الأولى. يحصل اللاعبون الذين قاموا بحجز اللعبة على 5 أيام إضافية من الوصول المبكر. ستضم البيتا خرائط متعددة، أوضاع لعب متنوعة بما فيها Search & Destroy وKill Block، وحوالي 19 سلاحاً مختلفاً يمكن للاعبين تجربتها.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/call-of-duty-modern-warfare-4-beta-dates-revealed-heres-how-to-get-in/",
+    "publishedAt": "2026-07-21"
   },
   {
-    "slug": "kingdom-hearts-missing-link-leaked-footage",
-    "title": "عودة من الموت: فيديو مسرب لـ Kingdom Hearts Missing-Link الملغاة",
-    "summary": "بعد أكثر من سنة من إيقاف تطوير لعبة Kingdom Hearts Missing-Link، ظهرت لقطات فيديو منها على الإنترنت. هذا التسريب يعطينا لمحة نادرة عن ما كان سيكون عليه المشروع قبل إلغاؤه. الفيديو المسرب يتضمن مشاهد غريبة وفريدة من نوعها، بما في ذلك أبطال يحملون Keyblades وهم يرتدون بدلات فضاء، مما يدل على أن الفريق كان يفكر في اتجاهات جريئة وغير تقليدية للعبة. هذا الإطلاق غير المتوقع للمحتوى المحذوف يعيد إلى الأذهان الأسف على مشاريع Square Enix المألوفة التي لم ترَ النور، مما يترك اللاعبين يتساءلون عما كان يمكن أن يكون.",
+    "slug": "game-pass-fasha-fi-janb-xbox",
+    "title": "الحلم الأزرق انهار: Xbox Game Pass لم يحقق الأرقام المطلوبة",
+    "summary": "اعترف مدير Creative Director في Forza Horizon 5 بأن Xbox Game Pass، رغم كونه فكرة جيدة الهدف، فشل في جذب عدد مشتركين كافٍ لتحقيق الربحية. كانت Microsoft تتوقع 77 مليون مشترك، لكن العدد الفعلي وصل فقط إلى 30 مليون. هذا الفشل ساهم مباشرة في الأزمة الحالية لـ Xbox، والتي أسفرت عن إغلاق استوديوهات وتسريح آلاف الموظفين. يؤكد براون أن Game Pass كانت محاولة صادقة لخدمة اللاعبين، لكن العملية لم تنجح كما هو مخطط، مما أدى إلى آثار مأساوية على الصناعة والعاملين بها.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/game-pass-was-a-good-idea-but-it-didnt-work-forza-horizon-5-creative-director-says/",
+    "publishedAt": "2026-07-21"
+  },
+  {
+    "slug": "modern-warfare-4-gameplay-debut",
+    "title": "سرعة اللعب تشعل الجدل: أول عرض حقيقي لـ Modern Warfare 4",
+    "summary": "عندما حضر بعض اللاعبين المختارين مؤتمر Fanatics Fest في نيويورك (16-19 يوليو)، تمكنوا من عرض أول لقطات حقيقية من نسق القتال متعدد اللاعبين في Call of Duty: Modern Warfare 4 عبر بث مباشر. على خلاف التقليد المعروف، لم تكن هناك فعالية رسمية \"Call of Duty: Next\" لهذا الإطلاق، بل تسرب المحتوى من خلال لاعبين حصلوا على فرصة تجربة اللعبة بشكل استثنائي. هذا الفيديو الأول أثار نقاشات حامية في المجتمع حول سرعة حركات اللاعب داخل اللعبة، مع تذكير الجماهير بالعهد الذهبي لألعاب Call of Duty في أوائل 2010s (Modern Warfare 2 و Black Ops 1)، حيث كانت آليات الحركة والقتال تتمتع بسرعة وإيقاع مختلف عما تعودوا عليه.",
     "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/kingdom-hearts-missing-link-footage-leak-beyblade-astronauts",
-    "publishedAt": "2026-07-20"
-  },
-  {
-    "slug": "cliff-bleszinski-returns-to-game-development",
-    "title": "من الماضي المؤلم إلى المستقبل: Cliff Bleszinski يفتح قلبه عن عودته المحتملة",
-    "summary": "Cliff Bleszinski، المصمم الأسطوري الذي أسهم بشكل أساسي في خلق سلسلة Gears of War وقاد تطورها في أول ثلاث أجزاء، كشف عن معركة شخصية طويلة مع الكحول التي أثرت على حياته المهنية. في حوار صادق، تحدث عن كيفية تأثير هذا الصراع على عمله حتى لو كانت الألعاب التي طورها من أجمل الأعمال في الصناعة. إلى جانب هذا الاعتراف الشجاع، ألمح Bleszinski إلى احتمالية عودته للعمل في تطوير الألعاب من جديد، مما قد يحمل آمالاً للاعبين الذين يتذكرون إبداعاته السابقة بشغف وحنين.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/cliff-bleszinski-alcoholism-gears-of-war-lawbreakers",
+    "sourceUrl": "https://www.eurogamer.net/call-of-duty-modern-warfare-4-gameplay-debut-community-reactions",
     "publishedAt": "2026-07-20"
   },
   {
@@ -184,59 +176,59 @@
     "publishedAt": "2026-07-20"
   },
   {
-    "slug": "modern-warfare-4-gameplay-debut",
-    "title": "سرعة اللعب تشعل الجدل: أول عرض حقيقي لـ Modern Warfare 4",
-    "summary": "عندما حضر بعض اللاعبين المختارين مؤتمر Fanatics Fest في نيويورك (16-19 يوليو)، تمكنوا من عرض أول لقطات حقيقية من نسق القتال متعدد اللاعبين في Call of Duty: Modern Warfare 4 عبر بث مباشر. على خلاف التقليد المعروف، لم تكن هناك فعالية رسمية \"Call of Duty: Next\" لهذا الإطلاق، بل تسرب المحتوى من خلال لاعبين حصلوا على فرصة تجربة اللعبة بشكل استثنائي. هذا الفيديو الأول أثار نقاشات حامية في المجتمع حول سرعة حركات اللاعب داخل اللعبة، مع تذكير الجماهير بالعهد الذهبي لألعاب Call of Duty في أوائل 2010s (Modern Warfare 2 و Black Ops 1)، حيث كانت آليات الحركة والقتال تتمتع بسرعة وإيقاع مختلف عما تعودوا عليه.",
+    "slug": "cliff-bleszinski-returns-to-game-development",
+    "title": "من الماضي المؤلم إلى المستقبل: Cliff Bleszinski يفتح قلبه عن عودته المحتملة",
+    "summary": "Cliff Bleszinski، المصمم الأسطوري الذي أسهم بشكل أساسي في خلق سلسلة Gears of War وقاد تطورها في أول ثلاث أجزاء، كشف عن معركة شخصية طويلة مع الكحول التي أثرت على حياته المهنية. في حوار صادق، تحدث عن كيفية تأثير هذا الصراع على عمله حتى لو كانت الألعاب التي طورها من أجمل الأعمال في الصناعة. إلى جانب هذا الاعتراف الشجاع، ألمح Bleszinski إلى احتمالية عودته للعمل في تطوير الألعاب من جديد، مما قد يحمل آمالاً للاعبين الذين يتذكرون إبداعاته السابقة بشغف وحنين.",
     "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/call-of-duty-modern-warfare-4-gameplay-debut-community-reactions",
+    "sourceUrl": "https://www.eurogamer.net/cliff-bleszinski-alcoholism-gears-of-war-lawbreakers",
     "publishedAt": "2026-07-20"
   },
   {
-    "slug": "starfield-2027-updates",
-    "title": "ستارفيلد تستمر في النمو: بيثيسدا تؤكد محتوى Starborn جديد قادم العام المقبل",
-    "summary": "أكدت بيثيسدا التزامها بتطوير ستارفيلد بعد أكثر من سنتين من إطلاقها، معلنة أن اللعبة «تبقى جزءاً مهماً من مستقبلنا». ستشهد اللعبة توسعات مستمرة تتضمن قصصاً جديدة وتحسينات موجهة للعب وتحديثات إضافية. الإضافة الكبيرة القادمة هي محتوى «Starborn» الذي سيصل سنة 2027. اللعبة التي وصلت لأكثر من 17 مليون لاعب عبر Game Pass والأنظمة الأخرى، عرفت توسعات سابقة مثل «Shattered Space» وإصدار PS5، مع تحديثات موسمية منها «Free Lanes» و«Terran Armada» اللتان وصلتا السنة الماضية. الدعم المستمر يعكس رؤية بيثيسدا طويلة الأمد للعبة.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/starfield-remains-important-to-bethesda-new-content-coming-in-2027/",
-    "publishedAt": "2026-07-19"
-  },
-  {
-    "slug": "blood-dawnwalker-physical-disc",
-    "title": "Blood of Dawnwalker الفامبير الوسيط سيصل على أقراص فيزيائية",
-    "summary": "أعلنت Bandai Namco و Rebel Wolves أن لعبة Blood of Dawnwalker الجديدة ستصدر على أقراص Blu-ray فيزيائية، وهي خطوة متميزة في سوق يهيمن عليه التوزيع الرقمي. اللعبة من نوع RPG تتناول قصة الفامبير في العصور الوسطى برؤية حديثة وفنية. هذا القرار يشير إلى ثقة الناشر بجودة المنتج النهائي وكذلك للعبة مع قاعدة لاعبين يفضلون الملكية المادية. في وقت تراجعت فيه الأقراص الفيزيائية بشكل كبير، يمثل هذا الخيار استجابة للطلب المستمر من عشاق النسخ المادية والمجمعين.",
+    "slug": "kingdom-hearts-missing-link-leaked-footage",
+    "title": "عودة من الموت: فيديو مسرب لـ Kingdom Hearts Missing-Link الملغاة",
+    "summary": "بعد أكثر من سنة من إيقاف تطوير لعبة Kingdom Hearts Missing-Link، ظهرت لقطات فيديو منها على الإنترنت. هذا التسريب يعطينا لمحة نادرة عن ما كان سيكون عليه المشروع قبل إلغاؤه. الفيديو المسرب يتضمن مشاهد غريبة وفريدة من نوعها، بما في ذلك أبطال يحملون Keyblades وهم يرتدون بدلات فضاء، مما يدل على أن الفريق كان يفكر في اتجاهات جريئة وغير تقليدية للعبة. هذا الإطلاق غير المتوقع للمحتوى المحذوف يعيد إلى الأذهان الأسف على مشاريع Square Enix المألوفة التي لم ترَ النور، مما يترك اللاعبين يتساءلون عما كان يمكن أن يكون.",
     "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/blood-of-dawnwalker-released-on-disc",
-    "publishedAt": "2026-07-19"
+    "sourceUrl": "https://www.eurogamer.net/kingdom-hearts-missing-link-footage-leak-beyblade-astronauts",
+    "publishedAt": "2026-07-20"
   },
   {
-    "slug": "hytale-content-preview-2026",
-    "title": "Hytale تعرض محتوى ضخم: 22 فيديو و37 صورة جديدة",
-    "summary": "أطلقت Hytale معاينة شاملة لمحتواها القادم، تتضمن 22 فيديو و37 صورة جديدة بالإضافة إلى ما يقارب 4000 كلمة من التوثيق التفصيلي. تأتي هذه الخطوة لإثبات التقدم المحرز في تطوير اللعبة والحفاظ على زخم الاهتمام المجتمعي بها. Hytale، المنافسة المباشرة للعبة Minecraft، تتميز برسومات فريدة وميكانيكيات جديدة توفر تجربة متميزة في نوع البناء والاستكشاف. المعاينة الواسعة تشير إلى تقدم ملموس وتوفر للمجتمع صورة واضحة عن حالة التطوير الحالية.",
+    "slug": "007-first-light-ensemble-concept",
+    "title": "جيمس بوند وزملاؤه: صانعو أول فيلم 007 كادوا يختارون مساراً مختلفاً تماماً",
+    "summary": "كشفت تفاصيل جديدة عن تطوير لعبة 007: First Light أن فريق الإبداع كان يفكر في مفهوم بديل يركز على فريق متكامل من وكلاء المخابرات بدلاً من التركيز الحصري على شخصية جيمس بوند. كان المفهوم الأصلي يتصور لعبة ensemble حيث يعمل جميع الوكلاء معاً في تعاون ديناميكي. هذا الكشف يوفر نظرة ثمينة خلف الكواليس على عملية القرارات الإبداعية الصعبة التي تواجه الفرق الإنتاجية. اختيار الاستوديو في النهاية التركيز على جيمس بوند وحده يعكس فهماً استراتيجياً للعلامة التجارية والتوقعات التقليدية للمعجبين. القرار يسلط الضوء على كيفية أن العناصر الأساسية للفرانشايز يمكن أن تؤثر بشكل جوهري على اتجاه المشروع.",
     "sourceName": "PC Gamer",
-    "sourceUrl": "https://www.pcgamer.com/games/survival-crafting/hytale-releases-massive-preview-of-upcoming-content-including-22-videos-and-37-new-images/",
-    "publishedAt": "2026-07-19"
+    "sourceUrl": "https://www.pcgamer.com/games/action/007-first-light-was-originally-going-to-be-less-about-james-bond-and-more-of-an-ensemble-piece-with-all-the-00s-working-together-as-they-do-in-slovakia/",
+    "publishedAt": "2026-07-20"
   },
   {
-    "slug": "final-fantasy-resonance-2d-alternate",
-    "title": "Final Fantasy: Resonance يتخيل السلسلة إذا ظلت بالرسومات ثنائية الأبعاد",
-    "summary": "كشفت Square Enix عن تريلر جديد للعبة Final Fantasy: Resonance، لعبة الموبايل الـ gacha المتفرعة من Fantasy Brave Exvius، يقدم عالماً بديلاً حيث احتفظت السلسلة برسوماتها البكسلية ثنائية الأبعاد بدلاً من الانتقال إلى الثلاثية الأبعاد. التريلر يستحضر جمالية HD-2D الحديثة التي استعادت شهرة الرسومات التقليدية. قرار Final Fantasy 7 الجريء بالانتقال للثلاثية الأبعاد سنة 1997 كان رهاناً محفوفاً للشركة قبل اندماجها مع Enix، لكنه غيّر مسار السلسلة إلى الأبد وأصبح نقطة تحول في تاريخ الألعاب.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/final-fantasy-resonance-trailer-imagines-a-world-without-final-fantasy-7-changing-everything/",
-    "publishedAt": "2026-07-19"
+    "slug": "riot-reverses-paid-classic-skins-decision",
+    "title": "حنين بدون ثمن: Riot تستسلم لضغط المجتمع وتلغي تسعير الـ Skins القديمة",
+    "summary": "تراجعت شركة Riot Games بسرعة عن قرار جعل الجلود الكلاسيكية في League of Legends Classic مدفوعة الأجر، وذلك استجابة لموجة انتقادات قوية من مجتمع اللاعبين. اعتبر المجتمع القرار محاولة تجارية متطفلة على الحنين والذكريات التي يرتبط بها اللاعبون بهذه الجلود. تجسد هذه الحادثة التوتر المستمر بين الشركات الكبرى والمجتمعات حول استراتيجيات تحقيق الإيرادات والحفاظ على رضا اللاعبين. استجابة Riot السريعة والحازمة تعكس فهماً متزايداً بأهمية الاستماع الجدي إلى صوت المجتمع، خاصة عندما يتعلق الأمر بالعناصر التي تحمل قيمة عاطفية عميقة للاعبين. القرار يظهر أن ضغط المجتمع الموحد يمكن أن يؤدي إلى تغييرات فورية.",
+    "sourceName": "PC Gamer",
+    "sourceUrl": "https://www.pcgamer.com/games/moba/riot-quickly-backpedals-on-paid-old-school-skins-in-league-of-legends-classic-after-backlash/",
+    "publishedAt": "2026-07-20"
   },
   {
-    "slug": "za-um-studio-layoffs",
-    "title": "أزمة في الاستوديو: ديسكو إليزيوم يعلن عن تسريح جماعي جديد",
-    "summary": "استوديو \"ZA/UM\" الشهير بلعبة \"Disco Elysium\" الحائزة على جوائز يواجه نكسة اقتصادية جديدة. الاستوديو أعلن عن تسريح ما يصل إلى 32 موظفاً من جميع الأقسام، وهي خطوة تعكس الضغوط المالية والتشغيلية الشديدة التي يواجهها. هذه ليست المرة الأولى - الاستوديو شهد نزاعات داخلية وقانونية علنية معقدة منذ إطلاق لعبته الرائعة عام 2019. الألعاب الاستثنائية لا تضمن الاستقرار المالي خاصة عندما تترافق مع تحديات إدارية وقانونية. هذه الأزمة تعكس حقيقة أوسع في صناعة الألعاب: حتى الاستوديوهات ذات الأعمال المشهورة والمعترف بها نقدياً قد تواجه صعوبات اقتصادية تجبرها على اتخاذ قرارات مؤلمة.",
+    "slug": "palworld-dominates-steam-million-concurrent",
+    "title": "بالوورلد تحافظ على عرشها: الظاهرة الألعاب تحقق مليون لاعب متزامن مجدداً",
+    "summary": "واصلت لعبة Palworld هيمنتها على منصة Steam خلال نهاية الأسبوع، حيث وصلت إلى ما يقارب مليون لاعب متزامن. هذا الإنجاز المتكرر يؤكد الجاذبية المستمرة للعبة التي تمكنت من الحفاظ على اهتمام المجتمع العالمي. تجمع Palworld بشكل فريد بين عناصر جمع المخلوقات والبقاء على قيد الحياة والحرف اليدوية، مما خلق صيغة تجذب فئات متنوعة من اللاعبين. استمرار اللعبة في تحطيم الأرقام القياسية من حيث عدد اللاعبين المتزامنين يعكس تفاني المجتمع وقوة الجاذبية الدائمة للمشروع. النجاح المستمر يضع Palworld في صفوف أكثر الألعاب حضوراً وتأثيراً على منصة Steam.",
     "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/disco-elysium-zero-parades-studio-zaum-to-lay-off-large-chunk-of-staff-once-more",
-    "publishedAt": "2026-07-19"
+    "sourceUrl": "https://www.eurogamer.net/palworld-almost-hits-1-million-concurrents-again",
+    "publishedAt": "2026-07-20"
   },
   {
-    "slug": "gears-of-war-creator-return",
-    "title": "عودة من الغياب: مبدع جيرز أوف ووور يفكر في العودة للتطوير",
-    "summary": "عالم تطوير الألعاب يشهد إشارات بعودة شخصية أسطورية إلى المشهد. كليف بليزينسكي، الرجل الذي صنع حقبة كاملة من ألعاب الحرب مع سلسلة \"Gears of War\"، يلمح إلى احتمالية عودته لمشهد التطوير بعد فترة من الغياب النسبي. مشاريعه الأخيرة في مجال الألعاب متعددة اللاعبين الحادة لم تحقق النتائج المتوقعة، مما دفعه للتفكير بجدية في نوع مختلف من الألعاب. بليزينسكي يشير بوضوح إلى أنه لن يركز على ألعاب النزاع الشديدة والمنافسة الحصرية، معتبراً أن هذا السوق مكتظ جداً وغير واعد. بدلاً من ذلك، يفكر بألعاب تركز على المتعة البسيطة والاستمتاع مع الأصدقاء بدون ضغوط تنافسية حادة.",
-    "sourceName": "PC Gamer",
-    "sourceUrl": "https://www.pcgamer.com/gaming-industry/gears-of-wars-creator-is-considering-returning-to-game-development-but-whatever-he-makes-wont-be-pvp-like-his-last-efforts-good-look-to-anyone-in-that-space/",
+    "slug": "game-of-thrones-war-westeros-rts-delayed-2027",
+    "title": "تأجيل حرب الحديقة الصغيرة: لعبة Game of Thrones الاستراتيجية تنتظر إلى 2027",
+    "summary": "أعلنت استوديو PlaySide Studios عن تأجيل موعد إطلاق لعبة Game of Thrones: War for Westeros RTS إلى عام 2027. يأتي هذا القرار في سياق التزام الفريق بضمان وصول اللعبة إلى معايير الجودة العالية التي يسعى إليها. كانت اللعبة المبنية على أساس سلسلة الكتب والمسلسل التلفازي الشهيرة من بين أكثر الألعاب المتوقعة من قبل المعجبين حول العالم. التأجيل يعكس الاتجاه المتزايد في الصناعة نحو منح الفرق المزيد من الوقت لتطوير منتجات متقنة بدلاً من الإطلاق المسرع. هذا القرار يشير إلى أن الاستوديو يفضل تحقيق رؤيته الكاملة حتى لو استغرق ذلك وقتاً أطول.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/game-of-thrones-war-for-westeros-rts-game-delayed-to-2027",
+    "publishedAt": "2026-07-20"
+  },
+  {
+    "slug": "call-of-duty-film-modern-warfare",
+    "title": "أفلام الحرب الحديثة: هوليوود تدخل عالم كول أوف ديوتي",
+    "summary": "عالم الألعاب والسينما يقتربان أكثر فأكثر. عملاق ألعاب الحرب \"كول أوف ديوتي\" يستعد لقفزته الكبرى نحو الشاشة الفضية، حيث سيدور الفيلم المرتقب في كون \"Modern Warfare\" الشهير الذي يحبه ملايين اللاعبين حول العالم. هذا المشروع السينمائي يأتي في إطار اتجاه هوليوودي متنامٍ نحو تحويل الألعاب الناجحة إلى أعمال درامية وحركية. سلسلة \"Modern Warfare\" تتمتع بسمعة قوية بفضل قصتها المشوقة وشخصياتها المتعمقة، مما يوفر أساساً صلباً للعمل السينمائي. هذه الخطوة تعكس إدراك شركات الإنتاج الكبرى بأن الألعاب الشهيرة تحمل جمهوراً ضخماً مستعداً للالتزام بمشاريع متعددة الوسائط والتفاعل مع محتوى تكميلي.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/call-of-duty-movie-set-modern-warfare-universe",
     "publishedAt": "2026-07-19"
   },
   {
@@ -248,59 +240,59 @@
     "publishedAt": "2026-07-19"
   },
   {
-    "slug": "call-of-duty-film-modern-warfare",
-    "title": "أفلام الحرب الحديثة: هوليوود تدخل عالم كول أوف ديوتي",
-    "summary": "عالم الألعاب والسينما يقتربان أكثر فأكثر. عملاق ألعاب الحرب \"كول أوف ديوتي\" يستعد لقفزته الكبرى نحو الشاشة الفضية، حيث سيدور الفيلم المرتقب في كون \"Modern Warfare\" الشهير الذي يحبه ملايين اللاعبين حول العالم. هذا المشروع السينمائي يأتي في إطار اتجاه هوليوودي متنامٍ نحو تحويل الألعاب الناجحة إلى أعمال درامية وحركية. سلسلة \"Modern Warfare\" تتمتع بسمعة قوية بفضل قصتها المشوقة وشخصياتها المتعمقة، مما يوفر أساساً صلباً للعمل السينمائي. هذه الخطوة تعكس إدراك شركات الإنتاج الكبرى بأن الألعاب الشهيرة تحمل جمهوراً ضخماً مستعداً للالتزام بمشاريع متعددة الوسائط والتفاعل مع محتوى تكميلي.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/call-of-duty-movie-set-modern-warfare-universe",
+    "slug": "gears-of-war-creator-return",
+    "title": "عودة من الغياب: مبدع جيرز أوف ووور يفكر في العودة للتطوير",
+    "summary": "عالم تطوير الألعاب يشهد إشارات بعودة شخصية أسطورية إلى المشهد. كليف بليزينسكي، الرجل الذي صنع حقبة كاملة من ألعاب الحرب مع سلسلة \"Gears of War\"، يلمح إلى احتمالية عودته لمشهد التطوير بعد فترة من الغياب النسبي. مشاريعه الأخيرة في مجال الألعاب متعددة اللاعبين الحادة لم تحقق النتائج المتوقعة، مما دفعه للتفكير بجدية في نوع مختلف من الألعاب. بليزينسكي يشير بوضوح إلى أنه لن يركز على ألعاب النزاع الشديدة والمنافسة الحصرية، معتبراً أن هذا السوق مكتظ جداً وغير واعد. بدلاً من ذلك، يفكر بألعاب تركز على المتعة البسيطة والاستمتاع مع الأصدقاء بدون ضغوط تنافسية حادة.",
+    "sourceName": "PC Gamer",
+    "sourceUrl": "https://www.pcgamer.com/gaming-industry/gears-of-wars-creator-is-considering-returning-to-game-development-but-whatever-he-makes-wont-be-pvp-like-his-last-efforts-good-look-to-anyone-in-that-space/",
     "publishedAt": "2026-07-19"
   },
   {
-    "slug": "fallout-5-pre-production-legacy-remasters",
-    "title": "ثورة فالاوت القادمة: بيثيسدا تجهز الجزء الخامس مع إعادة تصور الأجزاء الكلاسيكية",
-    "summary": "بيثيسدا أعلنت عن خطط طموحة لسلسلة فالاوت، حيث دخلت الجزء الخامس مرحلة الإنتاج الأساسية، بينما تعمل الشركة على إعادة تصميم شاملة لـ فالاوت 3 و فالاوت: نيو فيجاس الكلاسيكيين. هذه الخطوة تأتي مع إعلان تعاون تاريخي مع استوديو أوبسيديان المتخصص في تطوير لعبة فالاوت جديدة منفصلة. بالإضافة إلى ذلك، فالاوت 76 ستستقبل توسعاً ضخماً يعيد الحياة لنسخة الـ MMO من السلسلة. كل هذا يأتي ضمن استراتيجية طويلة الأجل تؤكد أن فالاوت أصبحت من أولويات بيثيسدا الرئيسية، خاصة بعد نجاح مسلسل أمازون التلفزيوني الذي جلب الانتباه الجماهيري الكبير للعلامة التجارية.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/fallout-re-confirmed-alongside-fallout-3-and-fallout-new-vegas-remasters/",
-    "publishedAt": "2026-07-18"
-  },
-  {
-    "slug": "bethesda-obsidian-partnership-fallout-confirmed",
-    "title": "اتحاد ألعاب: بيثيسدا وأوبسيديان يطويان صفحة الخلاف ويعملان معاً على فالاوت جديدة",
-    "summary": "أكد رئيس بيثيسدا توود هاوارد أن القصص الشائعة بين المجتمع الألعابي عن خلاف بينه وبين استوديو أوبسيديان لا تعكس الواقع. هاوارد أوضح أن هناك احترام متبادل كبير بين الشركتين خلف الكواليس، وأن بيثيسدا كانت تسعى دائماً للتعاون مع أوبسيديان بالطريقة الصحيحة. هذا التعاون أصبح الآن حقيقة واقعة، حيث تعمل أوبسيديان على لعبة فالاوت جديدة. هاوارد أشار إلى أنه استمتع دائماً بنجاح فالاوت: نيو فيجاس الذي طورته أوبسيديان. هذا الإعلان يضع حداً نهائياً للنقاشات غير المؤسسة حول خلاف وهمي بين الطرفين.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/todd-howard-addresses-fan-chatter-about-bethesda-obsidian-rivalry-conspiracies/",
-    "publishedAt": "2026-07-18"
-  },
-  {
-    "slug": "kotor-remake-2028-release-window",
-    "title": "نبشة الآمال: إعادة تطوير Knights of the Old Republic تستهدف سنة 2028",
-    "summary": "أعطت استوديو سابري إنتراكتيف إشارات إيجابية حول تطور لعبة Star Wars: Knights of the Old Republic المتأخرة كثيراً. وفقاً لمسؤول جودة الأعمال الجديد في الاستوديو، فإن اللعبة تستهدف نافذة إطلاق في سنة 2028. هذا الخبر يأتي بعد سنوات من التأخير والقلق حول مصير المشروع الذي كان يعاني من تحديات عديدة في التطوير. لعبة Knights of the Old Republic الأصلية تحتل مكانة مقدسة في قلوب عشاق ألعاب Star Wars، وإعادة تطويرها تعتبر فرصة نادرة لإحياء تراث ألعاب Star Wars الذهبي. هذا الإعلان قد يعيد الأمل لملايين المعجبين الذين انتظروا عودة هذه التجربة الأسطورية.",
+    "slug": "za-um-studio-layoffs",
+    "title": "أزمة في الاستوديو: ديسكو إليزيوم يعلن عن تسريح جماعي جديد",
+    "summary": "استوديو \"ZA/UM\" الشهير بلعبة \"Disco Elysium\" الحائزة على جوائز يواجه نكسة اقتصادية جديدة. الاستوديو أعلن عن تسريح ما يصل إلى 32 موظفاً من جميع الأقسام، وهي خطوة تعكس الضغوط المالية والتشغيلية الشديدة التي يواجهها. هذه ليست المرة الأولى - الاستوديو شهد نزاعات داخلية وقانونية علنية معقدة منذ إطلاق لعبته الرائعة عام 2019. الألعاب الاستثنائية لا تضمن الاستقرار المالي خاصة عندما تترافق مع تحديات إدارية وقانونية. هذه الأزمة تعكس حقيقة أوسع في صناعة الألعاب: حتى الاستوديوهات ذات الأعمال المشهورة والمعترف بها نقدياً قد تواجه صعوبات اقتصادية تجبرها على اتخاذ قرارات مؤلمة.",
     "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/kotor-remake-2028-release-window-chief-business-officer",
-    "publishedAt": "2026-07-18"
+    "sourceUrl": "https://www.eurogamer.net/disco-elysium-zero-parades-studio-zaum-to-lay-off-large-chunk-of-staff-once-more",
+    "publishedAt": "2026-07-19"
   },
   {
-    "slug": "gta-6-pre-orders-260-million-record",
-    "title": "أرقام خيالية: GTA 6 تحقق ربحاً يفوق 260 مليون دولار من الحجوزات المسبقة وحدها",
-    "summary": "بيانات من متخصصين في تحليل أسواق الألعاب تكشف عن نجاح غير مسبوق لحملة الحجز المسبق لـ Grand Theft Auto 6. اللعبة المرتقبة من Rockstar حققت إيرادات تجاوزت 260 مليون دولار من الحجوزات وحدها، مما يجعلها الأقوى والأكثر اهتماماً من حيث الحجوزات المسبقة في تاريخ صناعة الألعاب. هذه الأرقام الخيالية تعكس الحماس الهائل الذي يحيط باللعبة قبل إطلاقها، وتؤكد على مكانة سلسلة GTA كواحدة من أضخم العلامات التجارية في عالم الترفيه. رغم تصحيحات أجريت على بعض الأرقام المعلنة في البداية، إلا أن البيانات الحالية تظل مثيرة للإعجاب بشكل كبير.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/gta-6-pre-order-numbers-record",
-    "publishedAt": "2026-07-18"
-  },
-  {
-    "slug": "god-of-war-amazon-series-kratos-actor-injured-recast",
-    "title": "مسلسل God of War الحي على Amazon يشهد انقلاباً: استبدال ممثل كراتوس بسبب إصابة",
-    "summary": "يواجه مسلسل God of War الحي الذي تطوره Amazon للتلفاز انقلاباً كبيراً بسبب إصابة خطيرة تعرض لها الممثل الأساسي الذي يجسد شخصية كراتوس الأيقونية. اضطر فريق الإنتاج للبحث عن بديل لدور البطولة، الأمر الذي سيعطل جدول الإنتاج ويضيف ضغطاً على الميزانية والموارد. تعتبر هذه الإصابة نكسة كبيرة لمشروع Amazon الطموح الذي ينتظره معجبو سلسلة الألعاب بتوقعات عالية جداً. يعكس هذا الحادث التحديات الواقعية التي تواجه مسلسلات الحركة والخيال العلمي عالية التكلفة في مرحلة الإنتاج. كان المسلسل من بين أكثر مشاريع God of War المتوقعة، وقد يؤثر هذا التأخير على خطط الإطلاق والتسويق المستقبلية.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/god-of-war-amazon-actor-ryan-hurst-injury-recast",
-    "publishedAt": "2026-07-18"
-  },
-  {
-    "slug": "netflix-games-600-percent-growth-playground",
-    "title": "نتفليكس تحقق قفزة تاريخية في أعمال الألعاب بنمو 600%",
-    "summary": "كشفت شركة Netflix عن نمو قياسي في قطاع الألعاب الخاص بها، حيث حققت معدل نمو بلغ 600% في عدد لاعبي تطبيق Playground المخصص للأطفال خلال ثلاثة أشهر من إطلاقه في أبريل 2026. أعلنت الشركة عن تحقيق أعلى معدلات إطلاق لألعاب السحابة الخاصة بها مع نسخة بطولة كأس العالم والعبة رعب Unhinged. بينما لم تفصح Netflix عن أرقام دقيقة حول الأداء التفصيلي، أشارت إلى أن هذه الإشارات الإيجابية تعطيها ثقة متزايدة بمستقبل أعمال الألعاب. قال مسؤول تنفيذي للشركة أنهم لا يزالون في مرحلة البناء والتطوير، لكن النتائج الحالية تعطيهم قناعة بإمكانيات النمو المتواصل.",
+    "slug": "final-fantasy-resonance-2d-alternate",
+    "title": "Final Fantasy: Resonance يتخيل السلسلة إذا ظلت بالرسومات ثنائية الأبعاد",
+    "summary": "كشفت Square Enix عن تريلر جديد للعبة Final Fantasy: Resonance، لعبة الموبايل الـ gacha المتفرعة من Fantasy Brave Exvius، يقدم عالماً بديلاً حيث احتفظت السلسلة برسوماتها البكسلية ثنائية الأبعاد بدلاً من الانتقال إلى الثلاثية الأبعاد. التريلر يستحضر جمالية HD-2D الحديثة التي استعادت شهرة الرسومات التقليدية. قرار Final Fantasy 7 الجريء بالانتقال للثلاثية الأبعاد سنة 1997 كان رهاناً محفوفاً للشركة قبل اندماجها مع Enix، لكنه غيّر مسار السلسلة إلى الأبد وأصبح نقطة تحول في تاريخ الألعاب.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/netflix-says-part-of-its-games-business-is-up-600-but-its-still-early-days/",
+    "sourceUrl": "https://www.gamespot.com/articles/final-fantasy-resonance-trailer-imagines-a-world-without-final-fantasy-7-changing-everything/",
+    "publishedAt": "2026-07-19"
+  },
+  {
+    "slug": "hytale-content-preview-2026",
+    "title": "Hytale تعرض محتوى ضخم: 22 فيديو و37 صورة جديدة",
+    "summary": "أطلقت Hytale معاينة شاملة لمحتواها القادم، تتضمن 22 فيديو و37 صورة جديدة بالإضافة إلى ما يقارب 4000 كلمة من التوثيق التفصيلي. تأتي هذه الخطوة لإثبات التقدم المحرز في تطوير اللعبة والحفاظ على زخم الاهتمام المجتمعي بها. Hytale، المنافسة المباشرة للعبة Minecraft، تتميز برسومات فريدة وميكانيكيات جديدة توفر تجربة متميزة في نوع البناء والاستكشاف. المعاينة الواسعة تشير إلى تقدم ملموس وتوفر للمجتمع صورة واضحة عن حالة التطوير الحالية.",
+    "sourceName": "PC Gamer",
+    "sourceUrl": "https://www.pcgamer.com/games/survival-crafting/hytale-releases-massive-preview-of-upcoming-content-including-22-videos-and-37-new-images/",
+    "publishedAt": "2026-07-19"
+  },
+  {
+    "slug": "blood-dawnwalker-physical-disc",
+    "title": "Blood of Dawnwalker الفامبير الوسيط سيصل على أقراص فيزيائية",
+    "summary": "أعلنت Bandai Namco و Rebel Wolves أن لعبة Blood of Dawnwalker الجديدة ستصدر على أقراص Blu-ray فيزيائية، وهي خطوة متميزة في سوق يهيمن عليه التوزيع الرقمي. اللعبة من نوع RPG تتناول قصة الفامبير في العصور الوسطى برؤية حديثة وفنية. هذا القرار يشير إلى ثقة الناشر بجودة المنتج النهائي وكذلك للعبة مع قاعدة لاعبين يفضلون الملكية المادية. في وقت تراجعت فيه الأقراص الفيزيائية بشكل كبير، يمثل هذا الخيار استجابة للطلب المستمر من عشاق النسخ المادية والمجمعين.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/blood-of-dawnwalker-released-on-disc",
+    "publishedAt": "2026-07-19"
+  },
+  {
+    "slug": "starfield-2027-updates",
+    "title": "ستارفيلد تستمر في النمو: بيثيسدا تؤكد محتوى Starborn جديد قادم العام المقبل",
+    "summary": "أكدت بيثيسدا التزامها بتطوير ستارفيلد بعد أكثر من سنتين من إطلاقها، معلنة أن اللعبة «تبقى جزءاً مهماً من مستقبلنا». ستشهد اللعبة توسعات مستمرة تتضمن قصصاً جديدة وتحسينات موجهة للعب وتحديثات إضافية. الإضافة الكبيرة القادمة هي محتوى «Starborn» الذي سيصل سنة 2027. اللعبة التي وصلت لأكثر من 17 مليون لاعب عبر Game Pass والأنظمة الأخرى، عرفت توسعات سابقة مثل «Shattered Space» وإصدار PS5، مع تحديثات موسمية منها «Free Lanes» و«Terran Armada» اللتان وصلتا السنة الماضية. الدعم المستمر يعكس رؤية بيثيسدا طويلة الأمد للعبة.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/starfield-remains-important-to-bethesda-new-content-coming-in-2027/",
+    "publishedAt": "2026-07-19"
+  },
+  {
+    "slug": "bungie-marathon-director-departs",
+    "title": "استقالة مدير لعبة Marathon من Bungie في أوقات عصيبة",
+    "summary": "استوديو Bungie يشهد تطوراً إدارياً في فترة حساسة له، حيث أعلن مدير لعبة Marathon الحالي عن رحيله من الاستوديو المشهور. سيتلقى قيادة اللعبة مجموعة جديدة من المديرين، ما قد يشير إلى تحديات داخلية أو تغييرات استراتيجية. هذا الانتقال يأتي في وقت تواجه فيه الشركة تحديات متعددة، لكن إدارة Bungie أبدت ثقة بالفريق الجديد وقدرتهم على قيادة المشروع نحو آفاق أفضل. المدير الراحل أكد التزام الفريق برسالة إحضار لعبة بقعة ظلام استكشافية مرعبة للاعبين، وتوقع مفاجآت جديدة قادمة. هذا التغيير يعكس الديناميكيات المعقدة لصناعة الألعاب حيث تنتقل المواهب بحثاً عن فرص جديدة.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/marathon-game-director-leaves-bungie-at-a-tumultuous-time/",
     "publishedAt": "2026-07-18"
   },
   {
@@ -312,27 +304,59 @@
     "publishedAt": "2026-07-18"
   },
   {
-    "slug": "bungie-marathon-director-departs",
-    "title": "استقالة مدير لعبة Marathon من Bungie في أوقات عصيبة",
-    "summary": "استوديو Bungie يشهد تطوراً إدارياً في فترة حساسة له، حيث أعلن مدير لعبة Marathon الحالي عن رحيله من الاستوديو المشهور. سيتلقى قيادة اللعبة مجموعة جديدة من المديرين، ما قد يشير إلى تحديات داخلية أو تغييرات استراتيجية. هذا الانتقال يأتي في وقت تواجه فيه الشركة تحديات متعددة، لكن إدارة Bungie أبدت ثقة بالفريق الجديد وقدرتهم على قيادة المشروع نحو آفاق أفضل. المدير الراحل أكد التزام الفريق برسالة إحضار لعبة بقعة ظلام استكشافية مرعبة للاعبين، وتوقع مفاجآت جديدة قادمة. هذا التغيير يعكس الديناميكيات المعقدة لصناعة الألعاب حيث تنتقل المواهب بحثاً عن فرص جديدة.",
+    "slug": "netflix-games-600-percent-growth-playground",
+    "title": "نتفليكس تحقق قفزة تاريخية في أعمال الألعاب بنمو 600%",
+    "summary": "كشفت شركة Netflix عن نمو قياسي في قطاع الألعاب الخاص بها، حيث حققت معدل نمو بلغ 600% في عدد لاعبي تطبيق Playground المخصص للأطفال خلال ثلاثة أشهر من إطلاقه في أبريل 2026. أعلنت الشركة عن تحقيق أعلى معدلات إطلاق لألعاب السحابة الخاصة بها مع نسخة بطولة كأس العالم والعبة رعب Unhinged. بينما لم تفصح Netflix عن أرقام دقيقة حول الأداء التفصيلي، أشارت إلى أن هذه الإشارات الإيجابية تعطيها ثقة متزايدة بمستقبل أعمال الألعاب. قال مسؤول تنفيذي للشركة أنهم لا يزالون في مرحلة البناء والتطوير، لكن النتائج الحالية تعطيهم قناعة بإمكانيات النمو المتواصل.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/marathon-game-director-leaves-bungie-at-a-tumultuous-time/",
+    "sourceUrl": "https://www.gamespot.com/articles/netflix-says-part-of-its-games-business-is-up-600-but-its-still-early-days/",
     "publishedAt": "2026-07-18"
   },
   {
-    "slug": "netflix-minigolf-game",
-    "title": "Netflix تطلق لعبة جولف مرحة تجمع أشهر مسلسلاتها في تجربة واحدة",
-    "summary": "أعلنت Netflix عن لعبة جديدة باسم Netflix Minigolf تجمع بين ميكانيكا الجولف الصغيرة والـ pinball في تجربة حفلة تعاونية. تتضمن اللعبة أكثر من 60 مستوى مصممة داخل عوالم مسلسلات Netflix الشهيرة بما فيها Stranger Things و Bridgerton و Squid Game. تُتيح اللعبة لللاعبين التحكم بشخصيات من هذه العروض وتجميع قوى خاصة تدعى \"Pranks\" لإزعاج الخصوم. تُطلق في 28 يوليو للمشتركين فقط مع دعم لعب محلي تعاوني حتى أربعة لاعبين باستخدام الهاتف الذكي كجهاز تحكم.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/new-netflix-game-brings-together-the-streamers-most-popular-shows/",
-    "publishedAt": "2026-07-17"
+    "slug": "god-of-war-amazon-series-kratos-actor-injured-recast",
+    "title": "مسلسل God of War الحي على Amazon يشهد انقلاباً: استبدال ممثل كراتوس بسبب إصابة",
+    "summary": "يواجه مسلسل God of War الحي الذي تطوره Amazon للتلفاز انقلاباً كبيراً بسبب إصابة خطيرة تعرض لها الممثل الأساسي الذي يجسد شخصية كراتوس الأيقونية. اضطر فريق الإنتاج للبحث عن بديل لدور البطولة، الأمر الذي سيعطل جدول الإنتاج ويضيف ضغطاً على الميزانية والموارد. تعتبر هذه الإصابة نكسة كبيرة لمشروع Amazon الطموح الذي ينتظره معجبو سلسلة الألعاب بتوقعات عالية جداً. يعكس هذا الحادث التحديات الواقعية التي تواجه مسلسلات الحركة والخيال العلمي عالية التكلفة في مرحلة الإنتاج. كان المسلسل من بين أكثر مشاريع God of War المتوقعة، وقد يؤثر هذا التأخير على خطط الإطلاق والتسويق المستقبلية.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/god-of-war-amazon-actor-ryan-hurst-injury-recast",
+    "publishedAt": "2026-07-18"
   },
   {
-    "slug": "gta-6-مبيعات-صادمة",
-    "title": "توقعات صاعقة: GTA 6 قد تحقق 5 مليارات دولار في أسبوعها الأول فقط",
-    "summary": "أصدرت شركة الأبحاث المتخصصة Newzoo توقعات جريئة بشأن مبيعات Grand Theft Auto 6 عند إطلاقه في نوفمبر القادم. تتوقع الشركة أن اللعبة قد تحقق ما بين 3.3 و5.2 مليار دولار عالمياً خلال أسبوعها الأول وحده، وهو رقم يتجاوز بكثير المليار دولار التي حققتها GTA 5 في 72 ساعة عند إطلاقها عام 2013. اعتمدت Newzoo توقعاتها على أرقام الطلب المسبق القوية جداً، حيث بلغت المبيعات الرقمية وحدها 180 مليون دولار في الأسبوع الأخير من يونيو بين الولايات المتحدة والدول الأوروبية الكبرى.",
+    "slug": "gta-6-pre-orders-260-million-record",
+    "title": "أرقام خيالية: GTA 6 تحقق ربحاً يفوق 260 مليون دولار من الحجوزات المسبقة وحدها",
+    "summary": "بيانات من متخصصين في تحليل أسواق الألعاب تكشف عن نجاح غير مسبوق لحملة الحجز المسبق لـ Grand Theft Auto 6. اللعبة المرتقبة من Rockstar حققت إيرادات تجاوزت 260 مليون دولار من الحجوزات وحدها، مما يجعلها الأقوى والأكثر اهتماماً من حيث الحجوزات المسبقة في تاريخ صناعة الألعاب. هذه الأرقام الخيالية تعكس الحماس الهائل الذي يحيط باللعبة قبل إطلاقها، وتؤكد على مكانة سلسلة GTA كواحدة من أضخم العلامات التجارية في عالم الترفيه. رغم تصحيحات أجريت على بعض الأرقام المعلنة في البداية، إلا أن البيانات الحالية تظل مثيرة للإعجاب بشكل كبير.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/gta-6-pre-order-numbers-record",
+    "publishedAt": "2026-07-18"
+  },
+  {
+    "slug": "kotor-remake-2028-release-window",
+    "title": "نبشة الآمال: إعادة تطوير Knights of the Old Republic تستهدف سنة 2028",
+    "summary": "أعطت استوديو سابري إنتراكتيف إشارات إيجابية حول تطور لعبة Star Wars: Knights of the Old Republic المتأخرة كثيراً. وفقاً لمسؤول جودة الأعمال الجديد في الاستوديو، فإن اللعبة تستهدف نافذة إطلاق في سنة 2028. هذا الخبر يأتي بعد سنوات من التأخير والقلق حول مصير المشروع الذي كان يعاني من تحديات عديدة في التطوير. لعبة Knights of the Old Republic الأصلية تحتل مكانة مقدسة في قلوب عشاق ألعاب Star Wars، وإعادة تطويرها تعتبر فرصة نادرة لإحياء تراث ألعاب Star Wars الذهبي. هذا الإعلان قد يعيد الأمل لملايين المعجبين الذين انتظروا عودة هذه التجربة الأسطورية.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/kotor-remake-2028-release-window-chief-business-officer",
+    "publishedAt": "2026-07-18"
+  },
+  {
+    "slug": "bethesda-obsidian-partnership-fallout-confirmed",
+    "title": "اتحاد ألعاب: بيثيسدا وأوبسيديان يطويان صفحة الخلاف ويعملان معاً على فالاوت جديدة",
+    "summary": "أكد رئيس بيثيسدا توود هاوارد أن القصص الشائعة بين المجتمع الألعابي عن خلاف بينه وبين استوديو أوبسيديان لا تعكس الواقع. هاوارد أوضح أن هناك احترام متبادل كبير بين الشركتين خلف الكواليس، وأن بيثيسدا كانت تسعى دائماً للتعاون مع أوبسيديان بالطريقة الصحيحة. هذا التعاون أصبح الآن حقيقة واقعة، حيث تعمل أوبسيديان على لعبة فالاوت جديدة. هاوارد أشار إلى أنه استمتع دائماً بنجاح فالاوت: نيو فيجاس الذي طورته أوبسيديان. هذا الإعلان يضع حداً نهائياً للنقاشات غير المؤسسة حول خلاف وهمي بين الطرفين.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/gta-6-just-got-a-jaw-dropping-sales-prediction/",
+    "sourceUrl": "https://www.gamespot.com/articles/todd-howard-addresses-fan-chatter-about-bethesda-obsidian-rivalry-conspiracies/",
+    "publishedAt": "2026-07-18"
+  },
+  {
+    "slug": "fallout-5-pre-production-legacy-remasters",
+    "title": "ثورة فالاوت القادمة: بيثيسدا تجهز الجزء الخامس مع إعادة تصور الأجزاء الكلاسيكية",
+    "summary": "بيثيسدا أعلنت عن خطط طموحة لسلسلة فالاوت، حيث دخلت الجزء الخامس مرحلة الإنتاج الأساسية، بينما تعمل الشركة على إعادة تصميم شاملة لـ فالاوت 3 و فالاوت: نيو فيجاس الكلاسيكيين. هذه الخطوة تأتي مع إعلان تعاون تاريخي مع استوديو أوبسيديان المتخصص في تطوير لعبة فالاوت جديدة منفصلة. بالإضافة إلى ذلك، فالاوت 76 ستستقبل توسعاً ضخماً يعيد الحياة لنسخة الـ MMO من السلسلة. كل هذا يأتي ضمن استراتيجية طويلة الأجل تؤكد أن فالاوت أصبحت من أولويات بيثيسدا الرئيسية، خاصة بعد نجاح مسلسل أمازون التلفزيوني الذي جلب الانتباه الجماهيري الكبير للعلامة التجارية.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/fallout-re-confirmed-alongside-fallout-3-and-fallout-new-vegas-remasters/",
+    "publishedAt": "2026-07-18"
+  },
+  {
+    "slug": "battlefield-6-القتال-البحري",
+    "title": "بعد 21 سنة... باتلفيلد 6 تستعيد الطائرات ثنائية المقاعد وتفتتح حرباً بحرية جديدة",
+    "summary": "يجلب التحديث الجديد لـ Battlefield 6 ثورة في أسلوب اللعب مع إدخال نظام قتال بحري متطور يتضمن موجات متحركة تؤثر على الرؤية والحركة. للمرة الأولى منذ Battlefield 2 عام 2005، تعود الطائرات النفاثة ثنائية المقاعد التي يمكن لاعبين التحكم بها معاً. تدور أحداث الموسم الرابع \"Pacific Front\" في خريطة جديدة تدعى Tsuru Reef، وهي أرخبيل هادئ ضخم يوفر فرصاً لحروب برية وبحرية وجوية. تؤكد التسريبات وجود تعاون مع سلسلة Top Gun الشهيرة، مما يضيف بعداً سينمائياً للتجربة.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/battlefield-6-is-getting-a-feature-not-seen-in-21-years-and-a-top-gun-crossover/",
     "publishedAt": "2026-07-17"
   },
   {
@@ -344,27 +368,27 @@
     "publishedAt": "2026-07-17"
   },
   {
-    "slug": "battlefield-6-القتال-البحري",
-    "title": "بعد 21 سنة... باتلفيلد 6 تستعيد الطائرات ثنائية المقاعد وتفتتح حرباً بحرية جديدة",
-    "summary": "يجلب التحديث الجديد لـ Battlefield 6 ثورة في أسلوب اللعب مع إدخال نظام قتال بحري متطور يتضمن موجات متحركة تؤثر على الرؤية والحركة. للمرة الأولى منذ Battlefield 2 عام 2005، تعود الطائرات النفاثة ثنائية المقاعد التي يمكن لاعبين التحكم بها معاً. تدور أحداث الموسم الرابع \"Pacific Front\" في خريطة جديدة تدعى Tsuru Reef، وهي أرخبيل هادئ ضخم يوفر فرصاً لحروب برية وبحرية وجوية. تؤكد التسريبات وجود تعاون مع سلسلة Top Gun الشهيرة، مما يضيف بعداً سينمائياً للتجربة.",
+    "slug": "gta-6-مبيعات-صادمة",
+    "title": "توقعات صاعقة: GTA 6 قد تحقق 5 مليارات دولار في أسبوعها الأول فقط",
+    "summary": "أصدرت شركة الأبحاث المتخصصة Newzoo توقعات جريئة بشأن مبيعات Grand Theft Auto 6 عند إطلاقه في نوفمبر القادم. تتوقع الشركة أن اللعبة قد تحقق ما بين 3.3 و5.2 مليار دولار عالمياً خلال أسبوعها الأول وحده، وهو رقم يتجاوز بكثير المليار دولار التي حققتها GTA 5 في 72 ساعة عند إطلاقها عام 2013. اعتمدت Newzoo توقعاتها على أرقام الطلب المسبق القوية جداً، حيث بلغت المبيعات الرقمية وحدها 180 مليون دولار في الأسبوع الأخير من يونيو بين الولايات المتحدة والدول الأوروبية الكبرى.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/battlefield-6-is-getting-a-feature-not-seen-in-21-years-and-a-top-gun-crossover/",
+    "sourceUrl": "https://www.gamespot.com/articles/gta-6-just-got-a-jaw-dropping-sales-prediction/",
     "publishedAt": "2026-07-17"
   },
   {
-    "slug": "the-duskbloods-closed-network-test",
-    "title": "فرصة ذهبية لاختبار لعبة FromSoftware الجديدة قريباً على Switch 2",
-    "summary": "ستتاح فرصة محدودة للاعبي Nintendo Switch 2 لتجربة لعبة The Duskbloods قبل إطلاقها الرسمي. ستجري شركة FromSoftware اختبار شبكة مغلق في الفترة من 21 إلى 23 أغسطس المقبل، مع إمكانية تسجيل الرغبة في المشاركة ابتداءً من 22 يوليو. سيدعم الاختبار جلسات ألعاب متعددة اللاعبين تصل إلى 8 لاعبين، وستركز الشركة على قياس أداء الخوادم وحل المشاكل المتعلقة باللعب الجماعي وتوازن اللعبة. يتطلب المشاركة امتلاك جهاز Nintendo Switch 2 واشتراك فعال في خدمة Nintendo Switch Online. تمثل هذه الفرصة اختبار الخروج المختلف لـ FromSoftware عن ألعابهم الكلاسيكية.",
+    "slug": "netflix-minigolf-game",
+    "title": "Netflix تطلق لعبة جولف مرحة تجمع أشهر مسلسلاتها في تجربة واحدة",
+    "summary": "أعلنت Netflix عن لعبة جديدة باسم Netflix Minigolf تجمع بين ميكانيكا الجولف الصغيرة والـ pinball في تجربة حفلة تعاونية. تتضمن اللعبة أكثر من 60 مستوى مصممة داخل عوالم مسلسلات Netflix الشهيرة بما فيها Stranger Things و Bridgerton و Squid Game. تُتيح اللعبة لللاعبين التحكم بشخصيات من هذه العروض وتجميع قوى خاصة تدعى \"Pranks\" لإزعاج الخصوم. تُطلق في 28 يوليو للمشتركين فقط مع دعم لعب محلي تعاوني حتى أربعة لاعبين باستخدام الهاتف الذكي كجهاز تحكم.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/your-first-chance-to-play-the-duskbloods-early-is-next-month/",
-    "publishedAt": "2026-07-16"
+    "sourceUrl": "https://www.gamespot.com/articles/new-netflix-game-brings-together-the-streamers-most-popular-shows/",
+    "publishedAt": "2026-07-17"
   },
   {
-    "slug": "assassins-creed-black-flag-resynced-steam-success",
-    "title": "نجاح تاريخي لإعادة إطلاق Black Flag تحقق مليوني نسخة في اليوم الأول",
-    "summary": "حققت نسخة Assassin's Creed Black Flag Resynced المُعاد إطلاقها نجاحاً استثنائياً، حيث بيعت مليونا نسخة في يوم الإطلاق الأول فقط. كانت بيانات منصة Steam الأخيرة تشير إلى أن هذا الإطلاق يمثل أكبر نجاح في تاريخ سلسلة Assassin's Creed على المنصة الشهيرة. يأتي هذا النجاح رغم عدم تضمن اللعبة لجميع الميكانيكا القتالية الأيقونية من النسخة الأصلية، إذ اعتبرتها ستوديو Ubisoft Barcelona أولويات أقل مقابل العمل على تحسين القتال الأساسي. يعكس الإقبال الشديد رغبة اللاعبين في إعادة استكشاف العصر الذهبي للقراصنة.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/assassins-creed-black-flag-resynced-steam-launch-data",
+    "slug": "pubg-new-player-onboarding",
+    "title": "PUBG تعيد تصميم تجربة اللاعبين الجدد بـ 17 درس تدريبي شامل",
+    "summary": "أطلقت شركة Krafton Inc. تحديثاً كبيراً للعبة PUBG: Battlegrounds يركز على تحسين تجربة اللاعبين الجدد، الذين يواجهون صعوبات في الدخول لعالم لعبة battle royale معقد ومتطور. يتضمن التحديث 42.2 وضع تدريب جديد يسمى \"Basic Training\" يغطي 17 درساً تعليمياً تبدأ من الأساسيات مثل الحركة والتجهيز وتصل إلى دروس متقدمة في القتال والبقاء داخل منطقة الخطر. سيرافق اللاعب الجديد شخصية غير لاعب طوال رحلته التدريبية لتقديم التوجيهات. كما تم تحسين نظام التواصل بين الفريق بواجهة جديدة وإمكانية وضع علامات في الخريطة.",
+    "sourceName": "GameSpot",
+    "sourceUrl": "https://www.gamespot.com/articles/pubg-is-finally-fixing-one-of-its-biggest-new-player-hurdles/",
     "publishedAt": "2026-07-16"
   },
   {
@@ -376,27 +400,27 @@
     "publishedAt": "2026-07-16"
   },
   {
-    "slug": "pubg-new-player-onboarding",
-    "title": "PUBG تعيد تصميم تجربة اللاعبين الجدد بـ 17 درس تدريبي شامل",
-    "summary": "أطلقت شركة Krafton Inc. تحديثاً كبيراً للعبة PUBG: Battlegrounds يركز على تحسين تجربة اللاعبين الجدد، الذين يواجهون صعوبات في الدخول لعالم لعبة battle royale معقد ومتطور. يتضمن التحديث 42.2 وضع تدريب جديد يسمى \"Basic Training\" يغطي 17 درساً تعليمياً تبدأ من الأساسيات مثل الحركة والتجهيز وتصل إلى دروس متقدمة في القتال والبقاء داخل منطقة الخطر. سيرافق اللاعب الجديد شخصية غير لاعب طوال رحلته التدريبية لتقديم التوجيهات. كما تم تحسين نظام التواصل بين الفريق بواجهة جديدة وإمكانية وضع علامات في الخريطة.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/pubg-is-finally-fixing-one-of-its-biggest-new-player-hurdles/",
+    "slug": "assassins-creed-black-flag-resynced-steam-success",
+    "title": "نجاح تاريخي لإعادة إطلاق Black Flag تحقق مليوني نسخة في اليوم الأول",
+    "summary": "حققت نسخة Assassin's Creed Black Flag Resynced المُعاد إطلاقها نجاحاً استثنائياً، حيث بيعت مليونا نسخة في يوم الإطلاق الأول فقط. كانت بيانات منصة Steam الأخيرة تشير إلى أن هذا الإطلاق يمثل أكبر نجاح في تاريخ سلسلة Assassin's Creed على المنصة الشهيرة. يأتي هذا النجاح رغم عدم تضمن اللعبة لجميع الميكانيكا القتالية الأيقونية من النسخة الأصلية، إذ اعتبرتها ستوديو Ubisoft Barcelona أولويات أقل مقابل العمل على تحسين القتال الأساسي. يعكس الإقبال الشديد رغبة اللاعبين في إعادة استكشاف العصر الذهبي للقراصنة.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/assassins-creed-black-flag-resynced-steam-launch-data",
     "publishedAt": "2026-07-16"
   },
   {
-    "slug": "1666-amsterdam-new-game",
-    "title": "1666: Amsterdam - لعبة جديدة تمزج الفن الكلاسيكي بالسحر والظلام",
-    "summary": "Patrice Désilets، مبدع سلسلة Assassin's Creed الأسطورية، يعود بلعبة جديدة طموحة تحت عنوان \"1666: Amsterdam\". اللعبة التي كانت قيد التطوير منذ 16 سنة (بدأت في 2011 قبل إفلاس THQ)، تجمع بين الفانتازيا المظلمة والسحر والخوارق. تتنقل اللعبة عبر ثلاث حقب زمنية: أمستردام في القرن السابع عشر، سنة 1999، والعصر الحديث. ما يميز \"1666\" هو توجهها الفني الفريد: الفريق استوحى تصاميمه من عصر الذهب الهولندي في الرسم، مستخدماً لوحات فنانين مثل Johannes Vermeer و Adriaen van Ostade. اللعبة تحول الرسومات الكلاسيكية إلى بيئات تفاعلية، مما يعطيها هوية بصرية لم نرَ مثيلاً لها في صناعة الألعاب.",
+    "slug": "the-duskbloods-closed-network-test",
+    "title": "فرصة ذهبية لاختبار لعبة FromSoftware الجديدة قريباً على Switch 2",
+    "summary": "ستتاح فرصة محدودة للاعبي Nintendo Switch 2 لتجربة لعبة The Duskbloods قبل إطلاقها الرسمي. ستجري شركة FromSoftware اختبار شبكة مغلق في الفترة من 21 إلى 23 أغسطس المقبل، مع إمكانية تسجيل الرغبة في المشاركة ابتداءً من 22 يوليو. سيدعم الاختبار جلسات ألعاب متعددة اللاعبين تصل إلى 8 لاعبين، وستركز الشركة على قياس أداء الخوادم وحل المشاكل المتعلقة باللعب الجماعي وتوازن اللعبة. يتطلب المشاركة امتلاك جهاز Nintendo Switch 2 واشتراك فعال في خدمة Nintendo Switch Online. تمثل هذه الفرصة اختبار الخروج المختلف لـ FromSoftware عن ألعابهم الكلاسيكية.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/assassins-creed-creators-new-game-channels-fine-art-and-slasher-cinema/",
-    "publishedAt": "2026-07-15"
+    "sourceUrl": "https://www.gamespot.com/articles/your-first-chance-to-play-the-duskbloods-early-is-next-month/",
+    "publishedAt": "2026-07-16"
   },
   {
-    "slug": "far-cry-tv-show-steve-buscemi",
-    "title": "سلسلة Far Cry التلفزيونية تستقطب ممثلاً أسطورياً",
-    "summary": "مسلسل Far Cry القادم من شبكة FX والقائم على سلسلة الألعاب الشهيرة يستقطب نجماً معروفاً. الممثل الحائز على جوائز إيمي ستيف بوسيمي، الذي اشتهر بأدوار في أفلام \"Fargo\" و\"The Big Lebowski\" و\"Reservoir Dogs\" و\"Boardwalk Empire\"، انضم لطاقم العمل الذي يضم بالفعل Rob Mac و Lizzy Caplan. المسلسل سيتبع صيغة أنثولوجيا، حيث كل موسم يقدم عالماً جديداً مع شخصيات مختلفة، مثلما تفعل الألعاب الأصلية. Noah Hawley، من صنع مسلسل \"Fargo\" الحائز على الجوائز والآن \"Alien: Earth\"، سيعمل كمنتج تنفيذي. المسلسل سيعرض على FX و Hulu في أمريكا و Disney+ عالمياً حين إطلاقه، لم يُحدد موعد بعد.",
+    "slug": "call-of-duty-modern-warfare-4",
+    "title": "كول أوف ديوتي مودرن وارفير 4: العبة التاكتيكس تنتظر لاعبيها",
+    "summary": "إنفينيتي وارد تُحضّر نسخة تاكتيكالية محسّنة من كول أوف ديوتي الأسطورية. الإطلاق الكبير يتزامن مع حدث Fanatics Fest الشهير بنيويورك (16-19 يوليو)، حيث يمكن للاعبين تجربة اللعبة مباشرة قبل الإطلاق الفعلي. الحدث سيشهد نجم NBA كيفن ديورانت ونجمة الحركة إندي نافاريت من فيلم الرعب \"Obsession\" الذي كسر التوقعات بأرباح 426 مليون دولار عالمياً، مع حوار مفتوح مع فريق التطوير. اللاعبون سيحصلون على فرصة لعب النسخة المفتوحة مجاناً قريباً. تُعتبر هذه الإصدارة من الألعاب الأكثر انتظاراً بين محبي الألعاب التاكتيكية والقتالية حول العالم، خاصة مع إعادة تقديم الحملة الرسمية والمضاعفة.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/far-cry-tv-show-adds-iconic-veteran-actor-steve-buscemi/",
+    "sourceUrl": "https://www.gamespot.com/articles/star-of-2026s-biggest-movie-will-talk-call-of-duty-mw4-this-weekend/",
     "publishedAt": "2026-07-15"
   },
   {
@@ -408,59 +432,27 @@
     "publishedAt": "2026-07-15"
   },
   {
-    "slug": "call-of-duty-modern-warfare-4",
-    "title": "كول أوف ديوتي مودرن وارفير 4: العبة التاكتيكس تنتظر لاعبيها",
-    "summary": "إنفينيتي وارد تُحضّر نسخة تاكتيكالية محسّنة من كول أوف ديوتي الأسطورية. الإطلاق الكبير يتزامن مع حدث Fanatics Fest الشهير بنيويورك (16-19 يوليو)، حيث يمكن للاعبين تجربة اللعبة مباشرة قبل الإطلاق الفعلي. الحدث سيشهد نجم NBA كيفن ديورانت ونجمة الحركة إندي نافاريت من فيلم الرعب \"Obsession\" الذي كسر التوقعات بأرباح 426 مليون دولار عالمياً، مع حوار مفتوح مع فريق التطوير. اللاعبون سيحصلون على فرصة لعب النسخة المفتوحة مجاناً قريباً. تُعتبر هذه الإصدارة من الألعاب الأكثر انتظاراً بين محبي الألعاب التاكتيكية والقتالية حول العالم، خاصة مع إعادة تقديم الحملة الرسمية والمضاعفة.",
+    "slug": "far-cry-tv-show-steve-buscemi",
+    "title": "سلسلة Far Cry التلفزيونية تستقطب ممثلاً أسطورياً",
+    "summary": "مسلسل Far Cry القادم من شبكة FX والقائم على سلسلة الألعاب الشهيرة يستقطب نجماً معروفاً. الممثل الحائز على جوائز إيمي ستيف بوسيمي، الذي اشتهر بأدوار في أفلام \"Fargo\" و\"The Big Lebowski\" و\"Reservoir Dogs\" و\"Boardwalk Empire\"، انضم لطاقم العمل الذي يضم بالفعل Rob Mac و Lizzy Caplan. المسلسل سيتبع صيغة أنثولوجيا، حيث كل موسم يقدم عالماً جديداً مع شخصيات مختلفة، مثلما تفعل الألعاب الأصلية. Noah Hawley، من صنع مسلسل \"Fargo\" الحائز على الجوائز والآن \"Alien: Earth\"، سيعمل كمنتج تنفيذي. المسلسل سيعرض على FX و Hulu في أمريكا و Disney+ عالمياً حين إطلاقه، لم يُحدد موعد بعد.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/star-of-2026s-biggest-movie-will-talk-call-of-duty-mw4-this-weekend/",
+    "sourceUrl": "https://www.gamespot.com/articles/far-cry-tv-show-adds-iconic-veteran-actor-steve-buscemi/",
     "publishedAt": "2026-07-15"
   },
   {
-    "slug": "dying-light-beast-old-gen-cancelled",
-    "title": "نسخ الأجيال القديمة تنقرض: تكنولاند تلغي إصدارات PS4 و Xbox One من Dying Light",
-    "summary": "قررت شركة Techland الإطاحة بنسخ PS4 و Xbox One من لعبتها Dying Light: The Beast في خطوة وصفتها بـ«الصعبة لكن الضرورية». جاء هذا القرار بعد أن أدركت الفريق أن متطلبات اللعبة البصرية والتقنية تتجاوز قدرات الأجهزة القديمة بشكل كبير. اللعبة التي صدرت في 2025 على PC وPS5 وXbox Series X/S تعتمد بشكل أساسي على قوة المعالجات الحديثة في تقديم عالمها المفتوح وتأثيراتها البصرية المتقدمة وحركتها السلسة. لاعبو PS4 و Xbox One الذين اشتروا النسخة مسبقاً سيتلقون استرجاعاً مالياً كاملاً. هذا يعكس اتجاهاً متسارعاً نحو هجر الأجيال الماضية بسرعة أكبر من المتوقع.",
+    "slug": "1666-amsterdam-new-game",
+    "title": "1666: Amsterdam - لعبة جديدة تمزج الفن الكلاسيكي بالسحر والظلام",
+    "summary": "Patrice Désilets، مبدع سلسلة Assassin's Creed الأسطورية، يعود بلعبة جديدة طموحة تحت عنوان \"1666: Amsterdam\". اللعبة التي كانت قيد التطوير منذ 16 سنة (بدأت في 2011 قبل إفلاس THQ)، تجمع بين الفانتازيا المظلمة والسحر والخوارق. تتنقل اللعبة عبر ثلاث حقب زمنية: أمستردام في القرن السابع عشر، سنة 1999، والعصر الحديث. ما يميز \"1666\" هو توجهها الفني الفريد: الفريق استوحى تصاميمه من عصر الذهب الهولندي في الرسم، مستخدماً لوحات فنانين مثل Johannes Vermeer و Adriaen van Ostade. اللعبة تحول الرسومات الكلاسيكية إلى بيئات تفاعلية، مما يعطيها هوية بصرية لم نرَ مثيلاً لها في صناعة الألعاب.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/another-game-skips-last-gen-as-dying-light-the-beast-dumps-ps4-xbox-one/",
-    "publishedAt": "2026-07-14"
+    "sourceUrl": "https://www.gamespot.com/articles/assassins-creed-creators-new-game-channels-fine-art-and-slasher-cinema/",
+    "publishedAt": "2026-07-15"
   },
   {
-    "slug": "activision-modern-warfare-leaderboards-disabled",
-    "title": "قرار مثير للجدل: Activision تطفئ لوحات الترتيب في Modern Warfare 2 و3",
-    "summary": "أثار قرار Activision بإيقاف لوحات الترتيب والإحصائيات في Modern Warfare 2 و Modern Warfare 3 موجة من الاستياء والحيرة بين لاعبي سلسلة Call of Duty. تبررت الشركة بأنها تحسّن خوادمها استعداداً لإطلاق Modern Warfare 4 في أكتوبر، لكن التبرير أثار تساؤلات حادة عن العلاقة بين صيانة الخوادم الجديدة وحذف سجلات اللاعبين القدماء. اللاعبون يخافون من أن تكرار هذا السيناريو مع كل إطلاق جديد يعني أن الإحصائيات التي جمعوها بشق الأنفس ستختفي فجأة. المجتمع أشار إلى أن لوحات الترتيب كانت معطوبة لسنوات على أي حال، مما يعقّد الجدال حول حقيقة الدافع.",
+    "slug": "god-of-war-laufey-physical-edition-2027",
+    "title": "إله الحرب: لافي ستصل بنسخة فيزيائية في 2027",
+    "summary": "كشفت استوديو Santa Monica عن تأكيد رسمي بصدور نسخة فيزيائية من اللعبة القادمة \"God of War Laufey\"، وهو ما أثار تكهنات بشأن موعد إطلاقها. بما أن سوني قررت إيقاف دعم الأقراص الفيزيائية ابتداءً من يناير 2028، فإن وجود نسخة فيزيائية يشير إلى إطلاق اللعبة قبل هذا التاريخ. توقعات الصحفيين تشير إلى فبراير أو مارس 2027. اللعبة ستركز على قصة زوجة كراتوس \"فاي\" بدلاً من البطل الرئيسي، وستضم شخصيات جديدة منها مكعب لزج يؤديه الممثل جاك كويد. هذا الإعلان يثير حماس المعجبين الذين ينتظرون الفصل التالي من السلسلة الأسطورية.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/activisions-latest-call-of-duty-announcement-is-upsetting-and-bewildering-fans/",
-    "publishedAt": "2026-07-14"
-  },
-  {
-    "slug": "paramount-skydance-warner-bros-antitrust-lawsuit",
-    "title": "احتكار ديزني جديد؟ 12 ولاية أمريكية تقاضي Paramount لمنع استحواذها على وارنر براذرز",
-    "summary": "اتحدت 12 ولاية أمريكية في دعوى قانونية ضخمة لوقف استحواذ Paramount Skydance على Warner Bros. Discovery بقيمة 111 مليار دولار، معتبرة أن الصفقة تنتهك قوانين مكافحة الاحتكار. تقود كاليفورنيا الدعوى بدعم من ولايات أخرى بما فيها نيويورك وماساتشوستس، محذرة من أن الاندماج سيخنق المنافسة ويرفع الأسعار ويقلل جودة المحتوى والألعاب. يشمل التأثير المباشر على ألعاب مثل Mortal Kombat وعدد من عناوين الألعاب التابعة لوارنر براذرز. ترد Paramount بأن الدعوى تسيء تطبيق قوانين الاحتكار، مؤكدة أن الصفقة ستقويها للتنافس مع عمالقة مثل Netflix.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/us-states-are-trying-to-stop-paramount-skydance-from-owning-mortal-kombat-and-everything-else/",
-    "publishedAt": "2026-07-14"
-  },
-  {
-    "slug": "palworld-1-0-launch-steam-success",
-    "title": "النسخة الرسمية حافظت على السحر: Palworld تتصدر Steam بعد إطلاق نسخة 1.0",
-    "summary": "احتفظت لعبة Palworld بزخمها الهائل عند إطلاقها رسمياً بنسخة 1.0 على PC والأجهزة المنزلية، محتلة مرة أخرى مراكز متقدمة جداً على Steam. رغم أنها لم تصل إلى ذروة 2.1 مليون لاعب متزامن التي حققتها في أوائل 2024 أثناء مرحلة الدخول المبكر، لكن الاهتمام بالنسخة الرسمية أثبت استدامة شعبيتها. اللعبة التي جمعت بين آليات صيد المخلوقات وبناء الحضارة وعناصر البقاء استمرت في جذب أعداد ضخمة من اللاعبين. هذا النجاح يعكس تفاني المطورين في تحسين التجربة ويؤكد أن الألعاب التي توفر قيمة حقيقية تحافظ على جاذبيتها.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/palworld-player-count-launch-weekend",
-    "publishedAt": "2026-07-14"
-  },
-  {
-    "slug": "elder-scrolls-online-xbox-layoffs-concerns",
-    "title": "The Elder Scrolls Online تواجه مخاوف من دخولها مرحلة الصيانة",
-    "summary": "أثارت التسريحات الضخمة في استوديوهات Xbox الأسبوع الماضي قلقاً بين لاعبي \"The Elder Scrolls Online\"، حيث تأثر استوديو ZeniMax Online بقطع وظيفي كبير. يخشى المجتمع من أن تدخل اللعبة مرحلة \"الصيانة\" حيث تتوقف التطويرات الجديدة والمحتوى الإضافي المهم. أكد استوديو ZeniMax أن التسريحات لا تعني نهاية تطوير اللعبة، مؤكداً استمرار الدعم والتحديثات. ليس هذا أول تأثر للاستوديو بالتسريحات، حيث واجهت قطع وظيفي مشابهة قبل عام. المجتمع يراقب عن كثب لرؤية ما إذا ستحصل اللعبة على محتوى جديد ومهم أم ستصبح في وضعية دفاعية.",
-    "sourceName": "Eurogamer",
-    "sourceUrl": "https://www.eurogamer.net/the-elder-scrolls-online-xbox-layoffs-roadmap",
-    "publishedAt": "2026-07-14"
-  },
-  {
-    "slug": "beast-of-reincarnation-game-freak-action-rpg",
-    "title": "لعبة Game Freak الجديدة تجمع بين أسلوب سيكيرو والتكتيكات المرنة",
-    "summary": "كشفت Game Freak النقاب عن لعبة حركة جديدة بعنوان \"Beast of Reincarnation\" تجمع بين العناصر التكتيكية والقتالية الحادة. اللعبة مستوحاة من أسلوب \"Sekiro\" الشهير لكنها توفر مستويات صعوبة أكثر سهولة من خلال نوافذ بارييه أوسع وإمكانية إبطاء الوقت. اللاعبون سيرافقهم كائن يدعى \"Koo\" يمكنه المساعدة في المعارك. اللعبة ستطلق في أوائل أغسطس وتتميز بعوالم مفتوحة بها تحديات صعبة، مما يجعلها انحرافاً مثيراً عن سلسلة بوكيمون المشهورة.",
-    "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/beast-of-reincarnation-has-sekiro-vibes-but-it-wont-beat-you-down/",
+    "sourceUrl": "https://www.gamespot.com/articles/god-of-war-laufey-will-be-on-a-disc-and-that-tells-us-when-it-could-launch-by/",
     "publishedAt": "2026-07-14"
   },
   {
@@ -472,11 +464,19 @@
     "publishedAt": "2026-07-14"
   },
   {
-    "slug": "god-of-war-laufey-physical-edition-2027",
-    "title": "إله الحرب: لافي ستصل بنسخة فيزيائية في 2027",
-    "summary": "كشفت استوديو Santa Monica عن تأكيد رسمي بصدور نسخة فيزيائية من اللعبة القادمة \"God of War Laufey\"، وهو ما أثار تكهنات بشأن موعد إطلاقها. بما أن سوني قررت إيقاف دعم الأقراص الفيزيائية ابتداءً من يناير 2028، فإن وجود نسخة فيزيائية يشير إلى إطلاق اللعبة قبل هذا التاريخ. توقعات الصحفيين تشير إلى فبراير أو مارس 2027. اللعبة ستركز على قصة زوجة كراتوس \"فاي\" بدلاً من البطل الرئيسي، وستضم شخصيات جديدة منها مكعب لزج يؤديه الممثل جاك كويد. هذا الإعلان يثير حماس المعجبين الذين ينتظرون الفصل التالي من السلسلة الأسطورية.",
+    "slug": "beast-of-reincarnation-game-freak-action-rpg",
+    "title": "لعبة Game Freak الجديدة تجمع بين أسلوب سيكيرو والتكتيكات المرنة",
+    "summary": "كشفت Game Freak النقاب عن لعبة حركة جديدة بعنوان \"Beast of Reincarnation\" تجمع بين العناصر التكتيكية والقتالية الحادة. اللعبة مستوحاة من أسلوب \"Sekiro\" الشهير لكنها توفر مستويات صعوبة أكثر سهولة من خلال نوافذ بارييه أوسع وإمكانية إبطاء الوقت. اللاعبون سيرافقهم كائن يدعى \"Koo\" يمكنه المساعدة في المعارك. اللعبة ستطلق في أوائل أغسطس وتتميز بعوالم مفتوحة بها تحديات صعبة، مما يجعلها انحرافاً مثيراً عن سلسلة بوكيمون المشهورة.",
     "sourceName": "GameSpot",
-    "sourceUrl": "https://www.gamespot.com/articles/god-of-war-laufey-will-be-on-a-disc-and-that-tells-us-when-it-could-launch-by/",
+    "sourceUrl": "https://www.gamespot.com/articles/beast-of-reincarnation-has-sekiro-vibes-but-it-wont-beat-you-down/",
+    "publishedAt": "2026-07-14"
+  },
+  {
+    "slug": "elder-scrolls-online-xbox-layoffs-concerns",
+    "title": "The Elder Scrolls Online تواجه مخاوف من دخولها مرحلة الصيانة",
+    "summary": "أثارت التسريحات الضخمة في استوديوهات Xbox الأسبوع الماضي قلقاً بين لاعبي \"The Elder Scrolls Online\"، حيث تأثر استوديو ZeniMax Online بقطع وظيفي كبير. يخشى المجتمع من أن تدخل اللعبة مرحلة \"الصيانة\" حيث تتوقف التطويرات الجديدة والمحتوى الإضافي المهم. أكد استوديو ZeniMax أن التسريحات لا تعني نهاية تطوير اللعبة، مؤكداً استمرار الدعم والتحديثات. ليس هذا أول تأثر للاستوديو بالتسريحات، حيث واجهت قطع وظيفي مشابهة قبل عام. المجتمع يراقب عن كثب لرؤية ما إذا ستحصل اللعبة على محتوى جديد ومهم أم ستصبح في وضعية دفاعية.",
+    "sourceName": "Eurogamer",
+    "sourceUrl": "https://www.eurogamer.net/the-elder-scrolls-online-xbox-layoffs-roadmap",
     "publishedAt": "2026-07-14"
   }
 ]
