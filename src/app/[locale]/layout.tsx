@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Tajawal, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
@@ -135,6 +136,7 @@ export default async function RootLayout({
         )}
         <ConsentBanner />
         <InstallAppPrompt locale={locale} />
+        <Analytics />
       </body>
     </html>
   );
