@@ -14,6 +14,27 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(sha256(a), sha256(b));
 }
 
+// slugs أخبار قديمة كانت تحتوي أحرفاً عربية بالخطأ — استُبدلت بـ slugs إنجليزية نظيفة.
+// تُعالَج هنا (قبل مرحلة الـ ISR) وليس في next.config.ts redirects لأن مطابقة
+// next.config.ts تفشل مع أحرف عربية في المسار وتسبب TypeError على مستوى
+// x-next-cache-tags. الأخبار خارج news.json عمومًا تُغطّى بـ dynamicParams=false
+// في news/[slug]/page.tsx (404 نظيف بدل 500).
+const OLD_NEWS_SLUG_REDIRECTS: Readonly<Record<string, string>> = {
+  "halo-campaign-evolved-العودة-المنتظرة": "halo-campaign-evolved-returns-after-25-years",
+  "فضيحة-blizzard-مدير-مباراة-يخالف-القوانين": "blizzard-investigates-warcraft-game-master-abuse",
+  "zelda-ocarina-time-يعود-switch-2-الريميك": "zelda-ocarina-of-time-remake-switch-2",
+  "xbox-يحضر-ألعاب-جنة-الأصلية-للكمبيوتر": "xbox-brings-classic-games-to-pc",
+};
+
+function redirectedOldNewsSlug(pathname: string): string | null {
+  const m = pathname.match(/^(\/(?:ar|en))?\/news\/(.+)$/);
+  if (!m) return null;
+  const [, localePrefix, slug] = m;
+  const decoded = decodeURIComponent(slug);
+  const replacement = OLD_NEWS_SLUG_REDIRECTS[decoded];
+  return replacement ? (localePrefix ?? "") + "/news/" + replacement : null;
+}
+
 function isDashboardPath(pathname: string): boolean {
   const stripped = pathname.replace(/^\/(ar|en)(?=\/|$)/, "");
   return stripped === "/dashboard" || stripped.startsWith("/dashboard/");
@@ -64,6 +85,13 @@ function dashboardAuth(req: NextRequest): NextResponse | null {
  */
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  const newSlug = redirectedOldNewsSlug(pathname);
+  if (newSlug) {
+    const url = req.nextUrl.clone();
+    url.pathname = newSlug;
+    return NextResponse.redirect(url, 301);
+  }
 
   if (isDashboardPath(pathname)) {
     const denied = dashboardAuth(req);

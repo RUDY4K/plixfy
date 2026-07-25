@@ -8,6 +8,10 @@ import { locales, hasLocale, localeHref, ogLocaleFor, pageAlternates, type Local
 const SITE = "https://www.plixfy.com";
 
 export const revalidate = 21600;
+// أخبار تخرج من نافذة الـ60 عنصراً بعد التدوير تصير slug غير معروف — نرفض
+// أي slug خارج القائمة المبنية وقت البناء بدل محاولة عرضها ديناميكياً (كان
+// يسبب 500 لو الـ slug فيه أحرف غير ASCII، بسبب x-next-cache-tags header).
+export const dynamicParams = false;
 
 interface PageParams {
   params: Promise<{ locale: string; slug: string }>;

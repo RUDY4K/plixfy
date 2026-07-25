@@ -67,47 +67,9 @@ const nextConfig: NextConfig = {
         destination: "/category/racing",
         statusCode: 301,
       },
-      // slugs أخبار قديمة كانت تحتوي أحرفاً عربية بالخطأ — استُبدلت بـ slugs إنجليزية نظيفة
-      {
-        source: "/news/halo-campaign-evolved-العودة-المنتظرة",
-        destination: "/news/halo-campaign-evolved-returns-after-25-years",
-        statusCode: 301,
-      },
-      {
-        source: "/en/news/halo-campaign-evolved-العودة-المنتظرة",
-        destination: "/en/news/halo-campaign-evolved-returns-after-25-years",
-        statusCode: 301,
-      },
-      {
-        source: "/news/فضيحة-blizzard-مدير-مباراة-يخالف-القوانين",
-        destination: "/news/blizzard-investigates-warcraft-game-master-abuse",
-        statusCode: 301,
-      },
-      {
-        source: "/en/news/فضيحة-blizzard-مدير-مباراة-يخالف-القوانين",
-        destination: "/en/news/blizzard-investigates-warcraft-game-master-abuse",
-        statusCode: 301,
-      },
-      {
-        source: "/news/zelda-ocarina-time-يعود-switch-2-الريميك",
-        destination: "/news/zelda-ocarina-of-time-remake-switch-2",
-        statusCode: 301,
-      },
-      {
-        source: "/en/news/zelda-ocarina-time-يعود-switch-2-الريميك",
-        destination: "/en/news/zelda-ocarina-of-time-remake-switch-2",
-        statusCode: 301,
-      },
-      {
-        source: "/news/xbox-يحضر-ألعاب-جنة-الأصلية-للكمبيوتر",
-        destination: "/news/xbox-brings-classic-games-to-pc",
-        statusCode: 301,
-      },
-      {
-        source: "/en/news/xbox-يحضر-ألعاب-جنة-الأصلية-للكمبيوتر",
-        destination: "/en/news/xbox-brings-classic-games-to-pc",
-        statusCode: 301,
-      },
+      // ملاحظة: تحويلات الأخبار ذات الـ slugs العربية القديمة تُعالَج في src/proxy.ts
+      // وليس هنا — next.config.ts redirects لا تطابق صحيح مع أحرف عربية في المسار
+      // (يسبب TypeError: Invalid character in header content على مستوى ISR cache tags).
     ];
   },
   async headers() {
