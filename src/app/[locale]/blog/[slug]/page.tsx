@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CategoryStrip from "@/components/CategoryStrip";
-import { getPostBySlug, getPostSlugs, getAllPosts } from "@/lib/blog";
+import { getPostBySlug, getPostSlugs, getAllPosts, type BlogPost } from "@/lib/blog";
+import { getPostEnBySlug, getPostEnSlugs, getAllPostsEn, type BlogPostEn } from "@/lib/blogEn";
 import { getGamesByCategory } from "@/lib/games";
+import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import { BRAND_AR } from "@/lib/siteContent";
+import { hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
 
 const SITE = "https://www.plixfy.com";
 
@@ -15,67 +18,99 @@ interface PageParams {
   params: Promise<{ locale: string; slug: string }>;
 }
 
-// المدوّنة عربية فقط — النسخة الإنجليزية تحوَّل للنسخة العربية
 export async function generateStaticParams() {
-  return getPostSlugs().map((slug) => ({ locale: "ar", slug }));
+  return [
+    ...getPostSlugs().map((slug) => ({ locale: "ar", slug })),
+    ...getPostEnSlugs().map((slug) => ({ locale: "en", slug })),
+  ];
+}
+
+const COPY = {
+  ar: {
+    brand: BRAND_AR,
+    home: "الرئيسية",
+    blog: "المدوّنة",
+    faqHeading: "أسئلة شائعة",
+    playNow: (category: string) => "جرّب " + category + " الآن",
+    otherPosts: "مقالات أخرى",
+  },
+  en: {
+    brand: "Plixfy",
+    home: "Home",
+    blog: "Blog",
+    faqHeading: "FAQ",
+    playNow: (category: string) => "Try " + category + " Now",
+    otherPosts: "Other Articles",
+  },
+} as const;
+
+function getPost(locale: Locale, slug: string) {
+  return locale === "en" ? getPostEnBySlug(slug) : getPostBySlug(slug);
+}
+
+/** يفرّق بين النسخة العربية (فيها تواريخ نشر وعنوان تصنيف) والإنجليزية */
+function isArPost(post: BlogPost | BlogPostEn): post is BlogPost {
+  return "relatedCategoryTitle" in post;
 }
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
-  const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const { locale, slug } = await params;
+  if (!hasLocale(locale)) return {};
+  const post = getPost(locale, slug);
   if (!post) return {};
 
   return {
     title: post.title,
     description: post.description,
     keywords: [...post.keywords],
-    alternates: { canonical: "/blog/" + post.slug },
+    alternates: pageAlternates(locale, "/blog/" + post.slug),
     openGraph: {
       type: "article",
       title: post.title,
       description: post.description,
-      url: SITE + "/blog/" + post.slug,
+      url: SITE + localeHref(locale, "/blog/" + post.slug),
       siteName: "Plixfy",
-      locale: "ar_SA",
-      publishedTime: post.publishedAt,
-      modifiedTime: post.updatedAt,
+      locale: ogLocaleFor(locale),
+      ...(isArPost(post) ? { publishedTime: post.publishedAt, modifiedTime: post.updatedAt } : {}),
     },
-    twitter: {
-      card: "summary_large_image",
-      title: post.title,
-      description: post.description,
-    },
+    twitter: { card: "summary_large_image", title: post.title, description: post.description },
   };
 }
 
 export default async function BlogPostPage({ params }: PageParams) {
-  const { locale, slug } = await params;
-  if (locale !== "ar") permanentRedirect("/blog/" + slug);
-  const post = getPostBySlug(slug);
+  const { locale: rawLocale, slug } = await params;
+  if (!hasLocale(rawLocale)) notFound();
+  const locale = rawLocale as Locale;
+  const c = COPY[locale];
+  const post = getPost(locale, slug);
   if (!post) notFound();
 
   const relatedGames = getGamesByCategory(post.relatedCategory).slice(0, 12);
-  const others = getAllPosts().filter((p) => p.slug !== post.slug);
+  const allPosts = locale === "en" ? getAllPostsEn() : getAllPosts();
+  const others = allPosts.filter((p) => p.slug !== post.slug);
   const otherPosts = [
     ...others.filter((p) => p.relatedCategory === post.relatedCategory),
     ...others.filter((p) => p.relatedCategory !== post.relatedCategory),
   ].slice(0, 3);
+
+  const categoryTitle = isArPost(post)
+    ? post.relatedCategoryTitle
+    : getLocalizedCategoryMeta(post.relatedCategory, "en")?.name ?? post.relatedCategory;
 
   const articleLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.h1,
     description: post.description,
-    inLanguage: "ar",
-    datePublished: post.publishedAt,
-    dateModified: post.updatedAt,
-    author: { "@type": "Organization", name: BRAND_AR },
+    inLanguage: locale,
+    ...(isArPost(post) ? { datePublished: post.publishedAt, dateModified: post.updatedAt } : {}),
+    author: { "@type": "Organization", name: c.brand },
     publisher: {
       "@type": "Organization",
-      name: BRAND_AR,
+      name: c.brand,
       logo: { "@type": "ImageObject", url: SITE + "/opengraph-image.png" },
     },
-    mainEntityOfPage: { "@type": "WebPage", "@id": SITE + "/blog/" + post.slug },
+    mainEntityOfPage: { "@type": "WebPage", "@id": SITE + localeHref(locale, "/blog/" + post.slug) },
   };
 
   const faqLd = {
@@ -92,9 +127,9 @@ export default async function BlogPostPage({ params }: PageParams) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "الرئيسية", item: SITE + "/" },
-      { "@type": "ListItem", position: 2, name: "المدوّنة", item: SITE + "/blog" },
-      { "@type": "ListItem", position: 3, name: post.h1, item: SITE + "/blog/" + post.slug },
+      { "@type": "ListItem", position: 1, name: c.home, item: SITE + localeHref(locale, "/") },
+      { "@type": "ListItem", position: 2, name: c.blog, item: SITE + localeHref(locale, "/blog") },
+      { "@type": "ListItem", position: 3, name: post.h1, item: SITE + localeHref(locale, "/blog/" + post.slug) },
     ],
   };
 
@@ -103,14 +138,13 @@ export default async function BlogPostPage({ params }: PageParams) {
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify([articleLd, faqLd, breadcrumbLd]),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([articleLd, faqLd, breadcrumbLd]) }}
       />
       <Breadcrumbs
+        locale={locale}
         items={[
-          { label: "الرئيسية", href: "/" },
-          { label: "المدوّنة", href: "/blog" },
+          { label: c.home, href: localeHref(locale, "/") },
+          { label: c.blog, href: localeHref(locale, "/blog") },
           { label: post.h1 },
         ]}
       />
@@ -143,7 +177,7 @@ export default async function BlogPostPage({ params }: PageParams) {
 
         <section className="mb-8">
           <h2 className="text-xl md:text-2xl font-bold text-text-primary mb-4">
-            أسئلة شائعة
+            {c.faqHeading}
           </h2>
           <div className="space-y-4">
             {post.faq.map((f) => (
@@ -161,9 +195,10 @@ export default async function BlogPostPage({ params }: PageParams) {
       {relatedGames.length > 0 && (
         <div className="mb-8">
           <CategoryStrip
-            title={"جرّب " + post.relatedCategoryTitle + " الآن"}
-            viewAllHref={"/category/" + post.relatedCategory}
+            title={c.playNow(categoryTitle)}
+            viewAllHref={localeHref(locale, "/category/" + post.relatedCategory)}
             games={relatedGames}
+            locale={locale}
           />
         </div>
       )}
@@ -171,13 +206,13 @@ export default async function BlogPostPage({ params }: PageParams) {
       {otherPosts.length > 0 && (
         <section className="border-t border-white/10 pt-6">
           <h2 className="text-lg md:text-xl font-bold text-text-primary mb-4">
-            مقالات أخرى
+            {c.otherPosts}
           </h2>
           <ul className="space-y-2">
             {otherPosts.map((p) => (
               <li key={p.slug}>
                 <Link
-                  href={"/blog/" + p.slug}
+                  href={localeHref(locale, "/blog/" + p.slug)}
                   className="text-primary hover:underline text-sm md:text-base"
                 >
                   {p.h1}

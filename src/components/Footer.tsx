@@ -17,8 +17,8 @@ export default function Footer({ locale = defaultLocale }: { locale?: Locale }) 
     { href: localeHref(locale, "/"), label: t.nav.home },
     { href: localeHref(locale, "/categories"), label: t.nav.categories },
     { href: localeHref(locale, "/favorites"), label: t.nav.favorites },
-    { href: "/blog", label: t.footer.blog },
-    { href: "/news", label: t.footer.news },
+    { href: localeHref(locale, "/blog"), label: t.footer.blog },
+    { href: localeHref(locale, "/news"), label: t.footer.news },
   ];
 
   const legalLinks: readonly FooterLink[] = [

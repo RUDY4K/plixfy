@@ -12,7 +12,8 @@ import {
 import type { Game } from "@/lib/games";
 import { getTopGame } from "@/lib/gameStats";
 import { getAllPosts } from "@/lib/blog";
-import { getAllNews, formatNewsDate } from "@/lib/news";
+import { getAllPostsEn } from "@/lib/blogEn";
+import { getAllNews, formatNewsDate, newsTitle } from "@/lib/news";
 import { categoryShortLabel } from "@/lib/categoryI18n";
 import { hasLocale, localeHref, getDict } from "@/lib/i18n";
 
@@ -159,74 +160,64 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         ) : null
       )}
 
-      {locale === "ar" ? (
-        <>
-          <section className="mt-12 px-4 md:px-0">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg md:text-2xl font-bold text-text-primary">
-                {t.common.fromBlog}
-              </h2>
+      <section className="mt-12 px-4 md:px-0">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg md:text-2xl font-bold text-text-primary">
+            {t.common.fromBlog}
+          </h2>
+          <Link href={href("/blog")} className="text-sm text-primary hover:underline">
+            {t.common.allPosts}
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {(locale === "en" ? getAllPostsEn() : getAllPosts())
+            .slice(0, 4)
+            .map((post) => (
               <Link
-                href="/blog"
-                className="text-sm text-primary hover:underline"
+                key={post.slug}
+                href={href(`/blog/${post.slug}`)}
+                className="block rounded-2xl border border-primary/20 bg-surface/60 p-4 hover:border-primary/50 transition-colors"
               >
-                {t.common.allPosts}
+                <h3 className="text-sm font-bold text-text-primary mb-2 leading-snug">
+                  {post.h1}
+                </h3>
+                <p className="text-xs text-text-secondary leading-relaxed line-clamp-3">
+                  {post.description}
+                </p>
               </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {getAllPosts()
-                .slice(0, 4)
-                .map((post) => (
-                  <Link
-                    key={post.slug}
-                    href={`/blog/${post.slug}`}
-                    className="block rounded-2xl border border-primary/20 bg-surface/60 p-4 hover:border-primary/50 transition-colors"
-                  >
-                    <h3 className="text-sm font-bold text-text-primary mb-2 leading-snug">
-                      {post.h1}
-                    </h3>
-                    <p className="text-xs text-text-secondary leading-relaxed line-clamp-3">
-                      {post.description}
-                    </p>
-                  </Link>
-                ))}
-            </div>
-          </section>
+            ))}
+        </div>
+      </section>
 
-          <section className="mt-10 px-4 md:px-0">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg md:text-2xl font-bold text-text-primary">
-                {t.common.latestNews}
-              </h2>
-              <Link
-                href="/news"
-                className="text-sm text-primary hover:underline"
-              >
-                {t.common.allNews}
-              </Link>
-            </div>
-            <ul className="space-y-2">
-              {getAllNews()
-                .slice(0, 3)
-                .map((item) => (
-                  <li key={item.slug}>
-                    <Link
-                      href={`/news/${item.slug}`}
-                      className="flex items-baseline gap-3 rounded-xl border border-primary/10 bg-surface/40 px-4 py-3 hover:border-primary/40 transition-colors"
-                    >
-                      <span className="text-xs text-text-secondary shrink-0">
-                        {formatNewsDate(item.publishedAt)}
-                      </span>
-                      <span className="text-sm text-text-primary leading-snug">
-                        {item.title}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-            </ul>
-          </section>
-        </>
-      ) : null}
+      <section className="mt-10 px-4 md:px-0">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg md:text-2xl font-bold text-text-primary">
+            {t.common.latestNews}
+          </h2>
+          <Link href={href("/news")} className="text-sm text-primary hover:underline">
+            {t.common.allNews}
+          </Link>
+        </div>
+        <ul className="space-y-2">
+          {getAllNews()
+            .slice(0, 3)
+            .map((item) => (
+              <li key={item.slug}>
+                <Link
+                  href={href(`/news/${item.slug}`)}
+                  className="flex items-baseline gap-3 rounded-xl border border-primary/10 bg-surface/40 px-4 py-3 hover:border-primary/40 transition-colors"
+                >
+                  <span className="text-xs text-text-secondary shrink-0">
+                    {formatNewsDate(item.publishedAt, locale)}
+                  </span>
+                  <span className="text-sm text-text-primary leading-snug">
+                    {newsTitle(item, locale)}
+                  </span>
+                </Link>
+              </li>
+            ))}
+        </ul>
+      </section>
 
       <section className="mt-10 px-4 md:px-0" aria-labelledby="about-plixfy-heading">
         <h2

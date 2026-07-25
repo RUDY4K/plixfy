@@ -38,9 +38,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...bilingual("/about", "monthly", 0.3),
     ...bilingual("/privacy", "monthly", 0.3),
     ...bilingual("/terms", "monthly", 0.3),
-    // المدوّنة والأخبار عربية فقط — بدون نسخة إنجليزية
-    { url: SITE + "/blog", changeFrequency: "weekly", priority: 0.6 },
-    { url: SITE + "/news", changeFrequency: "daily", priority: 0.7 },
+    ...bilingual("/blog", "weekly", 0.6),
+    ...bilingual("/news", "daily", 0.7),
   ];
 
   const categoryRoutes: MetadataRoute.Sitemap = categories.flatMap((c) =>
@@ -59,19 +58,53 @@ export default function sitemap(): MetadataRoute.Sitemap {
     bilingual("/play/" + g.slug + "/like", "monthly", 0.5)
   );
 
-  const blogRoutes: MetadataRoute.Sitemap = getAllPosts().map((p) => ({
-    url: SITE + "/blog/" + p.slug,
-    lastModified: new Date(p.updatedAt),
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
+  const blogRoutes: MetadataRoute.Sitemap = getAllPosts().flatMap((p) => {
+    const languages = {
+      ar: SITE + "/blog/" + p.slug,
+      en: SITE + "/en/blog/" + p.slug,
+      "x-default": SITE + "/blog/" + p.slug,
+    };
+    return [
+      {
+        url: languages.ar,
+        lastModified: new Date(p.updatedAt),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+        alternates: { languages },
+      },
+      {
+        url: languages.en,
+        lastModified: new Date(p.updatedAt),
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+        alternates: { languages },
+      },
+    ];
+  });
 
-  const newsRoutes: MetadataRoute.Sitemap = getAllNews().map((n) => ({
-    url: SITE + "/news/" + n.slug,
-    lastModified: new Date(n.publishedAt),
-    changeFrequency: "weekly",
-    priority: 0.6,
-  }));
+  const newsRoutes: MetadataRoute.Sitemap = getAllNews().flatMap((n) => {
+    const languages = {
+      ar: SITE + "/news/" + n.slug,
+      en: SITE + "/en/news/" + n.slug,
+      "x-default": SITE + "/news/" + n.slug,
+    };
+    return [
+      {
+        url: languages.ar,
+        lastModified: new Date(n.publishedAt),
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+        alternates: { languages },
+      },
+      {
+        url: languages.en,
+        lastModified: new Date(n.publishedAt),
+        changeFrequency: "weekly" as const,
+        priority: 0.5,
+        alternates: { languages },
+      },
+    ];
+  });
 
   return [
     ...staticRoutes,

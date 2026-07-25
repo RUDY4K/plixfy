@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAllNews, getNewsBySlug, getNewsSlugs, formatNewsDate } from "@/lib/news";
+import { getAllNews, getNewsBySlug, getNewsSlugs, formatNewsDate, newsTitle, newsSummary } from "@/lib/news";
 import { BRAND_AR } from "@/lib/siteContent";
+import { locales, hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
 
 const SITE = "https://www.plixfy.com";
 
@@ -12,56 +13,86 @@ interface PageParams {
   params: Promise<{ locale: string; slug: string }>;
 }
 
-// الأخبار عربية فقط — النسخة الإنجليزية تحوَّل للنسخة العربية
 export async function generateStaticParams() {
-  return getNewsSlugs().map((slug) => ({ locale: "ar", slug }));
+  const slugs = getNewsSlugs();
+  return locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
 }
 
+const COPY = {
+  ar: {
+    brand: BRAND_AR,
+    home: "الرئيسية",
+    news: "أخبار الألعاب",
+    source: "المصدر الأصلي:",
+    breakTitle: "خذ استراحة من الأخبار والعب مجاناً 🎮",
+    breakLink: "تصفّح مئات الألعاب بدون تحميل على بليكسفاي",
+    otherNews: "أخبار أخرى",
+    breadcrumbAria: "مسار التنقل",
+  },
+  en: {
+    brand: "Plixfy",
+    home: "Home",
+    news: "Gaming News",
+    source: "Original source:",
+    breakTitle: "Take a break from the news and play free 🎮",
+    breakLink: "Browse hundreds of no-download games on Plixfy",
+    otherNews: "Other News",
+    breadcrumbAria: "Breadcrumb",
+  },
+} as const;
+
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  if (!hasLocale(locale)) return {};
   const item = getNewsBySlug(slug);
   if (!item) return {};
+  const c = COPY[locale];
 
-  const description = item.summary.slice(0, 155);
+  const title = newsTitle(item, locale);
+  const description = newsSummary(item, locale).slice(0, 155);
   return {
-    title: item.title + " | " + BRAND_AR,
+    title: title + " | " + c.brand,
     description,
-    alternates: { canonical: "/news/" + item.slug },
+    alternates: pageAlternates(locale, "/news/" + item.slug),
     openGraph: {
       type: "article",
-      title: item.title,
+      title,
       description,
-      url: SITE + "/news/" + item.slug,
+      url: SITE + localeHref(locale, "/news/" + item.slug),
       siteName: "Plixfy",
-      locale: "ar_SA",
+      locale: ogLocaleFor(locale),
       publishedTime: item.publishedAt,
     },
-    twitter: { card: "summary_large_image", title: item.title, description },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
 export default async function NewsItemPage({ params }: PageParams) {
-  const { locale, slug } = await params;
-  if (locale !== "ar") permanentRedirect("/news/" + slug);
+  const { locale: rawLocale, slug } = await params;
+  if (!hasLocale(rawLocale)) notFound();
+  const locale = rawLocale as Locale;
+  const c = COPY[locale];
   const item = getNewsBySlug(slug);
   if (!item) notFound();
 
+  const title = newsTitle(item, locale);
+  const summary = newsSummary(item, locale);
   const otherNews = getAllNews().filter((n) => n.slug !== item.slug).slice(0, 4);
 
   const articleLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
-    headline: item.title,
-    description: item.summary.slice(0, 155),
-    inLanguage: "ar",
+    headline: title,
+    description: summary.slice(0, 155),
+    inLanguage: locale,
     datePublished: item.publishedAt,
-    author: { "@type": "Organization", name: BRAND_AR },
+    author: { "@type": "Organization", name: c.brand },
     publisher: {
       "@type": "Organization",
-      name: BRAND_AR,
+      name: c.brand,
       logo: { "@type": "ImageObject", url: SITE + "/opengraph-image.png" },
     },
-    mainEntityOfPage: { "@type": "WebPage", "@id": SITE + "/news/" + item.slug },
+    mainEntityOfPage: { "@type": "WebPage", "@id": SITE + localeHref(locale, "/news/" + item.slug) },
     isBasedOn: item.sourceUrl,
   };
 
@@ -69,9 +100,9 @@ export default async function NewsItemPage({ params }: PageParams) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "الرئيسية", item: SITE + "/" },
-      { "@type": "ListItem", position: 2, name: "أخبار الألعاب", item: SITE + "/news" },
-      { "@type": "ListItem", position: 3, name: item.title, item: SITE + "/news/" + item.slug },
+      { "@type": "ListItem", position: 1, name: c.home, item: SITE + localeHref(locale, "/") },
+      { "@type": "ListItem", position: 2, name: c.news, item: SITE + localeHref(locale, "/news") },
+      { "@type": "ListItem", position: 3, name: title, item: SITE + localeHref(locale, "/news/" + item.slug) },
     ],
   };
 
@@ -85,15 +116,15 @@ export default async function NewsItemPage({ params }: PageParams) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify([articleLd, breadcrumbLd]) }}
         />
 
-        <nav aria-label="مسار التنقل" className="mb-6 text-sm text-slate-500">
-          <Link href="/" className="hover:text-blue-700 transition-colors">
-            الرئيسية
+        <nav aria-label={c.breadcrumbAria} className="mb-6 text-sm text-slate-500">
+          <Link href={localeHref(locale, "/")} className="hover:text-blue-700 transition-colors">
+            {c.home}
           </Link>
           <span className="mx-2" aria-hidden="true">
             ‹
           </span>
-          <Link href="/news" className="hover:text-blue-700 transition-colors">
-            أخبار الألعاب
+          <Link href={localeHref(locale, "/news")} className="hover:text-blue-700 transition-colors">
+            {c.news}
           </Link>
         </nav>
 
@@ -106,20 +137,20 @@ export default async function NewsItemPage({ params }: PageParams) {
                   {item.sourceName}
                 </span>
                 <time dateTime={item.publishedAt} className="text-slate-500">
-                  {formatNewsDate(item.publishedAt)}
+                  {formatNewsDate(item.publishedAt, locale)}
                 </time>
               </div>
               <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 leading-snug tracking-tight">
-                {item.title}
+                {title}
               </h1>
             </header>
 
             <div className="text-base text-slate-700 leading-loose whitespace-pre-line">
-              {item.summary}
+              {summary}
             </div>
 
             <p className="mt-8 pt-5 border-t border-slate-100 text-sm text-slate-500">
-              المصدر الأصلي:{" "}
+              {c.source}{" "}
               <a
                 href={item.sourceUrl}
                 target="_blank"
@@ -133,22 +164,18 @@ export default async function NewsItemPage({ params }: PageParams) {
         </article>
 
         <div className="mt-8 rounded-2xl bg-gradient-to-l from-[#1a1030] to-[#2a1245] p-6 text-center shadow-md">
-          <p className="text-base font-bold text-white mb-1">
-            خذ استراحة من الأخبار والعب مجاناً 🎮
-          </p>
+          <p className="text-base font-bold text-white mb-1">{c.breakTitle}</p>
           <Link
-            href="/"
+            href={localeHref(locale, "/")}
             className="text-pink-400 hover:text-pink-300 text-sm font-semibold transition-colors"
           >
-            تصفّح مئات الألعاب بدون تحميل على بليكسفاي
+            {c.breakLink}
           </Link>
         </div>
 
         {otherNews.length > 0 && (
           <section className="mt-10">
-            <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-4">
-              أخبار أخرى
-            </h2>
+            <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-4">{c.otherNews}</h2>
             <ul className="space-y-3">
               {otherNews.map((n) => (
                 <li
@@ -156,10 +183,10 @@ export default async function NewsItemPage({ params }: PageParams) {
                   className="rounded-xl bg-white border border-slate-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all"
                 >
                   <Link
-                    href={"/news/" + n.slug}
+                    href={localeHref(locale, "/news/" + n.slug)}
                     className="text-slate-800 hover:text-blue-800 font-semibold text-sm md:text-base transition-colors"
                   >
-                    {n.title}
+                    {newsTitle(n, locale)}
                   </Link>
                 </li>
               ))}

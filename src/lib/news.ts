@@ -6,6 +6,10 @@ export interface NewsItem {
   title: string;
   /** ملخّص عربي أصلي مُعاد صياغته — ليس ترجمة حرفية */
   summary: string;
+  /** عنوان إنجليزي أصلي — قد يكون غير متوفر للعناصر القديمة قبل الدعم الإنجليزي */
+  titleEn?: string;
+  /** ملخّص إنجليزي أصلي — قد يكون غير متوفر للعناصر القديمة قبل الدعم الإنجليزي */
+  summaryEn?: string;
   /** اسم المصدر الأصلي للخبر (يُعرض مع رابط الإسناد) */
   sourceName: string;
   sourceUrl: string;
@@ -37,12 +41,22 @@ export function getNewsSlugs(): readonly string[] {
   return ITEMS.map((n) => n.slug);
 }
 
-export function formatNewsDate(iso: string): string {
+export function formatNewsDate(iso: string, locale: "ar" | "en" = "ar"): string {
   const date = new Date(iso + "T00:00:00Z");
-  return new Intl.DateTimeFormat("ar", {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ar", {
     year: "numeric",
     month: "long",
     day: "numeric",
     timeZone: "UTC",
   }).format(date);
+}
+
+/** العنوان حسب اللغة — يرجع للعربي إذا العنصر قديم وما فيه نسخة إنجليزية بعد */
+export function newsTitle(item: NewsItem, locale: "ar" | "en"): string {
+  return locale === "en" ? (item.titleEn ?? item.title) : item.title;
+}
+
+/** الملخّص حسب اللغة — يرجع للعربي إذا العنصر قديم وما فيه نسخة إنجليزية بعد */
+export function newsSummary(item: NewsItem, locale: "ar" | "en"): string {
+  return locale === "en" ? (item.summaryEn ?? item.summary) : item.summary;
 }

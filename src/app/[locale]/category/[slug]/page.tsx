@@ -7,6 +7,7 @@ import type { CategorySlug } from "@/lib/games";
 import { categoryContent } from "@/lib/categoryContent";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import { getPostsByCategory } from "@/lib/blog";
+import { getPostsEnByCategory } from "@/lib/blogEn";
 import GameCard from "@/components/GameCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import TrackOnMount from "@/components/TrackOnMount";
@@ -149,7 +150,10 @@ export default async function CategoryPage({
   // المحتوى التحريري العربي يُعرض في النسخة العربية فقط
   const content = locale === "ar" ? categoryContent[slug as CategorySlug] ?? null : null;
   const relatedForLinks = categoryContent[slug as CategorySlug]?.related ?? [];
-  const relatedPosts = locale === "ar" ? getPostsByCategory(slug as CategorySlug) : [];
+  const relatedPosts =
+    locale === "en"
+      ? getPostsEnByCategory(slug as CategorySlug)
+      : getPostsByCategory(slug as CategorySlug);
 
   const collectionLd = {
     "@context": "https://schema.org",
@@ -261,7 +265,7 @@ export default async function CategoryPage({
           {relatedPosts.map((post) => (
             <Link
               key={post.slug}
-              href={"/blog/" + post.slug}
+              href={href("/blog/" + post.slug)}
               className="inline-flex items-center min-h-12 px-4 rounded-xl bg-surface-secondary text-text-primary text-sm font-bold hover:bg-primary/15 hover:text-primary transition"
             >
               📖 {post.h1}

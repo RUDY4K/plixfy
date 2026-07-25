@@ -1,56 +1,103 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { getAllPosts } from "@/lib/blog";
+import { getAllPosts, type BlogPost } from "@/lib/blog";
+import { getAllPostsEn, type BlogPostEn } from "@/lib/blogEn";
 import { BRAND_AR } from "@/lib/siteContent";
+import {
+  locales,
+  hasLocale,
+  localeHref,
+  ogLocaleFor,
+  pageAlternates,
+  type Locale,
+} from "@/lib/i18n";
 
 const SITE = "https://www.plixfy.com";
 
 export const revalidate = 86400;
 
-// المدوّنة عربية فقط — النسخة الإنجليزية تحوَّل للنسخة العربية
 export function generateStaticParams() {
-  return [{ locale: "ar" }];
+  return locales.map((locale) => ({ locale }));
 }
 
-export const metadata: Metadata = {
-  title: `المدوّنة - ${BRAND_AR} | أدلّة ونصائح الألعاب`,
-  description:
-    "مقالات وأدلّة عن أفضل الألعاب المجانية أونلاين: ألعاب سباق، بنات، آيو، وأكثر. نصائح للّعب وترشيحات مختارة من بليكسفاي.",
-  alternates: {
-    canonical: "/blog",
-    types: { "application/rss+xml": "/blog/rss.xml" },
+/** يفرّق بين النسخة العربية (فيها تواريخ نشر) والإنجليزية */
+function isArPost(post: BlogPost | BlogPostEn): post is BlogPost {
+  return "relatedCategoryTitle" in post;
+}
+
+const COPY = {
+  ar: {
+    metaTitle: `المدوّنة - ${BRAND_AR} | أدلّة ونصائح الألعاب`,
+    metaDescription:
+      "مقالات وأدلّة عن أفضل الألعاب المجانية أونلاين: ألعاب سباق، بنات، آيو، وأكثر. نصائح للّعب وترشيحات مختارة من بليكسفاي.",
+    ogDescription: "أدلّة ونصائح وترشيحات لأفضل الألعاب المجانية أونلاين.",
+    home: "الرئيسية",
+    blog: "المدوّنة",
+    h1: "مدوّنة بليكسفاي",
+    intro:
+      "أدلّة ونصائح وترشيحات مختارة لأفضل الألعاب المجانية أونلاين. اكتشف ألعاباً جديدة وتعلّم كيف تتفوّق فيها.",
+    readMore: "اقرأ المقال ←",
   },
-  openGraph: {
-    type: "website",
-    title: `المدوّنة - ${BRAND_AR}`,
-    description: "أدلّة ونصائح وترشيحات لأفضل الألعاب المجانية أونلاين.",
-    url: SITE + "/blog",
-    siteName: "Plixfy",
-    locale: "ar_SA",
+  en: {
+    metaTitle: "Blog - Plixfy | Game Guides & Tips",
+    metaDescription:
+      "Articles and guides on the best free online games: racing, girls games, .io, and more. Tips and hand-picked recommendations from Plixfy.",
+    ogDescription: "Guides, tips, and hand-picked recommendations for the best free online games.",
+    home: "Home",
+    blog: "Blog",
+    h1: "Plixfy Blog",
+    intro:
+      "Hand-picked guides, tips, and recommendations for the best free online games. Discover new games and learn how to master them.",
+    readMore: "Read article →",
   },
-};
+} as const;
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/blog">): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(locale)) return {};
+  const c = COPY[locale];
+
+  return {
+    title: c.metaTitle,
+    description: c.metaDescription,
+    alternates: {
+      ...pageAlternates(locale, "/blog"),
+      ...(locale === "ar" ? { types: { "application/rss+xml": "/blog/rss.xml" } } : {}),
+    },
+    openGraph: {
+      type: "website",
+      title: c.metaTitle,
+      description: c.ogDescription,
+      url: SITE + localeHref(locale, "/blog"),
+      siteName: "Plixfy",
+      locale: ogLocaleFor(locale),
+    },
+  };
+}
 
 export default async function BlogIndexPage({
   params,
 }: PageProps<"/[locale]/blog">) {
-  const { locale } = await params;
-  if (locale !== "ar") permanentRedirect("/blog");
-  const posts = getAllPosts();
+  const { locale } = (await params) as { locale: Locale };
+  if (!hasLocale(locale)) notFound();
+  const c = COPY[locale];
+  const posts = locale === "en" ? getAllPostsEn() : getAllPosts();
 
   const blogLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
-    name: `مدوّنة ${BRAND_AR}`,
-    url: SITE + "/blog",
-    inLanguage: "ar",
+    name: c.h1,
+    url: SITE + localeHref(locale, "/blog"),
+    inLanguage: locale,
     blogPost: posts.map((p) => ({
       "@type": "BlogPosting",
       headline: p.h1,
-      url: SITE + "/blog/" + p.slug,
-      datePublished: p.publishedAt,
-      dateModified: p.updatedAt,
+      url: SITE + localeHref(locale, "/blog/" + p.slug),
+      ...(isArPost(p) ? { datePublished: p.publishedAt, dateModified: p.updatedAt } : {}),
       description: p.description,
     })),
   };
@@ -63,16 +110,14 @@ export default async function BlogIndexPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogLd) }}
       />
       <Breadcrumbs
-        items={[{ label: "الرئيسية", href: "/" }, { label: "المدوّنة" }]}
+        locale={locale}
+        items={[{ label: c.home, href: localeHref(locale, "/") }, { label: c.blog }]}
       />
 
       <header className="mb-8">
-        <h1 className="text-2xl md:text-4xl font-bold text-text-primary">
-          مدوّنة بليكسفاي
-        </h1>
+        <h1 className="text-2xl md:text-4xl font-bold text-text-primary">{c.h1}</h1>
         <p className="text-sm md:text-base text-text-secondary mt-2 max-w-3xl leading-relaxed">
-          أدلّة ونصائح وترشيحات مختارة لأفضل الألعاب المجانية أونلاين. اكتشف
-          ألعاباً جديدة وتعلّم كيف تتفوّق فيها.
+          {c.intro}
         </p>
       </header>
 
@@ -80,7 +125,7 @@ export default async function BlogIndexPage({
         {posts.map((post) => (
           <Link
             key={post.slug}
-            href={"/blog/" + post.slug}
+            href={localeHref(locale, "/blog/" + post.slug)}
             className="block rounded-2xl bg-surface p-5 md:p-6 border border-white/5 hover:border-primary/40 transition-colors"
           >
             <h2 className="text-lg md:text-xl font-bold text-text-primary mb-2">
@@ -90,7 +135,7 @@ export default async function BlogIndexPage({
               {post.description}
             </p>
             <span className="inline-block mt-3 text-sm font-semibold text-primary">
-              اقرأ المقال ←
+              {c.readMore}
             </span>
           </Link>
         ))}
