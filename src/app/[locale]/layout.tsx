@@ -69,6 +69,9 @@ export async function generateMetadata({
   return {
     metadataBase: new URL("https://www.plixfy.com"),
     applicationName: "Plixfy",
+    other: {
+      "google-adsense-account": ADSENSE_CLIENT,
+    },
     manifest: "/manifest.webmanifest",
     icons: {
       icon: [
