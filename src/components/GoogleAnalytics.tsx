@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Script from 'next/script';
 import { getConsent, onConsentChange } from '@/lib/consent';
 
@@ -102,15 +102,21 @@ export function trackEventOnce(
 }
 
 export default function GoogleAnalytics({ gaId }: { gaId: string }) {
+  const [enabled, setEnabled] = useState(false);
+
   useEffect(() => {
     const existing = getConsent();
     if (existing) {
       applyConsent(existing);
+      setEnabled(existing === 'accept');
     }
-    return onConsentChange(applyConsent);
+    return onConsentChange((choice) => {
+      applyConsent(choice);
+      setEnabled(choice === 'accept');
+    });
   }, []);
 
-  if (!gaId) return null;
+  if (!gaId || !enabled) return null;
 
   return (
     <>
@@ -127,11 +133,10 @@ export default function GoogleAnalytics({ gaId }: { gaId: string }) {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('consent', 'default', {
-            ad_storage: 'denied',
-            ad_user_data: 'denied',
-            ad_personalization: 'denied',
-            analytics_storage: 'denied',
-            wait_for_update: 500,
+            ad_storage: 'granted',
+            ad_user_data: 'granted',
+            ad_personalization: 'granted',
+            analytics_storage: 'granted',
           });
           gtag('js', new Date());
           gtag('config', '${gaId}', {

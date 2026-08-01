@@ -1,5 +1,6 @@
 const CLID = process.env.NEXT_PUBLIC_PLAYGAMA_CLID;
 const HOST = "https://playgama.com";
+let didWarnAboutMissingClid = false;
 
 function buildUrl(path: string): string {
   const url = new URL(path, HOST);
@@ -10,7 +11,8 @@ function buildUrl(path: string): string {
 }
 
 export function getPlaygamaEmbedUrl(slug: string): string {
-  if (!CLID) {
+  if (!CLID && !didWarnAboutMissingClid) {
+    didWarnAboutMissingClid = true;
     console.warn("NEXT_PUBLIC_PLAYGAMA_CLID is not set. Using affiliate fallback.");
   }
   return buildUrl("/export/game/" + slug);

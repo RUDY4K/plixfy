@@ -31,14 +31,12 @@ export default function GameCard(props: GameCardProps) {
         props.category
       : props.category;
 
-  const ariaLabel = category ? title + ", " + category : title;
   const stats = showStats ? getGameStats(slug) : null;
 
   return (
     <Link
       href={localeHref(locale, "/play/" + slug)}
       className="group relative block transition-transform duration-200 hover:-translate-y-1 active:scale-[0.94]"
-      aria-label={ariaLabel}
       data-game-slug={slug}
       data-position={position}
       data-placement={placement}

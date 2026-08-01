@@ -6,24 +6,41 @@ import { getAllNews } from "@/lib/news";
 const SITE = "https://www.plixfy.com";
 
 type ChangeFreq = MetadataRoute.Sitemap[number]["changeFrequency"];
+type SitemapExtras = Pick<
+  MetadataRoute.Sitemap[number],
+  "lastModified" | "images"
+>;
+
+// Last material catalogue/content refresh. Keep this accurate when game data is
+// refreshed; search engines can then trust the date instead of seeing every URL
+// as newly changed on every build.
+const GAME_CATALOG_LAST_MODIFIED = new Date("2026-07-19T00:00:00.000Z");
 
 /** يبني إدخالين (عربي + إنجليزي) لكل مسار متوفر باللغتين مع hreflang */
 function bilingual(
   path: string,
   changeFrequency: ChangeFreq,
   priority: number,
-  enPriority?: number
+  enPriority?: number,
+  extras: SitemapExtras = {},
 ): MetadataRoute.Sitemap {
   const arUrl = SITE + path;
   const enUrl = SITE + "/en" + (path === "/" ? "" : path);
   const languages = { ar: arUrl, en: enUrl, "x-default": arUrl };
   return [
-    { url: arUrl, changeFrequency, priority, alternates: { languages } },
+    {
+      url: arUrl,
+      changeFrequency,
+      priority,
+      alternates: { languages },
+      ...extras,
+    },
     {
       url: enUrl,
       changeFrequency,
       priority: enPriority ?? Math.max(priority - 0.1, 0.1),
       alternates: { languages },
+      ...extras,
     },
   ];
 }
@@ -51,11 +68,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   );
 
   const gameRoutes: MetadataRoute.Sitemap = allGames.flatMap((g) =>
-    bilingual("/play/" + g.slug, "monthly", 0.6)
-  );
-
-  const similarRoutes: MetadataRoute.Sitemap = allGames.flatMap((g) =>
-    bilingual("/play/" + g.slug + "/like", "monthly", 0.5)
+    bilingual("/play/" + g.slug, "monthly", 0.6, undefined, {
+      lastModified: GAME_CATALOG_LAST_MODIFIED,
+      images: [g.thumbnail],
+    }),
   );
 
   const blogRoutes: MetadataRoute.Sitemap = getAllPosts().flatMap((p) => {
@@ -113,6 +129,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...categoryRoutes,
     ...bestRoutes,
     ...gameRoutes,
-    ...similarRoutes,
   ];
 }

@@ -85,7 +85,7 @@ export default function ConsentBanner() {
           <button
             type="button"
             onClick={onAccept}
-            className="flex-1 md:flex-none px-5 py-2.5 rounded-xl min-h-12 bg-primary text-white text-sm font-bold neon-glow-pink hover:scale-105 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-bg transition-all duration-200"
+            className="flex-1 md:flex-none px-5 py-2.5 rounded-xl min-h-12 bg-primary text-bg text-sm font-bold neon-glow-pink hover:scale-105 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-bg transition-all duration-200"
             aria-label={t.consent.accept}
           >
             {t.consent.accept}

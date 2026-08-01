@@ -26,7 +26,6 @@ export default function HeroTile(props: HeroTileProps) {
     <Link
       href={localeHref(locale, "/play/" + slug)}
       className={wrapperClass}
-      aria-label={t.common.playAria + title}
       data-game-slug={slug}
       data-placement={isTopGame ? "hero-top-game" : "hero"}
     >
@@ -38,7 +37,8 @@ export default function HeroTile(props: HeroTileProps) {
           sizes="(max-width: 768px) 100vw, 1280px"
           quality={70}
           className="object-cover transition-transform duration-700 group-hover:scale-105"
-          preload
+          loading="eager"
+          fetchPriority="high"
         />
 
         {/* Bottom gradient (dark fade up from bottom) */}

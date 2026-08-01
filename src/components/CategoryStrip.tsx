@@ -10,7 +10,9 @@ export interface CategoryStripProps {
   locale?: Locale;
 }
 
-const STRIP_LIMIT = 12;
+// One complete desktop row keeps the homepage fast while category pages retain
+// access to the full catalogue.
+const STRIP_LIMIT = 6;
 
 export default function CategoryStrip(props: CategoryStripProps) {
   const { title, viewAllHref, games } = props;

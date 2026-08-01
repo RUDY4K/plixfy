@@ -52,6 +52,7 @@ export async function generateMetadata({
     return {
       title: t.play.notFoundTitle,
       alternates: { canonical: localeHref(locale, "/") },
+      robots: { index: false, follow: true },
     };
   }
   const category =
@@ -63,6 +64,7 @@ export async function generateMetadata({
   return {
     title: copy.title,
     description: copy.description,
+    robots: { index: false, follow: true },
     alternates: pageAlternates(locale, path),
     openGraph: {
       type: "website",

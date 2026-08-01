@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { Tajawal, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
@@ -9,6 +10,7 @@ import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PageViewTracker from "@/components/PageViewTracker";
+import WebVitals from "@/components/WebVitals";
 import MonetagServiceWorker from "@/components/MonetagServiceWorker";
 import ConsentBanner from "@/components/ConsentBanner";
 import InstallAppPrompt from "@/components/InstallAppPrompt";
@@ -24,7 +26,7 @@ import { allGames } from "@/lib/games";
 
 const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "700"],
   variable: "--font-tajawal",
   display: "optional",
 });
@@ -111,11 +113,6 @@ export default async function RootLayout({
       <head>
         <link rel="preconnect" href="https://playgama.com" />
         <link rel="dns-prefetch" href="https://playgama.com" />
-        <script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-          crossOrigin="anonymous"
-        />
       </head>
       <body className="bg-bg text-text-primary antialiased min-h-screen pb-32 md:pb-0 relative ambient-glows overflow-x-hidden">
         <div className="noise-overlay" aria-hidden="true" />
@@ -129,11 +126,17 @@ export default async function RootLayout({
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+            <WebVitals />
             <Suspense fallback={null}>
               <PageViewTracker />
             </Suspense>
           </>
         )}
+        <Script
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+          strategy="lazyOnload"
+          crossOrigin="anonymous"
+        />
         <ConsentBanner />
         <InstallAppPrompt locale={locale} />
         <Analytics />
