@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { Tajawal, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
@@ -14,6 +13,7 @@ import WebVitals from "@/components/WebVitals";
 import MonetagServiceWorker from "@/components/MonetagServiceWorker";
 import ConsentBanner from "@/components/ConsentBanner";
 import InstallAppPrompt from "@/components/InstallAppPrompt";
+import DeferredAdSense from "@/components/DeferredAdSense";
 import {
   locales,
   hasLocale,
@@ -132,11 +132,7 @@ export default async function RootLayout({
             </Suspense>
           </>
         )}
-        <Script
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-          strategy="lazyOnload"
-          crossOrigin="anonymous"
-        />
+        <DeferredAdSense client={ADSENSE_CLIENT} />
         <ConsentBanner />
         <InstallAppPrompt locale={locale} />
         <Analytics />
