@@ -12,10 +12,22 @@ interface NavItem {
 }
 
 function isActive(pathname: string, href: string): boolean {
+  // Arabic URLs are canonical without a prefix, but the server renders them
+  // through an internal /ar rewrite. Normalize both views so hydration sees
+  // the same active navigation item.
+  const visiblePathname =
+    pathname === "/ar"
+      ? "/"
+      : pathname.startsWith("/ar/")
+        ? pathname.slice(3)
+        : pathname;
+
   if (href === "/") {
-    return pathname === "/" || pathname === "/en";
+    return visiblePathname === "/" || visiblePathname === "/en";
   }
-  return pathname === href || pathname.startsWith(href + "/");
+  return (
+    visiblePathname === href || visiblePathname.startsWith(href + "/")
+  );
 }
 
 export default function BottomNav() {
