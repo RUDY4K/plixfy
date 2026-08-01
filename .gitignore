@@ -49,3 +49,5 @@ next-env.d.ts
 
 # local cron logs
 scripts/*.log
+scripts/.social-published.json
+.social/
