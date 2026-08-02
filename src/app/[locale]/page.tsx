@@ -51,6 +51,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               "نعم، تستطيع تشغيل جميع الألعاب المتاحة على Plixfy مجانًا من المتصفح.",
           },
           {
+            question: "كيف ألعب أونلاين من الجوال بدون تسجيل؟",
+            answer:
+              "افتح Plixfy في متصفح الجوال واختر أي لعبة متوافقة ثم اضغط زر اللعب. لا تحتاج إلى تسجيل حساب، وتعمل اللعبة مباشرة عبر الإنترنت دون تثبيت.",
+          },
+          {
             question: "هل تعمل ألعاب Plixfy على الجوال؟",
             answer:
               "نعم، يدعم Plixfy الهواتف والأجهزة اللوحية وأجهزة الكمبيوتر. قد تختلف أدوات التحكم بحسب اللعبة والجهاز.",
@@ -75,6 +80,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           {
             question: "Are Plixfy games free?",
             answer: "Yes. Every game available on Plixfy can be played free in your browser.",
+          },
+          {
+            question: "How can I play online on mobile without signing up?",
+            answer:
+              "Open Plixfy in your mobile browser, choose a compatible game, and select Play. The game runs online without registration or installation.",
           },
           {
             question: "Do Plixfy games work on mobile devices?",
@@ -301,28 +311,48 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         </p>
       </section>
 
-      <section className="mt-10 px-4 md:px-0" aria-labelledby="home-faq-heading">
+      <section
+        className="mt-10 px-4 md:px-0"
+        aria-labelledby="home-faq-heading"
+        itemScope
+        itemType="https://schema.org/FAQPage"
+      >
         <h2
           id="home-faq-heading"
           className="text-lg md:text-2xl font-bold text-text-primary mb-4"
         >
           {locale === "ar" ? "أسئلة شائعة عن الألعاب المجانية" : "Free games FAQ"}
         </h2>
-        <dl className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-2">
           {faq.map((item) => (
-            <div
+            <article
               key={item.question}
               className="rounded-2xl border border-primary/15 bg-surface/50 p-4"
+              itemScope
+              itemProp="mainEntity"
+              itemType="https://schema.org/Question"
             >
-              <dt className="font-bold text-text-primary leading-snug">
+              <h3
+                className="font-bold text-text-primary leading-snug"
+                itemProp="name"
+              >
                 {item.question}
-              </dt>
-              <dd className="mt-2 text-sm text-text-secondary leading-relaxed">
-                {item.answer}
-              </dd>
-            </div>
+              </h3>
+              <div
+                itemScope
+                itemProp="acceptedAnswer"
+                itemType="https://schema.org/Answer"
+              >
+                <p
+                  className="mt-2 text-sm text-text-secondary leading-relaxed"
+                  itemProp="text"
+                >
+                  {item.answer}
+                </p>
+              </div>
+            </article>
           ))}
-        </dl>
+        </div>
       </section>
 
       <div className="mt-12 px-4 md:px-0">
