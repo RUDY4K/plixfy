@@ -178,7 +178,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   const allLd = [
     websiteLd,
     organizationLd,
-    faqLd,
     ...(trendingLd ? [trendingLd] : []),
     ...(topPicksLd ? [topPicksLd] : []),
   ];
@@ -201,6 +200,13 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(allLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqLd).replace(/</g, "\\u003c"),
         }}
       />
 
