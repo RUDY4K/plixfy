@@ -37,6 +37,62 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       ? `العب ${allGames.length.toLocaleString("ar-SA")} لعبة مجانية فوراً من المتصفح، بدون تحميل أو تسجيل.`
       : `Play ${allGames.length.toLocaleString("en-US")} free games instantly in your browser, with no download or sign-up.`;
 
+  const faq =
+    locale === "ar"
+      ? [
+          {
+            question: "كيف ألعب ألعاب مجانية على المتصفح بدون تحميل؟",
+            answer:
+              "افتح Plixfy من الجوال أو الكمبيوتر، اختر اللعبة التي تريدها ثم اضغط زر اللعب. تعمل الألعاب مباشرة داخل المتصفح مجانًا، ولا تحتاج إلى تنزيل تطبيق أو إنشاء حساب.",
+          },
+          {
+            question: "هل ألعاب Plixfy مجانية؟",
+            answer:
+              "نعم، تستطيع تشغيل جميع الألعاب المتاحة على Plixfy مجانًا من المتصفح.",
+          },
+          {
+            question: "هل تعمل ألعاب Plixfy على الجوال؟",
+            answer:
+              "نعم، يدعم Plixfy الهواتف والأجهزة اللوحية وأجهزة الكمبيوتر. قد تختلف أدوات التحكم بحسب اللعبة والجهاز.",
+          },
+          {
+            question: "هل أحتاج إلى تسجيل حساب قبل اللعب؟",
+            answer:
+              "لا، يمكنك بدء معظم الألعاب فورًا دون تسجيل. تُحفظ بعض التفضيلات محليًا في متصفحك عند توفرها.",
+          },
+          {
+            question: "ما أنواع الألعاب المتوفرة على Plixfy؟",
+            answer:
+              "تضم المكتبة ألعاب الأكشن والسباقات والألغاز والرياضة والتصويب والألعاب الخفيفة وألعاب البنات وألعاب io، وتُضاف اختيارات جديدة باستمرار.",
+          },
+        ]
+      : [
+          {
+            question: "How can I play free browser games without downloading?",
+            answer:
+              "Open Plixfy on your phone or computer, choose a game, and select Play. Games run free inside your browser without an app download or account.",
+          },
+          {
+            question: "Are Plixfy games free?",
+            answer: "Yes. Every game available on Plixfy can be played free in your browser.",
+          },
+          {
+            question: "Do Plixfy games work on mobile devices?",
+            answer:
+              "Yes. Plixfy supports phones, tablets, and desktop computers, although controls can vary by game and device.",
+          },
+          {
+            question: "Do I need an account to play?",
+            answer:
+              "No. You can start most games immediately without registering. Some preferences may be saved locally in your browser.",
+          },
+          {
+            question: "What kinds of games are available on Plixfy?",
+            answer:
+              "The library includes action, racing, puzzle, sports, shooting, casual, girls, and io games, with new picks added regularly.",
+          },
+        ];
+
   const websiteLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -56,6 +112,19 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     name: t.brand,
     url: SITE,
     logo: SITE + "/icon-512.png",
+  };
+
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
   };
 
   const topGame = getTopGame();
@@ -99,6 +168,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   const allLd = [
     websiteLd,
     organizationLd,
+    faqLd,
     ...(trendingLd ? [trendingLd] : []),
     ...(topPicksLd ? [topPicksLd] : []),
   ];
@@ -120,7 +190,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(allLd),
+          __html: JSON.stringify(allLd).replace(/</g, "\\u003c"),
         }}
       />
 
@@ -229,6 +299,30 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <p className="text-sm md:text-base text-text-secondary max-w-4xl leading-relaxed">
           {homeIntro}
         </p>
+      </section>
+
+      <section className="mt-10 px-4 md:px-0" aria-labelledby="home-faq-heading">
+        <h2
+          id="home-faq-heading"
+          className="text-lg md:text-2xl font-bold text-text-primary mb-4"
+        >
+          {locale === "ar" ? "أسئلة شائعة عن الألعاب المجانية" : "Free games FAQ"}
+        </h2>
+        <dl className="grid gap-3 md:grid-cols-2">
+          {faq.map((item) => (
+            <div
+              key={item.question}
+              className="rounded-2xl border border-primary/15 bg-surface/50 p-4"
+            >
+              <dt className="font-bold text-text-primary leading-snug">
+                {item.question}
+              </dt>
+              <dd className="mt-2 text-sm text-text-secondary leading-relaxed">
+                {item.answer}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <div className="mt-12 px-4 md:px-0">
