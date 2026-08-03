@@ -31,7 +31,7 @@ const tajawal = Tajawal({
   display: "optional",
 });
 
-const ADSENSE_CLIENT = "ca-pub-5387661711080146";
+const ADSENSE_CLIENT = "ca-pub-7564871953180369";
 
 const inter = Inter({
   subsets: ["latin"],
