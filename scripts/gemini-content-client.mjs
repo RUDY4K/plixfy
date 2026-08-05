@@ -1,7 +1,7 @@
 // Minimal Gemini Interactions API client for cloud content jobs.
 // Usage: GEMINI_API_KEY=... node scripts/update-news.mjs
 
-const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta2/interactions";
+const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/interactions";
 const DEFAULT_MODEL = "gemini-3.6-flash";
 
 function sleep(ms) {
