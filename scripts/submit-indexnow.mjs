@@ -23,14 +23,21 @@ async function urlsFromSitemap() {
   return [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => decodeXml(match[1]));
 }
 
-async function recentNewsUrls() {
-  const raw = await readFile(path.join(ROOT, "src", "data", "news.json"), "utf8");
-  const news = JSON.parse(raw);
+async function recentContentUrls() {
+  const [newsRaw, blogRaw] = await Promise.all([
+    readFile(path.join(ROOT, "src", "data", "news.json"), "utf8"),
+    readFile(path.join(ROOT, "src", "data", "blog-generated.json"), "utf8"),
+  ]);
+  const news = JSON.parse(newsRaw);
+  const blog = JSON.parse(blogRaw);
   const cutoff = Date.now() - 48 * 60 * 60 * 1000;
-  const urls = news
+  const newsUrls = news
     .filter((item) => new Date(`${item.publishedAt}T23:59:59Z`).getTime() >= cutoff)
-    .map((item) => `${SITE}/ar/news/${item.slug}`);
-  return [`${SITE}/ar`, `${SITE}/ar/news`, ...urls];
+    .flatMap((item) => [`${SITE}/news/${item.slug}`, `${SITE}/en/news/${item.slug}`]);
+  const blogUrls = blog
+    .filter((item) => new Date(`${item.publishedAt}T23:59:59Z`).getTime() >= cutoff)
+    .flatMap((item) => [`${SITE}/blog/${item.slug}`, `${SITE}/en/blog/${item.slug}`]);
+  return [SITE, `${SITE}/news`, `${SITE}/en/news`, `${SITE}/blog`, `${SITE}/en/blog`, ...newsUrls, ...blogUrls];
 }
 
 async function submit(urlList) {
@@ -63,5 +70,5 @@ async function submit(urlList) {
 }
 
 const mode = process.argv.includes("--all") ? "all" : "recent-news";
-const urls = mode === "all" ? await urlsFromSitemap() : await recentNewsUrls();
+const urls = mode === "all" ? await urlsFromSitemap() : await recentContentUrls();
 await submit(urls);
