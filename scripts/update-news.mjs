@@ -1,6 +1,5 @@
-// يجلب أحدث أخبار الألعاب من مصادر RSS، يختار أهمها ويعيد صياغتها بالعربية
-// عبر Claude Code CLI (اشتراك محلي، بدون API)، ثم يحدّث src/data/news.json.
-// يعمل عبر Task Scheduler على جهاز المستخدم كل 12 ساعة (scripts/news-cron.cmd).
+// يجلب أحدث أخبار الألعاب من مصادر RSS، ثم ينشئ نسختين أصليتين بالعربية والإنجليزية.
+// يستخدم Anthropic API في GitHub Actions، مع Claude CLI كخيار محلي عند التشغيل اليدوي.
 import fs from "node:fs";
 import path from "node:path";
 import { runClaude, extractJson } from "./claude-cli.mjs";
