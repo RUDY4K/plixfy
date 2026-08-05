@@ -33,13 +33,13 @@ jobs:
 
       - name: Validate automation scripts
         run: |
-          node --check scripts/anthropic-content-client.mjs
+          node --check scripts/gemini-content-client.mjs
           node --check scripts/update-news.mjs
           node --check scripts/update-blog.mjs
 
       - name: Fetch and rewrite current gaming news
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/update-news.mjs
 
       - name: Validate generated news
@@ -78,7 +78,7 @@ jobs:
       - name: Generate the weekly bilingual blog article
         if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 6 * * 0'
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/update-blog.mjs
 
       - name: Validate generated blog data

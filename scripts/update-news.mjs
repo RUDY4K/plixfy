@@ -1,9 +1,9 @@
 // يجلب أحدث أخبار الألعاب من مصادر RSS، ثم ينشئ نسختين أصليتين بالعربية والإنجليزية.
-// يستخدم Anthropic API في GitHub Actions، مع Claude CLI كخيار محلي عند التشغيل اليدوي.
+// يستخدم Gemini API في GitHub Actions، مع Claude CLI كخيار محلي عند التشغيل اليدوي.
 import fs from "node:fs";
 import path from "node:path";
 import { runClaude, extractJson } from "./claude-cli.mjs";
-import { runAnthropicContent, extractJsonObject } from "./anthropic-content-client.mjs";
+import { runGeminiContent, extractJsonObject } from "./gemini-content-client.mjs";
 
 const NEWS_FILE = path.join(process.cwd(), "src", "data", "news.json");
 const MAX_STORED = 60;
@@ -128,8 +128,8 @@ async function main() {
 
   let parsed;
   try {
-    if (process.env.ANTHROPIC_API_KEY) {
-      const raw = await runAnthropicContent({
+    if (process.env.GEMINI_API_KEY) {
+      const raw = await runGeminiContent({
         prompt,
         system:
           "You are a careful bilingual gaming-news editor. Use only supplied candidates, never invent facts, and return valid JSON only.",
