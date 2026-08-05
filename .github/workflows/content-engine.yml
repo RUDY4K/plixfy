@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: write
-  copilot-requests: write
 
 concurrency:
   group: plixfy-content-engine
@@ -31,18 +30,15 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install GitHub Copilot CLI
-        run: npm install --global @github/copilot@1.0.78
-
       - name: Validate automation scripts
         run: |
-          node --check scripts/copilot-content-client.mjs
+          node --check scripts/anthropic-content-client.mjs
           node --check scripts/update-news.mjs
           node --check scripts/update-blog.mjs
 
       - name: Fetch and rewrite current gaming news
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node scripts/update-news.mjs
 
       - name: Validate generated news
@@ -81,7 +77,7 @@ jobs:
       - name: Generate the weekly bilingual blog article
         if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 6 * * 0'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node scripts/update-blog.mjs
 
       - name: Validate generated blog data

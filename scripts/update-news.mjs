@@ -4,7 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { runClaude, extractJson } from "./claude-cli.mjs";
-import { runCopilotContent, extractJsonObject } from "./copilot-content-client.mjs";
+import { runAnthropicContent, extractJsonObject } from "./anthropic-content-client.mjs";
 
 const NEWS_FILE = path.join(process.cwd(), "src", "data", "news.json");
 const MAX_STORED = 60;
@@ -129,11 +129,12 @@ async function main() {
 
   let parsed;
   try {
-    if (process.env.GITHUB_TOKEN) {
-      const raw = runCopilotContent({
+    if (process.env.ANTHROPIC_API_KEY) {
+      const raw = await runAnthropicContent({
         prompt,
         system:
           "You are a careful bilingual gaming-news editor. Use only supplied candidates, never invent facts, and return valid JSON only.",
+        maxTokens: 5_500,
       });
       parsed = extractJsonObject(raw);
     } else {
