@@ -1,4 +1,5 @@
 import type { CategorySlug } from "@/lib/games";
+import { getGeneratedBlogRecords } from "@/lib/generatedBlog";
 
 export interface BlogSection {
   heading: string;
@@ -891,16 +892,35 @@ const POSTS: readonly BlogPost[] = [
   },
 ];
 
+function getGeneratedPosts(): readonly BlogPost[] {
+  return getGeneratedBlogRecords().map((post) => ({
+    slug: post.slug,
+    title: post.ar.title,
+    h1: post.ar.h1,
+    description: post.ar.description,
+    publishedAt: post.publishedAt,
+    updatedAt: post.updatedAt,
+    keywords: post.ar.keywords,
+    intro: post.ar.intro,
+    sections: post.ar.sections,
+    faq: post.ar.faq,
+    relatedCategory: post.relatedCategory,
+    relatedCategoryTitle: post.relatedCategoryTitle,
+  }));
+}
+
 export function getAllPosts(): readonly BlogPost[] {
-  return [...POSTS].sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
+  return [...getGeneratedPosts(), ...POSTS].sort((a, b) =>
+    a.publishedAt < b.publishedAt ? 1 : -1,
+  );
 }
 
 export function getPostBySlug(slug: string): BlogPost | undefined {
-  return POSTS.find((p) => p.slug === slug);
+  return getAllPosts().find((p) => p.slug === slug);
 }
 
 export function getPostSlugs(): readonly string[] {
-  return POSTS.map((p) => p.slug);
+  return getAllPosts().map((p) => p.slug);
 }
 
 /** مقالات مرتبطة بتصنيف معيّن — تُعرض في صفحة التصنيف كروابط داخلية */

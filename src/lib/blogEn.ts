@@ -1,5 +1,6 @@
 import type { CategorySlug } from "@/lib/games";
 import type { BlogSection, BlogFaq } from "@/lib/blog";
+import { getGeneratedBlogRecords } from "@/lib/generatedBlog";
 
 export interface BlogPostEn {
   slug: string;
@@ -11,6 +12,8 @@ export interface BlogPostEn {
   sections: readonly BlogSection[];
   faq: readonly BlogFaq[];
   relatedCategory: CategorySlug;
+  publishedAt?: string;
+  updatedAt?: string;
 }
 
 // محتوى إنجليزي أصلي مولَّد عبر scripts/generate-en-blog.mjs — لا تحرّر يدويًا.
@@ -730,18 +733,34 @@ const POSTS_EN: readonly BlogPostEn[] = [
   },
 ];
 
+function getGeneratedPostsEn(): readonly BlogPostEn[] {
+  return getGeneratedBlogRecords().map((post) => ({
+    slug: post.slug,
+    title: post.en.title,
+    h1: post.en.h1,
+    description: post.en.description,
+    keywords: post.en.keywords,
+    intro: post.en.intro,
+    sections: post.en.sections,
+    faq: post.en.faq,
+    relatedCategory: post.relatedCategory,
+    publishedAt: post.publishedAt,
+    updatedAt: post.updatedAt,
+  }));
+}
+
 export function getAllPostsEn(): readonly BlogPostEn[] {
-  return POSTS_EN;
+  return [...getGeneratedPostsEn(), ...POSTS_EN];
 }
 
 export function getPostEnBySlug(slug: string): BlogPostEn | undefined {
-  return POSTS_EN.find((p) => p.slug === slug);
+  return getAllPostsEn().find((p) => p.slug === slug);
 }
 
 export function getPostEnSlugs(): readonly string[] {
-  return POSTS_EN.map((p) => p.slug);
+  return getAllPostsEn().map((p) => p.slug);
 }
 
 export function getPostsEnByCategory(category: CategorySlug): readonly BlogPostEn[] {
-  return POSTS_EN.filter((p) => p.relatedCategory === category);
+  return getAllPostsEn().filter((p) => p.relatedCategory === category);
 }

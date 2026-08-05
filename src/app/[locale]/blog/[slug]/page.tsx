@@ -53,6 +53,12 @@ function isArPost(post: BlogPost | BlogPostEn): post is BlogPost {
   return "relatedCategoryTitle" in post;
 }
 
+function hasPostDates(
+  post: BlogPost | BlogPostEn,
+): post is (BlogPost | BlogPostEn) & { publishedAt: string; updatedAt: string } {
+  return typeof post.publishedAt === "string" && typeof post.updatedAt === "string";
+}
+
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(locale)) return {};
@@ -71,7 +77,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       url: SITE + localeHref(locale, "/blog/" + post.slug),
       siteName: "Plixfy",
       locale: ogLocaleFor(locale),
-      ...(isArPost(post) ? { publishedTime: post.publishedAt, modifiedTime: post.updatedAt } : {}),
+      ...(hasPostDates(post) ? { publishedTime: post.publishedAt, modifiedTime: post.updatedAt } : {}),
     },
     twitter: { card: "summary_large_image", title: post.title, description: post.description },
   };
@@ -103,7 +109,7 @@ export default async function BlogPostPage({ params }: PageParams) {
     headline: post.h1,
     description: post.description,
     inLanguage: locale,
-    ...(isArPost(post) ? { datePublished: post.publishedAt, dateModified: post.updatedAt } : {}),
+    ...(hasPostDates(post) ? { datePublished: post.publishedAt, dateModified: post.updatedAt } : {}),
     author: { "@type": "Organization", name: c.brand },
     publisher: {
       "@type": "Organization",

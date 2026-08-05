@@ -22,9 +22,10 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-/** يفرّق بين النسخة العربية (فيها تواريخ نشر) والإنجليزية */
-function isArPost(post: BlogPost | BlogPostEn): post is BlogPost {
-  return "relatedCategoryTitle" in post;
+function hasPostDates(
+  post: BlogPost | BlogPostEn,
+): post is (BlogPost | BlogPostEn) & { publishedAt: string; updatedAt: string } {
+  return typeof post.publishedAt === "string" && typeof post.updatedAt === "string";
 }
 
 const COPY = {
@@ -97,7 +98,7 @@ export default async function BlogIndexPage({
       "@type": "BlogPosting",
       headline: p.h1,
       url: SITE + localeHref(locale, "/blog/" + p.slug),
-      ...(isArPost(p) ? { datePublished: p.publishedAt, dateModified: p.updatedAt } : {}),
+      ...(hasPostDates(p) ? { datePublished: p.publishedAt, dateModified: p.updatedAt } : {}),
       description: p.description,
     })),
   };

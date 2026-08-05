@@ -4,6 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { runClaude, extractJson } from "./claude-cli.mjs";
+import { runGitHubModel, extractJsonObject } from "./github-models-client.mjs";
 
 const NEWS_FILE = path.join(process.cwd(), "src", "data", "news.json");
 const MAX_STORED = 60;
@@ -97,6 +98,15 @@ async function main() {
     return;
   }
 
+  const promptCandidates = candidates.map((item, candidateIndex) => ({
+    candidateIndex,
+    source: item.source,
+    title: item.title,
+    link: item.link,
+    pubDate: item.pubDate,
+    description: item.description,
+  }));
+
   const prompt = [
     "أنت محرر أخبار ألعاب فيديو محترف يكتب بالعربية والإنجليزية لموقع بليكسفاي (plixfy.com).",
     `أمامك قائمة أخبار إنجليزية حديثة. اختر أهم ${MAX_NEW_PER_RUN} أخبار (الأوسع اهتماماً: إصدارات كبرى، قرارات المنصات، ألعاب شهيرة)، واكتب لكل خبر نسختين مستقلتين مبنيتين على نفس الوقائع من النص المصدر (وليس ترجمة إحداهما عن الأخرى):`,
@@ -111,42 +121,64 @@ async function main() {
     existing.slice(0, 20).map((n) => "- " + n.title).join("\n"),
     "",
     "الأخبار المرشّحة (JSON):",
-    JSON.stringify(candidates, null, 1),
+    JSON.stringify(promptCandidates, null, 1),
     "",
     'أخرج JSON خاماً فقط — بدون أي تعليق أو سياج أكواد — بهذه البنية بالضبط:',
-    '{"items":[{"slug":"kebab-case-latin","title":"عنوان عربي","summary":"ملخص عربي 100-180 كلمة","titleEn":"English title","summaryEn":"English summary 100-180 words","sourceName":"اسم المصدر","sourceUrl":"رابط الخبر الأصلي"}]}',
+    '{"items":[{"candidateIndex":0,"slug":"kebab-case-latin","title":"عنوان عربي","summary":"ملخص عربي 100-180 كلمة","titleEn":"English title","summaryEn":"English summary 100-180 words"}]}',
   ].join("\n");
 
   let parsed;
   try {
-    parsed = extractJson(runClaude({ prompt }));
+    if (process.env.GITHUB_TOKEN) {
+      const raw = await runGitHubModel({
+        prompt,
+        system:
+          "You are a careful bilingual gaming-news editor. Use only supplied candidates, never invent facts, and return valid JSON only.",
+        maxTokens: 5_500,
+      });
+      parsed = extractJsonObject(raw);
+    } else {
+      parsed = extractJson(runClaude({ prompt }));
+    }
   } catch (err) {
-    console.error(`Claude CLI run failed: ${err.message}`);
+    console.error(`News generation failed: ${err.message}`);
     process.exit(1);
   }
 
   const today = new Date().toISOString().slice(0, 10);
   const fresh = (parsed.items || [])
-    .filter(
-      (it) =>
-        it.slug &&
-        it.title &&
-        it.summary &&
-        it.sourceUrl &&
-        !knownUrls.has(it.sourceUrl) &&
-        !knownSlugs.has(it.slug),
-    )
+    .filter((it) => {
+      const candidate = candidates[it.candidateIndex];
+      return (
+        Number.isInteger(it.candidateIndex) &&
+        candidate &&
+        /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(it.slug || "") &&
+        typeof it.title === "string" &&
+        typeof it.summary === "string" &&
+        typeof it.titleEn === "string" &&
+        typeof it.summaryEn === "string" &&
+        it.title.length >= 20 &&
+        it.summary.length >= 180 &&
+        it.titleEn.length >= 20 &&
+        it.summaryEn.length >= 180 &&
+        !knownUrls.has(candidate.link) &&
+        !knownSlugs.has(it.slug)
+      );
+    })
     .slice(0, MAX_NEW_PER_RUN)
-    .map((it) => ({
-      slug: it.slug,
-      title: it.title,
-      summary: it.summary,
-      titleEn: it.titleEn,
-      summaryEn: it.summaryEn,
-      sourceName: it.sourceName,
-      sourceUrl: it.sourceUrl,
-      publishedAt: today,
-    }));
+    .map((it) => {
+      const candidate = candidates[it.candidateIndex];
+      return {
+        slug: it.slug,
+        title: it.title.trim(),
+        summary: it.summary.trim(),
+        titleEn: it.titleEn.trim(),
+        summaryEn: it.summaryEn.trim(),
+        sourceName: candidate.source,
+        sourceUrl: candidate.link,
+        publishedAt: today,
+      };
+    });
 
   console.log(`New items accepted: ${fresh.length}`);
   if (fresh.length === 0) {
