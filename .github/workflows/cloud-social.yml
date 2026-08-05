@@ -35,15 +35,15 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
       - name: Restore delivery state
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             scripts/.social-published.json
@@ -81,7 +81,7 @@ jobs:
 
       - name: Save delivery state
         if: ${{ success() && env.SOCIAL_DRY_RUN != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: |
             scripts/.social-published.json
@@ -90,7 +90,7 @@ jobs:
 
       - name: Upload generated pack
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: social-pack-${{ github.run_id }}-${{ github.run_attempt }}
           path: .social/*.json
