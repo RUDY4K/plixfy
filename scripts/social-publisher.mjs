@@ -1,6 +1,11 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import {
+  loadEnvLocal,
+  sendTelegramMessage,
+  sendTelegramPhoto,
+} from "./telegram-client.mjs";
 
 const ROOT = process.cwd();
 const STATE_FILE = path.join(ROOT, "scripts", ".social-published.json");
@@ -12,15 +17,6 @@ const ALLOWED_PLATFORMS = new Set([
   "tiktok",
   "youtube",
 ]);
-
-function loadEnvLocal() {
-  const file = path.join(ROOT, ".env.local");
-  if (!fs.existsSync(file)) return;
-  for (const line of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
-    const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*"?([^"]*)"?\s*$/);
-    if (match && !(match[1] in process.env)) process.env[match[1]] = match[2];
-  }
-}
 
 function loadPack(file) {
   const pack = JSON.parse(fs.readFileSync(file, "utf8"));
@@ -46,6 +42,12 @@ function loadPack(file) {
         throw new Error(`items[${index}].url must be a Plixfy HTTPS URL`);
       }
     }
+    if (item.image) {
+      const image = new URL(item.image);
+      if (image.protocol !== "https:") {
+        throw new Error(`items[${index}].image must use HTTPS`);
+      }
+    }
   }
   return pack;
 }
@@ -69,41 +71,53 @@ function itemKey(item, pack) {
 
 function readState() {
   try {
-    return JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
+    const state = JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
+    return {
+      published: state.published || {},
+      deliveries: state.deliveries || {},
+    };
   } catch {
-    return { published: {} };
+    return { published: {}, deliveries: {} };
   }
 }
 
 function writeState(state) {
-  const entries = Object.entries(state.published)
-    .sort((a, b) => String(b[1]).localeCompare(String(a[1])))
-    .slice(0, 500);
-  fs.writeFileSync(STATE_FILE, JSON.stringify({ published: Object.fromEntries(entries) }, null, 2) + "\n");
-}
-
-async function sendTelegram(chatId, text, preview = false) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text,
-      disable_web_page_preview: !preview,
-    }),
-    signal: AbortSignal.timeout(20000),
-  });
-  const body = await response.json().catch(() => ({}));
-  if (!response.ok || !body.ok) {
-    throw new Error(`Telegram sendMessage failed: HTTP ${response.status}`);
-  }
+  const prune = (record, limit) =>
+    Object.fromEntries(
+      Object.entries(record)
+        .sort((a, b) => String(b[1]).localeCompare(String(a[1])))
+        .slice(0, limit),
+    );
+  fs.writeFileSync(
+    STATE_FILE,
+    JSON.stringify(
+      {
+        published: prune(state.published, 500),
+        deliveries: prune(state.deliveries, 1000),
+      },
+      null,
+      2,
+    ) + "\n",
+  );
 }
 
 function renderPost(item, pack, forAdmin) {
   const url = trackedUrl(item, pack);
   const heading = forAdmin ? `📦 ${item.platform.toUpperCase()} · ${item.kind || "post"}\n` : "";
   return `${heading}${item.text.trim()}${url ? `\n\n${url}` : ""}`;
+}
+
+async function deliver(chatId, item, pack, forAdmin) {
+  const text = renderPost(item, pack, forAdmin);
+  if (item.image && text.length <= 1024) {
+    try {
+      await sendTelegramPhoto(chatId, item.image, text);
+      return;
+    } catch (error) {
+      console.warn(`Photo delivery failed; falling back to text (${error.message})`);
+    }
+  }
+  await sendTelegramMessage(chatId, text, { preview: true });
 }
 
 async function main() {
@@ -128,14 +142,24 @@ async function main() {
 
   const publicChatId = process.env.TELEGRAM_CHANNEL_ID;
   for (const item of pending) {
-    if (item.platform === "telegram" && publicChatId) {
-      await sendTelegram(publicChatId, renderPost(item, pack, false), true);
+    const key = itemKey(item, pack);
+    const publicDeliveryKey = `${key}:public`;
+    const adminDeliveryKey = `${key}:admin`;
+
+    if (item.platform === "telegram" && publicChatId && !state.deliveries[publicDeliveryKey]) {
+      await deliver(publicChatId, item, pack, false);
+      state.deliveries[publicDeliveryKey] = new Date().toISOString();
+      writeState(state);
     }
-    await sendTelegram(process.env.TELEGRAM_CHAT_ID, renderPost(item, pack, true), true);
-    state.published[itemKey(item, pack)] = new Date().toISOString();
+    if (!state.deliveries[adminDeliveryKey]) {
+      await deliver(process.env.TELEGRAM_CHAT_ID, item, pack, true);
+      state.deliveries[adminDeliveryKey] = new Date().toISOString();
+      writeState(state);
+    }
+    state.published[key] = new Date().toISOString();
+    writeState(state);
   }
 
-  writeState(state);
   console.log(
     publicChatId
       ? `Published ${pending.length} posts and delivered the review pack to Telegram.`

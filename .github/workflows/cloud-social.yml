@@ -1,0 +1,108 @@
+name: Plixfy Cloud Social
+
+on:
+  schedule:
+    # GitHub schedules use UTC: 09:30 and 19:30 Asia/Riyadh.
+    - cron: "30 6 * * *"
+    - cron: "30 16 * * *"
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: Content slot
+        required: true
+        default: auto
+        type: choice
+        options:
+          - auto
+          - morning
+          - evening
+      dry_run:
+        description: Validate without sending anything
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plixfy-cloud-social
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Restore delivery state
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            scripts/.social-published.json
+            .social/cloud-state.json
+          key: social-state-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            social-state-
+
+      - name: Select slot
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "SOCIAL_SLOT=${{ inputs.slot }}" >> "$GITHUB_ENV"
+            echo "SOCIAL_DRY_RUN=${{ inputs.dry_run }}" >> "$GITHUB_ENV"
+          elif [[ "${{ github.event.schedule }}" == "30 6 * * *" ]]; then
+            echo "SOCIAL_SLOT=morning" >> "$GITHUB_ENV"
+            echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
+          else
+            echo "SOCIAL_SLOT=evening" >> "$GITHUB_ENV"
+            echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Generate and deliver social pack
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        shell: bash
+        run: |
+          args=("--slot=${SOCIAL_SLOT}")
+          if [[ "${SOCIAL_DRY_RUN}" == "true" ]]; then
+            args+=("--dry-run")
+          fi
+          node scripts/cloud-social-runner.mjs "${args[@]}"
+
+      - name: Save delivery state
+        if: ${{ success() && env.SOCIAL_DRY_RUN != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            scripts/.social-published.json
+            .social/cloud-state.json
+          key: social-state-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Upload generated pack
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-pack-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .social/*.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Alert admin on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ALERT_MESSAGE: >-
+            🚨 فشل ناشر Plixfy السحابي. راجع التشغيل:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node scripts/telegram-alert.mjs

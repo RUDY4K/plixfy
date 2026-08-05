@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "indexnow": "node scripts/submit-indexnow.mjs --all",
-    "refresh-monetag-sw": "node scripts/refresh-monetag-sw.mjs"
+    "refresh-monetag-sw": "node scripts/refresh-monetag-sw.mjs",
+    "social:cloud": "node scripts/cloud-social-runner.mjs",
+    "social:cloud:dry": "node scripts/cloud-social-runner.mjs --dry-run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.109.1",
