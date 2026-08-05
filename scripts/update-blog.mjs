@@ -2,7 +2,7 @@
 // Usage: GITHUB_TOKEN=... node scripts/update-blog.mjs [--dry-run]
 import fs from "node:fs";
 import path from "node:path";
-import { runGitHubModel, extractJsonObject } from "./github-models-client.mjs";
+import { runCopilotContent, extractJsonObject } from "./copilot-content-client.mjs";
 
 const ROOT = process.cwd();
 const OUT_FILE = path.join(ROOT, "src", "data", "blog-generated.json");
@@ -210,10 +210,10 @@ Return JSON only with this exact structure:
 
 Write Arabic naturally for Gulf readers and write the English version independently, not as a literal translation. Mention Plixfy sparingly. Do not add URLs; the site adds internal game links separately.`;
 
-  const raw = await runGitHubModel({
+  const raw = runCopilotContent({
     prompt,
     system: "You are a meticulous bilingual gaming editor. Return valid JSON only and stay grounded in supplied catalogue data.",
-    maxTokens: 9_000,
+    timeoutMs: 300_000,
   });
   const record = extractJsonObject(raw);
   validateRecord(record, topic);

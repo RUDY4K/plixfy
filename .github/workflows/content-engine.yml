@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: write
-  models: read
+  copilot-requests: write
 
 concurrency:
   group: plixfy-content-engine
@@ -31,9 +31,12 @@ jobs:
         with:
           node-version: 24
 
+      - name: Install GitHub Copilot CLI
+        run: npm install --global @github/copilot@1.0.78
+
       - name: Validate automation scripts
         run: |
-          node --check scripts/github-models-client.mjs
+          node --check scripts/copilot-content-client.mjs
           node --check scripts/update-news.mjs
           node --check scripts/update-blog.mjs
 
