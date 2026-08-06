@@ -34,6 +34,8 @@ jobs:
       - name: Validate automation scripts
         run: |
           node --check scripts/gemini-content-client.mjs
+          node --check scripts/text-encoding.mjs
+          node --check scripts/repair-news-encoding.mjs
           node --check scripts/update-news.mjs
           node --check scripts/update-blog.mjs
 
@@ -44,6 +46,7 @@ jobs:
 
       - name: Validate generated news
         run: |
+          node scripts/repair-news-encoding.mjs --check
           node -e "const fs=require('fs');const items=JSON.parse(fs.readFileSync('src/data/news.json','utf8'));if(!Array.isArray(items)||items.length<1)throw new Error('news.json is empty');for(const n of items){for(const k of ['slug','title','summary','titleEn','summaryEn','sourceName','sourceUrl','publishedAt'])if(typeof n[k]!=='string'||!n[k].trim())throw new Error('Invalid '+k+' in '+(n.slug||'unknown'));}console.log('Validated '+items.length+' news items.');"
 
       - name: Detect content changes

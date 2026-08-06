@@ -4,6 +4,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { runClaude, extractJson } from "./claude-cli.mjs";
 import { runGeminiContent, extractJsonObject } from "./gemini-content-client.mjs";
+import {
+  findRepairableMojibake,
+  repairObjectStrings,
+  repairUtf8Mojibake,
+} from "./text-encoding.mjs";
 
 const NEWS_FILE = path.join(process.cwd(), "src", "data", "news.json");
 const MAX_STORED = 60;
@@ -68,7 +73,12 @@ async function fetchFeed(feed) {
 
 function loadExisting() {
   try {
-    return JSON.parse(fs.readFileSync(NEWS_FILE, "utf8"));
+    const original = JSON.parse(fs.readFileSync(NEWS_FILE, "utf8"));
+    const repairable = findRepairableMojibake(original);
+    return {
+      items: repairObjectStrings(original),
+      encodingWasRepaired: repairable.length > 0,
+    };
   } catch (err) {
     console.error(`Cannot read ${NEWS_FILE}: ${err.message}`);
     process.exit(1);
@@ -76,7 +86,7 @@ function loadExisting() {
 }
 
 async function main() {
-  const existing = loadExisting();
+  const { items: existing, encodingWasRepaired } = loadExisting();
   const knownUrls = new Set(existing.map((n) => n.sourceUrl));
   const knownSlugs = new Set(existing.map((n) => n.slug));
 
@@ -93,6 +103,10 @@ async function main() {
 
   console.log(`Candidates: ${candidates.length}`);
   if (candidates.length === 0) {
+    if (encodingWasRepaired) {
+      fs.writeFileSync(NEWS_FILE, JSON.stringify(existing, null, 2) + "\n", "utf8");
+      console.log("Repaired existing news encoding.");
+    }
     console.log("No new candidates — nothing to do.");
     return;
   }
@@ -169,10 +183,10 @@ async function main() {
       const candidate = candidates[it.candidateIndex];
       return {
         slug: it.slug,
-        title: it.title.trim(),
-        summary: it.summary.trim(),
-        titleEn: it.titleEn.trim(),
-        summaryEn: it.summaryEn.trim(),
+        title: repairUtf8Mojibake(it.title.trim()),
+        summary: repairUtf8Mojibake(it.summary.trim()),
+        titleEn: repairUtf8Mojibake(it.titleEn.trim()),
+        summaryEn: repairUtf8Mojibake(it.summaryEn.trim()),
         sourceName: candidate.source,
         sourceUrl: candidate.link,
         publishedAt: today,
@@ -181,6 +195,10 @@ async function main() {
 
   console.log(`New items accepted: ${fresh.length}`);
   if (fresh.length === 0) {
+    if (encodingWasRepaired) {
+      fs.writeFileSync(NEWS_FILE, JSON.stringify(existing, null, 2) + "\n", "utf8");
+      console.log("Repaired existing news encoding.");
+    }
     console.log("Nothing new to write.");
     return;
   }
@@ -188,6 +206,11 @@ async function main() {
   const merged = [...fresh, ...existing]
     .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
     .slice(0, MAX_STORED);
+
+  const invalidEncoding = findRepairableMojibake(merged);
+  if (invalidEncoding.length > 0) {
+    throw new Error(`Refusing to publish mojibake: ${invalidEncoding.slice(0, 5).join(", ")}`);
+  }
 
   fs.writeFileSync(NEWS_FILE, JSON.stringify(merged, null, 2) + "\n", "utf8");
   console.log(`Wrote ${merged.length} items to news.json`);
