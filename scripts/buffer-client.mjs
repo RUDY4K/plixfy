@@ -9,7 +9,9 @@ function sleep(ms) {
 function apiKey() {
   const value = process.env.BUFFER_API_KEY || process.env.BUFFER_ACCESS_TOKEN;
   if (!value) throw new Error("BUFFER_API_KEY is not set");
-  return value;
+  // Clipboard and Windows shell pipelines can inject a BOM or another invisible
+  // Unicode character into secrets. Authorization headers only accept visible ASCII.
+  return value.replace(/[^\x21-\x7E]/g, "");
 }
 
 async function graphql(query, variables = {}) {
@@ -75,6 +77,8 @@ export async function getBufferChannels(organizationId) {
           name
           displayName
           service
+          isDisconnected
+          isLocked
           isQueuePaused
         }
       }
@@ -107,6 +111,7 @@ export function mapChannelsByPlatform(channels) {
   };
   const result = {};
   for (const channel of channels) {
+    if (channel.isDisconnected || channel.isLocked) continue;
     const platform = serviceToPlatform[String(channel.service || "").toLowerCase()];
     if (platform && !result[platform]) result[platform] = channel;
   }

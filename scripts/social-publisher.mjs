@@ -154,13 +154,6 @@ async function main() {
   for (const item of pending) {
     console.log(`- ${item.platform}/${item.contentId} (${item.text.length} chars)`);
   }
-  if (dryRun || pending.length === 0) return;
-
-  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
-    throw new Error("TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are required for alerts and fallback");
-  }
-
-  const publicChatId = process.env.TELEGRAM_CHANNEL_ID;
   let bufferChannels = {};
   if (isBufferConfigured()) {
     try {
@@ -175,6 +168,13 @@ async function main() {
       console.warn(`Buffer discovery failed; using Telegram fallback: ${error.message}`);
     }
   }
+  if (dryRun || pending.length === 0) return;
+
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
+    throw new Error("TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are required for alerts and fallback");
+  }
+
+  const publicChatId = process.env.TELEGRAM_CHANNEL_ID;
 
   const summary = [];
   for (const item of pending) {

@@ -10,7 +10,11 @@ try {
     console.log("No social channels are connected yet.");
   } else {
     for (const channel of channels) {
-      console.log(`${channel.service}: ${channel.displayName || channel.name} (${channel.id})`);
+      console.log(
+        `${channel.service}: ${channel.displayName || channel.name} (${channel.id})` +
+          `${channel.isDisconnected ? " [disconnected]" : ""}` +
+          `${channel.isLocked ? " [locked]" : ""}`,
+      );
     }
   }
 } catch (error) {
