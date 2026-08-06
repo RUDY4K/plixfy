@@ -6,6 +6,7 @@ import { BRAND_AR } from "@/lib/siteContent";
 import { locales, hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
 
 const SITE = "https://www.plixfy.com";
+const SOCIAL_IMAGE = SITE + "/opengraph-image";
 
 export const revalidate = 21600;
 // أخبار تخرج من نافذة الـ60 عنصراً بعد التدوير تصير slug غير معروف — نرفض
@@ -66,8 +67,9 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       siteName: "Plixfy",
       locale: ogLocaleFor(locale),
       publishedTime: item.publishedAt,
+      images: [{ url: SOCIAL_IMAGE, width: 1200, height: 630, alt: title }],
     },
-    twitter: { card: "summary_large_image", title, description },
+    twitter: { card: "summary_large_image", title, description, images: [SOCIAL_IMAGE] },
   };
 }
 
