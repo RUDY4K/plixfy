@@ -299,6 +299,7 @@ async function main() {
 
   const publisherArgs = [path.join(ROOT, "scripts", "social-publisher.mjs"), packFile];
   if (args.dryRun) publisherArgs.push("--dry-run");
+  if (args.force) publisherArgs.push("--force");
   const result = spawnSync(process.execPath, publisherArgs, { cwd: ROOT, stdio: "inherit" });
   if (result.status !== 0) throw new Error(`Social publisher exited with code ${result.status}`);
 

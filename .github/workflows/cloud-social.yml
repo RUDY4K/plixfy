@@ -21,6 +21,16 @@ on:
         required: true
         default: true
         type: boolean
+      force:
+        description: Republish even if this slot already completed
+        required: true
+        default: false
+        type: boolean
+      platforms:
+        description: Comma-separated destinations for this run
+        required: true
+        default: telegram,x,instagram,tiktok
+        type: string
 
 permissions:
   contents: read
@@ -58,12 +68,18 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "SOCIAL_SLOT=${{ inputs.slot }}" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=${{ inputs.dry_run }}" >> "$GITHUB_ENV"
+            echo "SOCIAL_FORCE=${{ inputs.force }}" >> "$GITHUB_ENV"
+            echo "SOCIAL_PLATFORMS=${{ inputs.platforms }}" >> "$GITHUB_ENV"
           elif [[ "${{ github.event.schedule }}" == "30 6 * * *" ]]; then
             echo "SOCIAL_SLOT=morning" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
+            echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
+            echo "SOCIAL_PLATFORMS=telegram,x,instagram,tiktok" >> "$GITHUB_ENV"
           else
             echo "SOCIAL_SLOT=evening" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
+            echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
+            echo "SOCIAL_PLATFORMS=telegram,x,instagram,tiktok" >> "$GITHUB_ENV"
           fi
 
       - name: Generate and deliver social pack
@@ -73,12 +89,14 @@ jobs:
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           BUFFER_ORGANIZATION_ID: ${{ vars.BUFFER_ORGANIZATION_ID }}
-          SOCIAL_PLATFORMS: telegram,x,instagram,tiktok
         shell: bash
         run: |
           args=("--slot=${SOCIAL_SLOT}")
           if [[ "${SOCIAL_DRY_RUN}" == "true" ]]; then
             args+=("--dry-run")
+          fi
+          if [[ "${SOCIAL_FORCE}" == "true" ]]; then
+            args+=("--force")
           fi
           node scripts/cloud-social-runner.mjs "${args[@]}"
 

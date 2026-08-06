@@ -140,16 +140,19 @@ async function main() {
   loadEnvLocal();
   const file = process.argv.find((arg) => arg.endsWith(".json"));
   const dryRun = process.argv.includes("--dry-run");
+  const force = process.argv.includes("--force");
   if (!file) throw new Error("Usage: node scripts/social-publisher.mjs <pack.json> [--dry-run]");
 
   const pack = loadPack(path.resolve(file));
   const state = readState();
   const enabled = activePlatforms();
   const selected = pack.items.filter((item) => enabled.has(item.platform));
-  const pending = selected.filter((item) => !state.published[itemKey(item, pack)]);
+  const pending = force
+    ? selected
+    : selected.filter((item) => !state.published[itemKey(item, pack)]);
 
   console.log(
-    `Validated ${pack.items.length} posts; ${selected.length} enabled; ${pending.length} pending; dryRun=${dryRun}`,
+    `Validated ${pack.items.length} posts; ${selected.length} enabled; ${pending.length} pending; dryRun=${dryRun}; force=${force}`,
   );
   for (const item of pending) {
     console.log(`- ${item.platform}/${item.contentId} (${item.text.length} chars)`);
