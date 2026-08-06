@@ -6,6 +6,12 @@ import {
   sendTelegramMessage,
   sendTelegramPhoto,
 } from "./telegram-client.mjs";
+import {
+  discoverBufferChannels,
+  isBufferConfigured,
+  mapChannelsByPlatform,
+  publishBufferPost,
+} from "./buffer-client.mjs";
 
 const ROOT = process.cwd();
 const STATE_FILE = path.join(ROOT, "scripts", ".social-published.json");
@@ -107,6 +113,16 @@ function renderPost(item, pack, forAdmin) {
   return `${heading}${item.text.trim()}${url ? `\n\n${url}` : ""}`;
 }
 
+function activePlatforms() {
+  const configured = process.env.SOCIAL_PLATFORMS || "telegram,x,instagram,tiktok";
+  return new Set(
+    configured
+      .split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter((value) => ALLOWED_PLATFORMS.has(value)),
+  );
+}
+
 async function deliver(chatId, item, pack, forAdmin) {
   const text = renderPost(item, pack, forAdmin);
   if (item.image && text.length <= 1024) {
@@ -128,43 +144,94 @@ async function main() {
 
   const pack = loadPack(path.resolve(file));
   const state = readState();
-  const pending = pack.items.filter((item) => !state.published[itemKey(item, pack)]);
+  const enabled = activePlatforms();
+  const selected = pack.items.filter((item) => enabled.has(item.platform));
+  const pending = selected.filter((item) => !state.published[itemKey(item, pack)]);
 
-  console.log(`Validated ${pack.items.length} posts; ${pending.length} pending; dryRun=${dryRun}`);
+  console.log(
+    `Validated ${pack.items.length} posts; ${selected.length} enabled; ${pending.length} pending; dryRun=${dryRun}`,
+  );
   for (const item of pending) {
     console.log(`- ${item.platform}/${item.contentId} (${item.text.length} chars)`);
   }
   if (dryRun || pending.length === 0) return;
 
-  for (const required of ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"]) {
-    if (!process.env[required]) throw new Error(`${required} is not set`);
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
+    throw new Error("TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are required for alerts and fallback");
   }
 
   const publicChatId = process.env.TELEGRAM_CHANNEL_ID;
+  let bufferChannels = {};
+  if (isBufferConfigured()) {
+    try {
+      const discovered = await discoverBufferChannels();
+      bufferChannels = mapChannelsByPlatform(discovered.channels);
+      console.log(
+        `Buffer connected: ${Object.entries(bufferChannels)
+          .map(([platform, channel]) => `${platform}=${channel.displayName || channel.name}`)
+          .join(", ") || "no channels"}`,
+      );
+    } catch (error) {
+      console.warn(`Buffer discovery failed; using Telegram fallback: ${error.message}`);
+    }
+  }
+
+  const summary = [];
   for (const item of pending) {
     const key = itemKey(item, pack);
     const publicDeliveryKey = `${key}:public`;
     const adminDeliveryKey = `${key}:admin`;
+    const bufferDeliveryKey = `${key}:buffer`;
+    let completed = false;
 
     if (item.platform === "telegram" && publicChatId && !state.deliveries[publicDeliveryKey]) {
       await deliver(publicChatId, item, pack, false);
       state.deliveries[publicDeliveryKey] = new Date().toISOString();
       writeState(state);
+      completed = true;
+      summary.push(`✅ Telegram: ${item.contentId}`);
     }
-    if (!state.deliveries[adminDeliveryKey]) {
+
+    const bufferChannel = bufferChannels[item.platform];
+    if (item.platform !== "telegram" && bufferChannel && !state.deliveries[bufferDeliveryKey]) {
+      try {
+        const post = await publishBufferPost({
+          channelId: bufferChannel.id,
+          platform: item.platform,
+          text: renderPost(item, pack, false),
+          image: item.image,
+          title: item.title || item.text.split("\n")[0],
+        });
+        state.deliveries[bufferDeliveryKey] = new Date().toISOString();
+        writeState(state);
+        completed = true;
+        summary.push(`✅ ${item.platform.toUpperCase()}: ${post.id}`);
+      } catch (error) {
+        console.warn(`${item.platform} publish failed; using Telegram fallback: ${error.message}`);
+        summary.push(`⚠️ ${item.platform.toUpperCase()}: ${error.message}`);
+      }
+    }
+
+    if (!completed && !state.deliveries[adminDeliveryKey]) {
       await deliver(process.env.TELEGRAM_CHAT_ID, item, pack, true);
       state.deliveries[adminDeliveryKey] = new Date().toISOString();
       writeState(state);
+      completed = true;
+      summary.push(`📦 ${item.platform.toUpperCase()}: sent to Telegram fallback`);
     }
-    state.published[key] = new Date().toISOString();
-    writeState(state);
+    if (completed) {
+      state.published[key] = new Date().toISOString();
+      writeState(state);
+    }
   }
 
-  console.log(
-    publicChatId
-      ? `Published ${pending.length} posts and delivered the review pack to Telegram.`
-      : `Delivered ${pending.length} review posts to Telegram; TELEGRAM_CHANNEL_ID is not set.`,
-  );
+  if (summary.length > 0) {
+    await sendTelegramMessage(
+      process.env.TELEGRAM_CHAT_ID,
+      [`📊 تقرير نشر Plixfy (${pack.date} · ${pack.slot})`, ...summary].join("\n"),
+    );
+  }
+  console.log(`Completed ${pending.length} social deliveries.`);
 }
 
 main().catch((error) => {

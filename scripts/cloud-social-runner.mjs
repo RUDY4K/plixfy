@@ -9,6 +9,7 @@ const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
 const CLOUD_STATE_FILE = path.join(SOCIAL_DIR, "cloud-state.json");
 const SITE = "https://www.plixfy.com";
+const DEFAULT_SOCIAL_IMAGE = `${SITE}/opengraph-image`;
 
 const CATEGORY_AR = {
   racing: "سباق",
@@ -162,6 +163,15 @@ function gamePack(game, date, slot) {
         url,
         image: game.thumbnail,
       },
+      {
+        platform: "tiktok",
+        kind: "game",
+        contentId,
+        title: `تحدي ${title}`,
+        text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #Gaming #Plixfy`,
+        url,
+        image: game.thumbnail,
+      },
     ],
   };
 }
@@ -205,6 +215,16 @@ function newsPack(news, date, slot) {
         contentId,
         text: `📰 ${title}\n\n${truncate(summary, 180)}\n\nالتفاصيل على Plixfy.\n\n#أخبار_الألعاب #GamingNews #Plixfy`,
         url,
+        image: DEFAULT_SOCIAL_IMAGE,
+      },
+      {
+        platform: "tiktok",
+        kind: "news",
+        contentId,
+        title: truncate(title, 80),
+        text: `📰 ${truncate(title, 115)}\n\nأبرز التفاصيل على Plixfy. ما رأيك بالخبر؟\n\n#أخبار_الألعاب #GamingNews #Plixfy`,
+        url,
+        image: DEFAULT_SOCIAL_IMAGE,
       },
     ],
   };
