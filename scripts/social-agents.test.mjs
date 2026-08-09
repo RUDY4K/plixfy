@@ -68,3 +68,14 @@ test("Buffer Instagram posts request an automatic feed post", () => {
     instagram: { type: "post", shouldShareToFeed: true, isAiGenerated: false },
   });
 });
+
+test("Buffer X posts omit unreliable remote media and keep the text link", () => {
+  const input = buildBufferPostInput({
+    channelId: "x-1",
+    platform: "x",
+    text: "جرّب اللعبة https://www.plixfy.com/ar/play/test",
+    image: "https://img.gamedistribution.com/test.jpg",
+  });
+  assert.equal(input.assets, undefined);
+  assert.match(input.text, /plixfy\.com/);
+});

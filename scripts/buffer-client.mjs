@@ -139,7 +139,9 @@ export function buildBufferPostInput({ channelId, platform, text, image, title }
     mode: process.env.BUFFER_SHARE_MODE || "shareNow",
     source: "plixfy-cloud-social",
   };
-  if (image) input.assets = [{ image: { url: image } }];
+  // Remote game thumbnails occasionally time out while Buffer uploads them to X.
+  // The tracked Plixfy link is the traffic goal, so X uses a reliable link-only post.
+  if (image && platform !== "x") input.assets = [{ image: { url: image } }];
   if (platform === "facebook") {
     input.metadata = { facebook: { type: "post" } };
   } else if (platform === "instagram") {
