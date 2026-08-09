@@ -1,9 +1,13 @@
-// Deterministic, AI-independent social publisher for GitHub Actions.
+// Local, deterministic social agents for GitHub Actions.
 // Usage: node scripts/cloud-social-runner.mjs [--slot=morning|evening|auto] [--dry-run] [--force]
-import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import {
+  ContentScoutAgent,
+  EditorialAgent,
+  PublicationAuditAgent,
+} from "./social-agents.mjs";
 
 const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
@@ -32,7 +36,9 @@ function readJson(file, fallback) {
 
 function writeJson(file, value) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(value, null, 2) + "\n");
+  const temporary = `${file}.tmp`;
+  fs.writeFileSync(temporary, JSON.stringify(value, null, 2) + "\n");
+  fs.renameSync(temporary, file);
 }
 
 function riyadhParts(now = new Date()) {
@@ -69,11 +75,6 @@ function parseArgs() {
   };
 }
 
-function stableIndex(seed, length) {
-  const hash = crypto.createHash("sha256").update(seed).digest();
-  return hash.readUInt32BE(0) % length;
-}
-
 function cleanContentId(value) {
   return value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 72);
 }
@@ -85,8 +86,7 @@ function truncate(text, max) {
 }
 
 function loadGames() {
-  const files = ["gd-games.json", "gm-games.json"];
-  return files
+  return ["gd-games.json", "gm-games.json"]
     .flatMap((name) => readJson(path.join(ROOT, "src", "data", name), []))
     .filter((game) => game?.slug && game?.title && game?.thumbnail)
     .map((game) => ({
@@ -111,67 +111,22 @@ function loadNews(referenceDate) {
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
-function chooseUnused(items, recentIds, seed, idField = "slug") {
-  const recent = new Set(recentIds);
-  const fresh = items.filter((item) => !recent.has(item[idField]));
-  const pool = fresh.length > 0 ? fresh : items;
-  if (pool.length === 0) throw new Error("No eligible content found");
-  return pool[stableIndex(seed, pool.length)];
-}
-
 function gamePack(game, date, slot) {
   const title = truncate(game.title, 70);
   const category = CATEGORY_AR[game.categorySlug] || game.category || "ألعاب";
   const url = `${SITE}/ar/play/${encodeURIComponent(game.slug)}`;
   const contentId = cleanContentId(`game-${game.slug}`);
-
   return {
     date,
     campaign: "ar_growth_cloud",
     slot,
     source: { kind: "game", id: game.slug },
     items: [
-      {
-        platform: "telegram",
-        kind: "game",
-        contentId,
-        text: `🎮 لعبة اليوم: ${title}\n\nتبي تحديًا سريعًا من المتصفح؟ جرّبها مجانًا بدون تحميل أو تسجيل. التصنيف: ${category}. شاركنا نتيجتك!`,
-        url,
-        image: game.thumbnail,
-      },
-      {
-        platform: "x",
-        kind: "game",
-        contentId,
-        text: `🎮 جرّب ${truncate(title, 55)} مجانًا من المتصفح، بدون تحميل أو تسجيل. كم نتيجة تقدر تحقق؟ 👇\n#ألعاب #Plixfy`,
-        url,
-        image: game.thumbnail,
-      },
-      {
-        platform: "facebook",
-        kind: "game",
-        contentId,
-        text: `🎮 اختيارنا اليوم هو ${title}. لعبة ${category} تعمل مباشرة من المتصفح مجانًا، بدون تحميل أو إنشاء حساب. جرّبها وقل لنا: وصلت لأي نتيجة؟`,
-        url,
-        image: game.thumbnail,
-      },
-      {
-        platform: "instagram",
-        kind: "game",
-        contentId,
-        text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #العاب_مجانية #ألعاب_متصفح #Plixfy`,
-        url,
-        image: game.thumbnail,
-      },
-      {
-        platform: "tiktok",
-        kind: "game",
-        contentId,
-        title: `تحدي ${title}`,
-        text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #Gaming #Plixfy`,
-        url,
-        image: game.thumbnail,
-      },
+      { platform: "telegram", kind: "game", contentId, text: `🎮 لعبة اليوم: ${title}\n\nتبي تحديًا سريعًا من المتصفح؟ جرّبها مجانًا بدون تحميل أو تسجيل. التصنيف: ${category}. شاركنا نتيجتك!`, url, image: game.thumbnail },
+      { platform: "x", kind: "game", contentId, text: `🎮 جرّب ${truncate(title, 55)} مجانًا من المتصفح، بدون تحميل أو تسجيل. كم نتيجة تقدر تحقق؟ 👇\n#ألعاب #Plixfy`, url, image: game.thumbnail },
+      { platform: "facebook", kind: "game", contentId, text: `🎮 اختيارنا اليوم هو ${title}. لعبة ${category} تعمل مباشرة من المتصفح مجانًا، بدون تحميل أو إنشاء حساب. جرّبها وقل لنا: وصلت لأي نتيجة؟`, url, image: game.thumbnail },
+      { platform: "instagram", kind: "game", contentId, text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #ألعاب_متصفح #Plixfy`, url, image: game.thumbnail },
+      { platform: "tiktok", kind: "game", contentId, title: `تحدي ${title}`, text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #Gaming #Plixfy`, url, image: game.thumbnail },
     ],
   };
 }
@@ -181,56 +136,22 @@ function newsPack(news, date, slot) {
   const summary = truncate(news.summary, 260);
   const url = `${SITE}/ar/news/${encodeURIComponent(news.slug)}`;
   const contentId = cleanContentId(`news-${news.slug}`);
-
   return {
     date,
     campaign: "ar_growth_cloud",
     slot,
     source: { kind: "news", id: news.slug },
     items: [
-      {
-        platform: "telegram",
-        kind: "news",
-        contentId,
-        text: `📰 ${title}\n\n${summary}\n\nاقرأ التفاصيل على Plixfy:`,
-        url,
-      },
-      {
-        platform: "x",
-        kind: "news",
-        contentId,
-        text: `📰 ${truncate(title, 145)}\n\nالتفاصيل على Plixfy 👇\n#أخبار_الألعاب`,
-        url,
-      },
-      {
-        platform: "facebook",
-        kind: "news",
-        contentId,
-        text: `📰 ${title}\n\n${summary}\n\nما رأيكم بالخبر؟ اقرأوا التفاصيل الكاملة على Plixfy.`,
-        url,
-      },
-      {
-        platform: "instagram",
-        kind: "news",
-        contentId,
-        text: `📰 ${title}\n\n${truncate(summary, 180)}\n\nالتفاصيل على Plixfy.\n\n#أخبار_الألعاب #GamingNews #Plixfy`,
-        url,
-        image: DEFAULT_SOCIAL_IMAGE,
-      },
-      {
-        platform: "tiktok",
-        kind: "news",
-        contentId,
-        title: truncate(title, 80),
-        text: `📰 ${truncate(title, 115)}\n\nأبرز التفاصيل على Plixfy. ما رأيك بالخبر؟\n\n#أخبار_الألعاب #GamingNews #Plixfy`,
-        url,
-        image: DEFAULT_SOCIAL_IMAGE,
-      },
+      { platform: "telegram", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nاقرأ التفاصيل على Plixfy:`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
+      { platform: "x", kind: "news", contentId, text: `📰 ${truncate(title, 145)}\n\nالتفاصيل على Plixfy 👇\n#أخبار_الألعاب`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
+      { platform: "facebook", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nما رأيكم بالخبر؟ اقرأوا التفاصيل الكاملة على Plixfy.`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
+      { platform: "instagram", kind: "news", contentId, text: `📰 ${title}\n\n${truncate(summary, 180)}\n\nالتفاصيل على Plixfy.\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
+      { platform: "tiktok", kind: "news", contentId, title: truncate(title, 80), text: `📰 ${truncate(title, 115)}\n\nأبرز التفاصيل على Plixfy. ما رأيك بالخبر؟\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
     ],
   };
 }
 
-function updateCloudState(state, pack) {
+function updateCloudState(state, pack, audit) {
   const now = new Date().toISOString();
   const runKey = `${pack.date}:${pack.slot}`;
   const next = {
@@ -243,7 +164,7 @@ function updateCloudState(state, pack) {
   } else {
     next.recentNews = [pack.source.id, ...next.recentNews.filter((id) => id !== pack.source.id)].slice(0, 30);
   }
-  next.runs[runKey] = { status: "published", source: pack.source, completedAt: now };
+  next.runs[runKey] = { status: "delivered", source: pack.source, counts: audit.counts, completedAt: now };
   next.runs = Object.fromEntries(Object.entries(next.runs).slice(-90));
   return next;
 }
@@ -256,7 +177,7 @@ async function verifyPublicUrl(url) {
         method: "HEAD",
         redirect: "follow",
         signal: AbortSignal.timeout(12_000),
-        headers: { "user-agent": "PlixfyCloudSocial/1.0" },
+        headers: { "user-agent": "PlixfyCloudSocial/2.0" },
       });
       lastStatus = response.status;
       if (response.ok) return;
@@ -271,40 +192,45 @@ async function main() {
   const args = parseArgs();
   const state = readJson(CLOUD_STATE_FILE, { recentGames: [], recentNews: [], runs: {} });
   const runKey = `${args.date}:${args.slot}`;
-  if (!args.dryRun && !args.force && state.runs?.[runKey]?.status === "published") {
+  if (!args.dryRun && !args.force && state.runs?.[runKey]?.status === "delivered") {
     console.log(`Run ${runKey} is already complete; nothing to do.`);
     return;
   }
 
-  let pack;
-  if (args.slot === "morning") {
-    const game = chooseUnused(loadGames(), state.recentGames || [], runKey);
-    pack = gamePack(game, args.date, args.slot);
-  } else {
-    const newsItems = loadNews(args.date);
-    if (newsItems.length > 0) {
-      const news = chooseUnused(newsItems, state.recentNews || [], runKey);
-      pack = newsPack(news, args.date, args.slot);
-    } else {
-      const game = chooseUnused(loadGames(), state.recentGames || [], runKey);
-      pack = gamePack(game, args.date, args.slot);
-    }
-  }
+  const selection = new ContentScoutAgent().select({
+    slot: args.slot,
+    games: loadGames(),
+    newsItems: loadNews(args.date),
+    recentGames: state.recentGames || [],
+    recentNews: state.recentNews || [],
+    seed: runKey,
+  });
+  console.log(`[ScoutAgent] selected ${selection.kind}/${selection.item.slug}`);
+
+  const rawPack = selection.kind === "news"
+    ? newsPack(selection.item, args.date, args.slot)
+    : gamePack(selection.item, args.date, args.slot);
+  const pack = new EditorialAgent().review(rawPack);
+  console.log(`[EditorAgent] approved ${pack.items.length} platform drafts`);
 
   await verifyPublicUrl(pack.items[0].url);
   fs.mkdirSync(SOCIAL_DIR, { recursive: true });
   const packFile = path.join(SOCIAL_DIR, `${args.date}-${args.slot}.json`);
+  const reportFile = path.join(SOCIAL_DIR, `${args.date}-${args.slot}-delivery.json`);
   writeJson(packFile, pack);
-  console.log(`Prepared ${pack.source.kind}/${pack.source.id} for ${runKey}.`);
 
-  const publisherArgs = [path.join(ROOT, "scripts", "social-publisher.mjs"), packFile];
+  const publisherArgs = [path.join(ROOT, "scripts", "social-publisher.mjs"), packFile, `--report=${reportFile}`];
   if (args.dryRun) publisherArgs.push("--dry-run");
   if (args.force) publisherArgs.push("--force");
   const result = spawnSync(process.execPath, publisherArgs, { cwd: ROOT, stdio: "inherit" });
-  if (result.status !== 0) throw new Error(`Social publisher exited with code ${result.status}`);
+  if (result.status !== 0) throw new Error(`PublisherAgent exited with code ${result.status}`);
+
+  const report = readJson(reportFile, null);
+  const audit = new PublicationAuditAgent().evaluate(report, { requirePublicDelivery: !args.dryRun });
+  console.log(`[AuditAgent] public=${audit.counts.publishedPublic}, accepted=${audit.counts.acceptedByBuffer}, fallback=${audit.counts.fallbackAdmin}, disconnected=${audit.counts.skippedDisconnected}, failed=${audit.counts.failed}`);
 
   if (!args.dryRun) {
-    writeJson(CLOUD_STATE_FILE, updateCloudState(state, pack));
+    writeJson(CLOUD_STATE_FILE, updateCloudState(state, pack, audit));
     console.log(`Recorded successful run ${runKey}.`);
   }
 }

@@ -29,7 +29,7 @@ on:
       platforms:
         description: Comma-separated destinations for this run
         required: true
-        default: telegram,x,instagram,tiktok
+        default: telegram,x,facebook,instagram,tiktok
         type: string
 
 permissions:
@@ -74,15 +74,15 @@ jobs:
             echo "SOCIAL_SLOT=morning" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
             echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_PLATFORMS=telegram,x,instagram,tiktok" >> "$GITHUB_ENV"
+            echo "SOCIAL_PLATFORMS=telegram,x,facebook,instagram,tiktok" >> "$GITHUB_ENV"
           else
             echo "SOCIAL_SLOT=evening" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
             echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_PLATFORMS=telegram,x,instagram,tiktok" >> "$GITHUB_ENV"
+            echo "SOCIAL_PLATFORMS=telegram,x,facebook,instagram,tiktok" >> "$GITHUB_ENV"
           fi
 
-      - name: Generate and deliver social pack
+      - name: Run scout, editor, publisher, and auditor agents
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -101,7 +101,7 @@ jobs:
           node scripts/cloud-social-runner.mjs "${args[@]}"
 
       - name: Save delivery state
-        if: ${{ success() && env.SOCIAL_DRY_RUN != 'true' }}
+        if: ${{ always() && env.SOCIAL_DRY_RUN != 'true' }}
         uses: actions/cache/save@v6
         with:
           path: |
@@ -109,13 +109,14 @@ jobs:
             .social/cloud-state.json
           key: social-state-${{ github.run_id }}-${{ github.run_attempt }}
 
-      - name: Upload generated pack
+      - name: Upload agent reports
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: social-pack-${{ github.run_id }}-${{ github.run_attempt }}
           path: .social/*.json
           if-no-files-found: ignore
+          include-hidden-files: true
           retention-days: 14
 
       - name: Alert admin on failure
@@ -124,6 +125,6 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ALERT_MESSAGE: >-
-            🚨 فشل ناشر Plixfy السحابي. راجع التشغيل:
+            🚨 فشل أحد وكلاء نشر Plixfy. راجع التشغيل:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: node scripts/telegram-alert.mjs
