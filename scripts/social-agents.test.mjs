@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { ContentScoutAgent, EditorialAgent, PublicationAuditAgent, deliveryCounts } from "./social-agents.mjs";
+import { buildBufferPostInput } from "./buffer-client.mjs";
 
 const baseItem = {
   platform: "x", kind: "game", contentId: "game-test",
@@ -54,4 +55,16 @@ test("AuditAgent accepts one real public post and reports fallbacks separately",
 test("AuditAgent reports Buffer acceptance separately from confirmed publishing", () => {
   const result = new PublicationAuditAgent().evaluate({ deliveries: [{ platform: "x", status: "accepted_by_buffer", public: true, externalId: "post-1" }] });
   assert.equal(result.counts.publishedPublic, 0); assert.equal(result.counts.acceptedByBuffer, 1);
+});
+
+test("Buffer Facebook posts include the required post type", () => {
+  const input = buildBufferPostInput({ channelId: "facebook-1", platform: "facebook", text: "test" });
+  assert.deepEqual(input.metadata, { facebook: { type: "post" } });
+});
+
+test("Buffer Instagram posts request an automatic feed post", () => {
+  const input = buildBufferPostInput({ channelId: "instagram-1", platform: "instagram", text: "test" });
+  assert.deepEqual(input.metadata, {
+    instagram: { type: "post", shouldShareToFeed: true, isAiGenerated: false },
+  });
 });

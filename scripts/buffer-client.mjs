@@ -131,7 +131,7 @@ export function mapChannelsByPlatform(channels) {
   return result;
 }
 
-export async function publishBufferPost({ channelId, platform, text, image, title }) {
+export function buildBufferPostInput({ channelId, platform, text, image, title }) {
   const input = {
     channelId,
     text,
@@ -140,9 +140,20 @@ export async function publishBufferPost({ channelId, platform, text, image, titl
     source: "plixfy-cloud-social",
   };
   if (image) input.assets = [{ image: { url: image } }];
-  if (platform === "tiktok") {
+  if (platform === "facebook") {
+    input.metadata = { facebook: { type: "post" } };
+  } else if (platform === "instagram") {
+    input.metadata = {
+      instagram: { type: "post", shouldShareToFeed: true, isAiGenerated: false },
+    };
+  } else if (platform === "tiktok") {
     input.metadata = { tiktok: { title: String(title || text).slice(0, 90) } };
   }
+  return input;
+}
+
+export async function publishBufferPost({ channelId, platform, text, image, title }) {
+  const input = buildBufferPostInput({ channelId, platform, text, image, title });
 
   const data = await graphql(
     `
