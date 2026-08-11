@@ -171,7 +171,9 @@ function renderVideo({ frame, overlay, output, duration }) {
     ],
     { stdio: "inherit" },
   );
-  if (result.status !== 0) throw new Error(`ffmpeg exited with code ${result.status}`);
+  if (result.status !== 0) {
+    throw new Error(result.error?.message || `ffmpeg exited with code ${result.status}`);
+  }
 }
 
 async function main() {
