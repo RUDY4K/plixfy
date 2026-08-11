@@ -47,7 +47,7 @@ jobs:
       - name: Validate generated news
         run: |
           node scripts/repair-news-encoding.mjs --check
-          node -e "const fs=require('fs');const items=JSON.parse(fs.readFileSync('src/data/news.json','utf8'));if(!Array.isArray(items)||items.length<1)throw new Error('news.json is empty');for(const n of items){for(const k of ['slug','title','summary','titleEn','summaryEn','sourceName','sourceUrl','publishedAt'])if(typeof n[k]!=='string'||!n[k].trim())throw new Error('Invalid '+k+' in '+(n.slug||'unknown'));}console.log('Validated '+items.length+' news items.');"
+          node -e "const fs=require('fs');const items=JSON.parse(fs.readFileSync('src/data/news.json','utf8'));if(!Array.isArray(items)||items.length<1)throw new Error('news.json is empty');for(const n of items){for(const k of ['slug','title','summary','titleEn','summaryEn','sourceName','sourceUrl','publishedAt'])if(typeof n[k]!=='string'||!n[k].trim())throw new Error('Invalid '+k+' in '+(n.slug||'unknown'));if(n.image&&(typeof n.image!=='string'||!n.image.startsWith('https://')))throw new Error('Invalid image in '+n.slug);}console.log('Validated '+items.length+' news items.');"
 
       - name: Detect content changes
         id: changes

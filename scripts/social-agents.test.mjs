@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ContentScoutAgent, EditorialAgent, PublicationAuditAgent, deliveryCounts } from "./social-agents.mjs";
 import { buildBufferPostInput } from "./buffer-client.mjs";
+import { buildDiscordPayload } from "./discord-client.mjs";
 
 const baseItem = {
   platform: "x", kind: "game", contentId: "game-test",
@@ -69,13 +70,33 @@ test("Buffer Instagram posts request an automatic feed post", () => {
   });
 });
 
-test("Buffer X posts omit unreliable remote media and keep the text link", () => {
+test("Buffer X posts include the Plixfy-hosted branded card", () => {
   const input = buildBufferPostInput({
     channelId: "x-1",
     platform: "x",
     text: "جرّب اللعبة https://www.plixfy.com/ar/play/test",
-    image: "https://img.gamedistribution.com/test.jpg",
+    image: "https://www.plixfy.com/api/social-card?kind=game&id=test",
   });
-  assert.equal(input.assets, undefined);
+  assert.deepEqual(input.assets, [{ image: { url: "https://www.plixfy.com/api/social-card?kind=game&id=test" } }]);
   assert.match(input.text, /plixfy\.com/);
+});
+
+test("EditorAgent accepts Discord as a public social destination", () => {
+  const pack = new EditorialAgent().review({
+    date: "2026-08-11",
+    campaign: "ar_growth_cloud",
+    items: [{ ...baseItem, platform: "discord" }],
+  });
+  assert.equal(pack.items[0].platform, "discord");
+});
+
+test("Discord payload carries the branded image and blocks mentions", () => {
+  const payload = buildDiscordPayload({
+    text: "خبر جديد على بليكسفاي https://www.plixfy.com/ar/news/test",
+    title: "خبر ألعاب جديد",
+    image: "https://www.plixfy.com/api/social-card?kind=news&id=test",
+    url: "https://www.plixfy.com/ar/news/test",
+  });
+  assert.equal(payload.embeds[0].image.url, "https://www.plixfy.com/api/social-card?kind=news&id=test");
+  assert.deepEqual(payload.allowed_mentions, { parse: [] });
 });

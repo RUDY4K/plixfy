@@ -55,6 +55,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
   const title = newsTitle(item, locale);
   const description = newsSummary(item, locale).slice(0, 155);
+  const socialImage = `${SITE}/api/social-card?kind=news&id=${encodeURIComponent(item.slug)}&v=2`;
   return {
     title: title + " | " + c.brand,
     description,
@@ -67,9 +68,9 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       siteName: "Plixfy",
       locale: ogLocaleFor(locale),
       publishedTime: item.publishedAt,
-      images: [{ url: SOCIAL_IMAGE, width: 1200, height: 630, alt: title }],
+      images: [{ url: socialImage, width: 1200, height: 1200, alt: title }],
     },
-    twitter: { card: "summary_large_image", title, description, images: [SOCIAL_IMAGE] },
+    twitter: { card: "summary_large_image", title, description, images: [socialImage] },
   };
 }
 
@@ -90,6 +91,7 @@ export default async function NewsItemPage({ params }: PageParams) {
     "@type": "NewsArticle",
     headline: title,
     description: summary.slice(0, 155),
+    image: item.image || SOCIAL_IMAGE,
     inLanguage: locale,
     datePublished: item.publishedAt,
     author: { "@type": "Organization", name: c.brand },
@@ -136,6 +138,10 @@ export default async function NewsItemPage({ params }: PageParams) {
 
         <article className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
           <div aria-hidden="true" className="h-1.5 bg-blue-700" />
+          {item.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={item.image} alt="" className="h-64 w-full object-cover md:h-80" />
+          ) : null}
           <div className="p-6 md:p-8">
             <header className="mb-6 border-b border-slate-100 pb-6">
               <div className="flex items-center gap-2 mb-4 text-xs">

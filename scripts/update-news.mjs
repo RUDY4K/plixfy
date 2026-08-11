@@ -44,6 +44,70 @@ function extractTag(block, tag) {
   return m ? m[1] : "";
 }
 
+function asHttpsImage(value, baseUrl) {
+  if (!value) return "";
+  try {
+    const url = new URL(decodeEntities(value), baseUrl);
+    return url.protocol === "https:" ? url.toString() : "";
+  } catch {
+    return "";
+  }
+}
+
+function extractFeedImage(block, articleUrl) {
+  const patterns = [
+    /<media:content\b[^>]*\burl=["']([^"']+)["'][^>]*>/i,
+    /<media:thumbnail\b[^>]*\burl=["']([^"']+)["'][^>]*>/i,
+    /<enclosure\b(?=[^>]*\btype=["']image\/)[^>]*\burl=["']([^"']+)["'][^>]*>/i,
+    /<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/i,
+  ];
+  for (const pattern of patterns) {
+    const found = block.match(pattern)?.[1];
+    const image = asHttpsImage(found, articleUrl);
+    if (image) return image;
+  }
+  const channelImage = extractTag(extractTag(block, "image"), "url");
+  return asHttpsImage(channelImage, articleUrl);
+}
+
+function extractMetaImage(html, articleUrl) {
+  const tags = html.match(/<meta\b[^>]*>/gi) || [];
+  for (const tag of tags) {
+    if (!/(?:property|name)=["'](?:og:image(?::secure_url)?|twitter:image(?::src)?)["']/i.test(tag)) continue;
+    const content = tag.match(/\bcontent=["']([^"']+)["']/i)?.[1];
+    const image = asHttpsImage(content, articleUrl);
+    if (image) return image;
+  }
+  return "";
+}
+
+async function fetchArticleImage(articleUrl) {
+  try {
+    const response = await fetch(articleUrl, {
+      redirect: "follow",
+      headers: { "user-agent": "Mozilla/5.0 (compatible; PlixfyNewsBot/2.0; +https://www.plixfy.com)" },
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) return "";
+    return extractMetaImage(await response.text(), response.url || articleUrl);
+  } catch {
+    return "";
+  }
+}
+
+async function backfillMissingImages(items, limit = 12) {
+  const targets = items.filter((item) => item?.sourceUrl && !item.image).slice(0, limit);
+  const images = await Promise.all(targets.map((item) => fetchArticleImage(item.sourceUrl)));
+  let updated = 0;
+  targets.forEach((item, index) => {
+    if (images[index]) {
+      item.image = images[index];
+      updated += 1;
+    }
+  });
+  return updated;
+}
+
 async function fetchFeed(feed) {
   try {
     const res = await fetch(feed.url, {
@@ -57,13 +121,17 @@ async function fetchFeed(feed) {
     const xml = await res.text();
     const items = [...xml.matchAll(/<item[\s>][\s\S]*?<\/item>/g)].map((m) => m[0]);
     return items
-      .map((block) => ({
-        source: feed.name,
-        title: decodeEntities(extractTag(block, "title")),
-        link: decodeEntities(extractTag(block, "link")),
-        pubDate: extractTag(block, "pubDate"),
-        description: stripHtml(extractTag(block, "description")).slice(0, 1200),
-      }))
+      .map((block) => {
+        const link = decodeEntities(extractTag(block, "link"));
+        return {
+          source: feed.name,
+          title: decodeEntities(extractTag(block, "title")),
+          link,
+          pubDate: extractTag(block, "pubDate"),
+          description: stripHtml(extractTag(block, "description")).slice(0, 1200),
+          image: extractFeedImage(block, link),
+        };
+      })
       .filter((it) => it.title && it.link);
   } catch (err) {
     console.error(`[${feed.name}] fetch failed: ${err.message} — skipping`);
@@ -87,23 +155,36 @@ function loadExisting() {
 
 async function main() {
   const { items: existing, encodingWasRepaired } = loadExisting();
+  const imagesOnly = process.argv.includes("--images-only");
+  const backfilledImages = await backfillMissingImages(existing, imagesOnly ? MAX_STORED : 12);
+  if (imagesOnly) {
+    fs.writeFileSync(NEWS_FILE, JSON.stringify(existing, null, 2) + "\n", "utf8");
+    console.log(`Added source images to ${backfilledImages} existing news items.`);
+    return;
+  }
   const knownUrls = new Set(existing.map((n) => n.sourceUrl));
   const knownSlugs = new Set(existing.map((n) => n.slug));
 
   const feedResults = await Promise.all(FEEDS.map(fetchFeed));
   const cutoff = Date.now() - CANDIDATE_WINDOW_HOURS * 3600 * 1000;
 
-  const candidates = feedResults
+  const candidateStubs = feedResults
     .flat()
     .filter((it) => {
       const t = Date.parse(it.pubDate);
       return (!Number.isNaN(t) ? t >= cutoff : true) && !knownUrls.has(it.link);
     })
     .slice(0, 40);
+  const candidates = (await Promise.all(
+    candidateStubs.map(async (item) => ({
+      ...item,
+      image: item.image || (await fetchArticleImage(item.link)),
+    })),
+  )).filter((item) => Boolean(item.image));
 
   console.log(`Candidates: ${candidates.length}`);
   if (candidates.length === 0) {
-    if (encodingWasRepaired) {
+    if (encodingWasRepaired || backfilledImages > 0) {
       fs.writeFileSync(NEWS_FILE, JSON.stringify(existing, null, 2) + "\n", "utf8");
       console.log("Repaired existing news encoding.");
     }
@@ -189,13 +270,14 @@ async function main() {
         summaryEn: repairUtf8Mojibake(it.summaryEn.trim()),
         sourceName: candidate.source,
         sourceUrl: candidate.link,
+        image: candidate.image,
         publishedAt: today,
       };
     });
 
   console.log(`New items accepted: ${fresh.length}`);
   if (fresh.length === 0) {
-    if (encodingWasRepaired) {
+    if (encodingWasRepaired || backfilledImages > 0) {
       fs.writeFileSync(NEWS_FILE, JSON.stringify(existing, null, 2) + "\n", "utf8");
       console.log("Repaired existing news encoding.");
     }

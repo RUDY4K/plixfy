@@ -13,7 +13,6 @@ const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
 const CLOUD_STATE_FILE = path.join(SOCIAL_DIR, "cloud-state.json");
 const SITE = "https://www.plixfy.com";
-const DEFAULT_SOCIAL_IMAGE = `${SITE}/opengraph-image`;
 
 const CATEGORY_AR = {
   racing: "سباق",
@@ -85,6 +84,14 @@ function truncate(text, max) {
   return `${normalized.slice(0, max - 1).trim()}…`;
 }
 
+function socialCardUrl(kind, id) {
+  const url = new URL("/api/social-card", SITE);
+  url.searchParams.set("kind", kind);
+  url.searchParams.set("id", id);
+  url.searchParams.set("v", "2");
+  return url.toString();
+}
+
 function loadGames() {
   return ["gd-games.json", "gm-games.json"]
     .flatMap((name) => readJson(path.join(ROOT, "src", "data", name), []))
@@ -116,17 +123,19 @@ function gamePack(game, date, slot) {
   const category = CATEGORY_AR[game.categorySlug] || game.category || "ألعاب";
   const url = `${SITE}/ar/play/${encodeURIComponent(game.slug)}`;
   const contentId = cleanContentId(`game-${game.slug}`);
+  const image = socialCardUrl("game", game.slug);
   return {
     date,
     campaign: "ar_growth_cloud",
     slot,
     source: { kind: "game", id: game.slug },
     items: [
-      { platform: "telegram", kind: "game", contentId, text: `🎮 لعبة اليوم: ${title}\n\nتبي تحديًا سريعًا من المتصفح؟ جرّبها مجانًا بدون تحميل أو تسجيل. التصنيف: ${category}. شاركنا نتيجتك!`, url, image: game.thumbnail },
-      { platform: "x", kind: "game", contentId, text: `🎮 جرّب ${truncate(title, 55)} مجانًا من المتصفح، بدون تحميل أو تسجيل. كم نتيجة تقدر تحقق؟ 👇\n#ألعاب #Plixfy`, url, image: game.thumbnail },
-      { platform: "facebook", kind: "game", contentId, text: `🎮 اختيارنا اليوم هو ${title}. لعبة ${category} تعمل مباشرة من المتصفح مجانًا، بدون تحميل أو إنشاء حساب. جرّبها وقل لنا: وصلت لأي نتيجة؟`, url, image: game.thumbnail },
-      { platform: "instagram", kind: "game", contentId, text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #ألعاب_متصفح #Plixfy`, url, image: game.thumbnail },
-      { platform: "tiktok", kind: "game", contentId, title: `تحدي ${title}`, text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #Gaming #Plixfy`, url, image: game.thumbnail },
+      { platform: "telegram", kind: "game", contentId, text: `🎮 لعبة اليوم: ${title}\n\nتبي تحديًا سريعًا من المتصفح؟ جرّبها مجانًا بدون تحميل أو تسجيل. التصنيف: ${category}. شاركنا نتيجتك!`, url, image },
+      { platform: "discord", kind: "game", contentId, title: `🎮 لعبة اليوم: ${title}`, text: `جاهز لتحدٍ سريع؟ جرّب ${title} مجانًا من المتصفح، بدون تحميل أو تسجيل، ثم شاركنا نتيجتك في الديسكورد.`, url, image },
+      { platform: "x", kind: "game", contentId, text: `🎮 جرّب ${truncate(title, 55)} مجانًا من المتصفح، بدون تحميل أو تسجيل. كم نتيجة تقدر تحقق؟ 👇\n#ألعاب #Plixfy`, url, image },
+      { platform: "facebook", kind: "game", contentId, text: `🎮 اختيارنا اليوم هو ${title}. لعبة ${category} تعمل مباشرة من المتصفح مجانًا، بدون تحميل أو إنشاء حساب. جرّبها وقل لنا: وصلت لأي نتيجة؟`, url, image },
+      { platform: "instagram", kind: "game", contentId, text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #ألعاب_متصفح #Plixfy`, url, image },
+      { platform: "tiktok", kind: "game", contentId, title: `تحدي ${title}`, text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #Gaming #Plixfy`, url, image },
     ],
   };
 }
@@ -136,17 +145,19 @@ function newsPack(news, date, slot) {
   const summary = truncate(news.summary, 260);
   const url = `${SITE}/ar/news/${encodeURIComponent(news.slug)}`;
   const contentId = cleanContentId(`news-${news.slug}`);
+  const image = socialCardUrl("news", news.slug);
   return {
     date,
     campaign: "ar_growth_cloud",
     slot,
     source: { kind: "news", id: news.slug },
     items: [
-      { platform: "telegram", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nاقرأ التفاصيل على Plixfy:`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
-      { platform: "x", kind: "news", contentId, text: `📰 ${truncate(title, 145)}\n\nالتفاصيل على Plixfy 👇\n#أخبار_الألعاب`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
-      { platform: "facebook", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nما رأيكم بالخبر؟ اقرأوا التفاصيل الكاملة على Plixfy.`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
-      { platform: "instagram", kind: "news", contentId, text: `📰 ${title}\n\n${truncate(summary, 180)}\n\nالتفاصيل على Plixfy.\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
-      { platform: "tiktok", kind: "news", contentId, title: truncate(title, 80), text: `📰 ${truncate(title, 115)}\n\nأبرز التفاصيل على Plixfy. ما رأيك بالخبر؟\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image: news.image || DEFAULT_SOCIAL_IMAGE },
+      { platform: "telegram", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nاقرأ التفاصيل على Plixfy:`, url, image },
+      { platform: "discord", kind: "news", contentId, title: `📰 ${title}`, text: `${truncate(summary, 420)}\n\nناقش الخبر معنا ثم اقرأ التفاصيل الكاملة على Plixfy.`, url, image },
+      { platform: "x", kind: "news", contentId, text: `📰 ${truncate(title, 145)}\n\nالتفاصيل على Plixfy 👇\n#أخبار_الألعاب`, url, image },
+      { platform: "facebook", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nما رأيكم بالخبر؟ اقرأوا التفاصيل الكاملة على Plixfy.`, url, image },
+      { platform: "instagram", kind: "news", contentId, text: `📰 ${title}\n\n${truncate(summary, 180)}\n\nالتفاصيل على Plixfy.\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image },
+      { platform: "tiktok", kind: "news", contentId, title: truncate(title, 80), text: `📰 ${truncate(title, 115)}\n\nأبرز التفاصيل على Plixfy. ما رأيك بالخبر؟\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image },
     ],
   };
 }

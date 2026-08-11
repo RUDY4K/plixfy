@@ -130,6 +130,17 @@ export default async function NewsIndexPage({
               className="rounded-2xl bg-white p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all"
             >
               <Link href={localeHref(locale, "/news/" + item.slug)} className="block group">
+                {item.image ? (
+                  // Source images come from several editorial CDNs, so the plain
+                  // element intentionally avoids a brittle hostname allow-list.
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.image}
+                    alt=""
+                    loading="lazy"
+                    className="mb-5 h-52 w-full rounded-xl object-cover md:h-64"
+                  />
+                ) : null}
                 <div className="flex items-center gap-2 mb-3 text-xs">
                   <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-bold">
                     {item.sourceName}

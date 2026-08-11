@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 
 export const SOCIAL_PLATFORMS = Object.freeze([
   "telegram",
+  "discord",
   "x",
   "facebook",
   "instagram",
@@ -12,6 +13,7 @@ export const SOCIAL_PLATFORMS = Object.freeze([
 const PLATFORM_SET = new Set(SOCIAL_PLATFORMS);
 const TEXT_LIMITS = Object.freeze({
   telegram: 3500,
+  discord: 1900,
   x: 240,
   facebook: 3000,
   instagram: 2200,

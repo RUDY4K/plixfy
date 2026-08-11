@@ -286,10 +286,16 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               <li key={item.slug}>
                 <Link
                   href={href(`/news/${item.slug}`)}
-                  className="group block rounded-2xl border border-white/[0.06] bg-white/[0.035] p-4 transition hover:border-primary/25 hover:bg-white/[0.06]"
+                  className="group flex items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.035] p-3 transition hover:border-primary/25 hover:bg-white/[0.06]"
                 >
-                  <span className="text-[11px] font-bold text-primary">{formatNewsDate(item.publishedAt, locale)}</span>
-                  <span className="mt-1.5 line-clamp-2 block text-sm font-bold leading-6 text-white/85 group-hover:text-white">{newsTitle(item, locale)}</span>
+                  {item.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.image} alt="" loading="lazy" className="h-20 w-24 shrink-0 rounded-xl object-cover" />
+                  ) : null}
+                  <span className="min-w-0">
+                    <span className="block text-[11px] font-bold text-primary">{formatNewsDate(item.publishedAt, locale)}</span>
+                    <span className="mt-1.5 line-clamp-2 block text-sm font-bold leading-6 text-white/85 group-hover:text-white">{newsTitle(item, locale)}</span>
+                  </span>
                 </Link>
               </li>
             ))}

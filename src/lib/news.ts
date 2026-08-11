@@ -13,6 +13,8 @@ export interface NewsItem {
   /** اسم المصدر الأصلي للخبر (يُعرض مع رابط الإسناد) */
   sourceName: string;
   sourceUrl: string;
+  /** Original editorial image used on the news page and branded social card. */
+  image?: string;
   /** YYYY-MM-DD */
   publishedAt: string;
 }

@@ -29,7 +29,7 @@ on:
       platforms:
         description: Comma-separated destinations for this run
         required: true
-        default: telegram,x,facebook,instagram,tiktok
+        default: telegram,discord,x,facebook,instagram,tiktok
         type: string
 
 permissions:
@@ -74,12 +74,12 @@ jobs:
             echo "SOCIAL_SLOT=morning" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
             echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_PLATFORMS=telegram,x,facebook,instagram,tiktok" >> "$GITHUB_ENV"
+            echo "SOCIAL_PLATFORMS=telegram,discord,x,facebook,instagram,tiktok" >> "$GITHUB_ENV"
           else
             echo "SOCIAL_SLOT=evening" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
             echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_PLATFORMS=telegram,x,facebook,instagram,tiktok" >> "$GITHUB_ENV"
+            echo "SOCIAL_PLATFORMS=telegram,discord,x,facebook,instagram,tiktok" >> "$GITHUB_ENV"
           fi
 
       - name: Run scout, editor, publisher, and auditor agents
@@ -89,6 +89,9 @@ jobs:
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           BUFFER_ORGANIZATION_ID: ${{ vars.BUFFER_ORGANIZATION_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
         shell: bash
         run: |
           args=("--slot=${SOCIAL_SLOT}")

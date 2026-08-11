@@ -9,10 +9,11 @@ import {
   publishBufferPost,
 } from "./buffer-client.mjs";
 import { EditorialAgent, deliveryCounts } from "./social-agents.mjs";
+import { isDiscordConfigured, sendDiscordPost } from "./discord-client.mjs";
 
 const ROOT = process.cwd();
 const STATE_FILE = path.join(ROOT, "scripts", ".social-published.json");
-const ALLOWED_PLATFORMS = new Set(["telegram", "x", "facebook", "instagram", "tiktok", "youtube"]);
+const ALLOWED_PLATFORMS = new Set(["telegram", "discord", "x", "facebook", "instagram", "tiktok", "youtube"]);
 
 function loadPack(file) {
   return new EditorialAgent().review(JSON.parse(fs.readFileSync(file, "utf8")));
@@ -66,7 +67,7 @@ function renderPost(item, pack, forAdmin = false) {
 }
 
 function activePlatforms() {
-  const configured = process.env.SOCIAL_PLATFORMS ?? "telegram,x,facebook,instagram,tiktok";
+  const configured = process.env.SOCIAL_PLATFORMS ?? "telegram,discord,x,facebook,instagram,tiktok";
   return new Set(
     configured.split(",").map((value) => value.trim().toLowerCase()).filter((value) => ALLOWED_PLATFORMS.has(value)),
   );
@@ -149,6 +150,7 @@ async function main() {
     }
   }
   if (process.env.TELEGRAM_CHANNEL_ID && enabled.has("telegram")) report.connectedPublicPlatforms.push("telegram");
+  if (isDiscordConfigured() && enabled.has("discord")) report.connectedPublicPlatforms.push("discord");
   report.connectedPublicPlatforms.push(...Object.keys(bufferChannels).filter((platform) => enabled.has(platform)));
 
   if (dryRun) {
@@ -177,6 +179,30 @@ async function main() {
         state.published[key] = deliveredAt;
         writeState(state);
         report.deliveries.push(receipt(item, "published_public", { externalId: String(message?.message_id || "") }));
+        continue;
+      }
+
+      if (item.platform === "discord") {
+        if (!isDiscordConfigured()) {
+          report.deliveries.push(await sendAdminFallback(item, pack, state, key, "Discord is not connected"));
+          continue;
+        }
+        const deliveryKey = `${key}:discord`;
+        if (!force && state.deliveries[deliveryKey]) {
+          report.deliveries.push(receipt(item, "published_public", { externalId: state.deliveries[deliveryKey].externalId || "cached", cached: true }));
+          continue;
+        }
+        const message = await sendDiscordPost({
+          text: renderPost(item, pack),
+          image: item.image,
+          title: item.title || item.text.split("\n")[0],
+          url: trackedUrl(item, pack),
+        });
+        const deliveredAt = new Date().toISOString();
+        state.deliveries[deliveryKey] = { deliveredAt, externalId: String(message?.id || "") };
+        state.published[key] = deliveredAt;
+        writeState(state);
+        report.deliveries.push(receipt(item, "published_public", { externalId: String(message?.id || "") }));
         continue;
       }
 
