@@ -81,6 +81,22 @@ function extractMetaImage(html, articleUrl) {
   return "";
 }
 
+async function fetchMetadataServiceImage(articleUrl) {
+  try {
+    const metadataUrl = new URL("https://api.microlink.io");
+    metadataUrl.searchParams.set("url", articleUrl);
+    const response = await fetch(metadataUrl, {
+      headers: { "user-agent": "PlixfyNewsBot/2.0 (+https://www.plixfy.com)" },
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) return "";
+    const payload = await response.json();
+    return asHttpsImage(payload?.data?.image?.url, articleUrl);
+  } catch {
+    return "";
+  }
+}
+
 async function fetchArticleImage(articleUrl) {
   try {
     const response = await fetch(articleUrl, {
@@ -88,11 +104,15 @@ async function fetchArticleImage(articleUrl) {
       headers: { "user-agent": "Mozilla/5.0 (compatible; PlixfyNewsBot/2.0; +https://www.plixfy.com)" },
       signal: AbortSignal.timeout(15_000),
     });
-    if (!response.ok) return "";
-    return extractMetaImage(await response.text(), response.url || articleUrl);
+    if (response.ok) {
+      const image = extractMetaImage(await response.text(), response.url || articleUrl);
+      if (image) return image;
+    }
   } catch {
-    return "";
+    // Some publishers block automated article requests. The metadata service
+    // below is the deterministic fallback used by the news pipeline.
   }
+  return fetchMetadataServiceImage(articleUrl);
 }
 
 async function backfillMissingImages(items, limit = 12) {
