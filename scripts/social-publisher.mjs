@@ -221,6 +221,7 @@ async function main() {
         platform: item.platform,
         text: renderPost(item, pack),
         image: item.image,
+        video: item.video,
         title: item.title || item.text.split("\n")[0],
       });
       const deliveredAt = new Date().toISOString();

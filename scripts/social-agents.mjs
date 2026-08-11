@@ -121,6 +121,12 @@ export class EditorialAgent {
       if (item.image && new URL(item.image).protocol !== "https:") {
         throw new Error(`EditorAgent: items[${index}].image must use HTTPS`);
       }
+      if (item.video) {
+        const video = new URL(item.video);
+        if (video.protocol !== "https:" || !["plixfy.com", "www.plixfy.com"].includes(video.hostname)) {
+          throw new Error(`EditorAgent: items[${index}].video must be a Plixfy HTTPS URL`);
+        }
+      }
 
       return { ...item, text: validateText(item, index, pack.campaign) };
     });

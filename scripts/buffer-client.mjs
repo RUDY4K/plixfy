@@ -131,7 +131,7 @@ export function mapChannelsByPlatform(channels) {
   return result;
 }
 
-export function buildBufferPostInput({ channelId, platform, text, image, title }) {
+export function buildBufferPostInput({ channelId, platform, text, image, video, title }) {
   const input = {
     channelId,
     text,
@@ -141,7 +141,19 @@ export function buildBufferPostInput({ channelId, platform, text, image, title }
   };
   // Every network receives the same Plixfy-hosted social card. Keeping the asset
   // on our own domain avoids the remote publisher thumbnail timeouts seen on X.
-  if (image) input.assets = [{ image: { url: image } }];
+  if (video) {
+    input.assets = [{
+      video: {
+        url: video,
+        metadata: {
+          thumbnailOffset: 1_200,
+          title: String(title || text).slice(0, 90),
+        },
+      },
+    }];
+  } else if (image) {
+    input.assets = [{ image: { url: image } }];
+  }
   if (platform === "facebook") {
     input.metadata = { facebook: { type: "post" } };
   } else if (platform === "instagram") {
@@ -149,13 +161,15 @@ export function buildBufferPostInput({ channelId, platform, text, image, title }
       instagram: { type: "post", shouldShareToFeed: true, isAiGenerated: false },
     };
   } else if (platform === "tiktok") {
-    input.metadata = { tiktok: { title: String(title || text).slice(0, 90) } };
+    input.metadata = video
+      ? { tiktok: { isAiGenerated: false } }
+      : { tiktok: { title: String(title || text).slice(0, 90) } };
   }
   return input;
 }
 
-export async function publishBufferPost({ channelId, platform, text, image, title }) {
-  const input = buildBufferPostInput({ channelId, platform, text, image, title });
+export async function publishBufferPost({ channelId, platform, text, image, video, title }) {
+  const input = buildBufferPostInput({ channelId, platform, text, image, video, title });
 
   const data = await graphql(
     `

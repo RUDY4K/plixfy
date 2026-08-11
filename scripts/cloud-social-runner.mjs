@@ -92,6 +92,72 @@ function socialCardUrl(kind, id) {
   return url.toString();
 }
 
+function socialVideoUrl(kind, id) {
+  return `${SITE}/social/videos/${encodeURIComponent(`${kind}-${id}.mp4`)}`;
+}
+
+function runRequired(command, args) {
+  const result = spawnSync(command, args, { cwd: ROOT, stdio: "inherit" });
+  if (result.status !== 0) {
+    throw new Error(`${command} exited with code ${result.status}`);
+  }
+}
+
+async function waitForPublicVideo(url) {
+  for (let attempt = 1; attempt <= 30; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        method: "HEAD",
+        redirect: "follow",
+        cache: "no-store",
+        headers: { "user-agent": "PlixfyCloudSocial/2.0" },
+        signal: AbortSignal.timeout(15_000),
+      });
+      const type = response.headers.get("content-type") || "";
+      if (response.ok && type.startsWith("video/")) return;
+    } catch {
+      // Vercel may still be deploying the commit. Retry on the next interval.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 10_000));
+  }
+  throw new Error(`Generated TikTok video did not become public in time: ${url}`);
+}
+
+async function attachTikTokVideo(pack, args) {
+  const enabled = new Set(
+    String(process.env.SOCIAL_PLATFORMS || "telegram,discord,x,facebook,instagram,tiktok")
+      .split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean),
+  );
+  const item = pack.items.find((candidate) => candidate.platform === "tiktok");
+  if (!item || !enabled.has("tiktok") || args.dryRun) return pack;
+
+  const filename = `${pack.source.kind}-${pack.source.id}.mp4`;
+  const relativeOutput = path.join("public", "social", "videos", filename);
+  runRequired(process.execPath, [
+    path.join(ROOT, "scripts", "generate-social-video.mjs"),
+    `--kind=${pack.source.kind}`,
+    `--id=${pack.source.id}`,
+    `--output=${relativeOutput}`,
+  ]);
+
+  if (process.env.GITHUB_ACTIONS === "true") {
+    runRequired("git", ["config", "user.name", "github-actions[bot]"]);
+    runRequired("git", ["config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"]);
+    runRequired("git", ["add", "--", relativeOutput]);
+    const changed = spawnSync("git", ["diff", "--cached", "--quiet"], { cwd: ROOT }).status !== 0;
+    if (changed) {
+      runRequired("git", ["commit", "-m", `chore: render TikTok video for ${pack.source.id}`]);
+      runRequired("git", ["push", "origin", "HEAD:main"]);
+    }
+  }
+
+  item.video = socialVideoUrl(pack.source.kind, pack.source.id);
+  await waitForPublicVideo(item.video);
+  return pack;
+}
+
 function loadGames() {
   return ["gd-games.json", "gm-games.json"]
     .flatMap((name) => readJson(path.join(ROOT, "src", "data", name), []))
@@ -221,6 +287,7 @@ async function main() {
   const rawPack = selection.kind === "news"
     ? newsPack(selection.item, args.date, args.slot)
     : gamePack(selection.item, args.date, args.slot);
+  await attachTikTokVideo(rawPack, args);
   const pack = new EditorialAgent().review(rawPack);
   console.log(`[EditorAgent] approved ${pack.items.length} platform drafts`);
 

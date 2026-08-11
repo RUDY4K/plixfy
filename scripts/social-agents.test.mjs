@@ -81,6 +81,21 @@ test("Buffer X posts include the Plixfy-hosted branded card", () => {
   assert.match(input.text, /plixfy\.com/);
 });
 
+test("Buffer TikTok video posts use the hosted MP4 instead of the image card", () => {
+  const input = buildBufferPostInput({
+    channelId: "tiktok-1",
+    platform: "tiktok",
+    text: "Plixfy game",
+    title: "Plixfy game",
+    image: "https://www.plixfy.com/card.png",
+    video: "https://www.plixfy.com/social/videos/game.mp4",
+  });
+  assert.equal(input.assets.length, 1);
+  assert.equal(input.assets[0].video.url, "https://www.plixfy.com/social/videos/game.mp4");
+  assert.equal(input.assets[0].video.metadata.thumbnailOffset, 1_200);
+  assert.equal(input.metadata.tiktok.isAiGenerated, false);
+});
+
 test("EditorAgent accepts Discord as a public social destination", () => {
   const pack = new EditorialAgent().review({
     date: "2026-08-11",
