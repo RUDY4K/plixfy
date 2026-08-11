@@ -36,10 +36,52 @@ async function fetchSourceImage(value: string | undefined): Promise<string | nul
 }
 
 function titleSize(title: string) {
-  if (title.length <= 34) return 68;
-  if (title.length <= 60) return 56;
-  if (title.length <= 90) return 46;
-  return 40;
+  if (title.length <= 34) return 64;
+  if (title.length <= 60) return 52;
+  if (title.length <= 90) return 44;
+  return 38;
+}
+
+function wrapRtlTitle(value: string, maxLineLength = 24) {
+  const words = value.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+  const lines: string[] = [];
+  let line = "";
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (line && candidate.length > maxLineLength) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = candidate;
+    }
+  }
+  if (line) lines.push(line);
+  const hangingWords = new Set(["على", "في", "من", "إلى", "عن", "مع", "حتى"]);
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    const wordsInLine = lines[index].split(" ");
+    const lastWord = wordsInLine.at(-1);
+    if (lastWord && hangingWords.has(lastWord) && wordsInLine.length > 1) {
+      wordsInLine.pop();
+      lines[index] = wordsInLine.join(" ");
+      lines[index + 1] = `${lastWord} ${lines[index + 1]}`;
+    }
+  }
+  if (lines.length <= 4) return lines;
+  return [lines[0], lines[1], lines[2], lines.slice(3).join(" ")];
+}
+
+function splitMixedTitle(value: string) {
+  const latinPattern = /[A-Za-z][A-Za-z0-9:'+.®™-]*(?:\s+[A-Za-z0-9][A-Za-z0-9:'+.®™-]*)*/g;
+  const latin = (value.match(latinPattern) || []).join(" • ");
+  const arabic = value.replace(latinPattern, " ").replace(/\s+/g, " ").trim();
+  return {
+    latin,
+    arabic: arabic || (latin ? "العب الآن مجانًا على بليكسفاي" : value),
+  };
+}
+
+function visualRtlTokens(value: string) {
+  return value.split(" ").reverse();
 }
 
 export async function GET(request: Request) {
@@ -52,6 +94,8 @@ export async function GET(request: Request) {
   if (!game && !news) return new Response("Social card not found", { status: 404 });
 
   const title = String(game?.title || news?.title || "Plixfy");
+  const splitTitle = splitMixedTitle(title);
+  const titleLines = wrapRtlTitle(splitTitle.arabic);
   const label = game ? "لعبة اليوم" : "أخبار الألعاب";
   const source = game?.thumbnail || news?.image;
   const [font, logo, sourceImage] = await Promise.all([
@@ -147,14 +191,69 @@ export async function GET(request: Request) {
           style: {
             display: "flex",
             width: "100%",
+            flexDirection: "column",
+            alignItems: "flex-end",
             color: "white",
-            fontSize: titleSize(title),
+            fontSize: titleSize(splitTitle.arabic),
             fontWeight: 700,
-            lineHeight: 1.25,
+            lineHeight: 1.28,
             textAlign: "right",
+            direction: "rtl",
           },
         },
-        title,
+        splitTitle.latin
+          ? e(
+              "div",
+              {
+                dir: "ltr",
+                style: {
+                  display: "flex",
+                  width: "100%",
+                  justifyContent: "flex-end",
+                  direction: "ltr",
+                  color: "#ff82b9",
+                  fontSize: 35,
+                  lineHeight: 1.2,
+                  marginBottom: 10,
+                  letterSpacing: 0.5,
+                },
+              },
+              splitTitle.latin,
+            )
+          : null,
+        ...titleLines.map((line, index) =>
+          e(
+            "div",
+            {
+              key: `${index}-${line}`,
+              dir: "ltr",
+              style: {
+                display: "flex",
+                width: "100%",
+                justifyContent: "flex-end",
+                direction: "ltr",
+                textAlign: "right",
+                flexWrap: "nowrap",
+              },
+            },
+            ...visualRtlTokens(line).map((token, tokenIndex, tokens) =>
+              e(
+                "div",
+                {
+                  key: `${tokenIndex}-${token}`,
+                  dir: /^\d/.test(token) ? "ltr" : "rtl",
+                  style: {
+                    display: "flex",
+                    direction: /^\d/.test(token) ? "ltr" : "rtl",
+                    whiteSpace: "nowrap",
+                    marginRight: tokenIndex < tokens.length - 1 ? 13 : 0,
+                  },
+                },
+                token,
+              ),
+            ),
+          ),
+        ),
       ),
       e("div", { style: { display: "flex", color: "#ff5aa3", fontSize: 28, marginTop: 18, letterSpacing: 2 } }, "PLIXFY.COM"),
     ),
