@@ -27,6 +27,11 @@ await telegram("setMyDescription", { description });
 console.log("Telegram bot profile synchronized");
 
 if (channelId) {
-  await telegram("setChatDescription", { chat_id: channelId, description });
-  console.log("Telegram channel description synchronized");
+  try {
+    await telegram("setChatDescription", { chat_id: channelId, description });
+    console.log("Telegram channel description synchronized");
+  } catch (error) {
+    console.warn(`Telegram channel was not changed: ${error.message}`);
+    console.warn("Grant the bot permission to change channel info, then run this workflow again.");
+  }
 }
