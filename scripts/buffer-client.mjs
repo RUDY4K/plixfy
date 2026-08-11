@@ -197,3 +197,37 @@ export async function publishBufferPost({ channelId, platform, text, image, vide
   }
   return payload.post;
 }
+
+export async function getBufferPost(postId) {
+  const data = await graphql(
+    `
+      query GetPost($input: PostInput!) {
+        post(input: $input) {
+          id
+          status
+          dueAt
+          sentAt
+          externalLink
+          error {
+            message
+            supportUrl
+          }
+        }
+      }
+    `,
+    { input: { id: postId } },
+  );
+  return data?.post || null;
+}
+
+export async function waitForBufferPost(postId, { timeoutMs = 90_000, intervalMs = 5_000 } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  let post = null;
+
+  while (Date.now() < deadline) {
+    post = await getBufferPost(postId);
+    if (!post || post.status === "sent" || post.status === "error") return post;
+    await sleep(intervalMs);
+  }
+  return post;
+}

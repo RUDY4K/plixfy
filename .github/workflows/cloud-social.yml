@@ -86,7 +86,7 @@ jobs:
             echo "SOCIAL_SLOT=evening" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
             echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_PLATFORMS=telegram,discord,x,facebook,instagram,tiktok" >> "$GITHUB_ENV"
+            echo "SOCIAL_PLATFORMS=telegram,discord,x,facebook,instagram" >> "$GITHUB_ENV"
           fi
 
       - name: Run scout, editor, publisher, and auditor agents

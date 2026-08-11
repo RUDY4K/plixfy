@@ -1,0 +1,30 @@
+name: Buffer Post Status
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: Buffer post ID
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check final Buffer status
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: node scripts/check-buffer-post.mjs "${{ inputs.post_id }}"

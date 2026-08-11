@@ -7,6 +7,7 @@ import {
   isBufferConfigured,
   mapChannelsByPlatform,
   publishBufferPost,
+  waitForBufferPost,
 } from "./buffer-client.mjs";
 import { EditorialAgent, deliveryCounts } from "./social-agents.mjs";
 import { isDiscordConfigured, sendDiscordPost } from "./discord-client.mjs";
@@ -224,11 +225,29 @@ async function main() {
         video: item.video,
         title: item.title || item.text.split("\n")[0],
       });
+      const confirmedPost = await waitForBufferPost(post.id);
+      if (confirmedPost?.status === "error") {
+        const providerError = confirmedPost.error?.message || "Buffer reported a publishing error";
+        throw new Error(providerError);
+      }
+      const finalPost = confirmedPost || post;
+      const published = finalPost.status === "sent";
       const deliveredAt = new Date().toISOString();
-      state.deliveries[deliveryKey] = { deliveredAt, externalId: post.id, providerStatus: post.status };
+      state.deliveries[deliveryKey] = {
+        deliveredAt,
+        externalId: post.id,
+        providerStatus: finalPost.status,
+        externalLink: finalPost.externalLink || null,
+      };
       state.published[key] = deliveredAt;
       writeState(state);
-      report.deliveries.push(receipt(item, "accepted_by_buffer", { externalId: post.id, providerStatus: post.status, dueAt: post.dueAt || null }));
+      report.deliveries.push(receipt(item, published ? "published_public" : "accepted_by_buffer", {
+        externalId: post.id,
+        providerStatus: finalPost.status,
+        dueAt: finalPost.dueAt || post.dueAt || null,
+        sentAt: finalPost.sentAt || null,
+        externalLink: finalPost.externalLink || null,
+      }));
     } catch (error) {
       console.warn(`${item.platform} delivery failed: ${error.message}`);
       const fallback = await sendAdminFallback(item, pack, state, key, error.message).catch(() => null);
