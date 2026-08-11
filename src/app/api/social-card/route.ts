@@ -38,6 +38,32 @@ async function fetchSourceImage(value: string | undefined): Promise<string | nul
   }
 }
 
+async function fetchArticleImage(value: string | undefined): Promise<string | null> {
+  if (!value) return null;
+
+  try {
+    const sourceUrl = new URL(value);
+    if (sourceUrl.protocol !== "https:") return null;
+
+    const metadataUrl = new URL("https://api.microlink.io");
+    metadataUrl.searchParams.set("url", sourceUrl.toString());
+    const response = await fetch(metadataUrl, {
+      signal: AbortSignal.timeout(15_000),
+      headers: { "user-agent": "PlixfySocialCard/1.0 (+https://www.plixfy.com)" },
+    });
+    if (!response.ok) return null;
+
+    const payload = (await response.json()) as { data?: { image?: { url?: string } } };
+    const imageUrl = payload.data?.image?.url;
+    if (!imageUrl) return null;
+
+    const parsedImageUrl = new URL(imageUrl);
+    return parsedImageUrl.protocol === "https:" ? parsedImageUrl.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(request: Request) {
   const query = new URL(request.url).searchParams;
   const kind = query.get("kind");
@@ -47,7 +73,8 @@ export async function GET(request: Request) {
   const news = kind === "news" ? getNewsBySlug(id) : undefined;
   if (!game && !news) return new Response("Social card not found", { status: 404 });
 
-  const source = game?.thumbnail || news?.image;
+  const articleImage = !game && !news?.image ? await fetchArticleImage(news?.sourceUrl) : null;
+  const source = game?.thumbnail || news?.image || articleImage || undefined;
   const [logo, sourceImage] = await Promise.all([
     readFile(join(process.cwd(), "public/brand/plixfy-mark-v2-compact.png")),
     fetchSourceImage(source),
