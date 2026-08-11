@@ -1,4 +1,6 @@
 .playwright-mcp/
-public/social/
+public/social/*
+!public/social/videos/
+!public/social/videos/**
 games/masar/scripts/arrow_board.gd
 games/masar/scripts/arrow_tile.gd
