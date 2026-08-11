@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search, User, X } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import BrandLogo from "@/components/BrandLogo";
+import { usePlayerData } from "@/components/PlayerDataProvider";
 import { localeFromPathname, localeHref, getDict } from "@/lib/i18n";
 
 export default function Header() {
@@ -13,6 +15,8 @@ export default function Header() {
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
   const t = getDict(locale);
+  const { user } = usePlayerData();
+  const avatarUrl = typeof user?.user_metadata?.avatar_url === "string" ? user.user_metadata.avatar_url : null;
 
   useEffect(() => {
     function onScroll() {
@@ -24,37 +28,43 @@ export default function Header() {
   }, []);
 
   const headerClass = scrolled
-    ? "sticky top-0 z-50 bg-bg/72 backdrop-blur-xl border-b border-white/5 shadow-[0_1px_0_0_rgba(255,0,110,0.10)] transition-colors duration-300"
-    : "sticky top-0 z-50 bg-transparent border-b border-transparent transition-colors duration-300";
+    ? "sticky top-0 z-50 border-b border-white/[0.07] bg-bg/88 shadow-[0_12px_35px_rgba(0,0,0,.2)] backdrop-blur-2xl transition-colors duration-300"
+    : "sticky top-0 z-50 border-b border-transparent bg-bg/35 backdrop-blur-xl transition-colors duration-300";
+
+  const navItems = [
+    { href: localeHref(locale, "/categories"), label: t.nav.categories },
+    { href: localeHref(locale, "/news"), label: locale === "ar" ? "الأخبار" : "News" },
+    { href: localeHref(locale, "/blog"), label: locale === "ar" ? "المدونة" : "Blog" },
+  ];
 
   return (
     <header className={headerClass}>
-      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center gap-3 md:gap-6">
-        <Link
-          href={localeHref(locale, "/")}
-          className="relative shrink-0 inline-flex items-center min-h-12"
-          aria-label={t.header.homeAria}
-        >
-          <span
-            aria-hidden="true"
-            className="absolute -start-3 -top-3 w-16 h-16 rounded-full bg-primary/30 blur-2xl pointer-events-none"
-          />
-          <span className="relative z-10 gradient-text text-2xl md:text-3xl font-bold leading-none">
-            {t.brand}
-          </span>
-        </Link>
+      <div className="mx-auto flex h-[72px] max-w-7xl items-center gap-2 px-4 md:gap-5 md:px-6">
+        <BrandLogo locale={locale} />
 
-        <div className="hidden md:flex flex-1 justify-center">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label={t.nav.mainNavAria}>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-xl px-3 py-2 text-sm font-bold text-text-secondary transition hover:bg-white/[0.05] hover:text-white"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="hidden flex-1 justify-center md:flex">
           <form
             action={localeHref(locale, "/search")}
             role="search"
-            className="w-full max-w-md relative"
+            className="relative w-full max-w-md"
           >
             <input
               type="search"
               name="q"
               placeholder={t.header.searchPlaceholder}
-              className="w-full bg-surface/70 text-text-primary placeholder:text-text-faint rounded-full px-4 py-2.5 ps-10 min-h-12 outline-none border border-white/5 focus:border-primary/40 focus:shadow-[0_0_0_4px_rgba(255,0,110,0.18),0_0_24px_rgba(255,0,110,0.45)] transition-all duration-200"
+              className="min-h-12 w-full rounded-2xl border border-white/[0.07] bg-white/[0.045] px-4 py-2.5 ps-10 text-text-primary outline-none transition-all duration-200 placeholder:text-text-faint focus:border-accent-2/35 focus:bg-white/[0.07] focus:shadow-[0_0_0_4px_rgba(0,229,255,.07)]"
               aria-label={t.header.searchAria}
             />
             <Search
@@ -66,12 +76,12 @@ export default function Header() {
 
         <div className="flex-1 md:hidden" />
 
-        <LanguageSwitcher className="shrink-0 inline-flex items-center gap-1.5 px-2.5 md:px-3 h-12 rounded-full text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface/60 transition-colors" />
+        <LanguageSwitcher className="hidden h-12 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold text-text-secondary transition-colors hover:bg-white/[0.05] hover:text-text-primary sm:inline-flex md:px-3" />
 
         <button
           type="button"
           onClick={() => setSearchOpen((v) => !v)}
-          className="md:hidden w-12 h-12 inline-flex items-center justify-center text-text-primary rounded-full hover:bg-surface/60 transition-colors"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-xl text-text-primary transition-colors hover:bg-white/[0.05] md:hidden"
           aria-label={searchOpen ? t.header.closeSearch : t.header.searchAria}
           aria-expanded={searchOpen}
         >
@@ -80,11 +90,17 @@ export default function Header() {
 
         <Link
           href={localeHref(locale, "/profile")}
-          className="relative p-[2px] rounded-full bg-gradient-to-br from-[#FF006E] via-[#00F0FF] to-[#A100F2] shadow-[0_4px_14px_rgba(255,0,110,0.35)]"
+          className="relative rounded-2xl border border-white/[0.08] bg-white/[0.045] p-1 transition hover:border-white/20 hover:bg-white/[0.08]"
           aria-label={t.header.profileAria}
         >
-          <div className="w-9 h-9 rounded-full bg-surface grid place-items-center">
-            <User className="w-5 h-5 text-text-primary" aria-hidden="true" />
+          <div className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-surface-elevated">
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={avatarUrl} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+            ) : (
+              <User className="w-5 h-5 text-text-primary" aria-hidden="true" />
+            )}
+            {user ? <span className="absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border-2 border-surface-elevated bg-success" aria-hidden="true" /> : null}
           </div>
         </Link>
       </div>

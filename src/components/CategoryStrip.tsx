@@ -21,22 +21,22 @@ export default function CategoryStrip(props: CategoryStripProps) {
   const visibleGames = games.slice(0, STRIP_LIMIT);
 
   return (
-    <section className="mb-8 md:mb-12">
-      <div className="flex items-center justify-between mb-3 md:mb-4 px-4 md:px-0">
+    <section className="mb-9 md:mb-14">
+      <div className="mb-4 flex items-end justify-between px-4 md:px-0">
         <div className="flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="w-1 h-5 rounded-sm shadow-[0_0_12px_rgba(255,0,110,0.55)]"
+            className="h-6 w-1 rounded-full"
             style={{ background: "var(--gradient-primary)" }}
           />
-          <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-text-primary">
+          <h2 className="text-xl font-black tracking-tight text-text-primary md:text-2xl">
             {title}
           </h2>
         </div>
         {viewAllHref ? (
           <Link
             href={viewAllHref}
-            className="group inline-flex items-center gap-1 text-primary hover:text-accent-2 transition-colors text-sm font-semibold min-h-12 px-2"
+            className="group inline-flex min-h-12 items-center gap-1 rounded-xl px-2 text-sm font-bold text-text-secondary transition-colors hover:bg-white/[0.04] hover:text-white"
             aria-label={t.common.viewAllAria + title}
           >
             <span>{t.common.viewAll}</span>
@@ -57,11 +57,11 @@ export default function CategoryStrip(props: CategoryStripProps) {
           aria-hidden="true"
           className="md:hidden absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none"
         />
-        <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory px-4 pb-2 scrollbar-hide md:grid md:grid-cols-6 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
+        <div className="scrollbar-hide flex snap-x snap-mandatory gap-3.5 overflow-x-auto scroll-smooth px-4 pb-3 md:grid md:grid-cols-6 md:gap-5 md:overflow-visible md:px-0 md:pb-0">
           {visibleGames.map((game) => (
             <div
               key={game.slug}
-              className="snap-start shrink-0 w-[130px] md:w-auto"
+              className="w-[142px] shrink-0 snap-start md:w-auto"
             >
               <GameCard {...game} locale={locale} />
             </div>

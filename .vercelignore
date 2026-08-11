@@ -1,0 +1,4 @@
+.playwright-mcp/
+public/social/
+games/masar/scripts/arrow_board.gd
+games/masar/scripts/arrow_tile.gd

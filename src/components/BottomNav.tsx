@@ -45,18 +45,18 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="md:hidden fixed inset-x-3 z-50 glass rounded-3xl px-1.5 py-2 shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)] grid grid-cols-5"
+      className="glass fixed inset-x-3 z-50 grid grid-cols-5 rounded-[1.4rem] px-1.5 py-2 shadow-[0_18px_50px_rgba(0,0,0,.5)] md:hidden"
       style={{ bottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
       aria-label={t.nav.mainNavAria}
     >
       {items.map((item) => {
         const active = isActive(pathname, item.href);
         const colorClass = active
-          ? "text-primary"
-          : "text-accent-2/60";
+          ? "text-white"
+          : "text-text-faint";
         const labelWeight = active ? "font-semibold" : "font-medium";
         const iconClass = active
-          ? "w-5 h-5 scale-110 drop-shadow-[0_0_10px_var(--color-primary)] transition-all duration-200"
+          ? "w-5 h-5 scale-110 text-accent-2 transition-all duration-200"
           : "w-5 h-5 transition-all duration-200";
 
         return (
@@ -73,7 +73,7 @@ export default function BottomNav() {
             {active ? (
               <span
                 aria-hidden="true"
-                className="absolute top-0.5 w-1 h-1 rounded-full bg-primary shadow-[0_0_8px_var(--color-primary)] animate-[dotIn_280ms_cubic-bezier(.2,.7,.2,1)]"
+                className="absolute top-0.5 h-1 w-4 rounded-full bg-gradient-to-r from-primary to-accent-2 animate-[dotIn_280ms_cubic-bezier(.2,.7,.2,1)]"
               />
             ) : null}
             <item.Icon className={iconClass} aria-hidden="true" />

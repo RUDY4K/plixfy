@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import HeroTile from "@/components/HeroTile";
+import HomeHero from "@/components/HomeHero";
 import CategoryStrip from "@/components/CategoryStrip";
+import CategoryDock from "@/components/CategoryDock";
 import TrackOnMount from "@/components/TrackOnMount";
 import {
   getTrendingGames,
@@ -121,7 +122,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     "@type": "Organization",
     name: t.brand,
     url: SITE,
-    logo: SITE + "/icon-512.png",
+    logo: SITE + "/brand/plixfy-icon-v2-512.png",
   };
 
   const faqLd = {
@@ -151,8 +152,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   const action = take(getGamesByCategory("action", used));
   const puzzle = take(getGamesByCategory("puzzle", used));
   const io = take(getGamesByCategory("io", used));
-  const girls = take(getGamesByCategory("girls", used));
-  const casual = take(getGamesByCategory("casual", used));
 
   const MIN_STRIP = 10;
 
@@ -189,12 +188,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     { title: t.strips.action, viewAllHref: href("/category/action"), games: action },
     { title: t.strips.puzzle, viewAllHref: href("/category/puzzle"), games: puzzle },
     { title: t.strips.io, viewAllHref: href("/category/io"), games: io },
-    { title: t.strips.girls, viewAllHref: href("/category/girls"), games: girls },
-    { title: t.strips.casual, viewAllHref: href("/category/casual"), games: casual },
   ];
 
   return (
-    <main className="max-w-7xl mx-auto py-6 md:py-8 md:px-6">
+    <main className="mx-auto max-w-7xl py-4 md:px-6 md:py-8">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -210,29 +207,25 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         }}
       />
 
-      <header className="px-4 md:px-0 mb-6">
-        <h1 className="text-2xl md:text-4xl font-bold text-text-primary mb-3">
-          {t.home.h1}
-        </h1>
-        <p className="text-sm md:text-base text-text-secondary max-w-3xl leading-relaxed">
-          {homeSummary}
-        </p>
-      </header>
-
       <TrackOnMount
         eventName="hero_top_game_viewed"
         dedupKey={`hero:${topGame.slug}`}
         params={{ game_slug: topGame.slug, plays: topGame.plays ?? 0 }}
       />
-      <HeroTile
-        title={topGame.title}
-        slug={topGame.slug}
-        thumbnail={topGame.thumbnail}
-        category={categoryShortLabel(topGame.categorySlug, locale, topGame.category)}
-        description={topGame.description}
-        isTopGame
+      <HomeHero
         locale={locale}
+        heading={t.home.h1}
+        summary={homeSummary}
+        gameCount={allGames.length}
+        game={{
+          title: topGame.title,
+          slug: topGame.slug,
+          thumbnail: topGame.thumbnail,
+          category: categoryShortLabel(topGame.categorySlug, locale, topGame.category),
+        }}
       />
+
+      <CategoryDock locale={locale} />
 
       {strips.map((strip) =>
         strip.games.length >= MIN_STRIP ? (
@@ -246,73 +239,72 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         ) : null
       )}
 
-      <section className="mt-12 px-4 md:px-0">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg md:text-2xl font-bold text-text-primary">
-            {t.common.fromBlog}
-          </h2>
-          <Link href={href("/blog")} className="text-sm text-primary hover:underline">
-            {t.common.allPosts}
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {(locale === "en" ? getAllPostsEn() : getAllPosts())
-            .slice(0, 4)
-            .map((post) => (
+      <section className="mt-16 grid gap-5 px-4 lg:grid-cols-[1.25fr_.75fr] md:px-0">
+        <div className="overflow-hidden rounded-[2rem] border border-white/[0.07] bg-surface/65 p-5 md:p-7">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <span className="text-[11px] font-black uppercase tracking-[0.18em] text-accent-2">
+                {locale === "ar" ? "دليل اللاعب" : "PLAYER GUIDES"}
+              </span>
+              <h2 className="mt-1 text-xl font-black text-white md:text-2xl">{t.common.fromBlog}</h2>
+            </div>
+            <Link href={href("/blog")} className="rounded-xl px-3 py-2 text-sm font-bold text-text-secondary transition hover:bg-white/[0.05] hover:text-white">
+              {t.common.allPosts}
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(locale === "en" ? getAllPostsEn() : getAllPosts()).slice(0, 4).map((post, index) => (
               <Link
                 key={post.slug}
                 href={href(`/blog/${post.slug}`)}
-                className="block rounded-2xl border border-primary/20 bg-surface/60 p-4 hover:border-primary/50 transition-colors"
+                className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.035] p-4 transition hover:border-white/15 hover:bg-white/[0.06]"
               >
-                <h3 className="text-sm font-bold text-text-primary mb-2 leading-snug">
-                  {post.h1}
-                </h3>
-                <p className="text-xs text-text-secondary leading-relaxed line-clamp-3">
-                  {post.description}
-                </p>
+                <span className="mb-4 grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary/20 to-accent-2/10 font-latin text-xs font-black text-white ring-1 ring-white/[0.07]">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 className="line-clamp-2 text-sm font-black leading-6 text-white transition group-hover:text-accent-2">{post.h1}</h3>
+                <p className="mt-2 line-clamp-2 text-xs leading-5 text-text-secondary">{post.description}</p>
               </Link>
             ))}
+          </div>
         </div>
-      </section>
 
-      <section className="mt-10 px-4 md:px-0">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg md:text-2xl font-bold text-text-primary">
-            {t.common.latestNews}
-          </h2>
-          <Link href={href("/news")} className="text-sm text-primary hover:underline">
-            {t.common.allNews}
-          </Link>
-        </div>
-        <ul className="space-y-2">
-          {getAllNews()
-            .slice(0, 3)
-            .map((item) => (
+        <div className="rounded-[2rem] border border-white/[0.07] bg-surface/65 p-5 md:p-7">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <span className="text-[11px] font-black uppercase tracking-[0.18em] text-primary">
+                {locale === "ar" ? "مباشر" : "LIVE"}
+              </span>
+              <h2 className="mt-1 text-xl font-black text-white md:text-2xl">{t.common.latestNews}</h2>
+            </div>
+            <Link href={href("/news")} className="rounded-xl px-3 py-2 text-sm font-bold text-text-secondary transition hover:bg-white/[0.05] hover:text-white">
+              {t.common.allNews}
+            </Link>
+          </div>
+          <ul className="space-y-3">
+            {getAllNews().slice(0, 4).map((item) => (
               <li key={item.slug}>
                 <Link
                   href={href(`/news/${item.slug}`)}
-                  className="flex items-baseline gap-3 rounded-xl border border-primary/10 bg-surface/40 px-4 py-3 hover:border-primary/40 transition-colors"
+                  className="group block rounded-2xl border border-white/[0.06] bg-white/[0.035] p-4 transition hover:border-primary/25 hover:bg-white/[0.06]"
                 >
-                  <span className="text-xs text-text-secondary shrink-0">
-                    {formatNewsDate(item.publishedAt, locale)}
-                  </span>
-                  <span className="text-sm text-text-primary leading-snug">
-                    {newsTitle(item, locale)}
-                  </span>
+                  <span className="text-[11px] font-bold text-primary">{formatNewsDate(item.publishedAt, locale)}</span>
+                  <span className="mt-1.5 line-clamp-2 block text-sm font-bold leading-6 text-white/85 group-hover:text-white">{newsTitle(item, locale)}</span>
                 </Link>
               </li>
             ))}
-        </ul>
+          </ul>
+        </div>
       </section>
 
-      <section className="mt-10 px-4 md:px-0" aria-labelledby="about-plixfy-heading">
+      <section className="mx-4 mt-12 rounded-[2rem] border border-white/[0.06] bg-white/[0.025] p-5 md:mx-0 md:p-8" aria-labelledby="about-plixfy-heading">
         <h2
           id="about-plixfy-heading"
-          className="text-lg md:text-2xl font-bold text-text-primary mb-3"
+          className="mb-3 text-lg font-black text-text-primary md:text-2xl"
         >
           {locale === "ar" ? "ألعاب مجانية لكل الأجهزة" : "Free games for every device"}
         </h2>
-        <p className="text-sm md:text-base text-text-secondary max-w-4xl leading-relaxed">
+        <p className="max-w-4xl text-sm leading-7 text-text-secondary md:text-base md:leading-8">
           {homeIntro}
         </p>
       </section>
@@ -325,7 +317,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       >
         <h2
           id="home-faq-heading"
-          className="text-lg md:text-2xl font-bold text-text-primary mb-4"
+          className="mb-4 text-lg font-black text-text-primary md:text-2xl"
         >
           {locale === "ar" ? "أسئلة شائعة عن الألعاب المجانية" : "Free games FAQ"}
         </h2>
@@ -333,7 +325,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           {faq.map((item) => (
             <article
               key={item.question}
-              className="rounded-2xl border border-primary/15 bg-surface/50 p-4"
+              className="rounded-2xl border border-white/[0.06] bg-surface/55 p-5 transition hover:border-white/10"
               itemScope
               itemProp="mainEntity"
               itemType="https://schema.org/Question"
@@ -364,12 +356,13 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       <div className="mt-12 px-4 md:px-0">
         <Link
           href={href("/all-games")}
-          className="block rounded-2xl bg-gradient-to-r from-primary/20 to-accent/20 p-6 md:p-8 text-center hover:from-primary/30 hover:to-accent/30 transition-colors border border-primary/30"
+          className="group relative block overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(110deg,rgba(255,45,139,.16),rgba(118,87,255,.14),rgba(0,229,255,.1))] p-7 text-center transition hover:border-white/20 md:p-10"
         >
-          <p className="text-xl md:text-2xl font-bold text-text-primary mb-1">
+          <span className="absolute -right-16 -top-24 h-48 w-48 rounded-full bg-primary/15 blur-3xl transition group-hover:bg-primary/25" />
+          <p className="relative mb-1 text-xl font-black text-text-primary md:text-3xl">
             {t.common.browseAllCount.replace("{count}", String(allGames.length))}
           </p>
-          <p className="text-sm text-text-secondary">
+          <p className="relative text-sm text-text-secondary">
             {t.common.browseAllSub}
           </p>
         </Link>

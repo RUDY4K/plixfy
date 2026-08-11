@@ -1,6 +1,7 @@
 import Link from "next/link";
 import CookieSettingsButton from "@/components/CookieSettingsButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import BrandLogo from "@/components/BrandLogo";
 import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 
 interface FooterLink {
@@ -29,16 +30,14 @@ export default function Footer({ locale = defaultLocale }: { locale?: Locale }) 
 
   return (
     <footer
-      className="mt-16 border-t border-surface-elevated bg-surface/40 pb-28 md:pb-0"
+      className="mt-20 border-t border-white/[0.07] bg-[#090914]/80 pb-28 md:pb-0"
       aria-label={t.footer.footerAria}
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
           <div>
-            <div className="text-2xl font-extrabold gradient-text mb-2 font-latin">
-              {t.brand}
-            </div>
-            <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
+            <BrandLogo locale={locale} />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-text-secondary">
               {t.footer.tagline}
             </p>
           </div>

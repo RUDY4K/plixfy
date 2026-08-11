@@ -85,6 +85,8 @@ function dashboardAuth(req: NextRequest): NextResponse | null {
  */
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const isLocalPreview =
+    req.nextUrl.hostname === "localhost" || req.nextUrl.hostname === "127.0.0.1";
 
   const newSlug = redirectedOldNewsSlug(pathname);
   if (newSlug) {
@@ -103,6 +105,9 @@ export function proxy(req: NextRequest) {
   }
 
   if (pathname === "/ar" || pathname.startsWith("/ar/")) {
+    // Local rewrites re-enter the proxy in development. Let the internal /ar
+    // route render instead of redirecting it back to / and creating a loop.
+    if (isLocalPreview) return NextResponse.next();
     const stripped = pathname === "/ar" ? "/" : pathname.slice(3);
     const url = req.nextUrl.clone();
     url.pathname = stripped;

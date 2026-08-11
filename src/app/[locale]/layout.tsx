@@ -14,6 +14,7 @@ import MonetagServiceWorker from "@/components/MonetagServiceWorker";
 import ConsentBanner from "@/components/ConsentBanner";
 import InstallAppPrompt from "@/components/InstallAppPrompt";
 import DeferredAdSense from "@/components/DeferredAdSense";
+import PlayerDataProvider from "@/components/PlayerDataProvider";
 import {
   locales,
   hasLocale,
@@ -43,7 +44,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0D001A",
+  themeColor: "#070712",
 };
 
 const titles: Record<Locale, string> = {
@@ -75,11 +76,10 @@ export async function generateMetadata({
     manifest: "/manifest.webmanifest",
     icons: {
       icon: [
-        { url: "/favicon.ico", sizes: "256x256", type: "image/x-icon" },
-        { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-        { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+        { url: "/brand/plixfy-icon-v2-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/brand/plixfy-icon-v2-512.png", sizes: "512x512", type: "image/png" },
       ],
-      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+      apple: [{ url: "/brand/plixfy-apple-v2.png", sizes: "180x180", type: "image/png" }],
     },
     title: titles[locale],
     description: descriptions[locale],
@@ -119,12 +119,14 @@ export default async function RootLayout({
       </head>
       <body className="bg-bg text-text-primary antialiased min-h-screen pb-32 md:pb-0 relative ambient-glows overflow-x-hidden">
         <div className="noise-overlay" aria-hidden="true" />
-        <div className="relative z-10">
-          <Header />
-          {children}
-          <Footer locale={locale} />
-          <BottomNav />
-        </div>
+        <PlayerDataProvider>
+          <div className="relative z-10">
+            <Header />
+            {children}
+            <Footer locale={locale} />
+            <BottomNav />
+          </div>
+        </PlayerDataProvider>
         <MonetagServiceWorker />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>

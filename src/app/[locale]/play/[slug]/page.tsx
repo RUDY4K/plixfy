@@ -17,6 +17,8 @@ import GameCard from "@/components/GameCard";
 import GameFrame from "@/components/GameFrame";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ShareButton from "@/components/ShareButton";
+import FavoriteButton from "@/components/FavoriteButton";
+import TrackGamePlay from "@/components/TrackGamePlay";
 import {
   locales,
   hasLocale,
@@ -222,7 +224,8 @@ export default async function PlayPage({
       : [];
 
   return (
-    <main className="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
+    <main className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-8">
+      <TrackGamePlay slug={game.slug} />
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -250,7 +253,7 @@ export default async function PlayPage({
       />
       <div
         id="play-frame"
-        className="overflow-hidden rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.04)]"
+        className="overflow-hidden rounded-[1.75rem] border border-white/[0.08] bg-black shadow-[0_28px_80px_rgba(0,0,0,.42)] md:rounded-[2.25rem]"
       >
         <GameFrame
           slug={game.slug}
@@ -262,8 +265,8 @@ export default async function PlayPage({
         />
       </div>
 
-      <div className="mt-5">
-        <h1 className="text-2xl md:text-3xl font-bold text-text-primary font-latin">
+      <div className="mt-5 rounded-[1.75rem] border border-white/[0.06] bg-surface/55 p-4 md:mt-6 md:p-6">
+        <h1 className="font-latin text-2xl font-black tracking-tight text-text-primary md:text-4xl">
           {game.title}
         </h1>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm md:text-base text-text-secondary">
@@ -280,7 +283,7 @@ export default async function PlayPage({
 
         <a
           href="#play-frame"
-          className="mt-5 bg-primary text-white font-bold w-full py-4 rounded-2xl text-lg min-h-12 inline-flex items-center justify-center gap-2 glow-pink hover:scale-[1.02] hover:brightness-110 transition-all duration-200"
+          className="mt-5 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-white py-4 text-lg font-black text-[#090913] shadow-[0_14px_35px_rgba(255,255,255,.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent-2"
           aria-label={t.common.playAria + game.title}
           data-game-slug={game.slug}
           data-placement="play-cta"
@@ -290,6 +293,7 @@ export default async function PlayPage({
 
         <div className="mt-4 flex items-center gap-3">
           <ShareButton slug={game.slug} title={game.title} url={pageUrl} />
+          <FavoriteButton slug={game.slug} locale={locale} showLabel />
         </div>
       </div>
 

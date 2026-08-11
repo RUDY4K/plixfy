@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Crown, Flame, Sparkles, Star } from "lucide-react";
+import { Crown, Flame, Play, Sparkles, Star } from "lucide-react";
 import { getGameStats } from "@/lib/gameStats";
 import { categories } from "@/lib/games";
 import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export type GameBadge = "hot" | "new" | "top" | null;
 
@@ -34,27 +35,32 @@ export default function GameCard(props: GameCardProps) {
   const stats = showStats ? getGameStats(slug) : null;
 
   return (
-    <Link
-      href={localeHref(locale, "/play/" + slug)}
-      className="group relative block transition-transform duration-200 hover:-translate-y-1 active:scale-[0.94]"
-      data-game-slug={slug}
-      data-position={position}
-      data-placement={placement}
-    >
+    <article className="group relative transition duration-300 hover:-translate-y-1.5 active:scale-[0.97]">
+      <Link
+        href={localeHref(locale, "/play/" + slug)}
+        className="relative block"
+        data-game-slug={slug}
+        data-position={position}
+        data-placement={placement}
+      >
       <div
-        className="game-card-glow absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-200 -z-10"
+        className="game-card-glow absolute -inset-1 -z-10 rounded-[1.4rem] opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-100"
         style={{ background: "var(--gradient-card-hover)" }}
         aria-hidden="true"
       />
-      <div className="relative aspect-square overflow-hidden rounded-2xl bg-surface shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06),inset_0_-30px_60px_rgba(0,0,0,0.35)]">
+      <div className="relative aspect-square overflow-hidden rounded-[1.35rem] border border-white/[0.07] bg-surface shadow-[0_12px_30px_rgba(0,0,0,.16)] transition-colors group-hover:border-white/15">
         <Image
           src={thumbnail}
           alt={title}
           fill
           sizes="(max-width: 768px) 33vw, 180px"
           quality={60}
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.07]"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/5 opacity-70 transition-opacity group-hover:opacity-100" />
+        <span className="absolute left-1/2 top-1/2 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 scale-75 place-items-center rounded-2xl bg-white text-[#090913] opacity-0 shadow-[0_12px_35px_rgba(0,0,0,.28)] transition duration-300 group-hover:scale-100 group-hover:opacity-100">
+          <Play className="h-4 w-4 fill-current" aria-hidden="true" />
+        </span>
         {badge ? <Badge type={badge} newLabel={t.common.newBadge} /> : null}
         {stats ? (
           <div
@@ -72,10 +78,10 @@ export default function GameCard(props: GameCardProps) {
         ) : null}
       </div>
 
-      <div className="mt-2 px-1">
+      <div className="mt-2.5 px-1">
         <h3
           dir="ltr"
-          className="block text-[15px] font-semibold text-text-primary truncate font-latin tracking-tight text-start group-hover:text-primary transition-colors"
+          className="block truncate text-start font-latin text-[15px] font-extrabold tracking-tight text-text-primary transition-colors group-hover:text-white"
         >
           {title}
         </h3>
@@ -85,7 +91,13 @@ export default function GameCard(props: GameCardProps) {
           </p>
         ) : null}
       </div>
-    </Link>
+      </Link>
+      <FavoriteButton
+        slug={slug}
+        locale={locale}
+        className="absolute top-2 left-2 h-11 w-11 px-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+      />
+    </article>
   );
 }
 

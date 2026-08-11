@@ -11,10 +11,10 @@ async function loadTajawalBold(): Promise<Buffer> {
   return readFile(join(process.cwd(), "assets/fonts/Tajawal-Bold.ttf"));
 }
 
-const BG = "#0D001A";
-const CYAN = "#00F0FF";
-const INDIGO = "#FF006E";
-const PURPLE = "#A100F2";
+const BG = "#070712";
+const CYAN = "#00E5FF";
+const INDIGO = "#FF2D8B";
+const PURPLE = "#7657FF";
 
 export default async function Image({
   params,
@@ -22,6 +22,8 @@ export default async function Image({
   params: Promise<{ locale: string }>;
 }) {
   const tajawal = await loadTajawalBold();
+  const logo = await readFile(join(process.cwd(), "public/brand/plixfy-mark-v2-compact.png"));
+  const logoData = `data:image/png;base64,${logo.toString("base64")}`;
   const { locale } = await params;
 
   const title = locale === "en" ? "Plixfy" : "بليكسفاي";
@@ -37,7 +39,7 @@ export default async function Image({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: `linear-gradient(135deg, ${BG} 0%, #1A0F2E 50%, ${BG} 100%)`,
+          background: `linear-gradient(135deg, ${BG} 0%, #161426 50%, ${BG} 100%)`,
           position: "relative",
           fontFamily: "Tajawal",
         }}
@@ -72,7 +74,7 @@ export default async function Image({
             width: 180,
             height: 180,
             borderRadius: 40,
-            background: `linear-gradient(135deg, ${CYAN} 0%, ${INDIGO} 50%, ${PURPLE} 100%)`,
+            background: "rgba(255,255,255,.035)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -80,17 +82,8 @@ export default async function Image({
             marginBottom: 52,
           }}
         >
-          <div
-            style={{
-              fontSize: 140,
-              fontWeight: 700,
-              color: BG,
-              display: "flex",
-              lineHeight: 1,
-            }}
-          >
-            P
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={logoData} alt="" width="170" height="170" style={{ objectFit: "contain" }} />
         </div>
 
         <div

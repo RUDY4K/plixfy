@@ -80,7 +80,7 @@ export default async function AboutPage({
       "@type": "Organization",
       name: copy.brand,
       url: SITE,
-      logo: SITE + "/icon-512.png",
+      logo: SITE + "/brand/plixfy-icon-v2-512.png",
     },
   };
 
