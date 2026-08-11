@@ -2,7 +2,7 @@ const DISCORD_API = "https://discord.com/api/v10";
 
 function safeWebhookUrl(value) {
   if (!value) return null;
-  const url = new URL(value);
+  const url = new URL(String(value).trim());
   const validHost = url.hostname === "discord.com" || url.hostname === "discordapp.com";
   if (url.protocol !== "https:" || !validHost || !url.pathname.startsWith("/api/webhooks/")) {
     throw new Error("DISCORD_WEBHOOK_URL is not a valid Discord webhook URL");
