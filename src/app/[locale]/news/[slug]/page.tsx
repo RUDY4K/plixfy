@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
   const title = newsTitle(item, locale);
   const description = newsSummary(item, locale).slice(0, 155);
-  const socialImage = `${SITE}/api/social-card?kind=news&id=${encodeURIComponent(item.slug)}&v=3`;
+  const socialImage = `${SITE}/api/social-card?kind=news&id=${encodeURIComponent(item.slug)}&v=4`;
   return {
     title: title + " | " + c.brand,
     description,
