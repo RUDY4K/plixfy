@@ -17,6 +17,7 @@ import { getAllPostsEn } from "@/lib/blogEn";
 import { getAllNews, formatNewsDate, newsTitle } from "@/lib/news";
 import { categoryShortLabel } from "@/lib/categoryI18n";
 import { hasLocale, localeHref, getDict } from "@/lib/i18n";
+import { SOCIAL_PROFILE_URLS } from "@/lib/socialProfiles";
 
 const SITE = "https://www.plixfy.com";
 
@@ -123,6 +124,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     name: t.brand,
     url: SITE,
     logo: SITE + "/brand/plixfy-icon-v2-512.png",
+    sameAs: SOCIAL_PROFILE_URLS,
   };
 
   const faqLd = {

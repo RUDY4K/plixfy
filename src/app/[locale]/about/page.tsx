@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, localeHref, ogLocaleFor, pageAlternates } from "@/lib/i18n";
 import { allGames } from "@/lib/games";
+import { SOCIAL_PROFILE_URLS } from "@/lib/socialProfiles";
 
 const SITE = "https://www.plixfy.com";
 const AR_GAME_COUNT = allGames.length.toLocaleString("ar-SA");
@@ -81,6 +82,7 @@ export default async function AboutPage({
       name: copy.brand,
       url: SITE,
       logo: SITE + "/brand/plixfy-icon-v2-512.png",
+      sameAs: SOCIAL_PROFILE_URLS,
     },
   };
 
