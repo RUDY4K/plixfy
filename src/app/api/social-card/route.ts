@@ -1,20 +1,16 @@
-import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import React from "react";
+import sharp from "sharp";
 import { getGameBySlug } from "@/lib/games";
 import { getNewsBySlug } from "@/lib/news";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SIZE = { width: 1200, height: 1200 };
+const WIDTH = 1200;
+const HEIGHT = 1200;
 
-function dataUrl(buffer: Buffer, mime = "image/png") {
-  return `data:${mime};base64,${buffer.toString("base64")}`;
-}
-
-async function fetchSourceImage(value: string | undefined): Promise<string | null> {
+async function fetchSourceImage(value: string | undefined): Promise<Buffer | null> {
   if (!value) return null;
   const url = new URL(value);
   if (url.protocol !== "https:") return null;
@@ -27,15 +23,52 @@ async function fetchSourceImage(value: string | undefined): Promise<string | nul
     });
     if (!response.ok) return null;
 
-    const type = response.headers.get("content-type")?.split(";")[0] || "image/jpeg";
+    const type = response.headers.get("content-type")?.split(";")[0] || "";
     if (!type.startsWith("image/")) return null;
 
     const bytes = Buffer.from(await response.arrayBuffer());
-    if (bytes.length === 0 || bytes.length > 8 * 1024 * 1024) return null;
-    return dataUrl(bytes, type);
+    return bytes.length > 0 && bytes.length <= 12 * 1024 * 1024 ? bytes : null;
   } catch {
     return null;
   }
+}
+
+function fallbackBackground() {
+  return Buffer.from(`
+    <svg width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#070712"/>
+          <stop offset="0.55" stop-color="#241044"/>
+          <stop offset="1" stop-color="#070712"/>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#bg)"/>
+    </svg>
+  `);
+}
+
+function bottomShade() {
+  return Buffer.from(`
+    <svg width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0.58" stop-color="#070712" stop-opacity="0"/>
+          <stop offset="1" stop-color="#070712" stop-opacity="0.58"/>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#shade)"/>
+    </svg>
+  `);
+}
+
+function brandBadge() {
+  return Buffer.from(`
+    <svg width="412" height="162" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="410" height="160" rx="30" fill="#070712" fill-opacity="0.88" stroke="#ffffff" stroke-opacity="0.22" stroke-width="2"/>
+      <text x="166" y="100" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" letter-spacing="3">PLIXFY.COM</text>
+    </svg>
+  `);
 }
 
 export async function GET(request: Request) {
@@ -48,85 +81,30 @@ export async function GET(request: Request) {
   if (!game && !news) return new Response("Social card not found", { status: 404 });
 
   const source = game?.thumbnail || news?.image;
-  const [logo, sourceImage] = await Promise.all([
+  const [logoFile, sourceFile] = await Promise.all([
     readFile(join(process.cwd(), "public/brand/plixfy-mark-v2-compact.png")),
     fetchSourceImage(source),
   ]);
 
-  const e = React.createElement;
-  const element = e(
-    "div",
-    {
-      style: {
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        position: "relative",
-        overflow: "hidden",
-        background: "linear-gradient(145deg, #070712 0%, #180b2b 55%, #070712 100%)",
-        fontFamily: "Arial, sans-serif",
-      },
-    },
-    sourceImage
-      ? e("img", {
-          src: sourceImage,
-          alt: "",
-          width: 1200,
-          height: 1200,
-          style: { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" },
-        })
-      : null,
-    e("div", {
-      style: {
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        background: "linear-gradient(180deg, rgba(7,7,18,.04) 58%, rgba(7,7,18,.54) 100%)",
-      },
-    }),
-    e(
-      "div",
-      {
-        style: {
-          position: "absolute",
-          right: 58,
-          bottom: 58,
-          display: "flex",
-          alignItems: "center",
-          gap: 20,
-          padding: "16px 26px 16px 18px",
-          borderRadius: 30,
-          background: "rgba(7,7,18,.86)",
-          border: "2px solid rgba(255,255,255,.18)",
-          boxShadow: "0 18px 55px rgba(0,0,0,.45)",
-        },
-      },
-      e("img", {
-        src: dataUrl(logo),
-        alt: "Plixfy",
-        width: 126,
-        height: 126,
-        style: { objectFit: "contain" },
-      }),
-      e(
-        "div",
-        {
-          style: {
-            display: "flex",
-            color: "#ffffff",
-            fontSize: 32,
-            fontWeight: 800,
-            letterSpacing: 3,
-            textShadow: "0 2px 12px rgba(0,0,0,.65)",
-          },
-        },
-        "PLIXFY.COM",
-      ),
-    ),
-  );
+  const base = await sharp(sourceFile || fallbackBackground())
+    .rotate()
+    .resize(WIDTH, HEIGHT, { fit: "cover", position: "centre" })
+    .jpeg({ quality: 90, chromaSubsampling: "4:4:4" })
+    .toBuffer();
+  const logo = await sharp(logoFile).resize(126, 126, { fit: "contain" }).png().toBuffer();
+  const output = await sharp(base)
+    .composite([
+      { input: bottomShade(), left: 0, top: 0 },
+      { input: brandBadge(), left: 730, top: 980 },
+      { input: logo, left: 750, top: 998 },
+    ])
+    .png({ compressionLevel: 9, palette: false })
+    .toBuffer();
 
-  return new ImageResponse(element, {
-    ...SIZE,
-    headers: { "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800" },
+  return new Response(new Uint8Array(output), {
+    headers: {
+      "Content-Type": "image/png",
+      "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+    },
   });
 }
