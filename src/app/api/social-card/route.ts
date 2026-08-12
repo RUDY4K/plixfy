@@ -48,25 +48,15 @@ function fallbackBackground() {
   `);
 }
 
-function bottomShade() {
+function brandDomain() {
   return Buffer.from(`
-    <svg width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg">
+    <svg width="300" height="90" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0.58" stop-color="#070712" stop-opacity="0"/>
-          <stop offset="1" stop-color="#070712" stop-opacity="0.58"/>
-        </linearGradient>
+        <filter id="shadow" x="-20%" y="-30%" width="140%" height="160%">
+          <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#070712" flood-opacity="0.95"/>
+        </filter>
       </defs>
-      <rect width="100%" height="100%" fill="url(#shade)"/>
-    </svg>
-  `);
-}
-
-function brandBadge() {
-  return Buffer.from(`
-    <svg width="412" height="162" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="1" width="410" height="160" rx="30" fill="#070712" fill-opacity="0.88" stroke="#ffffff" stroke-opacity="0.22" stroke-width="2"/>
-      <text x="166" y="100" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" letter-spacing="3">PLIXFY.COM</text>
+      <text x="12" y="59" fill="#ffffff" stroke="#070712" stroke-width="5" paint-order="stroke fill" filter="url(#shadow)" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="800" letter-spacing="3">PLIXFY.COM</text>
     </svg>
   `);
 }
@@ -94,9 +84,8 @@ export async function GET(request: Request) {
   const logo = await sharp(logoFile).resize(126, 126, { fit: "contain" }).png().toBuffer();
   const output = await sharp(base)
     .composite([
-      { input: bottomShade(), left: 0, top: 0 },
-      { input: brandBadge(), left: 730, top: 980 },
-      { input: logo, left: 750, top: 998 },
+      { input: logo, left: 748, top: 1026 },
+      { input: brandDomain(), left: 882, top: 1044 },
     ])
     .png({ compressionLevel: 9, palette: false })
     .toBuffer();
