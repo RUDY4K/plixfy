@@ -34,3 +34,7 @@ export interface GeneratedBlogRecord {
 export function getGeneratedBlogRecords(): readonly GeneratedBlogRecord[] {
   return generatedBlogData as readonly GeneratedBlogRecord[];
 }
+
+export function isGeneratedBlogSlug(slug: string): boolean {
+  return getGeneratedBlogRecords().some((post) => post.slug === slug);
+}

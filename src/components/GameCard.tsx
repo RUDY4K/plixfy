@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Crown, Flame, Play, Sparkles, Star } from "lucide-react";
-import { getGameStats } from "@/lib/gameStats";
+import { Crown, Flame, Play, Sparkles } from "lucide-react";
 import { categories } from "@/lib/games";
 import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -22,7 +21,7 @@ export interface GameCardProps {
 }
 
 export default function GameCard(props: GameCardProps) {
-  const { title, thumbnail, slug, badge, position, placement, showStats } = props;
+  const { title, thumbnail, slug, badge, position, placement } = props;
   const locale = props.locale ?? defaultLocale;
   const t = getDict(locale);
 
@@ -31,8 +30,6 @@ export default function GameCard(props: GameCardProps) {
       ? categories.find((c) => c.slug === props.categorySlug)?.labelEn ??
         props.category
       : props.category;
-
-  const stats = showStats ? getGameStats(slug) : null;
 
   return (
     <article className="group relative transition duration-300 hover:-translate-y-1.5 active:scale-[0.97]">
@@ -62,20 +59,6 @@ export default function GameCard(props: GameCardProps) {
           <Play className="h-4 w-4 fill-current" aria-hidden="true" />
         </span>
         {badge ? <Badge type={badge} newLabel={t.common.newBadge} /> : null}
-        {stats ? (
-          <div
-            className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-1 text-[10px] font-bold text-white"
-            aria-hidden="true"
-          >
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/55 backdrop-blur-sm">
-              <Star className="w-2.5 h-2.5 fill-current text-amber-400" />
-              <span>{stats.ratingDisplay}</span>
-            </span>
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-black/55 backdrop-blur-sm">
-              {stats.playsDisplay}
-            </span>
-          </div>
-        ) : null}
       </div>
 
       <div className="mt-2.5 px-1">

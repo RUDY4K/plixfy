@@ -1,18 +1,21 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Star } from "lucide-react";
+import { Monitor, Smartphone } from "lucide-react";
 import {
   allGames,
   getGameBySlug,
   getGamesByCategory,
 } from "@/lib/games";
-import { getGameContent, type GameContent } from "@/lib/gameContent";
+import {
+  getGameContent,
+  hasEditorialGameContent,
+  type GameContent,
+} from "@/lib/gameContent";
 import { getGenericGameFaq } from "@/lib/gameFaqFallback";
 import { categoryContent } from "@/lib/categoryContent";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
-import type { CategorySlug, Game } from "@/lib/games";
-import { getGameStats } from "@/lib/gameStats";
+import type { CategorySlug, Game, GameDeviceSupport } from "@/lib/games";
 import GameCard from "@/components/GameCard";
 import GameFrame from "@/components/GameFrame";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -52,6 +55,16 @@ function buildDescription(
 ): string {
   if (content?.metaDescription) return content.metaDescription;
 
+  const support = game.supportedDevices ?? "unknown";
+  const deviceClaimEn =
+    support === "mobile-only"
+      ? " on mobile"
+      : support === "desktop-only"
+        ? " on desktop"
+        : support === "mobile-and-desktop"
+          ? " on mobile and desktop"
+          : "";
+
   if (locale === "en") {
     const meta = getLocalizedCategoryMeta(game.categorySlug, "en");
     const catName = meta ? meta.name : game.categorySlug;
@@ -60,7 +73,9 @@ function buildDescription(
       game.title +
       " free online on Plixfy — a " +
       catName.toLowerCase() +
-      " game that runs right in your browser on mobile and desktop. No download, no sign-up."
+      " game that runs right in your browser" +
+      deviceClaimEn +
+      ". No download, no sign-up."
     );
   }
 
@@ -107,6 +122,9 @@ export async function generateMetadata({
   return {
     title,
     description,
+    ...(!hasEditorialGameContent(slug, locale)
+      ? { robots: { index: false, follow: true } }
+      : {}),
     alternates: pageAlternates(locale, path),
     openGraph: {
       type: "website",
@@ -142,7 +160,7 @@ export default async function PlayPage({
     .slice(0, 6);
 
   const content = getGameContent(slug, locale);
-  const stats = getGameStats(game.slug);
+  const deviceSupport = game.supportedDevices ?? "unknown";
 
   const pageUrl = SITE + href("/play/" + slug);
   const imageUrl = absoluteUrl(game.thumbnail);
@@ -159,9 +177,21 @@ export default async function PlayPage({
     image: imageUrl,
     url: pageUrl,
     genre,
-    gamePlatform: ["Web Browser", "Mobile"],
+    gamePlatform:
+      deviceSupport === "mobile-only"
+        ? ["Mobile"]
+        : deviceSupport === "desktop-only"
+          ? ["Web Browser", "Desktop"]
+          : deviceSupport === "mobile-and-desktop"
+            ? ["Web Browser", "Mobile", "Desktop"]
+            : ["Web Browser"],
     applicationCategory: "Game",
-    operatingSystem: "Any",
+    operatingSystem:
+      deviceSupport === "mobile-only"
+        ? "Android, iOS"
+        : deviceSupport === "desktop-only"
+          ? "Windows, macOS, Linux"
+          : "Any",
     inLanguage: locale,
     offers: {
       "@type": "Offer",
@@ -200,7 +230,9 @@ export default async function PlayPage({
   // Generic fallback FAQs are still shown to users (helpful info) but we do
   // NOT advertise them as FAQPage schema because they're identical across
   // 342 games — Google may flag near-duplicate FAQ schema as spam.
-  const faq = hasRichFaq ? content.faq : getGenericGameFaq(game.title, locale);
+  const faq = hasRichFaq
+    ? content.faq
+    : getGenericGameFaq(game.title, locale, deviceSupport);
   const faqLd = hasRichFaq
     ? {
         "@context": "https://schema.org",
@@ -272,13 +304,7 @@ export default async function PlayPage({
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm md:text-base text-text-secondary">
           <span>{categoryLabel}</span>
           <span aria-hidden="true">·</span>
-          <span className="inline-flex items-center gap-1">
-            <Star className="w-4 h-4 fill-current text-amber-400" aria-hidden="true" />
-            <span className="font-semibold text-text-primary">{stats.ratingDisplay}</span>
-            <span className="sr-only">{t.play.outOf5}</span>
-          </span>
-          <span aria-hidden="true">·</span>
-          <span>{stats.playsDisplay} {t.play.playsSuffix}</span>
+          <span>{t.play.free}: {t.play.yes}</span>
         </div>
 
         <a
@@ -358,9 +384,20 @@ export default async function PlayPage({
             value={meta ? meta.icon + " " + meta.name : categoryLabel}
           />
           <InfoRow label={t.play.name} value={game.title} valueLatin />
-          <InfoRow label={t.play.rating} value={"⭐ " + stats.ratingDisplay + " / 5"} />
-          <InfoRow label={t.play.playsLabel} value={stats.playsDisplay} />
-          <InfoRow label={t.play.playType} value={t.play.browser} />
+          <InfoRow
+            label={t.play.supportedDevices}
+            value={
+              <DeviceSupportValue
+                support={deviceSupport}
+                labels={{
+                  both: t.play.mobileAndDesktop,
+                  mobile: t.play.mobileOnly,
+                  desktop: t.play.desktopOnly,
+                  unknown: t.play.deviceSupportUnknown,
+                }}
+              />
+            }
+          />
           <InfoRow label={t.play.free} value={t.play.yes} />
         </dl>
       </section>
@@ -452,7 +489,34 @@ export default async function PlayPage({
   );
 }
 
-function InfoRow(props: { label: string; value: string; valueLatin?: boolean }) {
+function DeviceSupportValue({
+  support,
+  labels,
+}: {
+  support: GameDeviceSupport;
+  labels: { both: string; mobile: string; desktop: string; unknown: string };
+}) {
+  const showMobile = support === "mobile-only" || support === "mobile-and-desktop";
+  const showDesktop = support === "desktop-only" || support === "mobile-and-desktop";
+  const label =
+    support === "unknown"
+      ? labels.unknown
+      : support === "mobile-only"
+      ? labels.mobile
+      : support === "desktop-only"
+        ? labels.desktop
+        : labels.both;
+
+  return (
+    <span className="inline-flex items-center gap-1.5 text-text-primary font-semibold">
+      {showMobile ? <Smartphone className="h-4 w-4 text-accent-3" aria-hidden="true" /> : null}
+      {showDesktop ? <Monitor className="h-4 w-4 text-secondary" aria-hidden="true" /> : null}
+      <span>{label}</span>
+    </span>
+  );
+}
+
+function InfoRow(props: { label: string; value: React.ReactNode; valueLatin?: boolean }) {
   const valueClass = props.valueLatin
     ? "text-text-primary font-semibold font-latin"
     : "text-text-primary font-semibold";

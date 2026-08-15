@@ -12,4 +12,5 @@ export const SOCIAL_PROFILE_URLS = [
   "https://x.com/plixfycom",
   "https://www.instagram.com/plixfycom/",
   "https://www.tiktok.com/@plixfygames",
+  "https://www.facebook.com/profile.php?id=61592922983710",
 ] as const;

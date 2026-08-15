@@ -1,7 +1,11 @@
 import type { GameContentFAQ } from "@/lib/gameContent";
+import type { GameDeviceSupport } from "@/lib/games";
 import type { Locale } from "@/lib/i18n";
 
-function genericFaqAr(title: string): readonly GameContentFAQ[] {
+function genericFaqAr(
+  title: string,
+  support: GameDeviceSupport
+): readonly GameContentFAQ[] {
   return [
     {
       question: "هل لعبة " + title + " مجانية؟",
@@ -18,16 +22,23 @@ function genericFaqAr(title: string): readonly GameContentFAQ[] {
         " تعمل من المتصفح مباشرة. بمجرد فتح الصفحة والضغط على زر العب الآن، تبدأ اللعبة فوراً بدون تحميل.",
     },
     {
-      question: "هل تعمل " + title + " على الجوال؟",
+      question: "ما الأجهزة التي تدعمها " + title + "؟",
       answer:
-        "نعم، " +
-        title +
-        " محسّنة للجوال وتعمل بسلاسة على أندرويد وآيفون من المتصفح، ويظهر التحكم تلقائياً على شكل أزرار لمس على الشاشة.",
+        support === "mobile-only"
+          ? title + " مخصّصة للجوال وتعمل من متصفح الهاتف بأزرار اللمس."
+          : support === "desktop-only"
+            ? title + " مخصّصة للكمبيوتر وتحتاج لوحة مفاتيح أو فأرة، لذلك لا نوصي بتشغيلها على الجوال."
+            : support === "mobile-and-desktop"
+              ? title + " تعمل على الجوال والكمبيوتر من المتصفح، ويتغير أسلوب التحكم بين اللمس ولوحة المفاتيح."
+              : "لم يؤكد الناشر الأجهزة المتوافقة مع " + title + " حتى الآن؛ راجع خانة الأجهزة المدعومة في الصفحة بعد تحديث بيانات اللعبة.",
     },
   ];
 }
 
-function genericFaqEn(title: string): readonly GameContentFAQ[] {
+function genericFaqEn(
+  title: string,
+  support: GameDeviceSupport
+): readonly GameContentFAQ[] {
   return [
     {
       question: "Is " + title + " free to play?",
@@ -44,18 +55,25 @@ function genericFaqEn(title: string): readonly GameContentFAQ[] {
         " runs directly in your browser. Open the page, hit the Play button, and the game starts instantly with no download.",
     },
     {
-      question: "Does " + title + " work on mobile?",
+      question: "Which devices support " + title + "?",
       answer:
-        "Yes, " +
-        title +
-        " is optimized for mobile and runs smoothly on Android and iPhone in the browser, with touch controls appearing automatically on screen.",
+        support === "mobile-only"
+          ? title + " is made for mobile browsers and uses touch controls."
+          : support === "desktop-only"
+            ? title + " is designed for desktop computers and requires a keyboard or mouse, so mobile play is not recommended."
+            : support === "mobile-and-desktop"
+              ? title + " works in mobile and desktop browsers, switching between touch and keyboard controls as needed."
+              : "The publisher has not confirmed device compatibility for " + title + " yet; check the supported-devices field after the game's data is updated.",
     },
   ];
 }
 
 export function getGenericGameFaq(
   title: string,
-  locale: Locale = "ar"
+  locale: Locale = "ar",
+  support: GameDeviceSupport = "unknown"
 ): readonly GameContentFAQ[] {
-  return locale === "en" ? genericFaqEn(title) : genericFaqAr(title);
+  return locale === "en"
+    ? genericFaqEn(title, support)
+    : genericFaqAr(title, support);
 }

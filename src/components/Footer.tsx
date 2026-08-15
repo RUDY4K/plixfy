@@ -9,7 +9,25 @@ interface FooterLink {
   label: string;
 }
 
-const CONTACT_EMAIL = "privacy@plixfy.com";
+const CONTACT_EMAIL = "plixfy.com@gmail.com";
+const SOCIAL_LINKS = [
+  { href: "https://x.com/plixfycom", label: "X", icon: "x" },
+  {
+    href: "https://www.instagram.com/plixfycom/",
+    label: "Instagram",
+    icon: "instagram",
+  },
+  {
+    href: "https://www.tiktok.com/@plixfygames",
+    label: "TikTok",
+    icon: "tiktok",
+  },
+  {
+    href: "https://www.facebook.com/profile.php?id=61592922983710",
+    label: "Facebook",
+    icon: "facebook",
+  },
+] as const;
 
 export default function Footer({ locale = defaultLocale }: { locale?: Locale }) {
   const t = getDict(locale);
@@ -26,6 +44,11 @@ export default function Footer({ locale = defaultLocale }: { locale?: Locale }) 
     { href: localeHref(locale, "/privacy"), label: t.footer.privacy },
     { href: localeHref(locale, "/terms"), label: t.footer.terms },
     { href: localeHref(locale, "/about"), label: t.footer.about },
+    { href: localeHref(locale, "/contact"), label: t.footer.contact },
+    {
+      href: localeHref(locale, "/editorial-policy"),
+      label: t.footer.editorialPolicy,
+    },
   ];
 
   return (
@@ -40,6 +63,26 @@ export default function Footer({ locale = defaultLocale }: { locale?: Locale }) 
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-text-secondary">
               {t.footer.tagline}
             </p>
+            <div className="mt-5">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-text-faint">
+                {locale === "ar" ? "تابع بليكسفاي" : "Follow Plixfy"}
+              </p>
+              <div className="flex flex-wrap gap-2" dir="ltr">
+                {SOCIAL_LINKS.map((social) => (
+                  <a
+                    key={social.href}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer me"
+                    aria-label={`${social.label} — Plixfy`}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-bold text-text-secondary transition hover:border-primary/40 hover:text-primary"
+                  >
+                    <SocialIcon name={social.icon} />
+                    {social.label}
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
 
           <FooterColumn title={t.footer.linksTitle} links={navLinks} />
@@ -82,6 +125,19 @@ export default function Footer({ locale = defaultLocale }: { locale?: Locale }) 
         </div>
       </div>
     </footer>
+  );
+}
+
+function SocialIcon({ name }: { name: (typeof SOCIAL_LINKS)[number]["icon"] }) {
+  const symbol =
+    name === "x" ? "𝕏" : name === "instagram" ? "◎" : name === "facebook" ? "f" : "♪";
+  return (
+    <span
+      className="grid h-5 w-5 place-items-center rounded-md bg-white/10 text-xs font-black"
+      aria-hidden="true"
+    >
+      {symbol}
+    </span>
   );
 }
 

@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Trophy, Star } from "lucide-react";
+import { Trophy } from "lucide-react";
 import {
   categories,
   getCategoryGames,
   type CategorySlug,
 } from "@/lib/games";
-import { getGameStats } from "@/lib/gameStats";
 import { categoryContent } from "@/lib/categoryContent";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import GameCard from "@/components/GameCard";
@@ -37,17 +36,16 @@ const uiCopy = {
     metaTitle: (name: string) =>
       `أفضل ${name} ${YEAR} - أعلى ${TOP_N} لعبة | بليكسفاي`,
     metaDescription: (name: string) =>
-      `قائمة أفضل ${name} على بليكسفاي لسنة ${YEAR} — مرتّبة حسب الشعبية وعدد اللاعبين. كلها مجانية وتعمل من المتصفح بدون تحميل.`,
+      `اختيارات فريق بليكسفاي من ألعاب ${name} لسنة ${YEAR}. ألعاب مجانية تعمل من المتصفح بدون تحميل.`,
     h1: (name: string) => `أفضل ${name} ${YEAR}`,
     bestN: `أفضل ${TOP_N}`,
     ldName: (name: string) => `أفضل ${name} ${YEAR}`,
     ldDescription: (n: number, name: string) =>
       `قائمة أفضل ${n} لعبة في ${name} على بليكسفاي`,
-    ldItemDescription: (title: string, plays: string) =>
-      `${title} — ${plays} مرة لعب على بليكسفاي`,
+    ldItemDescription: (title: string) =>
+      `${title} — من اختيارات فريق بليكسفاي`,
     intro: (n: number, name: string, hook: string) =>
-      `أعلى ${n} لعبة في ${name} على بليكسفاي، مرتّبة حسب الشعبية وعدد اللاعبين. ${hook}. كلها مجانية وتعمل من المتصفح بدون تحميل.`,
-    playsSuffix: "مرة لعب",
+      `${n} لعبة مختارة من فئة ${name} راجعها فريق بليكسفاي. ${hook}. كلها مجانية وتعمل من المتصفح بدون تحميل.`,
     exploreMore: "استكشف المزيد",
     viewAll: (name: string, n: number) => `عرض كل ${name} (${n}) ←`,
   },
@@ -56,17 +54,16 @@ const uiCopy = {
     metaTitle: (name: string) =>
       `Best ${name} ${YEAR} - Top ${TOP_N} Games | Plixfy`,
     metaDescription: (name: string) =>
-      `The best ${name} on Plixfy for ${YEAR} — ranked by popularity and player count. All free, playable in your browser with no download.`,
+      `Plixfy's editorial picks for ${name} in ${YEAR}. Free browser games with no download required.`,
     h1: (name: string) => `Best ${name} ${YEAR}`,
     bestN: `Top ${TOP_N}`,
     ldName: (name: string) => `Best ${name} ${YEAR}`,
     ldDescription: (n: number, name: string) =>
       `The top ${n} games in ${name} on Plixfy`,
-    ldItemDescription: (title: string, plays: string) =>
-      `${title} — ${plays} plays on Plixfy`,
+    ldItemDescription: (title: string) =>
+      `${title} — selected by the Plixfy editorial team`,
     intro: (n: number, name: string) =>
-      `The top ${n} games in ${name} on Plixfy, ranked by popularity and player count. All free — play right in your browser with no download.`,
-    playsSuffix: "plays",
+      `${n} ${name} games selected by the Plixfy editorial team. All are free to play in your browser with no download.`,
     exploreMore: "Explore More",
     viewAll: (name: string, n: number) => `View all ${name} (${n}) →`,
   },
@@ -91,6 +88,7 @@ export async function generateMetadata({
   return {
     title,
     description,
+    robots: { index: false, follow: true },
     alternates: pageAlternates(locale, path),
     openGraph: {
       type: "website",
@@ -120,11 +118,9 @@ export default async function BestCategoryPage({
   const allInCat = getCategoryGames(category);
   if (allInCat.length === 0) notFound();
 
-  // Rank by deterministic gameStats playsCount (acts as popularity score)
-  const ranked = [...allInCat]
-    .map((g) => ({ game: g, stats: getGameStats(g.slug) }))
-    .sort((a, b) => b.stats.playsCount - a.stats.playsCount)
-    .slice(0, TOP_N);
+  // Curated catalogue order. We do not claim popularity or player counts until
+  // those figures come from real, audited analytics.
+  const ranked = allInCat.slice(0, TOP_N);
 
   const content = locale === "ar" ? categoryContent[category as CategorySlug] : undefined;
   const url = SITE + href("/best/" + category);
@@ -136,13 +132,13 @@ export default async function BestCategoryPage({
     description: copy.ldDescription(ranked.length, meta.name),
     url,
     numberOfItems: ranked.length,
-    itemListElement: ranked.map(({ game, stats }, idx) => ({
+    itemListElement: ranked.map((game, idx) => ({
       "@type": "ListItem",
       position: idx + 1,
       url: SITE + href("/play/" + game.slug),
       name: game.title,
       image: game.thumbnail,
-      description: copy.ldItemDescription(game.title, stats.playsDisplay),
+      description: copy.ldItemDescription(game.title),
     })),
   };
 
@@ -204,7 +200,7 @@ export default async function BestCategoryPage({
       </header>
 
       <ol className="space-y-3 md:space-y-4 mb-10">
-        {ranked.map(({ game, stats }, idx) => (
+        {ranked.map((game, idx) => (
           <li
             key={game.slug}
             className="flex gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-surface border border-surface-elevated hover:border-primary/30 transition-colors"
@@ -239,17 +235,6 @@ export default async function BestCategoryPage({
                 <p className="text-xs md:text-sm text-text-secondary mt-0.5">
                   {meta.name}
                 </p>
-                <div className="mt-1.5 inline-flex items-center gap-2 text-xs text-text-faint">
-                  <span className="inline-flex items-center gap-1">
-                    <Star
-                      className="w-3 h-3 fill-current text-amber-400"
-                      aria-hidden="true"
-                    />
-                    {stats.ratingDisplay}
-                  </span>
-                  <span aria-hidden="true">·</span>
-                  <span>{stats.playsDisplay} {copy.playsSuffix}</span>
-                </div>
               </div>
             </Link>
           </li>

@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { allGames, categories } from "@/lib/games";
 import { getAllPosts } from "@/lib/blog";
-import { getAllNews } from "@/lib/news";
+import { hasEditorialGameContent } from "@/lib/gameContent";
+import { isGeneratedBlogSlug } from "@/lib/generatedBlog";
 
 const SITE = "https://www.plixfy.com";
 
@@ -53,6 +54,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...bilingual("/category/top", "daily", 0.8),
     ...bilingual("/category/trending", "daily", 0.8),
     ...bilingual("/about", "monthly", 0.3),
+    ...bilingual("/contact", "monthly", 0.4),
+    ...bilingual("/editorial-policy", "monthly", 0.4),
     ...bilingual("/privacy", "monthly", 0.3),
     ...bilingual("/terms", "monthly", 0.3),
     ...bilingual("/blog", "weekly", 0.6),
@@ -63,18 +66,43 @@ export default function sitemap(): MetadataRoute.Sitemap {
     bilingual("/category/" + c.slug, "weekly", 0.7)
   );
 
-  const bestRoutes: MetadataRoute.Sitemap = categories.flatMap((c) =>
-    bilingual("/best/" + c.slug, "weekly", 0.7)
-  );
+  const gameRoutes: MetadataRoute.Sitemap = allGames.flatMap((game) => {
+    const hasAr = hasEditorialGameContent(game.slug, "ar");
+    const hasEn = hasEditorialGameContent(game.slug, "en");
+    const arUrl = `${SITE}/play/${game.slug}`;
+    const enUrl = `${SITE}/en/play/${game.slug}`;
+    const languages = {
+      ...(hasAr ? { ar: arUrl, "x-default": arUrl } : {}),
+      ...(hasEn ? { en: enUrl } : {}),
+    };
 
-  const gameRoutes: MetadataRoute.Sitemap = allGames.flatMap((g) =>
-    bilingual("/play/" + g.slug, "monthly", 0.6, undefined, {
-      lastModified: GAME_CATALOG_LAST_MODIFIED,
-      images: [g.thumbnail],
-    }),
-  );
+    return [
+      ...(hasAr
+        ? [{
+            url: arUrl,
+            lastModified: GAME_CATALOG_LAST_MODIFIED,
+            changeFrequency: "monthly" as const,
+            priority: 0.6,
+            images: [game.thumbnail],
+            alternates: { languages },
+          }]
+        : []),
+      ...(hasEn
+        ? [{
+            url: enUrl,
+            lastModified: GAME_CATALOG_LAST_MODIFIED,
+            changeFrequency: "monthly" as const,
+            priority: 0.5,
+            images: [game.thumbnail],
+            alternates: { languages },
+          }]
+        : []),
+    ];
+  });
 
-  const blogRoutes: MetadataRoute.Sitemap = getAllPosts().flatMap((p) => {
+  const blogRoutes: MetadataRoute.Sitemap = getAllPosts()
+    .filter((post) => !isGeneratedBlogSlug(post.slug))
+    .flatMap((p) => {
     const languages = {
       ar: SITE + "/blog/" + p.slug,
       en: SITE + "/en/blog/" + p.slug,
@@ -96,38 +124,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: { languages },
       },
     ];
-  });
-
-  const newsRoutes: MetadataRoute.Sitemap = getAllNews().flatMap((n) => {
-    const languages = {
-      ar: SITE + "/news/" + n.slug,
-      en: SITE + "/en/news/" + n.slug,
-      "x-default": SITE + "/news/" + n.slug,
-    };
-    return [
-      {
-        url: languages.ar,
-        lastModified: new Date(n.publishedAt),
-        changeFrequency: "weekly" as const,
-        priority: 0.6,
-        alternates: { languages },
-      },
-      {
-        url: languages.en,
-        lastModified: new Date(n.publishedAt),
-        changeFrequency: "weekly" as const,
-        priority: 0.5,
-        alternates: { languages },
-      },
-    ];
-  });
+    });
 
   return [
     ...staticRoutes,
-    ...newsRoutes,
     ...blogRoutes,
     ...categoryRoutes,
-    ...bestRoutes,
     ...gameRoutes,
   ];
 }

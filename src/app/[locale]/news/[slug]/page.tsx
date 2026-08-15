@@ -59,6 +59,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   return {
     title: title + " | " + c.brand,
     description,
+    robots: { index: false, follow: true },
     alternates: pageAlternates(locale, "/news/" + item.slug),
     openGraph: {
       type: "article",

@@ -2,6 +2,20 @@ import { allGames, getGameBySlug, type Game } from "./games";
 
 const FALLBACK_TOP_SLUG = "moto-x3m";
 
+function riyadhDayNumber(now: Date): number {
+  // Riyadh stays on UTC+3 year-round. Moving the clock before truncating makes
+  // the daily pick change at midnight in Saudi Arabia, not at server midnight.
+  return Math.floor((now.getTime() + 3 * 60 * 60 * 1000) / 86_400_000);
+}
+
+export function getDailyGame(now = new Date()): Game {
+  const candidates = allGames.filter(
+    (game) => game.badge === "top" || game.badge === "hot"
+  );
+  const pool = candidates.length > 0 ? candidates : allGames;
+  return pool[riyadhDayNumber(now) % pool.length] ?? getTopGame();
+}
+
 export function getTopGame(): Game {
   let best: Game | null = null;
   let bestPlays = -1;

@@ -3,6 +3,11 @@ import gdGamesData from "@/data/gd-games.json";
 import gmGamesData from "@/data/gm-games.json";
 
 export type GameSource = "playgama" | "gd" | "gm";
+export type GameDeviceSupport =
+  | "mobile-and-desktop"
+  | "mobile-only"
+  | "desktop-only"
+  | "unknown";
 
 export interface Game {
   title: string;
@@ -13,6 +18,8 @@ export interface Game {
   categorySlug: CategorySlug;
   description?: string;
   plays?: number;
+  /** Devices on which the publisher has confirmed that the game is playable. */
+  supportedDevices?: GameDeviceSupport;
   /** مصدر اللعبة — غيابه يعني playgama (الكتالوج الأصلي) */
   source?: GameSource;
   /** معرّف اللعبة (Md5) في كتالوج GameDistribution — مطلوب عندما source === "gd" */
@@ -599,6 +606,7 @@ const playgamaGames: readonly Game[] = [
     title: "Moto X3M",
     slug: "moto-x3m",
     plays: 248,
+    supportedDevices: "mobile-and-desktop",
     thumbnail: "https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/53361cce-791e-4e4a-23dc-528ce9ea1000/enlarged",
     badge: "top",
     category: "سباق",

@@ -67,6 +67,8 @@ interface UIDict {
     privacy: string;
     terms: string;
     about: string;
+    contact: string;
+    editorialPolicy: string;
     rights: string;
     footerAria: string;
   };
@@ -142,8 +144,11 @@ interface UIDict {
     outOf5: string;
     playsLabel: string;
     playsSuffix: string;
-    playType: string;
-    browser: string;
+    supportedDevices: string;
+    mobileAndDesktop: string;
+    mobileOnly: string;
+    desktopOnly: string;
+    deviceSupportUnknown: string;
     free: string;
     yes: string;
     about: string;
@@ -183,6 +188,8 @@ const ar: UIDict = {
     privacy: "سياسة الخصوصية",
     terms: "شروط الاستخدام",
     about: "من نحن",
+    contact: "تواصل معنا",
+    editorialPolicy: "سياسة التحرير",
     rights: "© 2026 بليكسفاي — جميع الحقوق محفوظة",
     footerAria: "تذييل الصفحة",
   },
@@ -254,8 +261,11 @@ const ar: UIDict = {
     outOf5: "من 5",
     playsLabel: "مرات اللعب",
     playsSuffix: "مرة لعب",
-    playType: "نوع اللعب",
-    browser: "متصفح",
+    supportedDevices: "الأجهزة المدعومة",
+    mobileAndDesktop: "جوال وكمبيوتر",
+    mobileOnly: "جوال فقط",
+    desktopOnly: "كمبيوتر فقط",
+    deviceSupportUnknown: "غير محدد",
     free: "مجانية",
     yes: "نعم",
     about: "عن اللعبة",
@@ -300,6 +310,8 @@ const en: UIDict = {
     privacy: "Privacy Policy",
     terms: "Terms of Use",
     about: "About Us",
+    contact: "Contact Us",
+    editorialPolicy: "Editorial Policy",
     rights: "© 2026 Plixfy — All rights reserved",
     footerAria: "Page footer",
   },
@@ -371,8 +383,11 @@ const en: UIDict = {
     outOf5: "out of 5",
     playsLabel: "Plays",
     playsSuffix: "plays",
-    playType: "Play type",
-    browser: "Browser",
+    supportedDevices: "Supported devices",
+    mobileAndDesktop: "Mobile & desktop",
+    mobileOnly: "Mobile only",
+    desktopOnly: "Desktop only",
+    deviceSupportUnknown: "Not specified",
     free: "Free",
     yes: "Yes",
     about: "About the Game",

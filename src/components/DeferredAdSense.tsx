@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 const SCRIPT_ID = "plixfy-adsense";
 
@@ -9,7 +10,14 @@ const SCRIPT_ID = "plixfy-adsense";
  * scripts can otherwise mutate the document while hydration is still running.
  */
 export default function DeferredAdSense({ client }: { client: string }) {
+  const pathname = usePathname();
+  const isContentReviewExcluded =
+    /\/(?:en\/)?(?:play|news|search|favorites|profile|auth|dashboard|lab)(?:\/|$)/.test(
+      pathname,
+    );
+
   useEffect(() => {
+    if (isContentReviewExcluded) return;
     if (document.getElementById(SCRIPT_ID)) return;
 
     const timer = window.setTimeout(() => {
@@ -26,7 +34,7 @@ export default function DeferredAdSense({ client }: { client: string }) {
     }, 1000);
 
     return () => window.clearTimeout(timer);
-  }, [client]);
+  }, [client, isContentReviewExcluded]);
 
   return null;
 }

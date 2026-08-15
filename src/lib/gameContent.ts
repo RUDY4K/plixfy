@@ -1524,3 +1524,12 @@ export function getGameContent(
 export function hasGameContent(slug: string): boolean {
   return slug in gameContent || slug in generatedGameContent;
 }
+
+/** Hand-reviewed content that is suitable for search indexing. */
+export function hasEditorialGameContent(
+  slug: string,
+  locale: Locale = "ar",
+): boolean {
+  if (!(slug in gameContent)) return false;
+  return locale === "ar" || slug in topEnContent;
+}

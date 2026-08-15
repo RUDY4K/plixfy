@@ -11,7 +11,7 @@ import {
   allGames,
 } from "@/lib/games";
 import type { Game } from "@/lib/games";
-import { getTopGame } from "@/lib/gameStats";
+import { getDailyGame } from "@/lib/gameStats";
 import { getAllPosts } from "@/lib/blog";
 import { getAllPostsEn } from "@/lib/blogEn";
 import { getAllNews, formatNewsDate, newsTitle } from "@/lib/news";
@@ -21,7 +21,8 @@ import { SOCIAL_PROFILE_URLS } from "@/lib/socialProfiles";
 
 const SITE = "https://www.plixfy.com";
 
-export const revalidate = 86400;
+// Refresh hourly so the daily pick rolls over shortly after midnight in Riyadh.
+export const revalidate = 3600;
 
 export default async function Home({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
@@ -140,9 +141,9 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     })),
   };
 
-  const topGame = getTopGame();
+  const dailyGame = getDailyGame();
 
-  const used = new Set<string>([topGame.slug]);
+  const used = new Set<string>([dailyGame.slug]);
   const take = <T extends readonly Game[]>(list: T): T => {
     list.forEach((g) => used.add(g.slug));
     return list;
@@ -211,8 +212,8 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
       <TrackOnMount
         eventName="hero_top_game_viewed"
-        dedupKey={`hero:${topGame.slug}`}
-        params={{ game_slug: topGame.slug, plays: topGame.plays ?? 0 }}
+        dedupKey={`hero:${dailyGame.slug}`}
+        params={{ game_slug: dailyGame.slug, plays: dailyGame.plays ?? 0 }}
       />
       <HomeHero
         locale={locale}
@@ -220,10 +221,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         summary={homeSummary}
         gameCount={allGames.length}
         game={{
-          title: topGame.title,
-          slug: topGame.slug,
-          thumbnail: topGame.thumbnail,
-          category: categoryShortLabel(topGame.categorySlug, locale, topGame.category),
+          title: dailyGame.title,
+          slug: dailyGame.slug,
+          thumbnail: dailyGame.thumbnail,
+          category: categoryShortLabel(dailyGame.categorySlug, locale, dailyGame.category),
         }}
       />
 

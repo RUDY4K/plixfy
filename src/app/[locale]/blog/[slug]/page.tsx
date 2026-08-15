@@ -9,6 +9,7 @@ import { getGamesByCategory } from "@/lib/games";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import { BRAND_AR } from "@/lib/siteContent";
 import { hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
+import { isGeneratedBlogSlug } from "@/lib/generatedBlog";
 
 const SITE = "https://www.plixfy.com";
 
@@ -69,6 +70,9 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title: post.title,
     description: post.description,
     keywords: [...post.keywords],
+    ...(isGeneratedBlogSlug(slug)
+      ? { robots: { index: false, follow: true } }
+      : {}),
     alternates: pageAlternates(locale, "/blog/" + post.slug),
     openGraph: {
       type: "article",
