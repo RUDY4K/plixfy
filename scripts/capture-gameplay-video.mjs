@@ -4,7 +4,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { chromium } from "playwright-core";
 import sharp from "sharp";
 
@@ -169,6 +169,38 @@ async function captureFrames(page, targetDirectory, duration) {
   return sequence;
 }
 
+function startGameAudioCapture(target, duration) {
+  const source = process.env.PULSE_SOURCE;
+  if (process.platform !== "linux" || !source) return null;
+
+  const child = spawn(
+    process.env.FFMPEG_PATH || "ffmpeg",
+    [
+      "-y",
+      "-f", "pulse",
+      "-i", source,
+      "-t", String(duration),
+      "-ac", "2",
+      "-ar", "44100",
+      "-c:a", "pcm_s16le",
+      target,
+    ],
+    { stdio: ["ignore", "ignore", "pipe"] },
+  );
+  let errorOutput = "";
+  child.stderr.on("data", (chunk) => {
+    errorOutput = `${errorOutput}${chunk}`.slice(-4000);
+  });
+  const done = new Promise((resolve) => {
+    child.on("error", (error) => resolve({ ok: false, error: error.message }));
+    child.on("close", (code) => resolve({
+      ok: code === 0 && fs.existsSync(target) && fs.statSync(target).size > 1_000,
+      error: code === 0 ? "" : errorOutput,
+    }));
+  });
+  return { child, done, target };
+}
+
 async function validateCapturedFrames(targetDirectory, frameCount) {
   const indexes = [1, Math.max(1, Math.floor(frameCount / 2)), frameCount];
   const buffers = [];
@@ -237,28 +269,39 @@ async function buildBrandOverlay(target) {
     .toFile(target);
 }
 
-function renderVideo({ framesDirectory, frameCount, overlay, output, duration }) {
+function renderVideo({ framesDirectory, frameCount, overlay, audio, output, duration }) {
   fs.mkdirSync(path.dirname(output), { recursive: true });
   const inputRate = Math.max(1, frameCount / duration).toFixed(4);
-  const filter = [
+  const filters = [
     `[0:v]scale=${OUTPUT_WIDTH}:${OUTPUT_HEIGHT}:force_original_aspect_ratio=increase,crop=${OUTPUT_WIDTH}:${OUTPUT_HEIGHT},setsar=1,fps=30[game]`,
     `[game][1:v]overlay=0:0:format=auto,fade=t=in:st=0:d=0.3,fade=t=out:st=${Math.max(0, duration - 0.4)}:d=0.4,format=yuv420p[outv]`,
-    `[2:a]volume=0.018,afade=t=in:st=0:d=0.5,afade=t=out:st=${Math.max(0, duration - 0.6)}:d=0.6[outa]`,
-  ].join(";");
+  ];
+  if (audio) {
+    filters.push(
+      `[2:a]loudnorm=I=-18:TP=-2:LRA=11,aresample=44100,afade=t=in:st=0:d=0.25,afade=t=out:st=${Math.max(0, duration - 0.5)}:d=0.5[outa]`,
+    );
+  }
+  const filter = filters.join(";");
+  const inputs = [
+    "-y",
+    "-framerate", inputRate,
+    "-i", path.join(framesDirectory, "frame-%06d.jpg"),
+    "-loop", "1", "-i", overlay,
+  ];
+  if (audio) inputs.push("-i", audio);
+  const audioOptions = audio
+    ? ["-map", "[outa]", "-c:a", "aac", "-b:a", "128k"]
+    : ["-an"];
   const result = spawnSync(
     process.env.FFMPEG_PATH || "ffmpeg",
     [
-      "-y",
-      "-framerate", inputRate,
-      "-i", path.join(framesDirectory, "frame-%06d.jpg"),
-      "-loop", "1", "-i", overlay,
-      "-f", "lavfi", "-i", `aevalsrc=0.45*sin(2*PI*98*t)+0.16*sin(2*PI*196*t):s=44100:d=${duration}`,
+      ...inputs,
       "-filter_complex", filter,
-      "-map", "[outv]", "-map", "[outa]",
+      "-map", "[outv]",
+      ...audioOptions,
       "-t", String(duration),
       "-r", "30",
       "-c:v", "libx264", "-preset", "medium", "-crf", "22", "-profile:v", "high", "-level", "4.1",
-      "-c:a", "aac", "-b:a", "96k",
       "-movflags", "+faststart",
       output,
     ],
@@ -275,6 +318,7 @@ async function main() {
   const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-gameplay-"));
   const framesDirectory = path.join(temporary, "frames");
   const overlay = path.join(temporary, "overlay.png");
+  const capturedAudio = path.join(temporary, "game-audio.wav");
   fs.mkdirSync(framesDirectory, { recursive: true });
 
   const browser = await chromium.launch({
@@ -286,7 +330,6 @@ async function main() {
       "--disable-notifications",
       "--hide-scrollbars",
       "--no-sandbox",
-      "--mute-audio",
     ],
   });
 
@@ -339,7 +382,20 @@ async function main() {
     });
     await warmUpGame(page, args.warmup);
     await assertGameIsRecordable(page);
-    frameCount = await captureFrames(page, framesDirectory, args.duration);
+    const audioCapture = startGameAudioCapture(capturedAudio, args.duration);
+    try {
+      frameCount = await captureFrames(page, framesDirectory, args.duration);
+    } catch (error) {
+      audioCapture?.child.kill("SIGTERM");
+      throw error;
+    }
+    if (audioCapture) {
+      const audioResult = await audioCapture.done;
+      if (!audioResult.ok) {
+        console.warn(`[AudioCapture] game audio unavailable; rendering silently: ${audioResult.error}`);
+        fs.rmSync(capturedAudio, { force: true });
+      }
+    }
     await validateCapturedFrames(framesDirectory, frameCount);
     await context.close();
   } finally {
@@ -347,7 +403,14 @@ async function main() {
   }
 
   await buildBrandOverlay(overlay);
-  renderVideo({ framesDirectory, frameCount, overlay, output: args.output, duration: args.duration });
+  renderVideo({
+    framesDirectory,
+    frameCount,
+    overlay,
+    audio: fs.existsSync(capturedAudio) ? capturedAudio : null,
+    output: args.output,
+    duration: args.duration,
+  });
   console.log(JSON.stringify({
     id: args.id,
     title: game.title,
