@@ -18,15 +18,16 @@ const SITE = "https://www.plixfy.com";
 export const revalidate = 86400;
 
 const TOTAL = allGames.length;
+const PREVIEW_PER_CATEGORY = 12;
 
 const copyByLocale = {
   ar: {
     metaTitle: `جميع الألعاب - بليكسفاي | ${TOTAL}+ لعبة مجانية`,
     metaDescription: `تصفّح كل ${TOTAL} لعبة على بليكسفاي مرتّبة حسب التصنيف: سباق، أكشن، ألغاز، رياضة، تصويب، بنات، آيو، وخفيف. كلها مجانية وتعمل من المتصفح بدون تحميل.`,
     ogTitle: "جميع الألعاب - بليكسفاي",
-    ogDescription: "كل الألعاب على بليكسفاي في صفحة واحدة، مرتّبة حسب التصنيف.",
+    ogDescription: "اكتشف مكتبة ألعاب بليكسفاي مرتّبة حسب التصنيف.",
     h1: "جميع الألعاب",
-    intro: `${TOTAL} لعبة مجانية أونلاين على بليكسفاي، مرتّبة حسب التصنيف. كل الألعاب تعمل من المتصفح مباشرة بدون تحميل، ومتوافقة مع الجوال والحاسوب. اختر تصنيفك المفضّل من القائمة أدناه أو تصفّح القائمة كاملة.`,
+    intro: `${TOTAL} لعبة مجانية أونلاين على بليكسفاي، مرتّبة حسب التصنيف. تعمل الألعاب من المتصفح مباشرة بدون تحميل، وتوضح صفحة كل لعبة ما إذا كانت تدعم الجوال أو الكمبيوتر أو كليهما. اختر فئتك ثم افتح صفحة التصنيف لمشاهدة المجموعة كاملة.`,
     quickNavAria: "تنقّل سريع للتصنيفات",
     gamesCount: (n: number) => `(${n} لعبة)`,
     viewCategory: "عرض الفئة ←",
@@ -38,9 +39,9 @@ const copyByLocale = {
     metaTitle: `All Games - Plixfy | ${TOTAL}+ Free Games`,
     metaDescription: `Browse all ${TOTAL} games on Plixfy sorted by category: racing, action, puzzle, sports, shooting, girls, .io and casual. All free, playable in your browser with no download.`,
     ogTitle: "All Games - Plixfy",
-    ogDescription: "Every game on Plixfy on one page, sorted by category.",
+    ogDescription: "Explore the Plixfy game library, organized by category.",
     h1: "All Games",
-    intro: `${TOTAL} free online games on Plixfy, sorted by category. Every game runs directly in your browser with no download, on both mobile and desktop. Pick your favorite category below or browse the full list.`,
+    intro: `${TOTAL} free online games on Plixfy, organized by category. Games run directly in your browser with no download, and each game page states whether it supports mobile, desktop, or both. Choose a category to browse its complete collection.`,
     quickNavAria: "Quick category navigation",
     gamesCount: (n: number) => `(${n} games)`,
     viewCategory: "View category →",
@@ -101,8 +102,8 @@ export default async function AllGamesPage({
     name: copy.ldName(catLabel(locale, cat)),
     description: copy.ldDescription(games.length, catLabel(locale, cat)),
     url: SITE + href("/all-games") + "#" + cat.slug,
-    numberOfItems: games.length,
-    itemListElement: games.map((g, idx) => ({
+    numberOfItems: Math.min(games.length, PREVIEW_PER_CATEGORY),
+    itemListElement: games.slice(0, PREVIEW_PER_CATEGORY).map((g, idx) => ({
       "@type": "ListItem",
       position: idx + 1,
       url: SITE + href("/play/" + g.slug),
@@ -188,7 +189,7 @@ export default async function AllGamesPage({
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-6">
-            {games.map((g, idx) => (
+            {games.slice(0, PREVIEW_PER_CATEGORY).map((g, idx) => (
               <GameCard
                 key={g.slug}
                 {...g}
