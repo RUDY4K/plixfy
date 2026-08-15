@@ -96,6 +96,15 @@ function socialVideoUrl(kind, id) {
   return `${SITE}/social/videos/${encodeURIComponent(`${kind}-${id}.mp4`)}`;
 }
 
+function enabledPlatforms() {
+  return new Set(
+    String(process.env.SOCIAL_PLATFORMS || "telegram,discord,x,facebook,instagram,tiktok")
+      .split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean),
+  );
+}
+
 function runRequired(command, args) {
   const result = spawnSync(command, args, { cwd: ROOT, stdio: "inherit" });
   if (result.status !== 0) {
@@ -124,23 +133,33 @@ async function waitForPublicVideo(url) {
 }
 
 async function attachTikTokVideo(pack, args) {
-  const enabled = new Set(
-    String(process.env.SOCIAL_PLATFORMS || "telegram,discord,x,facebook,instagram,tiktok")
-      .split(",")
-      .map((value) => value.trim().toLowerCase())
-      .filter(Boolean),
-  );
+  const enabled = enabledPlatforms();
   const item = pack.items.find((candidate) => candidate.platform === "tiktok");
   if (!item || !enabled.has("tiktok") || args.dryRun) return pack;
 
   const filename = `${pack.source.kind}-${pack.source.id}.mp4`;
   const relativeOutput = path.join("public", "social", "videos", filename);
-  runRequired(process.execPath, [
-    path.join(ROOT, "scripts", "generate-social-video.mjs"),
-    `--kind=${pack.source.kind}`,
-    `--id=${pack.source.id}`,
-    `--output=${relativeOutput}`,
-  ]);
+  if (pack.source.kind === "game") {
+    const gameplay = spawnSync(
+      process.execPath,
+      [
+        path.join(ROOT, "scripts", "capture-gameplay-video.mjs"),
+        `--id=${pack.source.id}`,
+        `--output=${relativeOutput}`,
+      ],
+      { cwd: ROOT, stdio: "inherit" },
+    );
+    if (gameplay.status !== 0) {
+      throw new Error(`[VideoAgent] gameplay capture failed for ${pack.source.id}`);
+    }
+  } else {
+    runRequired(process.execPath, [
+      path.join(ROOT, "scripts", "generate-social-video.mjs"),
+      `--kind=${pack.source.kind}`,
+      `--id=${pack.source.id}`,
+      `--output=${relativeOutput}`,
+    ]);
+  }
 
   if (process.env.GITHUB_ACTIONS === "true") {
     runRequired("git", ["config", "user.name", "github-actions[bot]"]);
@@ -158,8 +177,27 @@ async function attachTikTokVideo(pack, args) {
   return pack;
 }
 
-function loadGames() {
-  return ["gd-games.json", "gm-games.json"]
+function loadPlaygamaGames() {
+  const source = fs.readFileSync(path.join(ROOT, "src", "lib", "games.ts"), "utf8");
+  const section = source.match(/const playgamaGames:[\s\S]*?=\s*\[([\s\S]*?)\n\];/);
+  if (!section) return [];
+  const games = [];
+  const pattern = /\{\s*title:\s*"((?:[^"\\]|\\.)*)",\s*slug:\s*"([^"]+)",\s*thumbnail:\s*"([^"]+)",[\s\S]*?category:\s*"((?:[^"\\]|\\.)*)",\s*categorySlug:\s*"([^"]+)"/g;
+  for (const match of section[1].matchAll(pattern)) {
+    games.push({
+      title: match[1],
+      slug: match[2],
+      thumbnail: match[3],
+      category: match[4],
+      categorySlug: match[5],
+      source: "playgama",
+    });
+  }
+  return games;
+}
+
+function loadGames({ recordableOnly = false } = {}) {
+  const publisherGames = ["gd-games.json", "gm-games.json"]
     .flatMap((name) => readJson(path.join(ROOT, "src", "data", name), []))
     .filter((game) => game?.slug && game?.title && game?.thumbnail)
     .map((game) => ({
@@ -168,8 +206,9 @@ function loadGames() {
       thumbnail: game.thumbnail,
       category: game.category || CATEGORY_AR[game.categorySlug] || "ألعاب",
       categorySlug: game.categorySlug || "casual",
-    }))
-    .sort((a, b) => a.slug.localeCompare(b.slug));
+    }));
+  const games = recordableOnly ? loadPlaygamaGames() : [...loadPlaygamaGames(), ...publisherGames];
+  return games.sort((a, b) => a.slug.localeCompare(b.slug));
 }
 
 function loadNews(referenceDate) {
@@ -274,20 +313,38 @@ async function main() {
     return;
   }
 
-  const selection = new ContentScoutAgent().select({
-    slot: args.slot,
-    games: loadGames(),
-    newsItems: loadNews(args.date),
-    recentGames: state.recentGames || [],
-    recentNews: state.recentNews || [],
-    seed: runKey,
-  });
-  console.log(`[ScoutAgent] selected ${selection.kind}/${selection.item.slug}`);
+  const hasTikTok = enabledPlatforms().has("tiktok");
+  const scout = new ContentScoutAgent();
+  let games = loadGames({ recordableOnly: hasTikTok });
+  const newsItems = loadNews(args.date);
+  const maximumAttempts = !args.dryRun && hasTikTok ? 6 : 1;
+  let selection;
+  let rawPack;
 
-  const rawPack = selection.kind === "news"
-    ? newsPack(selection.item, args.date, args.slot)
-    : gamePack(selection.item, args.date, args.slot);
-  await attachTikTokVideo(rawPack, args);
+  for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
+    selection = scout.select({
+      slot: args.slot,
+      games,
+      newsItems,
+      recentGames: state.recentGames || [],
+      recentNews: state.recentNews || [],
+      seed: `${runKey}:${attempt}`,
+    });
+    console.log(`[ScoutAgent] selected ${selection.kind}/${selection.item.slug}`);
+    rawPack = selection.kind === "news"
+      ? newsPack(selection.item, args.date, args.slot)
+      : gamePack(selection.item, args.date, args.slot);
+    try {
+      await attachTikTokVideo(rawPack, args);
+      break;
+    } catch (error) {
+      if (selection.kind !== "game" || attempt === maximumAttempts - 1) throw error;
+      console.warn(`${error.message}; trying another game`);
+      games = games.filter((game) => game.slug !== selection.item.slug);
+    }
+  }
+
+  if (!selection || !rawPack) throw new Error("ScoutAgent could not prepare a social pack");
   const pack = new EditorialAgent().review(rawPack);
   console.log(`[EditorAgent] approved ${pack.items.length} platform drafts`);
 

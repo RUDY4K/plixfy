@@ -11,6 +11,7 @@
     "social:cloud": "node scripts/cloud-social-runner.mjs",
     "social:cloud:dry": "node scripts/cloud-social-runner.mjs --dry-run",
     "social:video": "node scripts/generate-social-video.mjs",
+    "social:gameplay": "node scripts/capture-gameplay-video.mjs",
     "social:buffer:check": "node scripts/check-buffer.mjs",
     "test:social-agents": "node --test scripts/social-agents.test.mjs"
   },
@@ -30,6 +31,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "playwright-core": "^1.62.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
