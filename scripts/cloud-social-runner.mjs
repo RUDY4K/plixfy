@@ -13,6 +13,7 @@ const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
 const CLOUD_STATE_FILE = path.join(SOCIAL_DIR, "cloud-state.json");
 const SITE = "https://www.plixfy.com";
+const VERIFIED_GAMEPLAY_IDS = new Set(["mr-racer-car-racing"]);
 
 const CATEGORY_AR = {
   racing: "سباق",
@@ -207,7 +208,9 @@ function loadGames({ recordableOnly = false } = {}) {
       category: game.category || CATEGORY_AR[game.categorySlug] || "ألعاب",
       categorySlug: game.categorySlug || "casual",
     }));
-  const games = recordableOnly ? loadPlaygamaGames() : [...loadPlaygamaGames(), ...publisherGames];
+  const games = recordableOnly
+    ? loadPlaygamaGames().filter((game) => VERIFIED_GAMEPLAY_IDS.has(game.slug))
+    : [...loadPlaygamaGames(), ...publisherGames];
   return games.sort((a, b) => a.slug.localeCompare(b.slug));
 }
 

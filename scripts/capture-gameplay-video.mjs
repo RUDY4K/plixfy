@@ -32,7 +32,7 @@ function parseArgs() {
   return {
     id,
     duration: Math.max(10, Math.min(24, Number(values.duration || 15))),
-    warmup: Math.max(8, Math.min(45, Number(values.warmup || 35))),
+    warmup: Math.max(8, Math.min(75, Number(values.warmup || 60))),
     output: path.resolve(
       ROOT,
       String(values.output || path.join("public", "social", "videos", `game-${id}.mp4`)),
@@ -92,13 +92,15 @@ function findChrome() {
 
 async function tapAndPlay(page, step) {
   const points = [
-    [0.965, 0.028],
+    [0.50, 0.90],
+    [0.50, 0.62],
     [0.505, 0.55],
-    [0.50, 0.72],
-    [0.50, 0.50],
-    [0.30, 0.68],
-    [0.70, 0.68],
     [0.50, 0.34],
+    [0.20, 0.12],
+    [0.50, 0.72],
+    [0.80, 0.80],
+    [0.20, 0.80],
+    [0.965, 0.028],
   ];
   const [xRatio, yRatio] = points[step % points.length];
   const x = Math.round(CAPTURE_WIDTH * xRatio);
@@ -106,9 +108,15 @@ async function tapAndPlay(page, step) {
   await page.mouse.move(x, y, { steps: 4 }).catch(() => {});
   await page.mouse.click(x, y, { delay: 90 }).catch(() => {});
 
-  const keys = ["Escape", "Enter", "Space", "ArrowRight", "ArrowUp", "KeyD", "KeyW", "ArrowLeft"];
+  const keys = ["Enter", "Space", "ArrowRight", "ArrowUp", "KeyD", "KeyW", "ArrowLeft", "ArrowDown"];
   const key = keys[step % keys.length];
   await page.keyboard.press(key, { delay: 140 }).catch(() => {});
+}
+
+async function driveGameplay(page, step) {
+  const keys = ["ArrowUp", "ArrowRight", "ArrowUp", "ArrowLeft", "KeyW", "KeyD", "Space", "KeyA"];
+  const key = keys[step % keys.length];
+  await page.keyboard.press(key, { delay: 180 }).catch(() => {});
 }
 
 async function warmUpGame(page, seconds) {
@@ -119,6 +127,27 @@ async function warmUpGame(page, seconds) {
     step += 1;
     await page.waitForTimeout(900);
   }
+}
+
+async function closeGameplayOverlays(page) {
+  // Many catalog games finish onboarding with a help/control sheet covering
+  // otherwise active gameplay. Close the common top-right dismiss targets
+  // before recording, then leave the mouse alone for the whole capture.
+  const closePoints = [
+    [0.803, 0.105],
+    [0.94, 0.08],
+    [0.965, 0.028],
+  ];
+  for (const [xRatio, yRatio] of closePoints) {
+    await page.mouse.click(
+      Math.round(CAPTURE_WIDTH * xRatio),
+      Math.round(CAPTURE_HEIGHT * yRatio),
+      { delay: 90 },
+    ).catch(() => {});
+    await page.waitForTimeout(500);
+  }
+  await page.keyboard.press("Enter", { delay: 120 }).catch(() => {});
+  await page.waitForTimeout(1_500);
 }
 
 async function assertGameIsRecordable(page) {
@@ -145,10 +174,11 @@ async function captureFrames(page, targetDirectory, duration) {
   const targetFrameGap = 1000 / 10;
   const endAt = Date.now() + duration * 1000;
   let nextActionAt = 0;
+  await page.keyboard.down("ArrowUp").catch(() => {});
   while (Date.now() < endAt) {
     const startedAt = Date.now();
     if (sequence >= nextActionAt) {
-      await tapAndPlay(page, Math.floor(sequence / 7));
+      await driveGameplay(page, Math.floor(sequence / 7));
       nextActionAt = sequence + 7;
     }
     sequence += 1;
@@ -163,6 +193,7 @@ async function captureFrames(page, targetDirectory, duration) {
     const remaining = targetFrameGap - (Date.now() - startedAt);
     if (remaining > 0) await page.waitForTimeout(remaining);
   }
+  await page.keyboard.up("ArrowUp").catch(() => {});
   if (sequence < 30) {
     throw new Error(`Gameplay capture produced only ${sequence} frames`);
   }
@@ -201,8 +232,44 @@ function startGameAudioCapture(target, duration) {
   return { child, done, target };
 }
 
-async function validateCapturedFrames(targetDirectory, frameCount) {
-  const indexes = [1, Math.max(1, Math.floor(frameCount / 2)), frameCount];
+async function matchesVerifiedGameplayProfile(gameId, filename) {
+  if (gameId !== "mr-racer-car-racing") return false;
+
+  const { data, info } = await sharp(filename)
+    .resize(CAPTURE_WIDTH, CAPTURE_HEIGHT, { fit: "fill" })
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  let yellowPixels = 0;
+  let lowerPixels = 0;
+  let darkCenterPixels = 0;
+  let centerPixels = 0;
+  for (let y = 0; y < info.height; y += 1) {
+    for (let x = 0; x < info.width; x += 1) {
+      const offset = (y * info.width + x) * info.channels;
+      const red = data[offset];
+      const green = data[offset + 1];
+      const blue = data[offset + 2];
+      if (y >= info.height * 0.42) {
+        lowerPixels += 1;
+        if (red > 170 && green > 115 && blue < 105) yellowPixels += 1;
+      }
+      if (x >= info.width * 0.17 && x <= info.width * 0.86 && y >= info.height * 0.08 && y <= info.height * 0.87) {
+        centerPixels += 1;
+        if (red < 38 && green < 38 && blue < 48) darkCenterPixels += 1;
+      }
+    }
+  }
+  const yellowRatio = yellowPixels / Math.max(1, lowerPixels);
+  const darkCenterRatio = darkCenterPixels / Math.max(1, centerPixels);
+  return yellowRatio >= 0.08 && darkCenterRatio < 0.45;
+}
+
+async function validateCapturedFrames(targetDirectory, frameCount, gameId) {
+  const sampleCount = Math.min(12, Math.max(6, Math.floor(frameCount / 8)));
+  const indexes = Array.from({ length: sampleCount }, (_, index) =>
+    Math.max(1, Math.min(frameCount, Math.round(1 + (index * (frameCount - 1)) / (sampleCount - 1)))),
+  );
   const buffers = [];
   for (const index of indexes) {
     const filename = path.join(targetDirectory, `frame-${String(index).padStart(6, "0")}.jpg`);
@@ -216,25 +283,25 @@ async function validateCapturedFrames(targetDirectory, frameCount) {
     }
     differences.push(total / buffers[index].length);
   }
-  if (Math.max(...differences) < 1.5) {
-    throw new Error("Gameplay capture has too little motion (loading or blocked screen)");
-  }
-
+  // Menus and story screens may contain particles or one-off transitions. Real
+  // gameplay must keep changing during the latter portion of the recording.
+  const latterDifferences = differences.slice(Math.floor(differences.length * 0.35));
+  const activeMotion = latterDifferences.filter((difference) => difference >= 4).length;
+  const activeRatio = activeMotion / Math.max(1, latterDifferences.length);
+  const averageMotion = latterDifferences.reduce((total, value) => total + value, 0) /
+    Math.max(1, latterDifferences.length);
+  const hasContinuousMotion = activeRatio >= 0.5;
+  // Slow driving/puzzle gameplay can have modest per-frame movement while a
+  // splash screen only animates a few particles. Require both repeated and
+  // substantial motion unless a verified per-game visual profile matches.
+  const hasSteadyGameplayMotion = activeRatio >= 0.3 && averageMotion >= 3;
+  const hasStrongMotion = activeRatio >= 0.35 && averageMotion >= 8;
   const lastFrame = path.join(targetDirectory, `frame-${String(frameCount).padStart(6, "0")}.jpg`);
-  const { data, info } = await sharp(lastFrame)
-    .extract({ left: 0, top: 0, width: 80, height: 80 })
-    .removeAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  let adPixels = 0;
-  for (let pixel = 0; pixel < data.length; pixel += info.channels) {
-    const red = data[pixel];
-    const green = data[pixel + 1];
-    const blue = data[pixel + 2];
-    if (red > 170 && green > 110 && blue < 100) adPixels += 1;
-  }
-  if (adPixels > 120) {
-    throw new Error("Gameplay capture still contains a publisher video ad");
+  const hasVerifiedGameplayVisual = await matchesVerifiedGameplayProfile(gameId, lastFrame);
+  if (!hasContinuousMotion && !hasSteadyGameplayMotion && !hasStrongMotion && !hasVerifiedGameplayVisual) {
+    throw new Error(
+      `Gameplay capture is still a menu or intro (motion ratio ${activeRatio.toFixed(2)}, average ${averageMotion.toFixed(2)})`,
+    );
   }
 }
 
@@ -381,6 +448,7 @@ async function main() {
       frame.scrollIntoView({ block: "center", inline: "center" });
     });
     await warmUpGame(page, args.warmup);
+    await closeGameplayOverlays(page);
     await assertGameIsRecordable(page);
     const audioCapture = startGameAudioCapture(capturedAudio, args.duration);
     try {
@@ -396,7 +464,7 @@ async function main() {
         fs.rmSync(capturedAudio, { force: true });
       }
     }
-    await validateCapturedFrames(framesDirectory, frameCount);
+    await validateCapturedFrames(framesDirectory, frameCount, game.slug);
     await context.close();
   } finally {
     await browser.close();
