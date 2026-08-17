@@ -68,9 +68,12 @@ function renderPost(item, pack, forAdmin = false) {
 }
 
 function activePlatforms() {
-  const configured = process.env.SOCIAL_PLATFORMS ?? "telegram,discord,x,facebook,instagram,tiktok";
+  const configured = process.env.SOCIAL_PLATFORMS ?? "telegram,discord,x,facebook,instagram";
   return new Set(
-    configured.split(",").map((value) => value.trim().toLowerCase()).filter((value) => ALLOWED_PLATFORMS.has(value)),
+    configured
+      .split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter((value) => ALLOWED_PLATFORMS.has(value) && value !== "tiktok"),
   );
 }
 

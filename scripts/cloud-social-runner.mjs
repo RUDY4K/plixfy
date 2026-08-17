@@ -99,10 +99,10 @@ function socialVideoUrl(kind, id) {
 
 function enabledPlatforms() {
   return new Set(
-    String(process.env.SOCIAL_PLATFORMS || "telegram,discord,x,facebook,instagram,tiktok")
+    String(process.env.SOCIAL_PLATFORMS || "telegram,discord,x,facebook,instagram")
       .split(",")
       .map((value) => value.trim().toLowerCase())
-      .filter(Boolean),
+      .filter((value) => value && value !== "tiktok"),
   );
 }
 

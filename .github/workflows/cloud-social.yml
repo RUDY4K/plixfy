@@ -29,7 +29,7 @@ on:
       platforms:
         description: Comma-separated destinations for this run
         required: true
-        default: telegram,discord,x,facebook,instagram,tiktok
+        default: telegram,discord,x,facebook,instagram
         type: string
 
 permissions:
@@ -54,14 +54,7 @@ jobs:
           cache: npm
 
       - name: Install social agent dependencies
-        run: |
-          npm ci --no-audit --no-fund
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg pulseaudio
-          pulseaudio --start --exit-idle-time=-1
-          pactl load-module module-null-sink sink_name=PlixfySink
-          pactl set-default-sink PlixfySink
-          echo "PULSE_SOURCE=PlixfySink.monitor" >> "$GITHUB_ENV"
+        run: npm ci --no-audit --no-fund
 
       - name: Restore delivery state
         uses: actions/cache/restore@v6
@@ -85,7 +78,7 @@ jobs:
             echo "SOCIAL_SLOT=morning" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
             echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_PLATFORMS=telegram,discord,x,facebook,instagram,tiktok" >> "$GITHUB_ENV"
+            echo "SOCIAL_PLATFORMS=telegram,discord,x,facebook,instagram" >> "$GITHUB_ENV"
           else
             echo "SOCIAL_SLOT=evening" >> "$GITHUB_ENV"
             echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
