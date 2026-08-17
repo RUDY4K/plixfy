@@ -62,6 +62,20 @@ function isolateLatin(value) {
   );
 }
 
+function prepareSpeech(value) {
+  const replacements = [
+    [/Saber Interactive/gi, "سَيْبَر إنْتِراكتِف"],
+    [/Rideshare/gi, "رايد شير"],
+    [/PLIXFY\.COM/gi, "بْلِكْسْ فاي"],
+    [/بليكسفاي دوت كوم/g, "بْلِكْسْ فاي"],
+    [/بليكسفاي/g, "بْلِكْسْ فاي"],
+  ];
+  return replacements.reduce(
+    (text, [pattern, replacement]) => text.replace(pattern, replacement),
+    cleanText(value),
+  );
+}
+
 function wrapWords(text, maxCharacters = 29, maxLines = 4) {
   const words = cleanText(text).split(" ");
   const lines = [];
@@ -110,8 +124,8 @@ function buildStory(item) {
   return {
     beats,
     narration: beats
-      .map((beat) => beat.text.replaceAll("PLIXFY.COM", "بليكسفاي دوت كوم").replace(/[.،؛:!?؟…]+$/u, ""))
-      .join(". "),
+      .map((beat) => prepareSpeech(beat.text).replace(/[.،؛:!?؟…]+$/u, ""))
+      .join(". ... "),
   };
 }
 
@@ -194,7 +208,14 @@ function synthesizeVoice(text, target) {
   const python = process.platform === "win32" ? "python" : "python3";
   const result = spawnSync(
     python,
-    ["-m", "edge_tts", "--voice", "ar-SA-HamedNeural", "--rate=+5%", "--text", text, "--write-media", target],
+    [
+      "-m", "edge_tts",
+      "--voice", "ar-EG-SalmaNeural",
+      "--rate=-2%",
+      "--pitch=+0Hz",
+      "--text", text,
+      "--write-media", target,
+    ],
     { cwd: ROOT, stdio: "inherit" },
   );
   if (result.status !== 0) {
