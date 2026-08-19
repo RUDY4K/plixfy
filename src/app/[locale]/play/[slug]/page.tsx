@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Monitor, Smartphone } from "lucide-react";
@@ -259,7 +258,6 @@ export default async function PlayPage({
     : game.description
       ? game.description.split("\n\n").filter((p) => p.trim().length > 0)
       : [];
-  const mediaImages = game.images.slice(0, 2);
   const videoUrl = game.videoId ? getPlaygamaVideoUrl(game.videoId) : null;
 
   return (
@@ -328,69 +326,36 @@ export default async function PlayPage({
         </div>
       </div>
 
-      {videoUrl || mediaImages.length > 0 ? (
+      {videoUrl ? (
         <section className="mt-6 border-t border-surface-elevated pt-6">
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
               <h2 className="text-lg font-bold text-text-primary md:text-2xl">
-                {locale === "ar" ? "صور وفيديو اللعبة" : "Game media"}
+                {locale === "ar" ? "فيديو اللعبة" : "Game video"}
               </h2>
               <p className="mt-1 text-sm text-text-secondary">
                 {locale === "ar"
-                  ? "مواد رسمية مقدّمة من Playgama"
-                  : "Official media provided by Playgama"}
+                  ? "فيديو معاينة رسمي مقدّم من Playgama"
+                  : "Official preview video provided by Playgama"}
               </p>
             </div>
-            {videoUrl ? (
-              <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                {locale === "ar" ? "فيديو معاينة" : "Preview video"}
-              </span>
-            ) : null}
+            <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+              {locale === "ar" ? "فيديو معاينة" : "Preview video"}
+            </span>
           </div>
 
-          <div className={videoUrl ? "grid gap-4 lg:grid-cols-[1.65fr_1fr]" : "grid gap-4 sm:grid-cols-2"}>
-            {videoUrl ? (
-              <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-black">
-                <video
-                  className="aspect-video h-full w-full object-contain"
-                  controls
-                  muted
-                  playsInline
-                  preload="metadata"
-                  poster={game.thumbnailWide || game.thumbnail}
-                  aria-label={(locale === "ar" ? "فيديو معاينة للعبة " : "Preview video for ") + game.title}
-                >
-                  <source src={videoUrl} type="video/mp4" />
-                </video>
-              </div>
-            ) : null}
-
-            <div className={videoUrl ? "grid self-start gap-3" : "contents"}>
-              {mediaImages.map((image, index) => (
-                <div
-                  key={image}
-                  className={`relative overflow-hidden rounded-2xl border border-white/[0.08] bg-surface ${
-                    index === 0
-                      ? "aspect-video"
-                      : videoUrl
-                        ? "aspect-square w-1/2 justify-self-center"
-                        : "aspect-square"
-                  }`}
-                >
-                  <Image
-                    src={image}
-                    alt={
-                      index === 0
-                        ? (locale === "ar" ? "صورة عريضة للعبة " : "Wide artwork for ") + game.title
-                        : (locale === "ar" ? "أيقونة لعبة " : "Game icon for ") + game.title
-                    }
-                    fill
-                    sizes={videoUrl ? "(min-width: 1024px) 16vw, 45vw" : "(min-width: 640px) 45vw, 92vw"}
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
+          <div className="mx-auto max-w-4xl overflow-hidden rounded-2xl border border-white/[0.08] bg-black">
+            <video
+              className="aspect-video w-full object-contain"
+              controls
+              muted
+              playsInline
+              preload="metadata"
+              poster={game.thumbnailWide || game.thumbnail}
+              aria-label={(locale === "ar" ? "فيديو معاينة للعبة " : "Preview video for ") + game.title}
+            >
+              <source src={videoUrl} type="video/mp4" />
+            </video>
           </div>
         </section>
       ) : null}
