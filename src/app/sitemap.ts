@@ -15,7 +15,7 @@ type SitemapExtras = Pick<
 // Last material catalogue/content refresh. Keep this accurate when game data is
 // refreshed; search engines can then trust the date instead of seeing every URL
 // as newly changed on every build.
-const GAME_CATALOG_LAST_MODIFIED = new Date("2026-07-19T00:00:00.000Z");
+const GAME_CATALOG_LAST_MODIFIED = new Date("2026-08-19T00:00:00.000Z");
 
 /** يبني إدخالين (عربي + إنجليزي) لكل مسار متوفر باللغتين مع hreflang */
 function bilingual(

@@ -41,35 +41,10 @@ function parseArgs() {
 }
 
 function findGame(id) {
-  for (const [name, source] of [
-    ["gd-games.json", "gd"],
-    ["gm-games.json", "gm"],
-  ]) {
-    const item = readJson(path.join(ROOT, "src", "data", name)).find(
-      (candidate) => candidate.slug === id,
-    );
-    if (!item) continue;
-    if (source === "gd" && item.gdId) {
-      return { ...item, source };
-    }
-    if (source === "gm" && item.gmId) {
-      return { ...item, source };
-    }
-  }
-  const source = fs.readFileSync(path.join(ROOT, "src", "lib", "games.ts"), "utf8");
-  const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const block = source.match(
-    new RegExp(`\\{\\s*title:\\s*"([^"]+)",\\s*slug:\\s*"${escapedId}",[\\s\\S]*?thumbnail:\\s*"([^"]+)"[\\s\\S]*?categorySlug:\\s*"([^"]+)"[\\s\\S]*?\\n\\s*\\},`),
+  const item = readJson(path.join(ROOT, "src", "data", "playgama-games.json")).find(
+    (candidate) => candidate.slug === id,
   );
-  if (block) {
-    return {
-      title: block[1],
-      slug: id,
-      thumbnail: block[2],
-      categorySlug: block[3],
-      source: "playgama",
-    };
-  }
+  if (item) return { ...item, source: "playgama" };
   throw new Error(`Game was not found or has no recordable embed: ${id}`);
 }
 

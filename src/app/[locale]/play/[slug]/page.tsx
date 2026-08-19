@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Monitor, Smartphone } from "lucide-react";
@@ -6,6 +7,7 @@ import {
   allGames,
   getGameBySlug,
   getGamesByCategory,
+  getPlaygamaVideoUrl,
 } from "@/lib/games";
 import {
   getGameContent,
@@ -43,9 +45,11 @@ function absoluteUrl(maybeRelative: string): string {
 
 export async function generateStaticParams() {
   return locales.flatMap((locale) =>
-    allGames.map((game) => ({ locale, slug: game.slug }))
+    allGames.slice(0, 96).map((game) => ({ locale, slug: game.slug }))
   );
 }
+
+export const dynamicParams = true;
 
 function buildDescription(
   locale: Locale,
@@ -133,11 +137,13 @@ export async function generateMetadata({
       url,
       siteName: "Plixfy",
       locale: ogLocaleFor(locale),
+      images: [{ url: absoluteUrl(game.thumbnailWide || game.thumbnail) }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [absoluteUrl(game.thumbnailWide || game.thumbnail)],
     },
   };
 }
@@ -163,7 +169,7 @@ export default async function PlayPage({
   const deviceSupport = game.supportedDevices ?? "unknown";
 
   const pageUrl = SITE + href("/play/" + slug);
-  const imageUrl = absoluteUrl(game.thumbnail);
+  const imageUrl = absoluteUrl(game.thumbnailWide || game.thumbnail);
   const genre = meta ? meta.name : game.category;
   const categoryLabel = locale === "en" && meta ? meta.name : game.category;
   const ldDescription =
@@ -248,12 +254,13 @@ export default async function PlayPage({
       }
     : null;
 
-  // للإنجليزية نستخدم وصف الكتالوج الإنجليزي كنص "عن اللعبة"
   const descriptionParagraphs = content
     ? content.longDescription.split("\n\n").filter((p) => p.trim().length > 0)
-    : locale === "en" && game.description
+    : game.description
       ? game.description.split("\n\n").filter((p) => p.trim().length > 0)
       : [];
+  const mediaImages = game.images.slice(0, 2);
+  const videoUrl = game.videoId ? getPlaygamaVideoUrl(game.videoId) : null;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-8">
@@ -290,10 +297,8 @@ export default async function PlayPage({
         <GameFrame
           slug={game.slug}
           title={game.title}
-          thumbnail={game.thumbnail}
-          source={game.source}
-          gdId={game.gdId}
-          gmId={game.gmId}
+          thumbnail={game.thumbnailWide || game.thumbnail}
+          orientation={game.orientation}
         />
       </div>
 
@@ -322,6 +327,73 @@ export default async function PlayPage({
           <FavoriteButton slug={game.slug} locale={locale} showLabel />
         </div>
       </div>
+
+      {videoUrl || mediaImages.length > 0 ? (
+        <section className="mt-6 border-t border-surface-elevated pt-6">
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-text-primary md:text-2xl">
+                {locale === "ar" ? "صور وفيديو اللعبة" : "Game media"}
+              </h2>
+              <p className="mt-1 text-sm text-text-secondary">
+                {locale === "ar"
+                  ? "مواد رسمية مقدّمة من Playgama"
+                  : "Official media provided by Playgama"}
+              </p>
+            </div>
+            {videoUrl ? (
+              <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                {locale === "ar" ? "فيديو معاينة" : "Preview video"}
+              </span>
+            ) : null}
+          </div>
+
+          <div className={videoUrl ? "grid gap-4 lg:grid-cols-[1.65fr_1fr]" : "grid gap-4 sm:grid-cols-2"}>
+            {videoUrl ? (
+              <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-black">
+                <video
+                  className="aspect-video h-full w-full object-contain"
+                  controls
+                  muted
+                  playsInline
+                  preload="metadata"
+                  poster={game.thumbnailWide || game.thumbnail}
+                  aria-label={(locale === "ar" ? "فيديو معاينة للعبة " : "Preview video for ") + game.title}
+                >
+                  <source src={videoUrl} type="video/mp4" />
+                </video>
+              </div>
+            ) : null}
+
+            <div className={videoUrl ? "grid self-start gap-3" : "contents"}>
+              {mediaImages.map((image, index) => (
+                <div
+                  key={image}
+                  className={`relative overflow-hidden rounded-2xl border border-white/[0.08] bg-surface ${
+                    index === 0
+                      ? "aspect-video"
+                      : videoUrl
+                        ? "aspect-square w-1/2 justify-self-center"
+                        : "aspect-square"
+                  }`}
+                >
+                  <Image
+                    src={image}
+                    alt={
+                      index === 0
+                        ? (locale === "ar" ? "صورة عريضة للعبة " : "Wide artwork for ") + game.title
+                        : (locale === "ar" ? "أيقونة لعبة " : "Game icon for ") + game.title
+                    }
+                    fill
+                    sizes={videoUrl ? "(min-width: 1024px) 16vw, 45vw" : "(min-width: 640px) 45vw, 92vw"}
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section id="related-games" className="mt-6 pt-6 border-t border-surface-elevated scroll-mt-24">
         <div className="flex items-center justify-between mb-3 md:mb-4">
@@ -399,6 +471,19 @@ export default async function PlayPage({
             }
           />
           <InfoRow label={t.play.free} value={t.play.yes} />
+          <InfoRow
+            label={locale === "ar" ? "اللغات" : "Languages"}
+            value={game.supportedLanguages.length > 0 ? game.supportedLanguages.join(" · ") : "—"}
+            valueLatin
+          />
+          <InfoRow
+            label={locale === "ar" ? "مشتريات داخل اللعبة" : "In-game purchases"}
+            value={
+              game.inGamePurchases
+                ? locale === "ar" ? "متوفرة" : "Available"
+                : locale === "ar" ? "غير موجودة" : "None"
+            }
+          />
         </dl>
       </section>
 
@@ -407,7 +492,7 @@ export default async function PlayPage({
           <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4">
             {t.play.about}
           </h2>
-          <div className="space-y-4 text-text-secondary leading-relaxed">
+          <div dir="auto" className="space-y-4 text-text-secondary leading-relaxed">
             {descriptionParagraphs.map((para, idx) => (
               <p key={idx}>{para}</p>
             ))}
@@ -433,10 +518,12 @@ export default async function PlayPage({
               </li>
             ))}
           </ol>
-        ) : (
-          <p className="text-text-secondary leading-relaxed">
-            {t.play.genericControls}
+        ) : game.howToPlay ? (
+          <p dir="auto" className="text-text-secondary leading-relaxed">
+            {game.howToPlay}
           </p>
+        ) : (
+          <p className="text-text-secondary leading-relaxed">{t.play.genericControls}</p>
         )}
       </section>
 

@@ -1,0 +1,78 @@
+name: Sync Playgama Catalog
+
+on:
+  schedule:
+    # Daily at 06:15 Asia/Riyadh.
+    - cron: "15 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: playgama-catalog-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Download the complete Playgama catalog
+        run: npm run games:sync
+
+      - name: Validate catalog and application types
+        run: |
+          node -e "const games=require('./src/data/playgama-games.json');if(games.length<1000)throw new Error('Catalog is unexpectedly small');if(games.some(g=>!g.slug||!g.thumbnail||!g.categorySlug))throw new Error('Invalid game entry');console.log('Validated '+games.length+' Playgama games.')"
+          npx tsc --noEmit
+
+      - name: Detect catalog changes
+        id: changes
+        shell: bash
+        run: |
+          if git diff --quiet -- src/data/playgama-games.json data/catalog-summary.md; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and publish catalog update
+        if: steps.changes.outputs.changed == 'true'
+        shell: bash
+        run: |
+          git config user.name "plixfy-catalog-bot"
+          git config user.email "plixfy-catalog-bot@users.noreply.github.com"
+          git add src/data/playgama-games.json data/catalog-summary.md
+          git commit -m "content(games): sync Playgama catalog"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Notify admin when catalog changes
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ALERT_MESSAGE: "✅ تمت مزامنة كتالوج ألعاب Plixfy الكامل من Playgama، وسيبدأ Vercel نشر التحديث الآن."
+        run: node scripts/telegram-alert.mjs
+
+      - name: Alert admin if synchronization fails
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ALERT_MESSAGE: "🚨 فشلت مزامنة كتالوج Playgama. راجع GitHub Actions قبل تعديل ملف الألعاب يدويًا."
+        run: node scripts/telegram-alert.mjs

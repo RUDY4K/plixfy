@@ -6,8 +6,6 @@ import { usePathname } from "next/navigation";
 import { Play, X, ArrowDown } from "lucide-react";
 import { localeFromPathname, getDict } from "@/lib/i18n";
 import { getPlaygamaEmbedUrl } from "@/lib/playgama";
-import { getGdEmbedUrl } from "@/lib/gamedistribution";
-import { getGmEmbedUrl } from "@/lib/gamemonetize";
 import { trackEvent, trackEventOnce } from "./GoogleAnalytics";
 
 export interface GameFrameProps {
@@ -15,21 +13,13 @@ export interface GameFrameProps {
   title: string;
   thumbnail: string;
   orientation?: "landscape" | "portrait" | "both";
-  source?: "playgama" | "gd" | "gm";
-  gdId?: string;
-  gmId?: string;
 }
 
 export default function GameFrame(props: GameFrameProps) {
-  const { slug, title, thumbnail, orientation, source, gdId, gmId } = props;
+  const { slug, title, thumbnail, orientation } = props;
   const t = getDict(localeFromPathname(usePathname()));
-  const sourceName = source === "gd" ? "gd" : source === "gm" ? "gm" : "playgama";
-  const embedSrc =
-    source === "gd" && gdId
-      ? getGdEmbedUrl(gdId, slug)
-      : source === "gm" && gmId
-        ? getGmEmbedUrl(gmId)
-        : getPlaygamaEmbedUrl(slug);
+  const sourceName = "playgama";
+  const embedSrc = getPlaygamaEmbedUrl(slug);
   const [playing, setPlaying] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [justEnded, setJustEnded] = useState(false);

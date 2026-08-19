@@ -24,9 +24,11 @@ const SIMILAR_COUNT = 12;
 
 export async function generateStaticParams() {
   return locales.flatMap((locale) =>
-    allGames.map((g) => ({ locale, slug: g.slug }))
+    allGames.slice(0, 96).map((g) => ({ locale, slug: g.slug }))
   );
 }
+
+export const dynamicParams = true;
 
 function buildMetaCopy(locale: Locale, title: string, category: string) {
   if (locale === "en") {

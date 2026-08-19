@@ -7,7 +7,8 @@ const csp = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https: https://*.playgama.com https://playgama.com https://picsum.photos https://fastly.picsum.photos https://*.google-analytics.com https://www.googletagmanager.com https://*.googleusercontent.com",
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://ep1.adtrafficquality.google",
-  "frame-src 'self' https://playgama.com https://*.playgama.com https://html5.gamedistribution.com https://html5.gamemonetize.co https://html5.gamemonetize.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google",
+  "frame-src 'self' https://playgama.com https://*.playgama.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google",
+  "media-src 'self' blob: https://static.playgama.com https://*.playgama.com",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
   "object-src 'none'",
@@ -36,14 +37,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "**.playgama.com",
-      },
-      {
-        protocol: "https",
-        hostname: "img.gamedistribution.com",
-      },
-      {
-        protocol: "https",
-        hostname: "img.gamemonetize.com",
       },
     ],
   },

@@ -183,20 +183,6 @@ function PrivacyAr() {
               .
             </li>
             <li>
-              <strong className="text-text-primary">GameDistribution</strong> —
-              تستضيف بعض الألعاب وتعرضها داخل إطار (iframe) معزول، وقد تعرض
-              إعلانات داخل اللعبة وفق سياستها.{" "}
-              <a
-                href="https://gamedistribution.com/privacy-policy"
-                className={linkClass}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                سياسة GameDistribution
-              </a>
-              .
-            </li>
-            <li>
               <strong className="text-text-primary">Vercel</strong> — مزوّد
               الاستضافة الذي تُقدَّم منه صفحات الموقع.
             </li>
@@ -421,20 +407,6 @@ function PrivacyEn() {
                 rel="noopener noreferrer"
               >
                 Playgama policy
-              </a>
-              .
-            </li>
-            <li>
-              <strong className="text-text-primary">GameDistribution</strong> —
-              hosts some games and displays them inside an isolated iframe, and
-              may show in-game ads under its own policy.{" "}
-              <a
-                href="https://gamedistribution.com/privacy-policy"
-                className={linkClass}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GameDistribution policy
               </a>
               .
             </li>

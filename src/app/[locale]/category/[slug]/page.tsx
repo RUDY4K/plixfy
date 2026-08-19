@@ -23,6 +23,7 @@ import {
 } from "@/lib/i18n";
 
 const SITE = "https://www.plixfy.com";
+const PAGE_SIZE = 60;
 
 // trending و top صفحات ديناميكية إضافية إلى جانب التصنيفات الثابتة
 const extraSlugs = ["trending", "top"] as const;
@@ -65,6 +66,9 @@ const uiCopy = {
     metaTitle: (name: string, count: number) =>
       name + " - " + count + " لعبة مجاناً | بليكسفاي",
     gamesCount: (n: number) => n + " لعبة",
+    previous: "السابق",
+    next: "التالي",
+    page: (current: number, total: number) => `صفحة ${current} من ${total}`,
     backAria: "العودة إلى الفئات",
     back: "العودة",
     bestIn: (name: string) => "🏆 أفضل " + name + " في 2026",
@@ -75,6 +79,9 @@ const uiCopy = {
     metaTitle: (name: string, count: number) =>
       name + " - " + count + " Free Games | Plixfy",
     gamesCount: (n: number) => n + " games",
+    previous: "Previous",
+    next: "Next",
+    page: (current: number, total: number) => `Page ${current} of ${total}`,
     backAria: "Back to categories",
     back: "Back",
     bestIn: (name: string) => "🏆 Best " + name + " in 2026",
@@ -126,8 +133,10 @@ export async function generateMetadata({
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/category/[slug]">) {
   const { locale, slug } = await params;
+  const query = await searchParams;
   if (!hasLocale(locale)) notFound();
   const t = getDict(locale);
   const copy = uiCopy[locale];
@@ -138,6 +147,16 @@ export default async function CategoryPage({
   if (!meta || games.length === 0) {
     notFound();
   }
+
+  const requestedPage = Number.parseInt(String(query.page ?? "1"), 10);
+  const totalPages = Math.max(1, Math.ceil(games.length / PAGE_SIZE));
+  const currentPage = Number.isFinite(requestedPage)
+    ? Math.min(Math.max(requestedPage, 1), totalPages)
+    : 1;
+  const visibleGames = games.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   const url = SITE + href("/category/" + slug);
   const description = buildCategoryDescription(
@@ -275,17 +294,44 @@ export default async function CategoryPage({
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-6">
-        {games.map((game, idx) => (
+        {visibleGames.map((game, idx) => (
           <GameCard
             key={game.slug}
             {...game}
             locale={locale}
-            position={idx + 1}
+            position={(currentPage - 1) * PAGE_SIZE + idx + 1}
             placement={"category-" + slug}
             showStats
           />
         ))}
       </div>
+
+      {totalPages > 1 ? (
+        <nav
+          className="mt-10 flex items-center justify-center gap-4"
+          aria-label={copy.page(currentPage, totalPages)}
+        >
+          {currentPage > 1 ? (
+            <Link
+              href={href(`/category/${slug}?page=${currentPage - 1}`)}
+              className="rounded-full border border-white/10 bg-surface px-5 py-3 text-sm font-bold text-text-primary hover:border-primary/40"
+            >
+              {copy.previous}
+            </Link>
+          ) : null}
+          <span className="text-sm text-text-secondary">
+            {copy.page(currentPage, totalPages)}
+          </span>
+          {currentPage < totalPages ? (
+            <Link
+              href={href(`/category/${slug}?page=${currentPage + 1}`)}
+              className="rounded-full border border-white/10 bg-surface px-5 py-3 text-sm font-bold text-text-primary hover:border-primary/40"
+            >
+              {copy.next}
+            </Link>
+          ) : null}
+        </nav>
+      ) : null}
 
       {relatedForLinks.length > 0 ? (
         <section
