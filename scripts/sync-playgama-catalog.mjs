@@ -123,12 +123,13 @@ async function fetchPage(offset) {
   return payload;
 }
 
-async function readExistingCount() {
+async function readExistingCatalog() {
   try {
-    const existing = JSON.parse(await fs.readFile(OUTPUT, "utf8"));
-    return Array.isArray(existing) ? existing.length : 0;
+    const text = await fs.readFile(OUTPUT, "utf8");
+    const existing = JSON.parse(text);
+    return { count: Array.isArray(existing) ? existing.length : 0, text };
   } catch {
-    return 0;
+    return { count: 0, text: "" };
   }
 }
 
@@ -153,14 +154,15 @@ async function main() {
     games.push(game);
   }
 
-  const oldCount = await readExistingCount();
+  const existing = await readExistingCatalog();
+  const oldCount = existing.count;
   if (games.length < 1000) throw new Error(`Safety stop: only ${games.length} valid games were returned.`);
   if (oldCount >= 1000 && games.length < oldCount * 0.8) {
     throw new Error(`Safety stop: catalog unexpectedly shrank from ${oldCount} to ${games.length}.`);
   }
 
-  await fs.mkdir(path.dirname(OUTPUT), { recursive: true });
-  await fs.writeFile(OUTPUT, JSON.stringify(games, null, 2) + "\n", "utf8");
+  const serialized = JSON.stringify(games, null, 2) + "\n";
+  const catalogChanged = serialized !== existing.text.replace(/\r\n/g, "\n");
 
   const counts = Object.fromEntries(Object.keys(categoryLabels).map((key) => [key, 0]));
   const devices = { "mobile-and-desktop": 0, "mobile-only": 0, "desktop-only": 0, unknown: 0 };
@@ -174,9 +176,14 @@ async function main() {
   }
   const now = new Date().toISOString();
   const summary = `# Playgama catalog sync\n\n- Synced: ${now}\n- Source: ${ENDPOINT}\n- Publisher: Playgama only\n- Reported by Playgama: ${first.totalCount}\n- Imported: ${games.length}\n- Games with preview video: ${gamesWithVideo}\n- Games with multiple images: ${gamesWithMultipleImages}\n- Invalid entries skipped: ${invalid}\n- Duplicate slugs skipped: ${duplicates}\n\n## Categories\n\n${Object.entries(counts).map(([key, value]) => `- ${key}: ${value}`).join("\n")}\n\n## Device support\n\n${Object.entries(devices).map(([key, value]) => `- ${key}: ${value}`).join("\n")}\n`;
-  await fs.writeFile(SUMMARY, summary, "utf8");
+  if (catalogChanged) {
+    await fs.mkdir(path.dirname(OUTPUT), { recursive: true });
+    await fs.writeFile(OUTPUT, serialized, "utf8");
+    await fs.writeFile(SUMMARY, summary, "utf8");
+  }
   console.log(`Playgama sync complete: ${games.length}/${first.totalCount} games imported.`);
   console.log(`Skipped ${invalid} invalid entries and ${duplicates} duplicate slugs.`);
+  console.log(catalogChanged ? "Catalog files updated." : "No catalog changes detected.");
 }
 
 main().catch((error) => {
