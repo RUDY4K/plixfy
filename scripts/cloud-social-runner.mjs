@@ -89,7 +89,7 @@ function socialCardUrl(kind, id) {
   const url = new URL("/api/social-card", SITE);
   url.searchParams.set("kind", kind);
   url.searchParams.set("id", id);
-  url.searchParams.set("v", "7");
+  url.searchParams.set("v", "8");
   return url.toString();
 }
 
