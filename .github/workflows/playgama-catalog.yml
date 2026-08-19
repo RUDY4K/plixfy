@@ -38,6 +38,7 @@ jobs:
       - name: Validate catalog and application types
         run: |
           node -e "const games=require('./src/data/playgama-games.json');if(games.length<1000)throw new Error('Catalog is unexpectedly small');if(games.some(g=>!g.slug||!g.thumbnail||!g.categorySlug))throw new Error('Invalid game entry');console.log('Validated '+games.length+' Playgama games.')"
+          npx next typegen
           npx tsc --noEmit
 
       - name: Detect catalog changes
