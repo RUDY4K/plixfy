@@ -3,12 +3,25 @@ import test from "node:test";
 import { ContentScoutAgent, EditorialAgent, PublicationAuditAgent, deliveryCounts } from "./social-agents.mjs";
 import { buildBufferPostInput } from "./buffer-client.mjs";
 import { buildDiscordPayload } from "./discord-client.mjs";
+import { loadPlaygamaGames, normalizePlaygamaGames } from "./playgama-social-games.mjs";
 
 const baseItem = {
   platform: "x", kind: "game", contentId: "game-test",
   text: "🎮 جرّب لعبة اليوم مجانًا من المتصفح بدون تحميل أو تسجيل وشاركنا نتيجتك.",
   url: "https://www.plixfy.com/ar/play/test", image: "https://www.plixfy.com/opengraph-image",
 };
+
+test("social catalog loads current Playgama JSON", () => {
+  const games = loadPlaygamaGames();
+  assert.ok(games.length > 0);
+  assert.ok(games.every((game) => game.source === "playgama"));
+  assert.ok(games.every((game) => game.slug && game.title && game.thumbnail && game.categorySlug));
+});
+
+test("social catalog rejects an invalid structure", () => {
+  assert.throws(() => normalizePlaygamaGames({ games: [] }), /expected an array/);
+  assert.throws(() => normalizePlaygamaGames([]), /no valid games/);
+});
 
 test("ScoutAgent chooses fresh news in the evening", () => {
   const selected = new ContentScoutAgent().select({ slot: "evening", games: [{ slug: "game-a" }], newsItems: [{ slug: "old" }, { slug: "fresh" }], recentGames: [], recentNews: ["old"], seed: "2026-08-09:evening" });
