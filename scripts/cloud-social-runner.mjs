@@ -8,6 +8,7 @@ import {
   EditorialAgent,
   PublicationAuditAgent,
 } from "./social-agents.mjs";
+import { loadPlaygamaGames } from "./playgama-social-games.mjs";
 
 const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
@@ -178,39 +179,11 @@ async function attachTikTokVideo(pack, args) {
   return pack;
 }
 
-function loadPlaygamaGames() {
-  const source = fs.readFileSync(path.join(ROOT, "src", "lib", "games.ts"), "utf8");
-  const section = source.match(/const playgamaGames:[\s\S]*?=\s*\[([\s\S]*?)\n\];/);
-  if (!section) return [];
-  const games = [];
-  const pattern = /\{\s*title:\s*"((?:[^"\\]|\\.)*)",\s*slug:\s*"([^"]+)",\s*thumbnail:\s*"([^"]+)",[\s\S]*?category:\s*"((?:[^"\\]|\\.)*)",\s*categorySlug:\s*"([^"]+)"/g;
-  for (const match of section[1].matchAll(pattern)) {
-    games.push({
-      title: match[1],
-      slug: match[2],
-      thumbnail: match[3],
-      category: match[4],
-      categorySlug: match[5],
-      source: "playgama",
-    });
-  }
-  return games;
-}
-
 function loadGames({ recordableOnly = false } = {}) {
-  const publisherGames = ["gd-games.json", "gm-games.json"]
-    .flatMap((name) => readJson(path.join(ROOT, "src", "data", name), []))
-    .filter((game) => game?.slug && game?.title && game?.thumbnail)
-    .map((game) => ({
-      slug: game.slug,
-      title: game.title,
-      thumbnail: game.thumbnail,
-      category: game.category || CATEGORY_AR[game.categorySlug] || "ألعاب",
-      categorySlug: game.categorySlug || "casual",
-    }));
+  const playgamaGames = loadPlaygamaGames(ROOT);
   const games = recordableOnly
-    ? loadPlaygamaGames().filter((game) => VERIFIED_GAMEPLAY_IDS.has(game.slug))
-    : [...loadPlaygamaGames(), ...publisherGames];
+    ? playgamaGames.filter((game) => VERIFIED_GAMEPLAY_IDS.has(game.slug))
+    : playgamaGames;
   return games.sort((a, b) => a.slug.localeCompare(b.slug));
 }
 

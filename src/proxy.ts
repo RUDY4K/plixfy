@@ -42,7 +42,7 @@ function isDashboardPath(pathname: string): boolean {
 
 function dashboardAuth(req: NextRequest): NextResponse | null {
   const user = process.env.DASHBOARD_USER?.trim();
-  const pass = process.env.DASHBOARD_PASS?.trim();
+  const pass = (process.env.DASHBOARD_PASSWORD ?? process.env.DASHBOARD_PASS)?.trim();
 
   if (!user || !pass) {
     return new NextResponse("Not found", { status: 404 });
