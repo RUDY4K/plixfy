@@ -105,3 +105,107 @@ export const categoryContent: Record<CategorySlug, CategoryContent> = {
     ],
   },
 };
+
+/**
+ * Original English editorial copy for the indexable category pages. Keeping it
+ * beside the Arabic copy makes the two experiences equally useful while the
+ * game catalogue and counts remain data-driven.
+ */
+export const categoryContentEn: Record<CategorySlug, CategoryContent> = {
+  racing: {
+    intro:
+      "Racing games on Plixfy cover quick arcade sprints, careful drifting challenges, motorcycle obstacle courses, and longer events where consistency matters as much as raw speed. Start by choosing a game that matches the controls you prefer: keyboard steering works well for precise desktop play, while touch-friendly titles are easier to enjoy on a phone. If a track feels difficult, learn its braking points before chasing the fastest time. A clean lap is usually more useful than accelerating into every corner. You can open each game directly in your browser with no installation, then use the category list to compare different vehicles, track styles, and levels of challenge.",
+    keywords: ["racing games", "car games", "motorcycle games", "drifting", "driving"],
+    related: ["sports", "action"],
+    metaHooks: [
+      "Race cars and motorcycles on tracks built for speed and control",
+      "Practise clean corners before chasing a faster lap time",
+      "Choose touch-friendly driving games for quick mobile sessions",
+      "Explore arcade racing, drifting, and obstacle-course challenges",
+    ],
+  },
+  action: {
+    intro:
+      "Action games bring together fast movement, combat, platforming, and mission-based adventures. Some reward quick reactions, while others give you room to study enemy patterns, choose upgrades, and decide when to attack or retreat. New players can begin with games that use only a few controls, then move to deeper challenges once movement and timing feel natural. On each game page, check the description and controls before starting so you know whether the title is best suited to a keyboard, mouse, or touchscreen. Every game in this category opens in the browser without an installation, making it easy to try a few styles and find the pace that suits you.",
+    keywords: ["action games", "fighting games", "adventure games", "platform games", "combat"],
+    related: ["shooting", "racing"],
+    metaHooks: [
+      "Take on fast missions, battles, and platforming challenges",
+      "Learn enemy patterns and improve your timing with every attempt",
+      "Choose simple action games or deeper upgrade-based adventures",
+      "Play browser action games on desktop or mobile without installing them",
+    ],
+  },
+  puzzle: {
+    intro:
+      "Puzzle games are a good choice when you want a calmer session built around observation, logic, or pattern recognition. The collection includes matching games, word challenges, hidden-object puzzles, number problems, and physics-based levels. Before making a move, look for the rule the level is teaching: colours may need to be grouped, objects may react in a set order, or a limited number of moves may reward planning ahead. If you get stuck, pause and test one idea at a time instead of repeating the same action. These games run directly in the browser and range from short, accessible levels to longer challenges that are easier to solve across several attempts.",
+    keywords: ["puzzle games", "brain games", "word games", "matching games", "logic puzzles"],
+    related: ["casual", "girls"],
+    metaHooks: [
+      "Solve word, matching, hidden-object, and logic challenges",
+      "Look for the level rule before spending a limited move",
+      "Take a calm break with puzzles that reward careful observation",
+      "Try short brain teasers or longer multi-stage browser puzzles",
+    ],
+  },
+  io: {
+    intro:
+      ".io games are built around short competitive rounds with simple rules that become more demanding as other players react to your choices. Depending on the game, your goal may be to collect resources, grow your character, claim space, or survive longer than nearby rivals. A useful first step is to learn the map and movement system before heading toward the busiest area. Staying near a safe edge can give you time to understand pickups and hazards. Because multiplayer availability and controls differ between titles, read the game page before joining a round. Plixfy lets you open the available .io games in your browser without installing a separate app.",
+    keywords: [".io games", "multiplayer games", "arena games", "survival games", "browser games"],
+    related: ["action", "casual"],
+    metaHooks: [
+      "Join short competitive rounds with clear, easy-to-learn goals",
+      "Collect resources, claim space, or outlast nearby rivals",
+      "Learn the map before moving into the busiest part of the arena",
+      "Compare browser-based .io games and their control styles",
+    ],
+  },
+  girls: {
+    intro:
+      "This creative games collection includes fashion, cooking, decoration, character design, pet care, and story-led activities. The category name follows a familiar search term, but the games are open to anyone who enjoys these themes. Some titles focus on free-form creativity, while others use recipes, customer requests, time limits, or step-by-step goals. For younger players, an adult should still review the individual game and its external content before play; a broad category label cannot guarantee that every title suits every age. Each game opens in the browser with no installation, and the cards make it easy to compare themes before choosing what to try.",
+    keywords: ["creative games", "fashion games", "cooking games", "dress up games", "decoration games"],
+    related: ["casual", "puzzle"],
+    metaHooks: [
+      "Create outfits, recipes, rooms, and character looks",
+      "Choose between open-ended creativity and goal-based challenges",
+      "Compare cooking, fashion, decoration, and pet-care games",
+      "Open each creative game directly in your browser",
+    ],
+  },
+  casual: {
+    intro:
+      "Casual games are designed for quick starts and rules you can understand without a long tutorial. You will find clickers, merging games, simple simulations, management challenges, and compact arcade levels that work well when you only have a few minutes. Easy controls do not always mean an easy finish: many titles gradually add new goals, faster timing, or resources that need to be used carefully. Check whether a game saves progress before closing the tab, because save behaviour varies by title and browser. Everything here can be opened without an installation, so you can sample different ideas and keep the games that fit the length and style of session you want.",
+    keywords: ["casual games", "clicker games", "merge games", "simulation games", "quick games"],
+    related: ["puzzle", "girls"],
+    metaHooks: [
+      "Start quickly with simple controls and short browser sessions",
+      "Try clickers, merging games, simulations, and compact arcade levels",
+      "Watch how each game adds goals and resource decisions over time",
+      "Check the game page for controls and save behaviour before playing",
+    ],
+  },
+  sports: {
+    intro:
+      "Sports games turn familiar ideas from football, basketball, tennis, golf, and cue sports into short browser challenges. Some titles aim for realistic timing and positioning, while others simplify the rules for faster arcade play. If you are new to a game, practise one skill first—such as passing, aiming, or controlling shot power—before trying to win a full match. The game description can also tell you whether you are facing computer-controlled opponents or whether a multiplayer mode is available. Browse the category to compare solo drills, quick matches, tournaments, and physics-based challenges, all playable from the browser without installing a separate game client.",
+    keywords: ["sports games", "football games", "basketball games", "tennis games", "pool games"],
+    related: ["racing", "action"],
+    metaHooks: [
+      "Play quick football, basketball, tennis, golf, and cue-sport challenges",
+      "Practise aiming, passing, and shot power before a full match",
+      "Compare arcade rules with more timing-focused sports games",
+      "Find solo drills, tournaments, and available multiplayer modes",
+    ],
+  },
+  shooting: {
+    intro:
+      "Shooting games test aiming, movement, positioning, and decisions made under pressure. The category includes target challenges, defence games, arena combat, and first- or third-person experiences with different control schemes. Desktop titles commonly combine keyboard movement with mouse aiming, while mobile-friendly games use touch controls; check the individual page before you begin. Accuracy improves when you pause between shots, use cover when the game provides it, and learn how each weapon behaves instead of firing continuously. Some games may contain stylised combat or themes intended for older players, so families should review a title before play. The games open directly in the browser with no installation.",
+    keywords: ["shooting games", "aiming games", "target games", "arena games", "defence games"],
+    related: ["action", "racing"],
+    metaHooks: [
+      "Practise aiming, movement, and positioning in varied challenges",
+      "Check whether a title uses mouse, keyboard, or touch controls",
+      "Use cover and learn weapon behaviour instead of firing continuously",
+      "Review combat themes before choosing a game for younger players",
+    ],
+  },
+};

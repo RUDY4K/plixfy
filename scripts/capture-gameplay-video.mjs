@@ -390,7 +390,7 @@ async function main() {
     });
     const page = await context.newPage();
     page.on("dialog", (dialog) => dialog.dismiss().catch(() => {}));
-    const gamePageUrl = `https://www.plixfy.com/ar/play/${game.slug}`;
+    const gamePageUrl = `https://www.plixfy.com/play/${game.slug}`;
     await page.goto(gamePageUrl, {
       waitUntil: "domcontentloaded",
       timeout: 60_000,

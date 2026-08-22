@@ -5,6 +5,7 @@ import process from "node:process";
 const ENDPOINT = "https://playgama.com/api/v1/partner/export/catalogue/games";
 const PAGE_SIZE = 1000;
 const OUTPUT = path.resolve("src/data/playgama-games.json");
+const METADATA = path.resolve("src/data/playgama-catalog-meta.json");
 const SUMMARY = path.resolve("data/catalog-summary.md");
 
 const categoryLabels = {
@@ -179,6 +180,11 @@ async function main() {
   if (catalogChanged) {
     await fs.mkdir(path.dirname(OUTPUT), { recursive: true });
     await fs.writeFile(OUTPUT, serialized, "utf8");
+    await fs.writeFile(
+      METADATA,
+      JSON.stringify({ syncedAt: now, gameCount: games.length, source: "playgama" }, null, 2) + "\n",
+      "utf8",
+    );
     await fs.writeFile(SUMMARY, summary, "utf8");
   }
   console.log(`Playgama sync complete: ${games.length}/${first.totalCount} games imported.`);

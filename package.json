@@ -15,7 +15,9 @@
     "social:info-short": "node scripts/generate-info-short.mjs",
     "social:gameplay": "node scripts/capture-gameplay-video.mjs",
     "social:buffer:check": "node scripts/check-buffer.mjs",
-    "test:social-agents": "node --test scripts/social-agents.test.mjs"
+    "test:social-agents": "node --test scripts/social-agents.test.mjs",
+    "test:site": "node --test scripts/site-regressions.test.mjs",
+    "test": "npm run test:social-agents && npm run test:site"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.109.1",
