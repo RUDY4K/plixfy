@@ -148,7 +148,6 @@ export default function PlayerDataProvider({ children }: { children: ReactNode }
       if (!active) return;
       setUser(data.user ?? null);
       setAuthLoading(false);
-      if (data.user) void syncCloudData(data.user, localFavorites, localRecent);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -156,14 +155,22 @@ export default function PlayerDataProvider({ children }: { children: ReactNode }
       const nextUser = session?.user ?? null;
       setUser(nextUser);
       setAuthLoading(false);
-      if (nextUser) void syncCloudData(nextUser, readFavorites(), readRecent());
     });
 
     return () => {
       active = false;
       listener.subscription.unsubscribe();
     };
-  }, [supabase, syncCloudData]);
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!supabase || !user) return;
+
+    // A game page can record a play before getUser() finishes. Always read the
+    // latest browser values after auth becomes available so those early guest
+    // writes are not missed by cloud sync.
+    void syncCloudData(user, readFavorites(), readRecent());
+  }, [supabase, user, syncCloudData]);
 
   const toggleFavorite = useCallback(
     (slug: string) => {

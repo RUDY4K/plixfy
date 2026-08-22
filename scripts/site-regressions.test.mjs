@@ -67,3 +67,16 @@ test("English category pages include original editorial guidance", () => {
     assert.match(content, new RegExp(`\\n  ${slug}: \\{`, "g"));
   }
 });
+
+test("player data sync reads the latest local values after auth resolves", () => {
+  const provider = read("src/components/PlayerDataProvider.tsx");
+
+  assert.match(
+    provider,
+    /void syncCloudData\(user, readFavorites\(\), readRecent\(\)\)/,
+  );
+  assert.doesNotMatch(
+    provider,
+    /syncCloudData\(data\.user, localFavorites, localRecent\)/,
+  );
+});
