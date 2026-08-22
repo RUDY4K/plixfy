@@ -1,0 +1,30 @@
+name: Submit Indexable URLs to IndexNow
+
+on:
+  schedule:
+    # 10:30 and 20:30 Asia/Riyadh, after catalog/content updates and deployment.
+    - cron: "30 7,17 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plixfy-indexnow
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the site
+        uses: actions/checkout@v7
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Submit only URLs listed in the live sitemap
+        run: node scripts/submit-indexnow.mjs --all

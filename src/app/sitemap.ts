@@ -3,6 +3,7 @@ import { allGames, categories } from "@/lib/games";
 import { getAllPosts } from "@/lib/blog";
 import { hasEditorialGameContent } from "@/lib/gameContent";
 import { isGeneratedBlogSlug } from "@/lib/generatedBlog";
+import catalogMeta from "@/data/playgama-catalog-meta.json";
 
 const SITE = "https://www.plixfy.com";
 
@@ -12,10 +13,8 @@ type SitemapExtras = Pick<
   "lastModified" | "images"
 >;
 
-// Last material catalogue/content refresh. Keep this accurate when game data is
-// refreshed; search engines can then trust the date instead of seeing every URL
-// as newly changed on every build.
-const GAME_CATALOG_LAST_MODIFIED = new Date("2026-08-19T00:00:00.000Z");
+// Updated by the Playgama sync only when the material catalog JSON changes.
+const GAME_CATALOG_LAST_MODIFIED = new Date(catalogMeta.syncedAt);
 
 /** يبني إدخالين (عربي + إنجليزي) لكل مسار متوفر باللغتين مع hreflang */
 function bilingual(

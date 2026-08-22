@@ -31,6 +31,7 @@ const SOCIAL_LINKS = [
 
 export default function Footer({ locale = defaultLocale }: { locale?: Locale }) {
   const t = getDict(locale);
+  const rights = t.footer.rights.replace("{year}", String(new Date().getFullYear()));
 
   const navLinks: readonly FooterLink[] = [
     { href: localeHref(locale, "/"), label: t.nav.home },
@@ -121,7 +122,7 @@ export default function Footer({ locale = defaultLocale }: { locale?: Locale }) 
         </div>
 
         <div className="mt-10 pt-6 border-t border-surface-elevated text-center text-xs text-text-faint">
-          {t.footer.rights}
+          {rights}
         </div>
       </div>
     </footer>

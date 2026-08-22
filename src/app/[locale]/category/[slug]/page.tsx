@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { categories, getCategoryGames } from "@/lib/games";
 import type { CategorySlug } from "@/lib/games";
-import { categoryContent } from "@/lib/categoryContent";
+import { categoryContent, categoryContentEn } from "@/lib/categoryContent";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import { getPostsByCategory } from "@/lib/blog";
 import { getPostsEnByCategory } from "@/lib/blogEn";
@@ -24,6 +24,7 @@ import {
 
 const SITE = "https://www.plixfy.com";
 const PAGE_SIZE = 60;
+const YEAR = new Date().getFullYear();
 
 // trending و top صفحات ديناميكية إضافية إلى جانب التصنيفات الثابتة
 const extraSlugs = ["trending", "top"] as const;
@@ -71,7 +72,7 @@ const uiCopy = {
     page: (current: number, total: number) => `صفحة ${current} من ${total}`,
     backAria: "العودة إلى الفئات",
     back: "العودة",
-    bestIn: (name: string) => "🏆 أفضل " + name + " في 2026",
+    bestIn: (name: string) => "🏆 أفضل " + name + " في " + YEAR,
     relatedCats: "تصنيفات ذات صلة",
   },
   en: {
@@ -84,7 +85,7 @@ const uiCopy = {
     page: (current: number, total: number) => `Page ${current} of ${total}`,
     backAria: "Back to categories",
     back: "Back",
-    bestIn: (name: string) => "🏆 Best " + name + " in 2026",
+    bestIn: (name: string) => "🏆 Best " + name + " in " + YEAR,
     relatedCats: "Related Categories",
   },
 } as const;
@@ -166,8 +167,8 @@ export default async function CategoryPage({
     meta.description
   );
   const top10 = games.slice(0, 10);
-  // المحتوى التحريري العربي يُعرض في النسخة العربية فقط
-  const content = locale === "ar" ? categoryContent[slug as CategorySlug] ?? null : null;
+  const localizedCategoryContent = locale === "ar" ? categoryContent : categoryContentEn;
+  const content = localizedCategoryContent[slug as CategorySlug] ?? null;
   const relatedForLinks = categoryContent[slug as CategorySlug]?.related ?? [];
   const relatedPosts =
     locale === "en"

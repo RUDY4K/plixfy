@@ -202,7 +202,7 @@ function loadNews(referenceDate) {
 function gamePack(game, date, slot) {
   const title = truncate(game.title, 70);
   const category = CATEGORY_AR[game.categorySlug] || game.category || "ألعاب";
-  const url = `${SITE}/ar/play/${encodeURIComponent(game.slug)}`;
+  const url = `${SITE}/play/${encodeURIComponent(game.slug)}`;
   const contentId = cleanContentId(`game-${game.slug}`);
   const image = socialCardUrl("game", game.slug);
   return {
@@ -224,7 +224,7 @@ function gamePack(game, date, slot) {
 function newsPack(news, date, slot) {
   const title = truncate(news.title, 110);
   const summary = truncate(news.summary, 260);
-  const url = `${SITE}/ar/news/${encodeURIComponent(news.slug)}`;
+  const url = `${SITE}/news/${encodeURIComponent(news.slug)}`;
   const contentId = cleanContentId(`news-${news.slug}`);
   const image = socialCardUrl("news", news.slug);
   return {

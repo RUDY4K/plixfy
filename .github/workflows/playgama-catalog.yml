@@ -45,7 +45,7 @@ jobs:
         id: changes
         shell: bash
         run: |
-          if git diff --quiet -- src/data/playgama-games.json data/catalog-summary.md; then
+          if git diff --quiet -- src/data/playgama-games.json src/data/playgama-catalog-meta.json data/catalog-summary.md; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -57,7 +57,7 @@ jobs:
         run: |
           git config user.name "plixfy-catalog-bot"
           git config user.email "plixfy-catalog-bot@users.noreply.github.com"
-          git add src/data/playgama-games.json data/catalog-summary.md
+          git add src/data/playgama-games.json src/data/playgama-catalog-meta.json data/catalog-summary.md
           git commit -m "content(games): sync Playgama catalog"
           git pull --rebase origin main
           git push origin HEAD:main

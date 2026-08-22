@@ -8,7 +8,7 @@ import { loadPlaygamaGames, normalizePlaygamaGames } from "./playgama-social-gam
 const baseItem = {
   platform: "x", kind: "game", contentId: "game-test",
   text: "🎮 جرّب لعبة اليوم مجانًا من المتصفح بدون تحميل أو تسجيل وشاركنا نتيجتك.",
-  url: "https://www.plixfy.com/ar/play/test", image: "https://www.plixfy.com/opengraph-image",
+  url: "https://www.plixfy.com/play/test", image: "https://www.plixfy.com/opengraph-image",
 };
 
 test("social catalog loads current Playgama JSON", () => {
@@ -87,7 +87,7 @@ test("Buffer X posts include the Plixfy-hosted branded card", () => {
   const input = buildBufferPostInput({
     channelId: "x-1",
     platform: "x",
-    text: "جرّب اللعبة https://www.plixfy.com/ar/play/test",
+    text: "جرّب اللعبة https://www.plixfy.com/play/test",
     image: "https://www.plixfy.com/api/social-card?kind=game&id=test",
   });
   assert.deepEqual(input.assets, [{ image: { url: "https://www.plixfy.com/api/social-card?kind=game&id=test" } }]);
@@ -120,10 +120,10 @@ test("EditorAgent accepts Discord as a public social destination", () => {
 
 test("Discord payload carries the branded image and blocks mentions", () => {
   const payload = buildDiscordPayload({
-    text: "خبر جديد على بليكسفاي https://www.plixfy.com/ar/news/test",
+    text: "خبر جديد على بليكسفاي https://www.plixfy.com/news/test",
     title: "خبر ألعاب جديد",
     image: "https://www.plixfy.com/api/social-card?kind=news&id=test",
-    url: "https://www.plixfy.com/ar/news/test",
+    url: "https://www.plixfy.com/news/test",
   });
   assert.equal(payload.embeds[0].image.url, "https://www.plixfy.com/api/social-card?kind=news&id=test");
   assert.deepEqual(payload.allowed_mentions, { parse: [] });

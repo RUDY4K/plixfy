@@ -29,12 +29,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   if (!hasLocale(locale)) notFound();
   const t = getDict(locale);
   const href = (path: string) => localeHref(locale, path);
-  const homeIntro = t.home.intro.replace(
-    /(?:أكثر من|more than)\s+380/i,
-    locale === "ar"
-      ? `${allGames.length.toLocaleString("ar-SA")}`
-      : `${allGames.length.toLocaleString("en-US")}`
+  const localizedGameCount = allGames.length.toLocaleString(
+    locale === "ar" ? "ar-SA" : "en-US",
   );
+  const homeIntro = t.home.intro.replace("{count}", localizedGameCount);
   const homeSummary =
     locale === "ar"
       ? `العب ${allGames.length.toLocaleString("ar-SA")} لعبة مجانية فوراً من المتصفح، بدون تحميل أو تسجيل.`

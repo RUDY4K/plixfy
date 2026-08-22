@@ -190,7 +190,7 @@ const ar: UIDict = {
     about: "من نحن",
     contact: "تواصل معنا",
     editorialPolicy: "سياسة التحرير",
-    rights: "© 2026 بليكسفاي — جميع الحقوق محفوظة",
+    rights: "© {year} بليكسفاي — جميع الحقوق محفوظة",
     footerAria: "تذييل الصفحة",
   },
   common: {
@@ -280,7 +280,7 @@ const ar: UIDict = {
   home: {
     h1: "ألعاب أونلاين مجانية - بليكسفاي",
     intro:
-      "بليكسفاي منصة ألعاب أونلاين مجانية تعمل من المتصفح مباشرة بدون أي تحميل أو تسجيل. تجد لدينا أكثر من 380 لعبة موزّعة على ثمانية تصنيفات رئيسية: السباق، الأكشن، الألغاز، الرياضة، التصويب، ألعاب البنات، ألعاب آيو، والألعاب الخفيفة المناسبة لجميع الأعمار. كل لعبة محمّلة من خوادم سريعة وتعمل بسلاسة على الجوال والحاسوب، مع واجهة عربية بالكامل تدعم الكتابة من اليمين إلى اليسار. تستطيع أن تبدأ اللعب في ثوانٍ، أن تحفظ ألعابك المفضّلة، وأن تكتشف ألعاباً جديدة كل أسبوع من قائمتنا المختارة بعناية. سواء كنت تبحث عن جلسة سريعة بين الفصول، عن لعبة عائلية تشاركها مع إخوتك، أو عن تحدٍّ جاد يستهلك ساعات، فإن مكتبتنا تضمّ كل ما تحتاجه من ألعاب أونلاين مجانية بدون تحميل.",
+      "بليكسفاي منصة ألعاب أونلاين مجانية تعمل من المتصفح مباشرة بدون أي تحميل أو تسجيل. تجد لدينا {count} لعبة موزّعة على ثمانية تصنيفات رئيسية: السباق، الأكشن، الألغاز، الرياضة، التصويب، ألعاب البنات، ألعاب آيو، والألعاب الخفيفة المناسبة لجميع الأعمار. كل لعبة محمّلة من خوادم سريعة وتعمل بسلاسة على الجوال والحاسوب، مع واجهة عربية بالكامل تدعم الكتابة من اليمين إلى اليسار. تستطيع أن تبدأ اللعب في ثوانٍ، أن تحفظ ألعابك المفضّلة، وأن تكتشف ألعاباً جديدة كل أسبوع من قائمتنا المختارة بعناية. سواء كنت تبحث عن جلسة سريعة بين الفصول، عن لعبة عائلية تشاركها مع إخوتك، أو عن تحدٍّ جاد يستهلك ساعات، فإن مكتبتنا تضمّ كل ما تحتاجه من ألعاب أونلاين مجانية بدون تحميل.",
   },
 };
 
@@ -312,7 +312,7 @@ const en: UIDict = {
     about: "About Us",
     contact: "Contact Us",
     editorialPolicy: "Editorial Policy",
-    rights: "© 2026 Plixfy — All rights reserved",
+    rights: "© {year} Plixfy — All rights reserved",
     footerAria: "Page footer",
   },
   common: {
@@ -402,7 +402,7 @@ const en: UIDict = {
   home: {
     h1: "Free Online Games - Play Instantly on Plixfy",
     intro:
-      "Plixfy is a free online gaming platform that runs directly in your browser — no downloads, no sign-up. Explore more than 380 games across eight main categories: racing, action, puzzle, sports, shooting, girls games, .io games, and casual games suitable for all ages. Every game loads from fast servers and runs smoothly on both mobile and desktop. Start playing in seconds, save your favorite games, and discover new hand-picked titles every week. Whether you want a quick session between classes, a family-friendly game to share, or a serious challenge that lasts for hours, our library has all the free online games you need — no download required.",
+      "Plixfy is a free online gaming platform that runs directly in your browser — no downloads, no sign-up. Explore {count} games across eight main categories: racing, action, puzzle, sports, shooting, girls games, .io games, and casual games suitable for all ages. Every game loads from fast servers and runs smoothly on both mobile and desktop. Start playing in seconds, save your favorite games, and discover new hand-picked titles every week. Whether you want a quick session between classes, a family-friendly game to share, or a serious challenge that lasts for hours, our library has all the free online games you need — no download required.",
   },
 };
 
