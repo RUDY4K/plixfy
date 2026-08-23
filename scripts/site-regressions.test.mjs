@@ -78,6 +78,25 @@ test("English category pages include original editorial guidance", () => {
   }
 });
 
+test("Arabic category guidance avoids unsupported safety and gameplay claims", () => {
+  const content = read("src/lib/categoryContent.ts");
+  const arabicContent = content.split("export const categoryContentEn")[0];
+
+  for (const unsupportedClaim of [
+    /آمنة 100%/,
+    /مجانية بنسبة 100%/,
+    /يحفظ تقدّمك تلقائياً/,
+    /آلاف اللاعبين/,
+    /لاعبين من السعودية والخليج/,
+    /زمن استجابة منخفض/,
+  ]) {
+    assert.doesNotMatch(arabicContent, unsupportedClaim);
+  }
+
+  assert.match(arabicContent, /تحقق من طريقة التحكم والجهاز المدعوم/);
+  assert.match(arabicContent, /يُفضّل أن يراجع أحد الوالدين اللعبة/);
+});
+
 test("player data sync reads the latest local values after auth resolves", () => {
   const provider = read("src/components/PlayerDataProvider.tsx");
 
