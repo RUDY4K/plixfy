@@ -271,6 +271,13 @@ async function main() {
       `غير متصل: ${counts.skippedDisconnected}`,
       `فشل: ${counts.failed}`,
     ];
+    if (pack.acquisition) {
+      lines.push(
+        `وكيل الاكتساب: ${pack.acquisition.agent} · تقييم ${pack.acquisition.score}`,
+        `صيغة الترويج: ${pack.acquisition.hookVariant} · الترند: ${pack.acquisition.trendStatus}`,
+        `سبب الاختيار: ${(pack.acquisition.reasons || []).join(", ")}`,
+      );
+    }
     await sendTelegramMessage(process.env.TELEGRAM_CHAT_ID, lines.join("\n")).catch((error) => console.warn(`Admin report failed: ${error.message}`));
   }
 }

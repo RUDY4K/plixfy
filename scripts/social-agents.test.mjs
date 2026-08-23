@@ -16,6 +16,8 @@ test("social catalog loads current Playgama JSON", () => {
   assert.ok(games.length > 0);
   assert.ok(games.every((game) => game.source === "playgama"));
   assert.ok(games.every((game) => game.slug && game.title && game.thumbnail && game.categorySlug));
+  assert.ok(games.some((game) => game.supportedDevices === "mobile-and-desktop"));
+  assert.ok(games.some((game) => game.description.length >= 300 && game.thumbnailWide));
 });
 
 test("social catalog rejects an invalid structure", () => {
@@ -52,6 +54,26 @@ test("EditorAgent rejects external landing pages", () => {
 
 test("EditorAgent rejects mostly-English text in an Arabic campaign", () => {
   assert.throws(() => new EditorialAgent().review({ date: "2026-08-09", campaign: "ar_growth_cloud", items: [{ ...baseItem, text: "This is a long English gaming post with only كلمات عربية قليلة جدًا" }] }), /enough Arabic/);
+});
+
+test("EditorAgent requires measurable metadata for acquisition campaigns", () => {
+  assert.throws(
+    () => new EditorialAgent().review({ date: "2026-08-23", campaign: "ar_acquisition_v1", items: [baseItem] }),
+    /acquisition campaign metadata/,
+  );
+  const pack = new EditorialAgent().review({
+    date: "2026-08-23",
+    campaign: "ar_acquisition_v1",
+    acquisition: {
+      agent: "traffic-acquisition-v1",
+      score: 80,
+      hookVariant: "b",
+      reasons: ["trend_match"],
+      trendStatus: "live",
+    },
+    items: [baseItem],
+  });
+  assert.equal(pack.acquisition.hookVariant, "b");
 });
 
 test("AuditAgent never counts Telegram fallback as a public post", () => {

@@ -98,6 +98,20 @@ export class EditorialAgent {
     if (!Array.isArray(pack.items) || pack.items.length === 0 || pack.items.length > 10) {
       throw new Error("EditorAgent: pack.items must contain 1-10 posts");
     }
+    if (String(pack.campaign || "").startsWith("ar_acquisition")) {
+      const acquisition = pack.acquisition;
+      if (
+        acquisition?.agent !== "traffic-acquisition-v1"
+        || !Number.isFinite(acquisition.score)
+        || acquisition.score < 0
+        || !["a", "b", "c"].includes(acquisition.hookVariant)
+        || !Array.isArray(acquisition.reasons)
+        || acquisition.reasons.length === 0
+        || !["live", "cached", "unavailable"].includes(acquisition.trendStatus)
+      ) {
+        throw new Error("EditorAgent: acquisition campaign metadata is missing or invalid");
+      }
+    }
 
     const seenPlatforms = new Set();
     const items = pack.items.map((item, index) => {

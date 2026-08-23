@@ -62,6 +62,7 @@ jobs:
           path: |
             scripts/.social-published.json
             .social/cloud-state.json
+            .social/saudi-trends.json
           key: social-state-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             social-state-
@@ -114,6 +115,7 @@ jobs:
           path: |
             scripts/.social-published.json
             .social/cloud-state.json
+            .social/saudi-trends.json
           key: social-state-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Upload agent reports
