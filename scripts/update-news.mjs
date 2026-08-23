@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { runClaude, extractJson } from "./claude-cli.mjs";
-import { runGeminiContent, extractJsonObject } from "./gemini-content-client.mjs";
+import { runGeminiJson } from "./gemini-content-client.mjs";
 import {
   findRepairableMojibake,
   repairObjectStrings,
@@ -244,13 +244,17 @@ async function main() {
   let parsed;
   try {
     if (process.env.GEMINI_API_KEY) {
-      const raw = await runGeminiContent({
+      parsed = await runGeminiJson({
         prompt,
         system:
           "You are a careful bilingual gaming-news editor. Use only supplied candidates, never invent facts, and return valid JSON only.",
         maxTokens: 5_500,
+        validate: (value) => {
+          if (!value || !Array.isArray(value.items)) {
+            throw new Error("Gemini news response must contain an items array");
+          }
+        },
       });
-      parsed = extractJsonObject(raw);
     } else {
       parsed = extractJson(runClaude({ prompt }));
     }

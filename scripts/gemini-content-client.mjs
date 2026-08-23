@@ -90,6 +90,46 @@ export async function runGeminiContent({
   throw lastError || new Error("Gemini API returned no usable response");
 }
 
+export async function runGeminiJson({
+  prompt,
+  system,
+  maxTokens,
+  maxAttempts = 2,
+  retryDelayMs = 1_000,
+  validate,
+  generate = runGeminiContent,
+}) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const retryInstruction = attempt === 1
+      ? ""
+      : "\n\nYour previous response could not be parsed or validated. Return one complete JSON object only. Do not use Markdown, comments, trailing commas, or text outside the JSON object.";
+
+    const raw = await generate({
+      prompt: prompt + retryInstruction,
+      system,
+      maxTokens,
+    });
+
+    try {
+      const parsed = extractJsonObject(raw);
+      if (validate) validate(parsed);
+      return parsed;
+    } catch (error) {
+      lastError = error;
+      console.warn(
+        `Gemini JSON attempt ${attempt}/${maxAttempts} was invalid: ${error.message}`,
+      );
+      if (attempt < maxAttempts && retryDelayMs > 0) await sleep(retryDelayMs);
+    }
+  }
+
+  throw new Error(
+    `Gemini returned invalid JSON after ${maxAttempts} attempts: ${lastError?.message || "unknown parse error"}`,
+  );
+}
+
 export function extractJsonObject(raw) {
   const fence = raw.match(/```(?:json)?\r?\n([\s\S]*?)\r?\n```/i);
   const body = fence ? fence[1] : raw;
