@@ -1,11 +1,23 @@
 # Plixfy cloud social automation
 
-The social system is intentionally deterministic, runs as four local agents, and does not require a paid AI provider:
+The social system is intentionally deterministic, runs as five local agents, and does not require a paid AI provider:
 
-1. Scout selects fresh game or news content.
-2. Editor validates Arabic, links, media URLs, secrets, and platform limits.
-3. Publisher sends only to connected public channels and records a receipt per platform.
-4. Auditor rejects runs where an admin fallback was incorrectly treated as public publishing.
+1. Trend agent reads the official Google Trends RSS feed for Saudi Arabia and keeps a 48-hour fallback snapshot.
+2. Traffic acquisition agent scores existing Plixfy game/news pages for Saudi interest, freshness, page quality, device support, and repeat avoidance.
+3. Editor validates Arabic, links, media URLs, secrets, and platform limits.
+4. Publisher sends only to connected public channels and records a receipt per platform.
+5. Auditor rejects runs where an admin fallback was incorrectly treated as public publishing.
+
+The trend feed contributes search phrases only. Plixfy does not copy external trend images or articles. If Google Trends is unavailable and the cached snapshot has expired, selection safely falls back to the quality signals in the Playgama catalog and Plixfy news data.
+
+## Acquisition measurement
+
+- GA4 campaign: `ar_acquisition_v1`.
+- Every selected page receives one deterministic hook variant: `a`, `b`, or `c`.
+- The hook is included in `utm_content`, so traffic and engagement can be compared in GA4 without changing the destination page.
+- Generated packs record the agent score, selection reasons, matched trends, hook variant, and trend-source status.
+- The private Telegram completion report includes the score and selection reasons.
+- The agent improves which existing page is promoted. It does not mass-generate indexable pages, buy traffic, post spam, or automate TikTok.
 
 ## Schedule
 
@@ -42,6 +54,7 @@ The Vercel production environment also requires `TELEGRAM_BOT_TOKEN`, `TELEGRAM_
 ```powershell
 npm run social:cloud:dry -- --slot=morning
 npm run social:cloud:dry -- --slot=evening
+npm run growth:dry
 npm run test:social-agents
 ```
 

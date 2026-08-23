@@ -11,11 +11,12 @@
     "refresh-monetag-sw": "node scripts/refresh-monetag-sw.mjs",
     "social:cloud": "node scripts/cloud-social-runner.mjs",
     "social:cloud:dry": "node scripts/cloud-social-runner.mjs --dry-run",
+    "growth:dry": "node scripts/cloud-social-runner.mjs --dry-run --slot=auto",
     "social:video": "node scripts/generate-social-video.mjs",
     "social:info-short": "node scripts/generate-info-short.mjs",
     "social:gameplay": "node scripts/capture-gameplay-video.mjs",
     "social:buffer:check": "node scripts/check-buffer.mjs",
-    "test:social-agents": "node --test scripts/social-agents.test.mjs",
+    "test:social-agents": "node --test scripts/social-agents.test.mjs scripts/traffic-acquisition-agent.test.mjs",
     "test:site": "node --test scripts/site-regressions.test.mjs",
     "test": "npm run test:social-agents && npm run test:site"
   },

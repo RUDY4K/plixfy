@@ -34,8 +34,13 @@ export function normalizePlaygamaGames(value) {
       title: game.title,
       slug: game.slug,
       thumbnail: game.thumbnail,
+      thumbnailWide: typeof game.thumbnailWide === "string" ? game.thumbnailWide : "",
       category: game.category,
       categorySlug: game.categorySlug,
+      description: typeof game.description === "string" ? game.description : "",
+      genres: Array.isArray(game.genres) ? game.genres.filter((genre) => typeof genre === "string") : [],
+      images: Array.isArray(game.images) ? game.images.filter((image) => typeof image === "string") : [],
+      supportedDevices: typeof game.supportedDevices === "string" ? game.supportedDevices : "unknown",
       source: "playgama",
     }));
 

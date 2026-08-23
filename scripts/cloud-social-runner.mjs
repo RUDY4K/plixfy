@@ -4,15 +4,20 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import {
-  ContentScoutAgent,
   EditorialAgent,
   PublicationAuditAgent,
 } from "./social-agents.mjs";
 import { loadPlaygamaGames } from "./playgama-social-games.mjs";
+import {
+  ACQUISITION_CAMPAIGN,
+  TrafficAcquisitionAgent,
+  fetchSaudiTrends,
+} from "./traffic-acquisition-agent.mjs";
 
 const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
 const CLOUD_STATE_FILE = path.join(SOCIAL_DIR, "cloud-state.json");
+const TREND_CACHE_FILE = path.join(SOCIAL_DIR, "saudi-trends.json");
 const SITE = "https://www.plixfy.com";
 const VERIFIED_GAMEPLAY_IDS = new Set(["mr-racer-car-racing"]);
 
@@ -78,6 +83,11 @@ function parseArgs() {
 
 function cleanContentId(value) {
   return value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 72);
+}
+
+function acquisitionContentId(kind, slug, hookVariant) {
+  const suffix = `-h${hookVariant}`;
+  return `${cleanContentId(`${kind}-${slug}`).slice(0, 72 - suffix.length).replace(/-$/, "")}${suffix}`;
 }
 
 function truncate(text, max) {
@@ -199,46 +209,58 @@ function loadNews(referenceDate) {
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
-function gamePack(game, date, slot) {
+function gamePack(game, date, slot, acquisition, trendSnapshot) {
   const title = truncate(game.title, 70);
   const category = CATEGORY_AR[game.categorySlug] || game.category || "ألعاب";
   const url = `${SITE}/play/${encodeURIComponent(game.slug)}`;
-  const contentId = cleanContentId(`game-${game.slug}`);
+  const hookVariant = acquisition.hookVariant;
+  const contentId = acquisitionContentId("game", game.slug, hookVariant);
   const image = socialCardUrl("game", game.slug);
+  const lead = {
+    a: `🎮 تحدي اليوم: ${title}`,
+    b: `⚡ تلعبها فورًا: ${title}`,
+    c: `👀 اختيار يستحق التجربة: ${title}`,
+  }[hookVariant];
   return {
     date,
-    campaign: "ar_growth_cloud",
+    campaign: ACQUISITION_CAMPAIGN,
     slot,
     source: { kind: "game", id: game.slug },
+    acquisition: { ...acquisition, trendSource: trendSnapshot.source, trendStatus: trendSnapshot.status },
     items: [
-      { platform: "telegram", kind: "game", contentId, text: `🎮 لعبة اليوم: ${title}\n\nتبي تحديًا سريعًا من المتصفح؟ جرّبها مجانًا بدون تحميل أو تسجيل. التصنيف: ${category}. شاركنا نتيجتك!`, url, image },
-      { platform: "discord", kind: "game", contentId, title: `🎮 لعبة اليوم: ${title}`, text: `جاهز لتحدٍ سريع؟ جرّب ${title} مجانًا من المتصفح، بدون تحميل أو تسجيل، ثم شاركنا نتيجتك في الديسكورد.`, url, image },
-      { platform: "x", kind: "game", contentId, text: `🎮 جرّب ${truncate(title, 55)} مجانًا من المتصفح، بدون تحميل أو تسجيل. كم نتيجة تقدر تحقق؟ 👇\n#ألعاب #Plixfy`, url, image },
-      { platform: "facebook", kind: "game", contentId, text: `🎮 اختيارنا اليوم هو ${title}. لعبة ${category} تعمل مباشرة من المتصفح مجانًا، بدون تحميل أو إنشاء حساب. جرّبها وقل لنا: وصلت لأي نتيجة؟`, url, image },
-      { platform: "instagram", kind: "game", contentId, text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #ألعاب_متصفح #Plixfy`, url, image },
-      { platform: "tiktok", kind: "game", contentId, title: `تحدي ${title}`, text: `🎮 تحدي اليوم: ${title}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #Gaming #Plixfy`, url, image },
+      { platform: "telegram", kind: "game", contentId, text: `${lead}\n\nلعبة ${category} تعمل مجانًا من المتصفح بدون تحميل أو تسجيل. جرّبها وشاركنا نتيجتك!`, url, image },
+      { platform: "discord", kind: "game", contentId, title: lead, text: `${lead}\n\nادخل التحدي مجانًا من المتصفح، بدون تحميل أو تسجيل، ثم شاركنا نتيجتك في الديسكورد.`, url, image },
+      { platform: "x", kind: "game", contentId, text: `${truncate(lead, 100)}\n\nمجانية من المتصفح وبدون تحميل. كم نتيجة تقدر تحقق؟ 👇\n#ألعاب #Plixfy`, url, image },
+      { platform: "facebook", kind: "game", contentId, text: `${lead}. لعبة ${category} تعمل مباشرة من المتصفح مجانًا، بدون تحميل أو إنشاء حساب. جرّبها وقل لنا: وصلت لأي نتيجة؟`, url, image },
+      { platform: "instagram", kind: "game", contentId, text: `${lead}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #ألعاب_متصفح #Plixfy`, url, image },
     ],
   };
 }
 
-function newsPack(news, date, slot) {
+function newsPack(news, date, slot, acquisition, trendSnapshot) {
   const title = truncate(news.title, 110);
   const summary = truncate(news.summary, 260);
   const url = `${SITE}/news/${encodeURIComponent(news.slug)}`;
-  const contentId = cleanContentId(`news-${news.slug}`);
+  const hookVariant = acquisition.hookVariant;
+  const contentId = acquisitionContentId("news", news.slug, hookVariant);
   const image = socialCardUrl("news", news.slug);
+  const lead = {
+    a: `📰 الخبر الذي يتداوله اللاعبون: ${title}`,
+    b: `⚡ ماذا حدث في عالم الألعاب؟ ${title}`,
+    c: `🎮 لماذا يهم هذا الخبر اللاعبين؟ ${title}`,
+  }[hookVariant];
   return {
     date,
-    campaign: "ar_growth_cloud",
+    campaign: ACQUISITION_CAMPAIGN,
     slot,
     source: { kind: "news", id: news.slug },
+    acquisition: { ...acquisition, trendSource: trendSnapshot.source, trendStatus: trendSnapshot.status },
     items: [
-      { platform: "telegram", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nاقرأ التفاصيل على Plixfy:`, url, image },
-      { platform: "discord", kind: "news", contentId, title: `📰 ${title}`, text: `${truncate(summary, 420)}\n\nناقش الخبر معنا ثم اقرأ التفاصيل الكاملة على Plixfy.`, url, image },
-      { platform: "x", kind: "news", contentId, text: `📰 ${truncate(title, 145)}\n\nالتفاصيل على Plixfy 👇\n#أخبار_الألعاب`, url, image },
-      { platform: "facebook", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nما رأيكم بالخبر؟ اقرأوا التفاصيل الكاملة على Plixfy.`, url, image },
-      { platform: "instagram", kind: "news", contentId, text: `📰 ${title}\n\n${truncate(summary, 180)}\n\nالتفاصيل على Plixfy.\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image },
-      { platform: "tiktok", kind: "news", contentId, title: truncate(title, 80), text: `📰 ${truncate(title, 115)}\n\nأبرز التفاصيل على Plixfy. ما رأيك بالخبر؟\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image },
+      { platform: "telegram", kind: "news", contentId, text: `${lead}\n\n${summary}\n\nاقرأ التفاصيل على Plixfy:`, url, image },
+      { platform: "discord", kind: "news", contentId, title: truncate(lead, 120), text: `${truncate(summary, 420)}\n\nناقش الخبر معنا ثم اقرأ التفاصيل الكاملة على Plixfy.`, url, image },
+      { platform: "x", kind: "news", contentId, text: `${truncate(lead, 165)}\n\nالتفاصيل على Plixfy 👇\n#أخبار_الألعاب`, url, image },
+      { platform: "facebook", kind: "news", contentId, text: `${lead}\n\n${summary}\n\nما رأيكم بالخبر؟ اقرأوا التفاصيل الكاملة على Plixfy.`, url, image },
+      { platform: "instagram", kind: "news", contentId, text: `${lead}\n\n${truncate(summary, 180)}\n\nالتفاصيل على Plixfy.\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image },
     ],
   };
 }
@@ -256,7 +278,13 @@ function updateCloudState(state, pack, audit) {
   } else {
     next.recentNews = [pack.source.id, ...next.recentNews.filter((id) => id !== pack.source.id)].slice(0, 30);
   }
-  next.runs[runKey] = { status: "delivered", source: pack.source, counts: audit.counts, completedAt: now };
+  next.runs[runKey] = {
+    status: "delivered",
+    source: pack.source,
+    acquisition: pack.acquisition,
+    counts: audit.counts,
+    completedAt: now,
+  };
   next.runs = Object.fromEntries(Object.entries(next.runs).slice(-90));
   return next;
 }
@@ -290,7 +318,12 @@ async function main() {
   }
 
   const hasTikTok = enabledPlatforms().has("tiktok");
-  const scout = new ContentScoutAgent();
+  const trendSnapshot = await fetchSaudiTrends({ cacheFile: TREND_CACHE_FILE });
+  console.log(
+    `[TrendAgent] source=${trendSnapshot.source} status=${trendSnapshot.status} terms=${trendSnapshot.trends.length}`,
+  );
+  if (trendSnapshot.warning) console.warn(`[TrendAgent] ${trendSnapshot.warning}`);
+  const scout = new TrafficAcquisitionAgent();
   let games = loadGames({ recordableOnly: hasTikTok });
   const newsItems = loadNews(args.date);
   const maximumAttempts = !args.dryRun && hasTikTok ? 6 : 1;
@@ -304,12 +337,16 @@ async function main() {
       newsItems,
       recentGames: state.recentGames || [],
       recentNews: state.recentNews || [],
+      trends: trendSnapshot.trends,
       seed: `${runKey}:${attempt}`,
+      referenceDate: args.date,
     });
-    console.log(`[ScoutAgent] selected ${selection.kind}/${selection.item.slug}`);
+    console.log(
+      `[TrafficAcquisitionAgent] selected ${selection.kind}/${selection.item.slug} score=${selection.acquisition.score} hook=${selection.acquisition.hookVariant} reasons=${selection.acquisition.reasons.join(",")}`,
+    );
     rawPack = selection.kind === "news"
-      ? newsPack(selection.item, args.date, args.slot)
-      : gamePack(selection.item, args.date, args.slot);
+      ? newsPack(selection.item, args.date, args.slot, selection.acquisition, trendSnapshot)
+      : gamePack(selection.item, args.date, args.slot, selection.acquisition, trendSnapshot);
     try {
       await attachTikTokVideo(rawPack, args);
       break;
@@ -320,7 +357,7 @@ async function main() {
     }
   }
 
-  if (!selection || !rawPack) throw new Error("ScoutAgent could not prepare a social pack");
+  if (!selection || !rawPack) throw new Error("TrafficAcquisitionAgent could not prepare a social pack");
   const pack = new EditorialAgent().review(rawPack);
   console.log(`[EditorAgent] approved ${pack.items.length} platform drafts`);
 

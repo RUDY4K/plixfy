@@ -48,6 +48,16 @@ test("automated Arabic social posts use canonical root-locale URLs", () => {
   assert.doesNotMatch(capture, /plixfy\.com\/ar\/play\//);
 });
 
+test("traffic acquisition posts are measurable and do not automate TikTok", () => {
+  const runner = read("scripts/cloud-social-runner.mjs");
+  const acquisition = read("scripts/traffic-acquisition-agent.mjs");
+
+  assert.match(acquisition, /ACQUISITION_CAMPAIGN = "ar_acquisition_v1"/);
+  assert.match(runner, /acquisitionContentId\("game", game\.slug, hookVariant\)/);
+  assert.match(runner, /acquisitionContentId\("news", news\.slug, hookVariant\)/);
+  assert.doesNotMatch(runner, /platform: "tiktok"/);
+});
+
 test("IndexNow submits only the live sitemap allow-list", () => {
   const submitter = read("scripts/submit-indexnow.mjs");
   const workflow = read(".github/workflows/indexnow.yml");
