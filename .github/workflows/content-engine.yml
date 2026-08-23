@@ -38,6 +38,7 @@ jobs:
           node --check scripts/repair-news-encoding.mjs
           node --check scripts/update-news.mjs
           node --check scripts/update-blog.mjs
+          node --test scripts/content-engine.test.mjs
 
       - name: Fetch and rewrite current gaming news
         env:

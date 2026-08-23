@@ -18,7 +18,8 @@
     "social:buffer:check": "node scripts/check-buffer.mjs",
     "test:social-agents": "node --test scripts/social-agents.test.mjs scripts/traffic-acquisition-agent.test.mjs",
     "test:site": "node --test scripts/site-regressions.test.mjs",
-    "test": "npm run test:social-agents && npm run test:site"
+    "test:content-engine": "node --test scripts/content-engine.test.mjs",
+    "test": "npm run test:social-agents && npm run test:site && npm run test:content-engine"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.109.1",
