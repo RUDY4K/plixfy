@@ -12,6 +12,7 @@
     "social:cloud": "node scripts/cloud-social-runner.mjs",
     "social:cloud:dry": "node scripts/cloud-social-runner.mjs --dry-run",
     "growth:dry": "node scripts/cloud-social-runner.mjs --dry-run --slot=auto",
+    "health:production": "node scripts/check-production-health.mjs",
     "social:video": "node scripts/generate-social-video.mjs",
     "social:info-short": "node scripts/generate-info-short.mjs",
     "social:gameplay": "node scripts/capture-gameplay-video.mjs",
@@ -19,7 +20,8 @@
     "test:social-agents": "node --test scripts/social-agents.test.mjs scripts/traffic-acquisition-agent.test.mjs",
     "test:site": "node --test scripts/site-regressions.test.mjs",
     "test:content-engine": "node --test scripts/content-engine.test.mjs",
-    "test": "npm run test:social-agents && npm run test:site && npm run test:content-engine"
+    "test:operations": "node --test scripts/production-health.test.mjs",
+    "test": "npm run test:social-agents && npm run test:site && npm run test:content-engine && npm run test:operations"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.109.1",
