@@ -1,0 +1,55 @@
+name: Plixfy Production Health
+
+on:
+  schedule:
+    # Around-the-clock coverage every two hours, offset from the publishing jobs.
+    - cron: "23 */2 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: plixfy-production-health
+  cancel-in-progress: true
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the site
+        uses: actions/checkout@v7
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check production and scheduled automation
+        env:
+          SITE_URL: https://www.plixfy.com
+          ADSENSE_PUBLISHER_ID: pub-7564871953180369
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/check-production-health.mjs
+
+      - name: Upload the health report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: production-health-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .health/production-health.json
+          if-no-files-found: ignore
+          include-hidden-files: true
+          retention-days: 14
+
+      - name: Alert the private admin channel on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ALERT_MESSAGE: >-
+            🚨 اكتشف مراقب Plixfy خللاً في الموقع أو التشغيل الآلي. راجع التقرير:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node scripts/telegram-alert.mjs
