@@ -1,6 +1,6 @@
 # Playgama catalog sync
 
-- Synced: 2026-08-23T04:02:07.030Z
+- Synced: 2026-08-24T04:06:56.366Z
 - Source: https://playgama.com/api/v1/partner/export/catalogue/games
 - Publisher: Playgama only
 - Reported by Playgama: 2015
@@ -23,7 +23,7 @@
 
 ## Device support
 
-- mobile-and-desktop: 1921
+- mobile-and-desktop: 1920
 - mobile-only: 5
-- desktop-only: 89
+- desktop-only: 90
 - unknown: 0
