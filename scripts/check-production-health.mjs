@@ -19,9 +19,11 @@ const reportPath = path.join(reportDirectory, "production-health.json");
 
 const workflowExpectations = [
   { file: "playgama-catalog.yml", label: "Playgama catalog", maxAgeHours: 30 },
-  { file: "content-engine.yml", label: "Content engine", maxAgeHours: 14 },
-  { file: "cloud-social.yml", label: "Cloud social", maxAgeHours: 14 },
-  { file: "indexnow.yml", label: "IndexNow", maxAgeHours: 14 },
+  // The longest scheduled gap is 14 hours. GitHub cron jobs can start late, so
+  // allow two hours of queueing grace before treating a workflow as stale.
+  { file: "content-engine.yml", label: "Content engine", maxAgeHours: 16 },
+  { file: "cloud-social.yml", label: "Cloud social", maxAgeHours: 16 },
+  { file: "indexnow.yml", label: "IndexNow", maxAgeHours: 16 },
 ];
 
 const report = {
