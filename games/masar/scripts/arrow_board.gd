@@ -7,7 +7,7 @@ signal blocked_tap
 signal hint_used
 
 const DIRECTIONS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
-const ARROWS := ["→", "↓", "←", "↑"]
+const ArrowTileScript = preload("res://scripts/arrow_tile.gd")
 var TILE_COLORS: Array[Color] = [Color("#315CF5")]
 var INK := Color.WHITE
 var BOARD_BG := Color("#E5E1D7")
@@ -72,8 +72,8 @@ func apply_palette(palette: Dictionary) -> void:
     TILE_COLORS.clear()
     TILE_COLORS.append(palette.primary)
     INK = palette.ink
-    BOARD_BG = palette.panel
-    BOARD_LINE = palette.text
+    BOARD_BG = palette.bg.darkened(0.06)
+    BOARD_LINE = palette.primary
     FREE_GLOW = palette.text
     if is_node_ready():
         _refresh_tile_states()
@@ -85,6 +85,8 @@ func show_hint() -> void:
         if _is_free(tile):
             hints_used += 1
             hint_used.emit()
+            if tile is ArrowTile:
+                tile.show_hint_flash()
             tile.pivot_offset = tile.size * 0.5
             var tween := create_tween()
             tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -164,14 +166,9 @@ func _ray_clear_in_map(cell: Vector2i, direction: Vector2i, occupied: Dictionary
 
 
 func _create_tile(cell: Vector2i, direction_index: int, color_index: int) -> void:
-    var tile := Button.new()
-    tile.text = ARROWS[direction_index]
+    var tile: ArrowTile = ArrowTileScript.new()
     tile.layout_direction = Control.LAYOUT_DIRECTION_LTR
-    tile.focus_mode = Control.FOCUS_NONE
-    tile.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-    tile.add_theme_font_size_override("font_size", 60)
-    tile.add_theme_color_override("font_color", INK)
-    tile.add_theme_color_override("font_pressed_color", INK)
+    tile.configure_visual(direction_index, TILE_COLORS[color_index], FREE_GLOW)
     tile.set_meta("cell", cell)
     tile.set_meta("direction_index", direction_index)
     tile.set_meta("color_index", color_index)
@@ -266,11 +263,9 @@ func _refresh_tile_states() -> void:
         if not is_instance_valid(tile):
             continue
         var base: Color = TILE_COLORS[int(tile.get_meta("color_index"))]
-        var free := _is_free(tile)
-        tile.modulate = Color.WHITE if free else Color(0.86, 0.86, 0.86, 1.0)
-        tile.add_theme_stylebox_override("normal", _tile_style(base if free else base.lightened(0.12), FREE_GLOW if free else Color(FREE_GLOW, 0.64), free))
-        tile.add_theme_stylebox_override("hover", _tile_style(base.lightened(0.06), FREE_GLOW, true))
-        tile.add_theme_stylebox_override("pressed", _tile_style(base.darkened(0.08), FREE_GLOW, true))
+        tile.modulate = Color.WHITE
+        if tile is ArrowTile:
+            tile.set_piece_colors(base, FREE_GLOW)
 
 
 func _play_board_entrance() -> void:
@@ -376,7 +371,17 @@ func _emit_progress() -> void:
 func _draw() -> void:
     var panel := StyleBoxFlat.new()
     panel.bg_color = BOARD_BG
-    panel.border_color = BOARD_LINE
-    panel.set_border_width_all(5)
-    panel.set_corner_radius_all(8)
+    panel.border_color = Color(BOARD_LINE, 0.30)
+    panel.set_border_width_all(3)
+    panel.set_corner_radius_all(24)
     draw_style_box(panel, Rect2(Vector2.ZERO, size))
+
+    var padding := 34.0
+    var available := size - Vector2.ONE * padding * 2.0
+    var cell_side := minf(available.x / grid_columns, available.y / grid_rows)
+    var board_size := Vector2(grid_columns, grid_rows) * cell_side
+    var origin := (size - board_size) * 0.5
+    for column in range(grid_columns):
+        for row in range(grid_rows):
+            var point := origin + Vector2(column + 0.5, row + 0.5) * cell_side
+            draw_circle(point, 3.0, Color(FREE_GLOW, 0.10))
