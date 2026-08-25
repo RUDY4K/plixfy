@@ -12,7 +12,7 @@ const SCRIPT_ID = "plixfy-adsense";
 export default function DeferredAdSense({ client }: { client: string }) {
   const pathname = usePathname();
   const isContentReviewExcluded =
-    /\/(?:en\/)?(?:play|news|search|favorites|profile|auth|dashboard|lab)(?:\/|$)/.test(
+    /\/(?:en\/)?(?:play|blog|news|search|favorites|profile|auth|dashboard|lab)(?:\/|$)/.test(
       pathname,
     );
 

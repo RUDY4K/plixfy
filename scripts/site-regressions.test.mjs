@@ -109,3 +109,42 @@ test("player data sync reads the latest local values after auth resolves", () =>
     /syncCloudData\(data\.user, localFavorites, localRecent\)/,
   );
 });
+
+test("template roundups and sourced news feeds stay out of the search sitemap", () => {
+  const sitemap = read("src/app/sitemap.ts");
+  const blogIndex = read("src/app/[locale]/blog/page.tsx");
+  const blogArticle = read("src/app/[locale]/blog/[slug]/page.tsx");
+  const newsIndex = read("src/app/[locale]/news/page.tsx");
+  const adsenseLoader = read("src/components/DeferredAdSense.tsx");
+
+  assert.match(blogIndex, /robots: \{ index: false, follow: true \}/);
+  assert.match(blogArticle, /robots: \{ index: false, follow: true \}/);
+  assert.match(newsIndex, /robots: \{ index: false, follow: true \}/);
+  assert.doesNotMatch(sitemap, /bilingual\("\/(?:blog|news)"/);
+  assert.doesNotMatch(sitemap, /blogRoutes/);
+  assert.match(adsenseLoader, /\(\?:play\|blog\|news\|search/);
+});
+
+test("reviewed game pages disclose the source before promoting related games", () => {
+  const playPage = read("src/app/[locale]/play/[slug]/page.tsx");
+  const disclosure = playPage.indexOf("دليل تحريري من فريق بليكسفاي");
+  const related = playPage.indexOf('id="related-games"');
+
+  assert.ok(disclosure > 0);
+  assert.ok(related > disclosure);
+  assert.match(playPage, /Playgama اللعبة وبياناتها الأساسية/);
+  assert.match(playPage, /href\(\"\/editorial-policy\"\)/);
+  assert.match(playPage, /catalogMeta\.syncedAt/);
+});
+
+test("trust pages explain sources, corrections, funding, and automation", () => {
+  const about = read("src/app/[locale]/about/page.tsx");
+  const editorial = read("src/app/[locale]/editorial-policy/page.tsx");
+
+  assert.match(about, /مصدر الألعاب/);
+  assert.match(about, /الإعلانات والاستقلالية/);
+  assert.match(about, /تواصل وتصحيح/);
+  assert.match(editorial, /مصدر البيانات وحدوده/);
+  assert.match(editorial, /الأتمتة والذكاء الاصطناعي/);
+  assert.match(editorial, /25 أغسطس 2026/);
+});

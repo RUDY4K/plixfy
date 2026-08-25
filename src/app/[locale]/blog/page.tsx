@@ -65,6 +65,7 @@ export async function generateMetadata({
   return {
     title: c.metaTitle,
     description: c.metaDescription,
+    robots: { index: false, follow: true },
     alternates: {
       ...pageAlternates(locale, "/blog"),
       ...(locale === "ar" ? { types: { "application/rss+xml": "/blog/rss.xml" } } : {}),

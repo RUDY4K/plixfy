@@ -1,8 +1,6 @@
 import type { MetadataRoute } from "next";
 import { allGames, categories } from "@/lib/games";
-import { getAllPosts } from "@/lib/blog";
 import { hasEditorialGameContent } from "@/lib/gameContent";
-import { isGeneratedBlogSlug } from "@/lib/generatedBlog";
 import catalogMeta from "@/data/playgama-catalog-meta.json";
 
 const SITE = "https://www.plixfy.com";
@@ -57,8 +55,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...bilingual("/editorial-policy", "monthly", 0.4),
     ...bilingual("/privacy", "monthly", 0.3),
     ...bilingual("/terms", "monthly", 0.3),
-    ...bilingual("/blog", "weekly", 0.6),
-    ...bilingual("/news", "daily", 0.7),
   ];
 
   const categoryRoutes: MetadataRoute.Sitemap = categories.flatMap((c) =>
@@ -99,35 +95,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ];
   });
 
-  const blogRoutes: MetadataRoute.Sitemap = getAllPosts()
-    .filter((post) => !isGeneratedBlogSlug(post.slug))
-    .flatMap((p) => {
-    const languages = {
-      ar: SITE + "/blog/" + p.slug,
-      en: SITE + "/en/blog/" + p.slug,
-      "x-default": SITE + "/blog/" + p.slug,
-    };
-    return [
-      {
-        url: languages.ar,
-        lastModified: new Date(p.updatedAt),
-        changeFrequency: "monthly" as const,
-        priority: 0.6,
-        alternates: { languages },
-      },
-      {
-        url: languages.en,
-        lastModified: new Date(p.updatedAt),
-        changeFrequency: "monthly" as const,
-        priority: 0.5,
-        alternates: { languages },
-      },
-    ];
-    });
-
   return [
     ...staticRoutes,
-    ...blogRoutes,
     ...categoryRoutes,
     ...gameRoutes,
   ];

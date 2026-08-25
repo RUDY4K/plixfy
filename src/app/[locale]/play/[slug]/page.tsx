@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Monitor, Smartphone } from "lucide-react";
+import { BadgeCheck, BookOpenCheck, Monitor, RefreshCw, Smartphone } from "lucide-react";
 import {
   allGames,
   getGameBySlug,
@@ -32,6 +32,7 @@ import {
   pageAlternates,
   type Locale,
 } from "@/lib/i18n";
+import catalogMeta from "@/data/playgama-catalog-meta.json";
 
 const SITE = "https://www.plixfy.com";
 
@@ -165,6 +166,7 @@ export default async function PlayPage({
     .slice(0, 6);
 
   const content = getGameContent(slug, locale);
+  const isEditorial = hasEditorialGameContent(slug, locale);
   const deviceSupport = game.supportedDevices ?? "unknown";
 
   const pageUrl = SITE + href("/play/" + slug);
@@ -259,6 +261,12 @@ export default async function PlayPage({
       ? game.description.split("\n\n").filter((p) => p.trim().length > 0)
       : [];
   const videoUrl = game.videoId ? getPlaygamaVideoUrl(game.videoId) : null;
+  const catalogDate = new Intl.DateTimeFormat(locale === "ar" ? "ar-SA" : "en-US", {
+    timeZone: "Asia/Riyadh",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(new Date(catalogMeta.syncedAt));
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-8">
@@ -360,57 +368,6 @@ export default async function PlayPage({
         </section>
       ) : null}
 
-      <section id="related-games" className="mt-6 pt-6 border-t border-surface-elevated scroll-mt-24">
-        <div className="flex items-center justify-between mb-3 md:mb-4">
-          <h2 className="text-lg md:text-2xl font-bold text-text-primary">
-            {t.play.similar}
-          </h2>
-          <Link
-            href={href("/play/" + game.slug + "/like")}
-            className="text-sm md:text-base text-primary hover:underline min-h-12 inline-flex items-center px-2"
-            aria-label={t.play.moreLikeAria + game.title}
-          >
-            {t.play.more}
-          </Link>
-        </div>
-
-        <div className="md:hidden">
-          <div
-            className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 -mx-4 px-4"
-            style={{ scrollbarWidth: "none" }}
-          >
-            {related.map((g, idx) => (
-              <div
-                key={g.slug}
-                className="snap-start shrink-0"
-                style={{ width: "130px" }}
-              >
-                <GameCard
-                  {...g}
-                  locale={locale}
-                  position={idx + 1}
-                  placement="related-mobile"
-                  showStats
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="hidden md:grid md:grid-cols-6 md:gap-6">
-          {related.map((g, idx) => (
-            <GameCard
-              key={g.slug}
-              {...g}
-              locale={locale}
-              position={idx + 1}
-              placement="related-desktop"
-              showStats
-            />
-          ))}
-        </div>
-      </section>
-
       <section className="mt-6 pt-6 border-t border-surface-elevated">
         <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4">
           {t.play.gameInfo}
@@ -451,6 +408,37 @@ export default async function PlayPage({
           />
         </dl>
       </section>
+
+      {isEditorial ? (
+        <aside className="mt-6 rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.06] p-5 md:p-6" aria-label={locale === "ar" ? "شفافية المحتوى" : "Content transparency"}>
+          <div className="flex items-start gap-3">
+            <BadgeCheck className="mt-0.5 h-6 w-6 shrink-0 text-emerald-300" aria-hidden="true" />
+            <div>
+              <p className="font-bold text-text-primary">
+                {locale === "ar" ? "دليل تحريري من فريق بليكسفاي" : "An editorial guide from the Plixfy team"}
+              </p>
+              <p className="mt-2 text-sm leading-7 text-text-secondary">
+                {locale === "ar"
+                  ? "وفّرت Playgama اللعبة وبياناتها الأساسية، وأضاف فريق بليكسفاي الشرح العربي، خطوات التحكم، النصائح، وتوضيح الأجهزة المدعومة. لا يؤثر الموزّع أو المعلن في ترتيب اللعبة أو صياغة رأينا التحريري."
+                  : "Playgama supplies the game and its core catalog data. Plixfy adds the guide, controls, practical tips, and device information. The distributor and advertisers do not buy rankings or control our editorial wording."}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-text-secondary">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/15 px-3 py-2">
+                  <BookOpenCheck className="h-4 w-4 text-primary" aria-hidden="true" />
+                  {locale === "ar" ? "شرح ونصائح مضافة" : "Added guide and tips"}
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/15 px-3 py-2">
+                  <RefreshCw className="h-4 w-4 text-secondary" aria-hidden="true" />
+                  {locale === "ar" ? `آخر مزامنة للبيانات: ${catalogDate}` : `Catalog data synced: ${catalogDate}`}
+                </span>
+              </div>
+              <Link href={href("/editorial-policy")} className="mt-4 inline-flex min-h-11 items-center text-sm font-bold text-primary hover:underline">
+                {locale === "ar" ? "كيف نراجع الألعاب ونصحح المعلومات؟" : "How we review games and correct information"}
+              </Link>
+            </div>
+          </div>
+        </aside>
+      ) : null}
 
       {descriptionParagraphs.length > 0 ? (
         <section className="mt-6 pt-6 border-t border-surface-elevated">
@@ -534,6 +522,33 @@ export default async function PlayPage({
                 {qa.answer}
               </p>
             </details>
+          ))}
+        </div>
+      </section>
+
+      <section id="related-games" className="mt-6 border-t border-surface-elevated pt-6 scroll-mt-24">
+        <div className="mb-3 flex items-center justify-between md:mb-4">
+          <h2 className="text-lg font-bold text-text-primary md:text-2xl">{t.play.similar}</h2>
+          <Link
+            href={href("/play/" + game.slug + "/like")}
+            className="inline-flex min-h-12 items-center px-2 text-sm text-primary hover:underline md:text-base"
+            aria-label={t.play.moreLikeAria + game.title}
+          >
+            {t.play.more}
+          </Link>
+        </div>
+        <div className="md:hidden">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-4 pb-2" style={{ scrollbarWidth: "none" }}>
+            {related.map((g, idx) => (
+              <div key={g.slug} className="w-[130px] shrink-0 snap-start">
+                <GameCard {...g} locale={locale} position={idx + 1} placement="related-mobile" showStats />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="hidden md:grid md:grid-cols-6 md:gap-6">
+          {related.map((g, idx) => (
+            <GameCard key={g.slug} {...g} locale={locale} position={idx + 1} placement="related-desktop" showStats />
           ))}
         </div>
       </section>

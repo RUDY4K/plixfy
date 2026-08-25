@@ -9,7 +9,6 @@ import { getGamesByCategory } from "@/lib/games";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import { BRAND_AR } from "@/lib/siteContent";
 import { hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
-import { isGeneratedBlogSlug } from "@/lib/generatedBlog";
 
 const SITE = "https://www.plixfy.com";
 
@@ -70,9 +69,11 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title: post.title,
     description: post.description,
     keywords: [...post.keywords],
-    ...(isGeneratedBlogSlug(slug)
-      ? { robots: { index: false, follow: true } }
-      : {}),
+    // The current category roundups remain available to readers, but are kept
+    // out of search until each one is rebuilt around verified, first-hand
+    // comparisons. This prevents template-style articles from weakening the
+    // site's overall content-quality signals.
+    robots: { index: false, follow: true },
     alternates: pageAlternates(locale, "/blog/" + post.slug),
     openGraph: {
       type: "article",

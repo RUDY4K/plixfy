@@ -58,6 +58,9 @@ export async function generateMetadata({
   return {
     title: c.metaTitle,
     description: c.metaDescription,
+    // The feed is useful to visitors, but summaries from external reporting
+    // are not submitted as search landing pages without original analysis.
+    robots: { index: false, follow: true },
     alternates: pageAlternates(locale, "/news"),
     openGraph: {
       type: "website",

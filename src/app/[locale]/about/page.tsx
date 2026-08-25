@@ -23,6 +23,13 @@ const copyByLocale = {
       `نختار لك بعناية ${AR_GAME_COUNT} لعبة تغطي تصنيفات متنوّعة: السباق، الأكشن، الألغاز، الرياضة، ألعاب البنات، والألعاب الخفيفة. نُحدّث المكتبة باستمرار لإضافة أحدث وأشهر الألعاب، مع التركيز على الجودة وسرعة الأداء على الجوال والكمبيوتر.`,
       "نؤمن بأن الألعاب يجب أن تكون متاحة للجميع ومجانية، لذلك تعتمد المنصة على عرض الإعلانات بشكل مدروس لا يُخلّ بتجربة اللعب. شكراً لاختيارك بليكسفاي، ونتمنى لك أوقاتاً ممتعة!",
     ],
+    sections: [
+      ["ما الذي نقدّمه؟", "لا نكتفي بعرض كتالوج ألعاب. نوضّح في صفحة كل لعبة الفئة، الأجهزة التي يعلن المصدر دعمها، اللغات، وجود مشتريات داخل اللعبة، وطريقة التحكم. وعندما تحمل الصفحة صفة دليل تحريري، يضيف فريقنا شرحاً عربياً ونصائح وأسئلة شائعة تساعدك على فهم اللعبة قبل تشغيلها."],
+      ["مصدر الألعاب", "نعتمد حالياً على كتالوج Playgama المرخّص كمصدر وحيد للألعاب ومواد المعاينة الرسمية. هذا يعني أن تشغيل اللعبة وملفاتها الأساسية يأتيان من الموزّع، بينما تتولى بليكسفاي تنظيم الاكتشاف، التصفح العربي، التصنيفات، والمحتوى الإرشادي المحيط باللعبة."],
+      ["المراجعة والدقة", "لا نطلب فهرسة كل صفحات الكتالوج في محركات البحث. نختار مجموعة محدودة فقط عندما يتوفر لها محتوى تحريري إضافي. وإذا تغيّر دعم جهاز أو طريقة تحكم أو توقفت لعبة عن العمل، نحدّث الصفحة أو نخرجها من مجموعة الصفحات المعتمدة حتى تُراجع من جديد."],
+      ["الإعلانات والاستقلالية", "تساعد الإعلانات وشراكات توزيع الألعاب في تغطية تكاليف الاستضافة والتطوير. لا يستطيع المعلن شراء تقييم أو ترتيب داخل الموقع، ولا نعرض عدد لعب أو تقييم مستخدمين ما لم يكن مستنداً إلى بيانات حقيقية. نحافظ كذلك على فصل واضح بين مساحة اللعب والإعلانات."],
+      ["تواصل وتصحيح", "إذا وجدت لعبة لا تعمل، أو معلومة غير دقيقة، أو محتوى تعتقد أنه ينتهك حقاً، أرسل رابط الصفحة ووصف المشكلة إلى plixfy.com@gmail.com. نراجع البلاغات المرتبطة بالأمان والحقوق والأجهزة المدعومة بأولوية، ويمكنك قراءة تفاصيل أكثر في سياسة التحرير المرتبطة أسفل الموقع."],
+    ],
   },
   en: {
     title: "About Us | Plixfy",
@@ -37,6 +44,13 @@ const copyByLocale = {
       "Plixfy is a platform dedicated to free online games, built to give players a fast, smooth experience straight from the browser — no downloads, no sign-ups. Our goal is to be the go-to destination for light, fun entertainment for the whole family.",
       `We hand-pick ${EN_GAME_COUNT} games covering a wide range of categories: racing, action, puzzle, sports, girls games, and casual titles. The library is updated constantly with the newest and most popular games, with a focus on quality and fast performance on mobile and desktop.`,
       "We believe games should be free and accessible to everyone, so the platform is supported by carefully placed ads that never get in the way of gameplay. Thanks for choosing Plixfy — have fun!",
+    ],
+    sections: [
+      ["What do we add?", "Plixfy is more than a catalog. A game page identifies the category, source-declared device support, languages, in-game purchases, and controls. Pages marked as editorial guides also include explanations, practical tips, and answers written for Plixfy readers."],
+      ["Where the games come from", "We currently use Playgama's licensed catalog as our sole source for games and official preview assets. Playgama delivers the playable title and core catalog data; Plixfy adds discovery, bilingual navigation, categorization, and the editorial material surrounding selected games."],
+      ["Review and accuracy", "We do not submit every catalog page for search indexing. Only a limited selection with additional editorial material is eligible. When device support changes, controls are inaccurate, or a title stops loading, we update the page or remove it from the reviewed set until it can be checked again."],
+      ["Funding and independence", "Advertising and game-distribution partnerships help pay for hosting and development. Advertisers cannot buy a rating or ranking, and we do not present generated play counts or ratings as genuine user data. Ads are also kept separate from the gameplay area."],
+      ["Corrections and contact", "If a game does not work, a detail is inaccurate, or you believe content infringes a right, email the page URL and a description to plixfy.com@gmail.com. Safety, rights, and device-support reports receive priority. Our Editorial Policy explains the process in more detail."],
     ],
   },
 } as const;
@@ -117,6 +131,15 @@ export default async function AboutPage({
       <div className="space-y-5 text-text-secondary leading-relaxed">
         {copy.paragraphs.map((para, idx) => (
           <p key={idx}>{para}</p>
+        ))}
+      </div>
+
+      <div className="mt-10 space-y-5">
+        {copy.sections.map(([heading, body]) => (
+          <section key={heading} className="rounded-3xl border border-white/10 bg-surface p-6 md:p-8">
+            <h2 className="text-xl font-bold text-text-primary">{heading}</h2>
+            <p className="mt-3 leading-8 text-text-secondary">{body}</p>
+          </section>
         ))}
       </div>
     </main>
