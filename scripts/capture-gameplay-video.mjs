@@ -137,11 +137,24 @@ async function assertGameIsRecordable(page) {
     "not available in your region",
     "game is unavailable",
     "access denied",
+    "your game is about to continue",
+    "playing ad",
+    "advertisement",
   ];
   const phrase = blockedPhrases.find((candidate) => text.includes(candidate));
   if (phrase) {
     throw new Error(`Publisher blocked gameplay capture: ${phrase}`);
   }
+}
+
+async function assertSiteChromeIsClear(page) {
+  const dialogs = page.locator('[role="dialog"]:visible');
+  const count = await dialogs.count();
+  if (count === 0) return;
+  const labels = await dialogs.evaluateAll((elements) =>
+    elements.map((element) => element.getAttribute("aria-label") || "unlabelled dialog"),
+  );
+  throw new Error(`Site overlay is still visible in gameplay capture: ${labels.join(", ")}`);
 }
 
 async function captureFrames(page, targetDirectory, duration) {
@@ -390,6 +403,15 @@ async function main() {
     });
     const page = await context.newPage();
     page.on("dialog", (dialog) => dialog.dismiss().catch(() => {}));
+    await page.addInitScript(() => {
+      // Site notices are useful for visitors but must never be baked into
+      // exported gameplay footage. Record with analytics explicitly rejected.
+      localStorage.setItem("gdpr-consent-v1", JSON.stringify({
+        choice: "reject",
+        timestamp: Date.now(),
+      }));
+      localStorage.setItem("plixfy-install-prompt-dismissed-at", String(Date.now()));
+    });
     const gamePageUrl = `https://www.plixfy.com/play/${game.slug}`;
     await page.goto(gamePageUrl, {
       waitUntil: "domcontentloaded",
@@ -424,6 +446,7 @@ async function main() {
     });
     await warmUpGame(page, args.warmup);
     await closeGameplayOverlays(page);
+    await assertSiteChromeIsClear(page);
     await assertGameIsRecordable(page);
     const audioCapture = startGameAudioCapture(capturedAudio, args.duration);
     try {
