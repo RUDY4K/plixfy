@@ -1,0 +1,1671 @@
+{
+  "base_url": "https://plixfy.com",
+  "total_urls_in_sitemap": 5368,
+  "url_categories": {
+    "games": 5363,
+    "categories": 0,
+    "static": 5
+  },
+  "sample_size": 30,
+  "statistics": {
+    "providers": {
+      "Other": 29
+    },
+    "mobile_meta_count": 30,
+    "pwa_count": 30,
+    "structured_data_count": 30
+  },
+  "sample_data": [
+    {
+      "url": "https://www.plixfy.com/games/y8-soccer-physics",
+      "title": "Soccer Physics - Play Free Online | Plixfy",
+      "meta_description": "Two-button soccer game! So dumb it’s fun. Play Soccer Physics free on Plixfy — instant Sports game in your browser, no download required.",
+      "h1": "Soccer Physics",
+      "iframe_src": "https://www.y8.com/embed/soccer_physics",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/58139/file/w380h285_retina_webp-9908b69427fb6c1dbb08bc3b4489f725.webp",
+        "https://cdn2.y8.com/cloudimage/12121/file/w380h285_retina_webp-083ed4dc0dd12e51bb761c778c4242f5.webp",
+        "https://cdn2.y8.com/cloudimage/25223/file/w380h285_retina_webp-020a74da7e27e79370b90a533aeeac13.webp",
+        "https://cdn2.y8.com/cloudimage/102107/file/w380h285_retina_webp-e092d4449cc60a160e422da8b2f8cd19.webp",
+        "https://cdn2.y8.com/cloudimage/383375/file/w380h285_retina_webp-d7fdcb56249ab749e6acad92c068b10d.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-stick-fighter-3d",
+      "title": "Stick Fighter 3D - Play Free Online | Plixfy",
+      "meta_description": "Stick Fighter 3D is an intense adventure game and It is time to fight. Play Stick Fighter 3D free in your browser on Plixfy — no download, no signup.",
+      "h1": "Stick Fighter 3D",
+      "iframe_src": "https://www.y8.com/embed/stick_fighter_3d",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/396419/file/w380h285_retina_webp-76e57774d78af29b7e149a2c13908bfa.webp",
+        "https://cdn2.y8.com/cloudimage/388635/file/w380h285_retina_webp-c5d3e5e17c66dacb0ba5783279145ef6.webp",
+        "https://cdn2.y8.com/cloudimage/84125/file/w380h285_retina_webp-f0e035c395fed7df384ee26638ce7f6f.webp",
+        "https://cdn2.y8.com/cloudimage/108891/file/w380h285_retina_webp-f219ed7ce55e71748e155786d0b4f840.webp",
+        "https://cdn2.y8.com/cloudimage/105095/file/w380h285_retina_webp-fcdf5b3b0a5bc1e575d7b29d1e77a1fd.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-undertale-sans-pacifist-fanmade-battle",
+      "title": "Undertale Sans Pacifist Fanmade Battle - Play Free Online | Plixfy",
+      "meta_description": "Undertale Sans Pacifist Fanmade Battle is a Flash-powered tribute to the iconic Undertale universe, where you face off against Sans in a non-lethal showdown.",
+      "h1": "Undertale Sans Pacifist Fanmade Battle",
+      "iframe_src": "https://www.y8.com/embed/undertale_sans_pacifist_fanmade_battle",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/62997/file/w380h285_retina_webp-bc30bc77fc0ed24443002d0015d13af0.webp",
+        "https://cdn2.y8.com/cloudimage/11515/file/w380h285_retina_webp-492636ae472a0d7e3772f167f413d3e6.webp",
+        "https://cdn2.y8.com/cloudimage/51797/file/w380h285_retina_webp-d98b58ff3b818a8efefd60db9a3cb020.webp",
+        "https://cdn2.y8.com/cloudimage/41665/file/w380h285_retina_webp-017652e370b29b76da64adf2119a5de7.webp",
+        "https://cdn2.y8.com/cloudimage/1633/file/w380h285_retina_webp-6bcf4ebf72e659ca3e55b122ca149810.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-feudalism-3",
+      "title": "Feudalism 3 - Play Free Online | Plixfy",
+      "meta_description": "Feudalism 3 - Join with other players and upgrade your rpg character. Play Feudalism 3 free in your browser on Plixfy — no download, no signup.",
+      "h1": "Feudalism 3",
+      "iframe_src": "https://www.y8.com/embed/feudalism_3",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/slither-trail",
+      "title": "Slither Trail - Play Free Online | Plixfy",
+      "meta_description": "Classic snake action — eat, grow, and avoid the walls. Play Slither Trail free on Plixfy — instant Arcade game in your browser, no download required.",
+      "h1": "Slither Trail",
+      "iframe_src": null,
+      "iframe_provider": null,
+      "images": [
+        "https://www.onlinegames.io/media/posts/440/responsive/Blocky-Parkour-Ninja-xs.jpg",
+        "https://www.onlinegames.io/media/posts/235/responsive/Bus-Subway-Runner-Game-xs.jpg",
+        "https://www.onlinegames.io/media/posts/554/responsive/Capybara-Clicker-Pro-xs.jpg",
+        "https://www.onlinegames.io/media/posts/760/responsive/Crazy-Ball-Game-xs.jpg",
+        "https://www.onlinegames.io/media/posts/734/responsive/Cross-the-Road-xs.jpg"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-wham-o-slip-n-slide-party-in-hawaii",
+      "title": "Wham O Slip N Slide: Party in Hawaii - Play Free Online | Plixfy",
+      "meta_description": "The biggest Slip &#39;N Slide in Hawaii. Play Wham O Slip N Slide: Party in Hawaii free on Plixfy — instant Casual game in your browser, no download required.",
+      "h1": "Wham O Slip N Slide: Party in Hawaii",
+      "iframe_src": "https://www.y8.com/embed/wham_o_slip_n_slide_party_in_hawaii",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-winter-mercenary",
+      "title": "Winter Mercenary - Play Free Online | Plixfy",
+      "meta_description": "Winter Mercenary is an intense first-person shooting game set in a harsh, snow-covered battlefield. Play Winter Mercenary free on Plixfy — no download.",
+      "h1": "Winter Mercenary",
+      "iframe_src": "https://www.y8.com/embed/winter_mercenary",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-geometry-rush-4d",
+      "title": "Geometry Rush 4D - Play Free Online | Plixfy",
+      "meta_description": "Geometry Rush 4D is an exhilarating 4D platformer that elevates speed, precision, and reflexes to new heights.",
+      "h1": "Geometry Rush 4D",
+      "iframe_src": "https://www.y8.com/embed/geometry_rush_4d",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-speedy-bartender",
+      "title": "Speedy Bartender - Play Free Online | Plixfy",
+      "meta_description": "Speedy Bartender is a fun arcade game where you need to use your skills to fill each visitor&#39;s glass full.",
+      "h1": "Speedy Bartender",
+      "iframe_src": "https://www.y8.com/embed/speedy_bartender",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-extreme-wheels-2-player-racing",
+      "title": "Extreme Wheels: 2 Player Racing - Play Free Online | Plixfy",
+      "meta_description": "Extreme Wheels 2 Player Racing is a high-speed browser game where you race powerful cars across challenging tracks.",
+      "h1": "Extreme Wheels: 2 Player Racing",
+      "iframe_src": "https://www.y8.com/embed/extreme_wheels_2_player_racing",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/383225/file/w380h285_retina_webp-608c4502ca1bfc05ac46bd25d38ccf29.webp",
+        "https://cdn2.y8.com/cloudimage/39313/file/w380h285_retina_webp-56acd9682d7188bba8407afee476c3e7.webp",
+        "https://cdn2.y8.com/cloudimage/14939/file/w380h285_retina_webp-49a33d0d8f6c93b87c64a201661cd6bb.webp",
+        "https://cdn2.y8.com/cloudimage/64043/file/w380h285_retina_webp-e68821b1382ee28813ed6d36841a9155.webp",
+        "https://cdn2.y8.com/cloudimage/64915/file/w380h285_retina_webp-b1cd5b8a803956afdf1511eb2074ad38.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-front-point-to-point",
+      "title": "Front Point to Point - Play Free Online | Plixfy",
+      "meta_description": "Note: This game is keyboard controlled. Play Front Point to Point free on Plixfy — instant Casual game in your browser, no download required.",
+      "h1": "Front Point to Point",
+      "iframe_src": "https://www.y8.com/embed/front_point_to_point",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-color-cross-2",
+      "title": "Color Cross 2 - Play Free Online | Plixfy",
+      "meta_description": "Color Cross 2 is a fun platform game with puzzles to solve to join the flag! With each jump, the environment changes! Time your jump on a solid platform and…",
+      "h1": "Color Cross 2",
+      "iframe_src": "https://www.y8.com/embed/color_cross_2",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-teen-titans-go-slash-of-justice",
+      "title": "Teen Titans Go: Slash of Justice - Play Free Online | Plixfy",
+      "meta_description": "Teen Titans Go! Slash of Justice is a fast-paced beat-em-up game based on the Teen Titans Go! animated cartoon TV series.",
+      "h1": "Teen Titans Go: Slash of Justice",
+      "iframe_src": "https://www.y8.com/embed/teen_titans_go_slash_of_justice",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-firing-range",
+      "title": "Firing Range - Play Free Online | Plixfy",
+      "meta_description": "Train sniping skills in this Fire Training game. Play Firing Range free on Plixfy — instant Casual game in your browser, no download required.",
+      "h1": "Firing Range",
+      "iframe_src": "https://www.y8.com/embed/firing_range",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-mot-s-grand-prix",
+      "title": "Mot&#39;s Grand Prix - Play Free Online | Plixfy",
+      "meta_description": "Step back in time to an era when folk were real folk and racecar steering wheels were real steering wheels.",
+      "h1": "Mot&#39;s Grand Prix",
+      "iframe_src": "https://www.y8.com/embed/mot_s_grand_prix",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-desert-car-race",
+      "title": "Desert Car Race - Play Free Online | Plixfy",
+      "meta_description": "In this game you need to race with car in desert. Play Desert Car Race free on Plixfy — instant Casual game in your browser, no download required.",
+      "h1": "Desert Car Race",
+      "iframe_src": "https://www.y8.com/embed/desert_car_race",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-city-truck-driver",
+      "title": "City Truck Driver - Play Free Online | Plixfy",
+      "meta_description": "City Truck Driver - Very cool 3D truck simulator game with free road, racing and missions. Play City Truck Driver free on Plixfy — no download.",
+      "h1": "City Truck Driver",
+      "iframe_src": "https://www.y8.com/embed/city_truck_driver",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-kogama-squid-",
+      "title": "Kogama Squid - Play Free Online | Plixfy",
+      "meta_description": "Kogama Squid  is fun virtual survival game where your ability to survive will keep you alive. Play Kogama Squid free on Plixfy — no download.",
+      "h1": "Kogama Squid",
+      "iframe_src": "https://www.y8.com/embed/kogama_squid_",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-wrack-rune",
+      "title": "Wrack & Rune - Play Free Online | Plixfy",
+      "meta_description": "Wrack &amp; Rune is a fun dungeon crawler game with a berserk partner! Have you ever wanted to explore challenging caves with a brave ally?  In this game…",
+      "h1": "Wrack & Rune",
+      "iframe_src": "https://www.y8.com/embed/wrack_rune",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-bubble-classic",
+      "title": "Bubble Classic - Play Free Online | Plixfy",
+      "meta_description": "Step into the world of Bubble Classic, a simple yet addictive arcade challenge that never goes out of style. Play Bubble Classic free on Plixfy — no download.",
+      "h1": "Bubble Classic",
+      "iframe_src": "https://www.y8.com/embed/bubble_classic",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/og-soul-essence-adventure",
+      "title": "Soul Essence Adventure - Play Free Online | Plixfy",
+      "meta_description": "Soul Essence Adventure is a 2D adventure game where you are stuck in a dark and gloomy castle and try to get out.",
+      "h1": "Soul Essence Adventure",
+      "iframe_src": "https://www.onlinegames.io/games/2022/unity2/soul-essence-adventure/index.html",
+      "iframe_provider": "Other",
+      "images": [
+        "https://www.onlinegames.io/media/posts/1190/responsive/99-nights-in-the-forest-xs.webp",
+        "https://www.onlinegames.io/media/posts/330/responsive/Cat-Simulator-Online-xs.jpg",
+        "https://www.onlinegames.io/media/posts/986/responsive/Cube-Worlds-xs.jpg",
+        "https://www.onlinegames.io/media/posts/1214/responsive/pixelmon-town-xs.webp",
+        "https://www.onlinegames.io/media/posts/593/responsive/Survival-Craft-Game-xs.jpg"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-dragonball-z",
+      "title": "Dragonball Z - Play Free Online | Plixfy",
+      "meta_description": "Fight it out in Dragonball Z style. Play Dragonball Z free on Plixfy — instant Casual game in your browser, no download required.",
+      "h1": "Dragonball Z",
+      "iframe_src": "https://www.y8.com/embed/dragonball_z",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-kogama-the-hovercentral",
+      "title": "Kogama: The HoverCentral - Play Free Online | Plixfy",
+      "meta_description": "Kogama: The HoverCentral is a 3D racing game with many cars and super challenges. Play Kogama: The HoverCentral free on Plixfy — no download.",
+      "h1": "Kogama: The HoverCentral",
+      "iframe_src": "https://www.y8.com/embed/kogama_the_hovercentral",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-amazing-circus-adventure",
+      "title": "Amazing Circus: Adventure - Play Free Online | Plixfy",
+      "meta_description": "Amazing Circus: Adventure is a fun 2D adventure in Amazing Circus Adventure. Play Amazing Circus: Adventure free on Plixfy — no download.",
+      "h1": "Amazing Circus: Adventure",
+      "iframe_src": "https://www.y8.com/embed/amazing_circus_adventure",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-garden-tales-3",
+      "title": "Garden Tales 3 - Play Free Online | Plixfy",
+      "meta_description": "Garden Tales 3 - Arcade match 3 game with plants and garden foods. Play Garden Tales 3 free in your browser on Plixfy — no download, no signup.",
+      "h1": "Garden Tales 3",
+      "iframe_src": "https://www.y8.com/embed/garden_tales_3",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-snake-neon",
+      "title": "Snake Neon - Play Free Online | Plixfy",
+      "meta_description": "Snake neon is a snake game, eat as much food to get a score and avoid collisions with other snakes or obstacles! Survives eating balls and grows up to be…",
+      "h1": "Snake Neon",
+      "iframe_src": "https://www.y8.com/embed/snake_neon",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/62997/file/w380h285_retina_webp-bc30bc77fc0ed24443002d0015d13af0.webp",
+        "https://cdn2.y8.com/cloudimage/11515/file/w380h285_retina_webp-492636ae472a0d7e3772f167f413d3e6.webp",
+        "https://cdn2.y8.com/cloudimage/51797/file/w380h285_retina_webp-d98b58ff3b818a8efefd60db9a3cb020.webp",
+        "https://cdn2.y8.com/cloudimage/41665/file/w380h285_retina_webp-017652e370b29b76da64adf2119a5de7.webp",
+        "https://cdn2.y8.com/cloudimage/1633/file/w380h285_retina_webp-6bcf4ebf72e659ca3e55b122ca149810.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-naruto-rpg-2",
+      "title": "Naruto RPG 2 - Play Free Online | Plixfy",
+      "meta_description": "Unleash your inner ninja in Naruto RPG 2, a retro-styled Flash fighting game inspired by the iconic anime universe.",
+      "h1": "Naruto RPG 2",
+      "iframe_src": "https://www.y8.com/embed/naruto_rpg_2",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/62997/file/w380h285_retina_webp-bc30bc77fc0ed24443002d0015d13af0.webp",
+        "https://cdn2.y8.com/cloudimage/11515/file/w380h285_retina_webp-492636ae472a0d7e3772f167f413d3e6.webp",
+        "https://cdn2.y8.com/cloudimage/51797/file/w380h285_retina_webp-d98b58ff3b818a8efefd60db9a3cb020.webp",
+        "https://cdn2.y8.com/cloudimage/41665/file/w380h285_retina_webp-017652e370b29b76da64adf2119a5de7.webp",
+        "https://cdn2.y8.com/cloudimage/1633/file/w380h285_retina_webp-6bcf4ebf72e659ca3e55b122ca149810.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-tile-journey",
+      "title": "Tile Journey - Play Free Online | Plixfy",
+      "meta_description": "Embark on the ultimate 3D puzzle adventure with Tile Journey - match your way to victory, one trio at a time! Tile Journey is a thrilling 3D puzzle game…",
+      "h1": "Tile Journey",
+      "iframe_src": "https://www.y8.com/embed/tile_journey",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-cherry-bomb-arcade",
+      "title": "Cherry Bomb - Play Free Online | Plixfy",
+      "meta_description": "Cherry Bomb is a arcade shoot’em up arcade game inspired by classic games like Space Invaders or Galaga. Play Cherry Bomb free on Plixfy — no download.",
+      "h1": "Cherry Bomb",
+      "iframe_src": "https://www.y8.com/embed/cherry_bomb_arcade",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    },
+    {
+      "url": "https://www.plixfy.com/games/y8-playful-kitten-escape-game",
+      "title": "Playful Kitten Escape - Play Free Online | Plixfy",
+      "meta_description": "In &quot;Playful Kitten Escape,&quot; players must rescue an adorable kitten trapped in a whimsical house.",
+      "h1": "Playful Kitten Escape",
+      "iframe_src": "https://www.y8.com/embed/playful_kitten_escape_game",
+      "iframe_provider": "Other",
+      "images": [
+        "https://cdn2.y8.com/cloudimage/13563/file/w380h285_retina_webp-945992e68bc64211d48ccd7b1dd83ba3.webp",
+        "https://cdn2.y8.com/cloudimage/85805/file/w380h285_retina_webp-9eef3c472704fda48952579ff4a490df.webp",
+        "https://cdn2.y8.com/cloudimage/28129/file/w380h285_retina_webp-bf96358d529e128446d4a39bbff99dcb.webp",
+        "https://cdn2.y8.com/cloudimage/61077/file/w380h285_retina_webp-8d50111f2b204124d8339b21acb32f03.webp",
+        "https://cdn2.y8.com/cloudimage/48757/file/w380h285_retina_webp-dbfc0f764c53973389b471a863cdef9a.webp"
+      ],
+      "description_text": null,
+      "category_links": [],
+      "structured_data": {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.plixfy.com#org",
+            "name": "Plixfy",
+            "url": "https://www.plixfy.com",
+            "logo": "https://www.plixfy.com/logo-full.svg",
+            "sameAs": [
+              "https://twitter.com/plixfy",
+              "https://www.facebook.com/plixfy",
+              "https://www.instagram.com/plixfy",
+              "https://www.tiktok.com/@plixfy"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.plixfy.com#website",
+            "url": "https://www.plixfy.com",
+            "name": "Plixfy",
+            "description": "Free browser games — play instantly, no download required.",
+            "publisher": {
+              "@id": "https://www.plixfy.com#org"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.plixfy.com/?q={search_term_string}#games"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      },
+      "has_mobile_meta": true,
+      "has_pwa_meta": true
+    }
+  ],
+  "category_urls_examples": []
+}

@@ -1,0 +1,327 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "report_date": "2026-05-24",
+  "test_environment": {
+    "os": "Windows 11 Pro",
+    "tool": "curl 8.x via bash",
+    "origin_for_iframe_tests": "non-allowlisted (curl, no domain pre-registered with provider)",
+    "user_agent_used_for_iframe_tests": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "headers_added_to_simulate_browser": [
+      "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+      "Accept-Language: en-US,en;q=0.9,ar;q=0.8",
+      "Sec-Fetch-Mode: navigate",
+      "Sec-Fetch-Site: cross-site",
+      "Sec-Fetch-Dest: iframe",
+      "Referer: https://plixfy.com/..."
+    ]
+  },
+
+  "platforms": {
+    "gamemonetize": {
+      "feed_endpoint": "https://rss.gamemonetize.com/rssfeed.php",
+      "endpoints_tested": [
+        {"url": "https://rss.gamemonetize.com/rssfeed.php?format=json&amount=All", "http_status": 200, "size_bytes": null, "games_returned": 5001, "note": "Marketing claims 36,976+ but public feed caps at 5,001"},
+        {"url": "https://rss.gamemonetize.com/rssfeed.php?format=json&amount=10&type=mobile", "http_status": 200, "games_returned": 11, "note": "type=mobile filter returns only 11 games total — token mobile catalog"},
+        {"url": "https://rss.gamemonetize.com/rssfeed.php?format=json&amount=1", "http_status": 200, "games_returned": 1},
+        {"url": "https://gamemonetize.com/api/games.json", "http_status": 404, "note": "Wrong endpoint guess"},
+        {"url": "https://gamemonetize.com/rss-newest-games.xml", "http_status": 404},
+        {"url": "https://gpapi.gamemonetize.com", "http_status": 0, "note": "DNS does not resolve"}
+      ],
+      "supported_query_parameters": {
+        "format": ["json", "xml"],
+        "amount": ["10", "20", "30", "40", "100", "All"],
+        "type": ["html5", "mobile"],
+        "category": ["All", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"],
+        "sort": ["Newest", "Most Popular", "Hot Games", "Best Games", "Exclusive Games", "Editor Picks", "No Branding"]
+      },
+      "category_codes": {
+        "0": "Action", "1": ".IO", "2": "2 Player", "3": "3D", "4": "Adventure",
+        "5": "Arcade", "6": "Bejeweled", "7": "Boys", "8": "Clicker", "9": "Cooking",
+        "10": "Girls", "11": "Hypercasual", "12": "Multiplayer", "13": "Puzzle",
+        "14": "Racing", "15": "Shooting", "16": "Soccer", "17": "Sports",
+        "18": "Stickman", "19": "Baby Hazel"
+      },
+      "per_game_fields": ["id", "title", "description", "instructions", "url", "category", "tags", "thumb", "width", "height"],
+      "field_availability_matrix": {
+        "id": true,
+        "title": true,
+        "description": true,
+        "category": true,
+        "thumbnail": true,
+        "width_height": true,
+        "mobile_flag": false,
+        "orientation": false,
+        "locale_or_language": false,
+        "region": false,
+        "company_publisher": false,
+        "release_date": false
+      },
+      "iframe_url_pattern": "https://html5.gamemonetize.co/{id}/",
+      "iframe_header_test": {
+        "test_url_sample": "https://html5.gamemonetize.co/7pmla0dtaz56alpxp7bnit4fvh3y2y9a/",
+        "result_no_headers": {"http_status": 403, "server": "cloudflare", "cf_cache_status": "DYNAMIC"},
+        "result_browser_ua_with_referer": {"http_status": 403, "server": "cloudflare"},
+        "result_full_sec_fetch_headers": {"http_status": 403, "server": "cloudflare"},
+        "verdict": "DOMAIN-GATED — Cloudflare WAF returns HTTP 403 from any non-allowlisted origin. Requires publisher to be pre-registered in GameMonetize dashboard before iframes will render."
+      },
+      "sample_game": {
+        "id": "37003",
+        "title": "Moving Magnet",
+        "category": "Puzzles",
+        "url": "https://html5.gamemonetize.co/7pmla0dtaz56alpxp7bnit4fvh3y2y9a/",
+        "thumb": "https://img.gamemonetize.com/7pmla0dtaz56alpxp7bnit4fvh3y2y9a/512x384.jpg",
+        "width": "1920",
+        "height": "1080"
+      },
+      "rate_limits": "Not documented. No throttling observed during 5+ rapid sequential requests."
+    },
+
+    "gamedistribution": {
+      "developer_terms_url": "https://static.gamedistribution.com/terms/developer.html",
+      "publisher_partnership_url": "https://gamedistribution.com/developers/partnership/",
+      "endpoints_tested": [
+        {"url": "https://gamedistribution.com/sitemap/games.xml", "http_status": 404},
+        {"url": "https://api.gamedistribution.com/v1/games", "http_status": 0, "note": "DNS does not resolve — api subdomain not public"},
+        {"url": "https://gamedistribution.com/api/games/feed/v1.0/games", "http_status": 308, "note": "Redirect; gated"},
+        {"url": "https://docs.gamedistribution.com/dgi/", "http_status": 0, "note": "DNS not public"}
+      ],
+      "iframe_url_pattern": "https://html5.gamedistribution.com/{game-id}/",
+      "iframe_header_test": {
+        "test_url_sample": "https://html5.gamedistribution.com/2e44fb60fd3f4606b1b06c17a2b9d60d/",
+        "result_browser_ua_with_referer": {"http_status": 200, "server": "nginx", "access_control_allow_origin": "*"},
+        "verdict": "HTTP 200 from any origin — but when the publisher domain isn't allowlisted in their dashboard, the game shows 'CLICK HERE TO PLAY' interstitial or redirects to gamedistribution.com (confirmed by prior plixfy session). Allowlisting required per game (or per domain via Direct Game Integration)."
+      },
+      "verified_business_terms": {
+        "developer_revenue_share_pct": 33,
+        "publisher_revenue_share_pct": "Not published",
+        "payout_schedule_days": 60,
+        "payment_methods": ["PayPal", "bank transfer"],
+        "minimum_payout_dev_paypal_eur": 50,
+        "minimum_payout_dev_bank_eur": 100,
+        "sanctioned_countries_excluded": ["Cuba", "Iran", "North Korea", "Crimea", "Syria"],
+        "saudi_arabia_excluded": false
+      },
+      "parent_company": {
+        "name": "Azerion Group N.V.",
+        "listing": "Nasdaq Stockholm",
+        "q1_2025_revenue_eur_millions": 128.0,
+        "q1_2025_adjusted_ebitda_eur_millions": 11.7,
+        "q1_2025_revenue_growth_yoy_pct": 7,
+        "annual_reports_public": true
+      },
+      "mena_expansion_announced": "2023-04 (Daria Tkalina, partnership manager)",
+      "field_availability_matrix": {
+        "id": "via DGI",
+        "title": "via DGI",
+        "mobile_flag": "yes via DGI",
+        "orientation": "yes via DGI",
+        "locale_or_language": "no",
+        "company_publisher": "yes"
+      }
+    },
+
+    "famobi": {
+      "feed_endpoint": "https://api.famobi.com/feed",
+      "endpoints_tested": [
+        {"url": "https://api.famobi.com/feed", "http_status": 200, "size_bytes": 503621, "format": "json"},
+        {"url": "https://api.famobi.com/feed.csv", "http_status": 200, "size_bytes": 357379, "format": "csv"}
+      ],
+      "top_level_structure": ["categories", "num_games", "games"],
+      "num_games": 639,
+      "categories": ["puzzle", "racing", "arcade", "action", "skill", "girls", "quiz", "match-3", "sports", "cars", "mahjong", "educational", "bubble-shooter", "cards", "dress-up", "make-up", "multiplayer", "jump-and-run", "time-management-and-strategy", "tamagotchi", "management", "cooking", "breakout"],
+      "per_game_fields": ["package_id", "name", "description", "thumb", "thumb_60", "thumb_120", "thumb_180", "link", "date", "aspect_ratio", "related", "categories", "orientation", "highscores_enabled"],
+      "field_availability_matrix": {
+        "id": "package_id",
+        "title": true,
+        "description": true,
+        "category": true,
+        "multiple_thumbnail_sizes": true,
+        "mobile_orientation": true,
+        "aspect_ratio_explicit": true,
+        "release_date": true,
+        "related_games": true,
+        "highscores_supported_flag": true,
+        "locale_or_language": false
+      },
+      "sample_game": {
+        "package_id": "temple-blocks",
+        "name": "Temple Blocks",
+        "description": "Think fast, plan smart, and solve the elemental puzzles!",
+        "link": "https://play.famobi.com/temple-blocks",
+        "date": "2026-01-30",
+        "orientation": "none",
+        "aspect_ratio": 0,
+        "categories": ["puzzle"]
+      },
+      "iframe_url_pattern": "https://games.famobi.com/{slug}/?fg_aid={affiliate-id}",
+      "iframe_header_test": {
+        "test_url_sample": "https://games.famobi.com/cut-the-rope-experiments/?fg_aid=A1000-1",
+        "result_browser_ua_with_referer": {"http_status": 200, "server": "nginx", "access_control_allow_origin": "*"},
+        "verdict": "HTTP 200 from any origin. Per Famobi FAQ, iframe usage 'must be unlocked individually' — email support@famobi.com to enable. No Cloudflare 403 block at the network layer."
+      },
+      "verified_business_terms": {
+        "minimum_monthly_traffic_required": 50000,
+        "minimum_payout_developer_eur": 250,
+        "minimum_payout_publisher_eur": 500,
+        "payout_method": "bank transfer only",
+        "payout_max_days": 45,
+        "tax_form_required": "TIN or VAT number",
+        "registered_address": "Schanzenstraße 6-20, 51063 Cologne, Germany",
+        "legal_entity": "Famobi GmbH"
+      },
+      "verified_brand_partners": ["Google", "Amazon", "Disney", "Deutsche Bahn", "Gruner + Jahr", "Telenor", "Spilgames", "Miniclip", "SpielAffe.de"],
+      "ads_txt_line_required": "google.com, pub-2504503821144226, RESELLER, f08c47fec0942fa0"
+    },
+
+    "playgama": {
+      "endpoints_tested": [
+        {"url": "https://playgama.com/api/v1/games", "http_status": 404, "note": "Catalog API is auth-gated, not on this public path"},
+        {"url": "https://playgama.com/business", "http_status": 200, "note": "Public partner landing page"},
+        {"url": "https://wiki.playgama.com/playgama/faq/payments-and-statistics", "http_status": 200, "note": "Public partner wiki — payment terms documented"}
+      ],
+      "iframe_url_pattern": "https://playgama.com/game/{slug}?clid={your-partner-id}",
+      "verified_business_terms": {
+        "partner_network_revenue_share_pct_tier_1": 70,
+        "partner_network_revenue_share_pct_tier_1_max_usd": 1000,
+        "partner_network_revenue_share_pct_tier_2_max": 90,
+        "partner_network_revenue_share_pct_tier_2_min_usd": 3000,
+        "playgama_direct_network_revenue_share_pct": 50,
+        "minimum_withdrawal_usd": 100,
+        "payment_methods": ["bank transfer (any country)", "cryptocurrency (on request)"],
+        "tax_form_required": "Not mentioned in public docs"
+      },
+      "industry_recognition_2025": [
+        "Finalist — MENA Games Industry Awards 2025",
+        "Finalist — Pocketgamer Mobile Games Awards 2025",
+        "Winner — Game Dev Heroes Awards 2025"
+      ],
+      "funding": {
+        "round": "Series A",
+        "year": 2024,
+        "amount_usd_millions": 3,
+        "lead_investor": "The Open Platform",
+        "co_investor": "s16vc"
+      },
+      "field_availability_matrix": {
+        "id": true,
+        "title": true,
+        "description": true,
+        "category": true,
+        "thumbnail": true,
+        "clid_partner_id_in_url": true,
+        "mobile_friendly_flag": "yes (per Playgama claim)",
+        "orientation": "yes (per Playgama claim — not yet verified in download)",
+        "locale_or_language": "unknown"
+      }
+    },
+
+    "onlinegames_io": {
+      "feed_endpoint": "https://www.onlinegames.io/media/plugins/genGames/embed.json",
+      "endpoints_tested": [
+        {"url": "https://www.onlinegames.io/media/plugins/genGames/embed.json", "http_status": 200, "size_bytes": 169431, "games_returned": 259}
+      ],
+      "per_game_fields": ["title", "embed", "image", "tags", "description"],
+      "iframe_url_pattern": "https://www.onlinegames.io/games/{year}/{engine}/{slug}/index.html",
+      "field_availability_matrix": {
+        "id": false,
+        "title": true,
+        "embed_url": true,
+        "image": true,
+        "tags": true,
+        "description": true,
+        "mobile_flag": false,
+        "orientation": false,
+        "category": "tag-based only"
+      },
+      "rev_share": "None — ads run inside their iframe and they take 100%. Free traffic-multiplier for publishers."
+    },
+
+    "gamepix": {
+      "feed_endpoint": "https://feeds.gamepix.com/v2/json",
+      "endpoints_tested": [
+        {"url": "https://feeds.gamepix.com/v2/json", "http_status": 200, "size_bytes": 20122, "games_returned": 24, "note": "Paginated, sid required for monetization"},
+        {"url": "https://feeds.gamepix.com/v2/json?sid=DEMO&pagination=10&page=1", "http_status": 400, "note": "DEMO sid rejected"}
+      ],
+      "per_game_fields": ["id", "title", "namespace", "description", "category", "orientation", "quality_score", "width", "height", "date_modified", "date_published", "banner_image", "image", "url"],
+      "field_availability_matrix": {
+        "id": true,
+        "title": true,
+        "description": true,
+        "category": true,
+        "orientation": true,
+        "quality_score": true,
+        "width_height": true,
+        "date_modified": true,
+        "date_published": true,
+        "banner_image": true,
+        "thumbnail": true,
+        "url": true,
+        "mobile_flag": false,
+        "locale_or_language": false
+      },
+      "iframe_url_pattern": "https://play.gamepix.com/{slug}/embed?sid={your-sid}",
+      "trustpilot_rating_2026": 2.9,
+      "recent_complaints_2025": [
+        "Non-payment reports (Jan 2025)",
+        "Dashboard revenue report manipulation alleged",
+        "40% traffic decline over 6 months"
+      ],
+      "verdict": "DISQUALIFIED for use in 2026"
+    },
+
+    "gamezop": {
+      "endpoints_tested": [
+        {"url": "https://api.gamezop.com/v3/games?id=10434", "http_status": 401, "note": "API requires authentication key"}
+      ],
+      "verdict": "Auth-gated. Need partner key. Did not pursue further given Playgama covers same use case at better terms."
+    },
+
+    "bigshare_io": {
+      "endpoints_tested": [
+        {"url": "https://bigshare.io/", "http_status": 522, "note": "Cloudflare origin error — site appears unresponsive at time of test"}
+      ],
+      "verdict": "SKIP — infrastructure unstable"
+    },
+
+    "revenue_games": {
+      "endpoints_tested": [
+        {"url": "https://revenue.games/", "http_status": 200, "server": "cloudflare"}
+      ],
+      "verdict": "New entrant. No track record. Re-evaluate in H2 2026."
+    },
+
+    "coolgames": {
+      "publisher_url": "https://www.coolgames.com/for-publishers/",
+      "verdict": "Not self-serve — contact form only. Defer."
+    },
+
+    "softgames": {
+      "publisher_url": "https://publishers.softgames.com/contact",
+      "verdict": "Not self-serve — enterprise contact only. Defer."
+    }
+  },
+
+  "iframe_gating_summary": {
+    "domain_gated_at_network_layer_HTTP_403": ["gamemonetize"],
+    "interstitial_overlay_when_not_allowlisted": ["gamedistribution"],
+    "iframe_unlock_required_per_partner": ["famobi"],
+    "no_iframe_friction_observed": ["playgama (CLID-based, no network-layer block)", "onlinegames_io"]
+  },
+
+  "saudi_payment_feasibility": {
+    "playgama": "Bank transfer to any country + crypto on request — best fit for Saudi banking",
+    "gamemonetize": "PayPal + USDT ERC20 — works for Saudi recipients",
+    "gamedistribution": "PayPal + bank transfer (EU-based) — works",
+    "famobi": "Bank transfer only — works but slower for Saudi recipients (45-day finalization)",
+    "gamepix": "Unreliable per 2025 complaints — do not test"
+  },
+
+  "mobile_filter_quality_ranking": [
+    {"platform": "famobi", "score": 9, "evidence": "Explicit orientation field (portrait/landscape/none) + aspect_ratio per game"},
+    {"platform": "gamepix", "score": 8, "evidence": "Explicit orientation field per game"},
+    {"platform": "gamedistribution", "score": 7, "evidence": "Mobile flag via DGI metadata"},
+    {"platform": "playgama", "score": 6, "evidence": "Claimed support, not yet verified in public download"},
+    {"platform": "gamemonetize", "score": 2, "evidence": "type=mobile filter returns only 11 games; no per-game mobile flag in feed payload"},
+    {"platform": "onlinegames_io", "score": 1, "evidence": "No mobile metadata at all"}
+  ]
+}

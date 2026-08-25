@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/.playwright-mcp/
+/scratch/
 
 # next.js
 /.next/
@@ -52,3 +54,17 @@ scripts/*.log
 scripts/.social-published.json
 .social/
 .health/
+
+# local private handoff material (never commit credentials)
+/.private/
+
+# local video factory runtime data
+/tools/video-factory/node_modules/
+/tools/video-factory/factory.log
+/tools/video-factory/state.json
+/tools/video-factory/raw/
+/tools/video-factory/overlays/
+
+# Python caches
+__pycache__/
+*.py[cod]

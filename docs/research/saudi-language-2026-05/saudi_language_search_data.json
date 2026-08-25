@@ -1,0 +1,305 @@
+{
+  "report_date": "2026-05-24",
+  "methodology": {
+    "tool": "Playwright (Chromium) + Google Trends (geo=SA, time=today 12-m, all categories, Web Search) + live Google Search SERP audit (gl=sa)",
+    "viewport": "1280x900 desktop",
+    "data_window": "2025-05-18 to 2026-05-24",
+    "absolute_volume_disclaimer": "Google Trends returns relative interest scores (0-100) normalized within each comparison set, not absolute search counts. The 'per 1,000 users' estimate is a weighted modeling assumption, not directly measured."
+  },
+
+  "google_trends_comparisons": [
+    {
+      "id": "ar-vs-en-general",
+      "url": "https://trends.google.com/trends/explore?geo=SA&q=%D8%A3%D9%84%D8%B9%D8%A7%D8%A8,games&date=today%2012-m",
+      "terms": [
+        {"query": "ألعاب", "language": "ar", "avg_interest": "~80"},
+        {"query": "games", "language": "en", "avg_interest": "~10"}
+      ],
+      "winner": "ar",
+      "ratio": 8,
+      "screenshot": "gt-alab-vs-games.png",
+      "related_queries_ar_top5": [
+        "ألعاب المشاركة والحوار من الألعاب المهيئة للرياضة الجماعية (Breakout)",
+        "المسكة الصحيحة للمضرب تسمى بالمسكة المخالية أو الطائرة (Breakout)",
+        "ألعاب جسم الإنسان (Breakout)",
+        "ندريس الألعاب المهيئة للرياضة الجماعية (Breakout)",
+        "من أدوات جزم الفعل أم الأمر (Breakout)"
+      ],
+      "related_queries_en_top5": [
+        "b22 games (Breakout)",
+        "lidl near me (Breakout)",
+        "where to watch nfl games (Breakout)",
+        "best family board games (Breakout)",
+        "best board games for families (Breakout)"
+      ],
+      "notes": "Single-word general comparison. Arabic dominates massively. English 'games' queries are polluted with sports broadcasts and family board games, not browser-games."
+    },
+    {
+      "id": "free-and-online",
+      "url": "https://trends.google.com/trends/explore?geo=SA&q=%D8%A3%D9%84%D8%B9%D8%A7%D8%A8%20%D9%85%D8%AC%D8%A7%D9%86%D9%8A%D8%A9,free%20games,%D8%A3%D9%84%D8%B9%D8%A7%D8%A8%20%D8%A3%D9%88%D9%86%D9%84%D8%A7%D9%8A%D9%86,online%20games&date=today%2012-m",
+      "terms": [
+        {"query": "ألعاب مجانية", "language": "ar", "avg_interest": 12},
+        {"query": "free games", "language": "en", "avg_interest": 42},
+        {"query": "ألعاب أونلاين", "language": "ar", "avg_interest": 0},
+        {"query": "online games", "language": "en", "avg_interest": 44}
+      ],
+      "winner": "en",
+      "ratio_free": 3.5,
+      "ratio_online": "≥44 (Arabic transliteration registers 0)",
+      "screenshot": "gt-free-online-games.png",
+      "raw_weekly_excerpts": [
+        {"week": "2025-05-18", "ar_free": 12, "en_free": 33, "ar_online": 0, "en_online": 37},
+        {"week": "2025-12-14", "ar_free": 12, "en_free": 76, "ar_online": 0, "en_online": 100, "note": "Christmas-week peak — English 'online games' hits 100, Arabic equivalent is 0"},
+        {"week": "2026-05-24", "ar_free": 7, "en_free": 33, "ar_online": 0, "en_online": 35}
+      ],
+      "related_queries_ar_top5": [
+        "ألعاب مجانية بدون_نت (Breakout)",
+        "العاب تعليمية (Breakout)",
+        "ألعاب كرة القدم مجانية (Breakout)",
+        "تنزيل ألعاب مجانًا بدون نت (Breakout)",
+        "ألعاب مجانية بنات (+200%)"
+      ],
+      "related_queries_en_free_games_top5": [
+        "play free games online without downloading (Breakout)",
+        "fog free online games (Breakout)",
+        "steam free games this week (Breakout)",
+        "car driving games online free (Breakout)",
+        "crazygames (Breakout)"
+      ],
+      "related_queries_en_online_games_top5": [
+        "casino online games www.900freespins.com (Breakout)",
+        "wikipedia (Breakout)",
+        "casino ohne oasis www.600freespins.com (Breakout)",
+        "msn games online (Breakout)",
+        "online casino paypal www.600freespins.com (Breakout)"
+      ],
+      "notes": "Transactional intent — English dominates. BUT note 'online games' English data is polluted with casino-spam queries, so real intent is closer to score 35 than 44."
+    },
+    {
+      "id": "girls-cars",
+      "url": "https://trends.google.com/trends/explore?geo=SA&q=%D8%A7%D9%84%D8%B9%D8%A7%D8%A8%20%D8%A8%D9%86%D8%A7%D8%AA,girls%20games,%D8%A7%D9%84%D8%B9%D8%A7%D8%A8%20%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA,car%20games&date=today%2012-m",
+      "terms": [
+        {"query": "العاب بنات", "language": "ar", "avg_interest": 72},
+        {"query": "girls games", "language": "en", "avg_interest": 8},
+        {"query": "العاب سيارات", "language": "ar", "avg_interest": 63},
+        {"query": "car games", "language": "en", "avg_interest": 33}
+      ],
+      "winner": "ar",
+      "ratio_girls": 9,
+      "ratio_cars": 1.9,
+      "screenshot": "gt-girls-cars.png",
+      "notes": "Genre-specific Arabic dominates heavily — especially the 'girls' segment. This is the strongest single-segment signal: 9× ratio."
+    },
+    {
+      "id": "kids-io",
+      "url": "https://trends.google.com/trends/explore?geo=SA&q=%D8%A7%D9%84%D8%B9%D8%A7%D8%A8%20%D8%A7%D8%B7%D9%81%D8%A7%D9%84,kids%20games,%D8%A7%D9%84%D8%B9%D8%A7%D8%A8%20io,io%20games&date=today%2012-m",
+      "terms": [
+        {"query": "العاب اطفال", "language": "ar", "avg_interest": 69},
+        {"query": "kids games", "language": "en", "avg_interest": 13},
+        {"query": "العاب io", "language": "ar", "avg_interest": 0},
+        {"query": "io games", "language": "en", "avg_interest": 4}
+      ],
+      "winner_kids": "ar",
+      "ratio_kids": 5.3,
+      "winner_io": "en (both weak)",
+      "screenshot": "gt-kids-io.png",
+      "notes": "Kids games segment is heavily Arabic. .io games is niche and barely registers in either language."
+    },
+    {
+      "id": "named-games",
+      "url": "https://trends.google.com/trends/explore?geo=SA&q=subway%20surfers,%D8%B5%D8%A8%D9%88%D9%8A%20%D8%B3%D9%8A%D8%B1%D9%81%D8%B1%D8%B2,moto%20x3m,%D9%85%D9%88%D8%AA%D9%88%20x3m&date=today%2012-m",
+      "terms": [
+        {"query": "subway surfers", "language": "en", "avg_interest": 68},
+        {"query": "صبوي سيرفرز", "language": "ar (transliteration)", "avg_interest": 1},
+        {"query": "moto x3m", "language": "en", "avg_interest": 1},
+        {"query": "موتو x3m", "language": "ar (transliteration)", "avg_interest": 0}
+      ],
+      "winner": "en",
+      "ratio_subway": 68,
+      "screenshot": "gt-named-games.png",
+      "notes": "Specific game IPs are searched almost exclusively in English. Arabic transliterations of game names get near-zero traffic. CRITICAL: do not translate game names on plixfy."
+    },
+    {
+      "id": "brands",
+      "url": "https://trends.google.com/trends/explore?geo=SA&q=%D8%A7%D9%84%D8%B9%D8%A7%D8%A8%20%D9%81%D9%84%D8%A7%D8%B4,flash%20games,crazygames,poki&date=today%2012-m",
+      "terms": [
+        {"query": "العاب فلاش", "language": "ar", "avg_interest": 6},
+        {"query": "flash games", "language": "en", "avg_interest": 1},
+        {"query": "crazygames", "language": "en", "avg_interest": 1},
+        {"query": "poki", "language": "en", "avg_interest": 77}
+      ],
+      "winner": "ar for flash genre, en+brand for portals",
+      "screenshot": "gt-brands.png",
+      "notes": "Poki dominates Saudi brand awareness 77× over CrazyGames. Poki is the brand to position against, not CrazyGames. Flash-games nostalgic term still leans Arabic 6×."
+    },
+    {
+      "id": "online-spaced",
+      "url": "https://trends.google.com/trends/explore?geo=SA&q=%D8%A3%D9%84%D8%B9%D8%A7%D8%A8%20%D8%A7%D9%88%D9%86%20%D9%84%D8%A7%D9%8A%D9%86,%D8%A7%D9%84%D8%B9%D8%A7%D8%A8%20%D8%A7%D9%88%D9%86%20%D9%84%D8%A7%D9%8A%D9%86,games%20online,play%20games&date=today%2012-m",
+      "terms": [
+        {"query": "ألعاب اون لاين", "language": "ar", "avg_interest": 0},
+        {"query": "العاب اون لاين", "language": "ar (alt-spell)", "avg_interest": 6},
+        {"query": "games online", "language": "en", "avg_interest": 44},
+        {"query": "play games", "language": "en", "avg_interest": 33}
+      ],
+      "winner": "en",
+      "ratio": "7×",
+      "notes": "Arabic transliteration of 'online' fails to gain traction. English 'games online' / 'play games' dominate the composite-phrase category."
+    }
+  ],
+
+  "live_serp_audits": [
+    {
+      "query": "العاب مجانية",
+      "geo": "SA",
+      "locale": "ar",
+      "url_used": "https://www.google.com/search?q=%D8%A7%D9%84%D8%B9%D8%A7%D8%A8+%D9%85%D8%AC%D8%A7%D9%86%D9%8A%D8%A9&gl=sa&hl=ar",
+      "screenshot": "serp-arabic.png",
+      "results": [
+        {"rank": 1, "domain": "poki.com", "url_path": "/ar", "title": "Poki (بوكي) - موقع العاب مجانية عبر الإنترنت - العب الآن!", "arabic_title": true},
+        {"rank": 2, "domain": "crazygames.com", "url_path": "/ar/", "title": "ألعاب مجانية عبر الإنترنت على كريزي جيمز | العبها الآن!", "arabic_title": true},
+        {"rank": 3, "domain": "playhop.com", "url_path": "/ar", "title": "ألعاب مجانية على الإنترنت — 20000+ لعبة متصفح | Playhop", "arabic_title": true},
+        {"rank": 4, "domain": "microsoft.com", "url_path": "/ar-dj/store/top-free/games/pc", "title": "ألعاب مجانية | Microsoft Store", "arabic_title": true},
+        {"rank": 5, "domain": "say.games", "url_path": "/ar", "title": "ألعاب مجانية على الإنترنت | العب الآن!", "arabic_title": true},
+        {"rank": 6, "domain": "playstation.com", "url_path": "/ar-ae/editorial/great-free-to-play-games-on-playstation-4/", "title": "أفضل الألعاب المجانية على PS4 وPS5", "arabic_title": true},
+        {"rank": 7, "domain": "yandex.com", "url_path": "/games/ar", "title": "Yandex Games — ألعاب مجانية", "arabic_title": true},
+        {"rank": 8, "domain": "facebook.com", "url_path": "video", "title": "Arabic video", "arabic_title": true},
+        {"rank": 9, "domain": "youtube.com", "url_path": "shorts/W6nFYWOBUOc", "title": "الألعاب المجانية مو دايمًا ألعاب مجانية!", "arabic_title": true}
+      ],
+      "verdict": "100% of organic SERP uses Arabic title tags. All major Western portals (Poki, CrazyGames, Playhop, Microsoft, Sony, Yandex) localize to /ar. Plixfy MUST do the same to compete."
+    },
+    {
+      "query": "free online games",
+      "geo": "SA",
+      "locale": "en",
+      "url_used": "https://www.google.com/search?q=free+online+games&gl=sa&hl=en",
+      "results": [
+        {"rank": 1, "domain": "poki.com", "title": "Free Online Games at Poki - Play Now!", "saudi_targeted": false},
+        {"rank": 2, "domain": "crazygames.com", "title": "Free Online Games on CrazyGames | Play Now!", "saudi_targeted": false},
+        {"rank": 3, "domain": "playhop.com", "title": "Playhop: Free Online Games — 20000+ Browser Games", "saudi_targeted": false},
+        {"rank": 4, "domain": "funbrain.com", "title": "Online Games for Kids", "saudi_targeted": false, "audience": "US kids"},
+        {"rank": 5, "domain": "pbskids.org", "title": "Games", "saudi_targeted": false, "audience": "US public TV"},
+        {"rank": 6, "domain": "arkadium.com", "title": "Play Free Games Online - No Download Fun Games to Play!", "saudi_targeted": false},
+        {"rank": 7, "domain": "gamesgames.com", "title": "Play Games Online | Free Games at Gamesgames.com", "saudi_targeted": false},
+        {"rank": 8, "domain": "msn.com", "title": "Play Free Online Games", "saudi_targeted": false, "audience": "MSN India"},
+        {"rank": 9, "domain": "addictinggames.com", "title": "Free Online Games | Addicting Games has over 5000 Games", "saudi_targeted": false},
+        {"rank": 10, "domain": "nick.com", "title": "Free Online Games for Kids | Nick - Browse All Games", "saudi_targeted": false, "audience": "US Nickelodeon"}
+      ],
+      "verdict": "Half the English Saudi SERP is US/India-targeted content with zero Saudi cultural targeting. There's a competitive opportunity gap for an English-locale Saudi-targeted site — but volume is much lower than the Arabic SERP."
+    }
+  ],
+
+  "saudi_youtube_top_gaming": [
+    {"rank": 1, "channel": "Arab Games Network (شبكة العاب العرب)", "subs_millions": 21, "username_script": "Arabic+Latin", "content_language": "Arabic"},
+    {"rank": 2, "channel": "BanderitaX", "subs_millions": 16.6, "username_script": "Latin", "content_language": "Arabic", "creator_location": "Jazan, Saudi Arabia"},
+    {"channel": "FANTOM Pro", "username_script": "Latin", "content_language": "Arabic"},
+    {"channel": "D-Gray (ديكراي)", "username_script": "Mixed", "content_language": "Arabic"},
+    {"channel": "صالح - OPiiLz", "username_script": "Mixed", "content_language": "Arabic"},
+    {"channel": "D7oomy_999 (دحومي٩٩٩)", "username_script": "Mixed", "content_language": "Arabic"},
+    {"channel": "YassPlays", "username_script": "Latin", "content_language": "Arabic"},
+    {"channel": "Yousef Ahmed", "username_script": "Latin", "content_language": "Arabic"},
+    {"channel": "TMFaisal", "username_script": "Latin", "content_language": "Arabic"},
+    {"channel": "Saud Brothers Gaming", "username_script": "Latin", "content_language": "Arabic"},
+    {"channel": "Gamer Snack", "username_script": "Latin", "content_language": "Arabic"}
+  ],
+
+  "saudi_google_play_top_free_games_april_2025": [
+    {"rank": 1, "name": "Candy Crush Saga", "name_language": "en", "arabic_localized": true},
+    {"rank": 2, "name": "Ludo King", "name_language": "en", "arabic_localized": true},
+    {"rank": 3, "name": "PUBG Mobile", "name_language": "en", "arabic_localized": true},
+    {"name": "Yalla Ludo", "name_language": "ar", "arabic_localized": true, "note": "Saudi-built — Arabic-name game"},
+    {"name": "Roblox", "name_language": "en", "arabic_localized": true},
+    {"name": "Subway Surfers", "name_language": "en", "arabic_localized": true},
+    {"name": "Free Fire", "name_language": "en", "arabic_localized": true},
+    {"name": "Among Us", "name_language": "en", "arabic_localized": true}
+  ],
+
+  "saudi_top_games_websites_dec_2024_feb_2026": [
+    {"rank": 1, "site": "twitch.tv", "monthly_visits_feb2026_millions": 6.23, "language": "en (global)", "audience": "hardcore livestream"},
+    {"rank": 2, "site": "discord.com", "monthly_visits_feb2026_millions": 4.96, "language": "en", "audience": "all gamers"},
+    {"rank": 3, "site": "steampowered.com", "monthly_visits_feb2026_millions": 1.83, "language": "en", "audience": "PC gamers"},
+    {"site": "roblox.com", "language": "en", "audience": "kids/teens"},
+    {"site": "asuracomic.net", "language": "en", "audience": "anime/manga readers"},
+    {"site": "sng.link", "language": "en", "audience": "mobile app deep-links"},
+    {"site": "g2a.com", "language": "en", "audience": "key reseller"},
+    {"site": "steamdb.info", "language": "en", "audience": "Steam stats nerds"},
+    {"site": "kammelna.com", "language": "ar (Saudi)", "audience": "Saudi card gamers — winner of Tamatem 2025 MENA award"},
+    {"site": "fortnite.com", "language": "en", "audience": "battle royale"}
+  ],
+
+  "saudi_native_arabic_browser_game_portals_in_serp": [
+    {"domain": "gamesbarq.com", "name": "العاب فلاش برق", "claimed_catalog": "1,000+ games", "language": "ar"},
+    {"domain": "jawalgames.com", "name": "العاب جوال مجانية", "claimed_catalog": "—", "language": "ar"},
+    {"domain": "mizogames.com", "name": "MizoGames", "claimed_catalog": "250+ games", "language": "ar"}
+  ],
+
+  "weighted_split_estimate_per_1000_searches": {
+    "pure_arabic": 620,
+    "pure_english": 280,
+    "mixed_language": 100,
+    "confidence": "MEDIUM-HIGH",
+    "model_assumptions": {
+      "category_share_arabic_dominant": [
+        {"category": "general ألعاب (single-word search)", "share_pct": 25, "language_split": "100% ar"},
+        {"category": "Arabic-genre searches (العاب بنات/سيارات/اطفال/etc.)", "share_pct": 35, "language_split": "100% ar"}
+      ],
+      "category_share_english_dominant": [
+        {"category": "specific game-name searches (Subway Surfers, Moto X3M, Among Us)", "share_pct": 15, "language_split": "100% en"},
+        {"category": "portal-brand searches (Poki, CrazyGames, Y8)", "share_pct": 10, "language_split": "100% en"},
+        {"category": "transactional 'free games' / 'online games' composites", "share_pct": 5, "language_split": "100% en"}
+      ],
+      "category_share_mixed": [
+        {"category": "Arabic genre + English game name OR English genre + Arabic noun", "share_pct": 10, "language_split": "mixed"}
+      ]
+    },
+    "verification_plan": "Confirm with first 30 days of plixfy launch analytics — measure session-level UI language flips and search-query language distribution."
+  },
+
+  "saudi_demographic_data": {
+    "smartphone_penetration_2024_pct": 92,
+    "smartphone_users_2024_millions": 33.55,
+    "device_share_ios_pct": 46,
+    "device_share_android_pct": 54,
+    "manufacturer_share": {"Apple": 46, "Samsung": 24, "Huawei": 12},
+    "implication": "iOS-heavy market — Safari Arabic RTL rendering must be tested explicitly"
+  },
+
+  "linguistic_research_findings": [
+    {
+      "source": "Jouf University 2024 (Kais Sultan Mousa Alowidha)",
+      "key_quote": "bilingual Saudis often switch between Arabic and English depending on the context, particularly in casual or professional settings. ... in casual settings, code-switching takes place according to the topic",
+      "implication": "Games-as-leisure is a topic-dependent Arabic-leaning context for Saudi users"
+    },
+    {
+      "source": "Saudi Journal of Language Studies 2025 (parental attitudes)",
+      "key_quote": "50% of surveyed mothers would prefer to use a mix of English and Arabic when speaking to their children at home and 70% believe that the age of four or five is ideal for starting to learn English",
+      "implication": "Next-gen Saudi children will be more bilingual, but not English-dominant"
+    },
+    {
+      "source": "Arab News (2024) on Saudi code-switching",
+      "key_quote": "code-switching that has become a linguistic norm reflecting shifting social dynamics, culture and identity",
+      "implication": "Bilingual product expectation, but not equal-weight"
+    }
+  ],
+
+  "key_industry_quote": {
+    "source": "Google Play Apps & Games Team (Medium post)",
+    "quote": "achieving a top 5 spot in Google Play's 'New + Updated' section requires Arabic localization. Strategy games are the top-grossing genre in MENA, and most of the top strategy games are localized to Arabic.",
+    "implication": "Industry consensus — Arabic localization is required for top-tier Saudi market success"
+  },
+
+  "final_recommendation": {
+    "strategy": "Arabic-first with English-preserved game names",
+    "components": {
+      "UI_chrome": "Arabic with dir='rtl' default",
+      "fonts": "Tajawal primary, Inter for Latin overlay",
+      "game_titles": "English, untranslated (Moto X3M stays Moto X3M)",
+      "URL_slugs": "English (/category/racing, /play/moto-x3m)",
+      "title_tags_meta": "Arabic for category/home pages",
+      "search_input": "Accept both Arabic and English",
+      "english_locale_toggle": "Defer to Month 3, add /en/ prefix"
+    },
+    "risk_of_alternative_english_first": "HIGH — forfeits 620/1000 majority + soft competitive English SERP doesn't compensate for the lost Arabic volume",
+    "risk_of_alternative_bilingual_equal": "MEDIUM — 2× content/SEO budget for a market that has settled preferences",
+    "risk_of_alternative_arabic_only_no_english": "MEDIUM — loses 280/1000 English-specific-game searchers"
+  }
+}

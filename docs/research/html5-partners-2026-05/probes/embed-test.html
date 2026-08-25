@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Plixfy cross-origin embed test</title>
+  <style>
+    body { margin:0; background:#0a0a0a; color:#fff; font-family:sans-serif; }
+    h1 { padding:8px 12px; font-size:14px; }
+    iframe { width:100%; height:60vh; border:0; display:block; }
+    .meta { padding:8px 12px; font-size:11px; color:#888; }
+  </style>
+</head>
+<body>
+  <h1>Plixfy embed test — playgama.com/export/game/moto-x3m</h1>
+  <iframe
+    src="https://playgama.com/export/game/moto-x3m?clid=plixfy_test"
+    allow="fullscreen;accelerometer;camera;clipboard-read;clipboard-write;gyroscope;autoplay;encrypted-media;picture-in-picture"
+    referrerpolicy="no-referrer-when-downgrade"
+    loading="lazy"
+  ></iframe>
+  <div class="meta" id="meta">checking…</div>
+  <script>
+    const f = document.querySelector('iframe');
+    const meta = document.getElementById('meta');
+    const t0 = performance.now();
+    f.addEventListener('load', () => {
+      meta.textContent = 'iframe load event fired in ' + Math.round(performance.now()-t0) + 'ms';
+    });
+    setTimeout(() => {
+      try {
+        meta.textContent += ' | contentWindow accessible: ' + !!f.contentWindow;
+      } catch(e) { meta.textContent += ' | contentWindow blocked: ' + e.message; }
+    }, 5000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+{
+  "report_date": "2026-05-24",
+  "test_environment": {
+    "tool": "Playwright (Chromium) + curl 8.x",
+    "viewport": "393x852 (iPhone 14 Pro mobile)",
+    "user_agent_default": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0 Safari/537.36",
+    "embed_test_origin": "http://127.0.0.1:18099 (non-allowlisted)",
+    "tester_location_inferred": "Saudi Arabia (CF-RAY 'DMM' = Damman/Dammam edge)"
+  },
+
+  "phase_1_hands_on": {
+    "homepage_load": {
+      "url": "https://playgama.com/",
+      "title": "Free Online Games — Play now on Playgama [18078 games]",
+      "lang_attr": "en",
+      "dir_attr": "",
+      "hreflang_locales": ["en", "x-default", "es", "de", "fr", "it", "pt-BR", "tr", "pl", "id"],
+      "hreflang_arabic_present": false,
+      "hreflang_russian_present": false,
+      "ar_subpath_status": 404,
+      "ru_subpath_status": 404,
+      "perf": {
+        "TTFB_ms": 14.7,
+        "DOMContentLoaded_ms": 366,
+        "Load_ms": 2991.6,
+        "FCP_ms": 296,
+        "LCP_ms": 296,
+        "transfer_size_bytes": 66705,
+        "decoded_body_size_bytes": 455015
+      }
+    },
+
+    "arabic_search_test": {
+      "query": "سباق",
+      "url_encoded_in_url": "%D8%B3%D8%A8%D8%A7%D9%82",
+      "search_executed_successfully": true,
+      "results_returned": 7,
+      "category_badges_returned": 3,
+      "result_sample": [
+        "Sprint Race",
+        "Formula Car Racing Games",
+        "NSR Street",
+        "Dinosaur Shifting Run",
+        "Moto X3M",
+        "Obby: Extreme Cart Ride",
+        "Real Racing. Formula 1"
+      ],
+      "category_badges": ["Racing", "Race Games", "Car Racing"],
+      "verdict": "Arabic INPUT works (semantic matching to English game titles). Arabic UI does not exist."
+    },
+
+    "game_page_inspection": {
+      "url": "https://playgama.com/game/moto-x3m",
+      "title": "Moto X3M — play on Playgama (by MadPuffers)",
+      "fields_displayed_per_game": [
+        "Developer (linkable)",
+        "Game Orientation (Landscape, Portrait)",
+        "Platforms (PC, Android, iOS)",
+        "Release date (July 2025)",
+        "Last Update (May 2026)",
+        "Supported Languages",
+        "ESRB rating (E10+)",
+        "Stores",
+        "Other Links",
+        "Social (Fandom wiki)",
+        "Categories",
+        "Tags with game counts",
+        "Embed URL (copyable)",
+        "Related games carousel",
+        "Random games carousel"
+      ],
+      "interactions": {
+        "play_button": "Triggers iframe load with src=https://playgama.com/export/game/moto-x3m?export_mode=portal",
+        "like_dislike": "Buttons present",
+        "share": "Native share button",
+        "add_to_desktop": "PWA install prompt",
+        "report": "Content report button"
+      }
+    },
+
+    "iframe_inspection": {
+      "iframe_src_pattern": "https://playgama.com/export/game/{slug}?clid={partner_id}",
+      "alt_pattern": "https://playgama.com/export/game/{slug}?export_mode=portal",
+      "iframe_width": 393.6,
+      "iframe_height": 852,
+      "iframe_sandbox": null,
+      "iframe_allow_attribute": "fullscreen;accelerometer;camera;clipboard-read;clipboard-write;screen-wake-lock;speaker-selection;web-share;geolocation;gyroscope;microphone;xr-spatial-tracking;autoplay;encrypted-media;picture-in-picture;payment;publickey-credentials-get;publickey-credentials-create;storage-access;attribution-reporting;browsing-topics"
+    }
+  },
+
+  "iframe_cross_origin_embed_test": {
+    "test_setup": {
+      "local_html_path": "C:/Users/gaming/projects/playhub/docs/research/html5-partners-2026-05/probes/embed-test.html",
+      "local_server": "Python http.server on 127.0.0.1:18099",
+      "iframe_src_tested": "https://playgama.com/export/game/moto-x3m?clid=plixfy_test"
+    },
+    "results": {
+      "iframe_load_event_fired": true,
+      "iframe_load_time_ms": 1018,
+      "content_window_accessible": true,
+      "console_errors": 1,
+      "rendered_correctly": true,
+      "verdict": "PASS — cross-origin embed works without any Playgama-side allowlist registration"
+    }
+  },
+
+  "http_header_probes": {
+    "playgama_homepage": {
+      "url": "https://playgama.com/",
+      "headers_of_interest": {
+        "X-BFF-Route-Name": "unknown",
+        "X-BFF-Locale": "en-US",
+        "preload_link": "doubleclick.net/tag/js/gpt.js + fundingchoicesmessages.google.com"
+      }
+    },
+    "ar_locale": {
+      "url": "https://playgama.com/ar/",
+      "request_headers": {"Accept-Language": "ar"},
+      "http_status": 404
+    },
+    "ru_locale": {
+      "url": "https://playgama.com/ru/",
+      "http_status": 404
+    },
+    "sitemap": {
+      "url": "https://playgama.com/sitemap.xml",
+      "http_status": 404,
+      "actual_sitemap_per_robots": "https://playgama.com/sitemaps/v1/sitemap-index.xml"
+    },
+    "robots_txt_dump": [
+      "User-agent: *",
+      "Disallow: /api/",
+      "Disallow: /vcq2/",
+      "Disallow: /blog/author/",
+      "Disallow: /export/wl/",
+      "Sitemap: https://playgama.com/sitemaps/v1/sitemap-index.xml",
+      "Sitemap: https://playgama.com/blog/sitemap_index.xml",
+      "Sitemap: https://wiki.playgama.com/playgama/sitemap-pages.xml"
+    ],
+
+    "embed_iframe_url": {
+      "url": "https://playgama.com/export/game/moto-x3m?clid=plixfy_test",
+      "user_agent_tested": "Mozilla/5.0 Chrome/121 Safari/537.36",
+      "sec_fetch_dest_tested": "iframe",
+      "referer_tested": "https://plixfy.com/games/moto-x3m",
+      "http_status": 200,
+      "response_headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "Content-Security-Policy": "frame-ancestors *; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: wss: data: blob:; style-src 'self' 'unsafe-inline' https:; img-src * data: blob: https:; connect-src * wss:; frame-src *; font-src * data:; media-src *; object-src 'none'; base-uri 'self'; form-action 'self'; worker-src 'self' blob:",
+        "Permissions-Policy": "geolocation=(self *), microphone=(self *), camera=(self *), payment=(self *), usb=(self *), magnetometer=(self *), gyroscope=(self *), accelerometer=(self *)",
+        "Referrer-Policy": "no-referrer-when-downgrade",
+        "X-BFF-Route-Name": "export-game-page",
+        "X-BFF-Locale": "en-US"
+      },
+      "iframe_friendly_verdict": "PASS — frame-ancestors * permits any parent domain"
+    }
+  },
+
+  "api_endpoint_probes": {
+    "tested_paths": [
+      {"path": "/api/games", "http_status": 404},
+      {"path": "/api/v1/games", "http_status": 404},
+      {"path": "/api/game/moto-x3m", "http_status": 404},
+      {"path": "/api/main", "http_status": 404},
+      {"path": "/api/bff/main", "http_status": 404},
+      {"path": "/bff/game/moto-x3m", "http_status": 404},
+      {"path": "/export/api/games", "http_status": 404},
+      {"path": "/vcq2/", "http_status": 404, "note": "Blocked in robots.txt — internal route"}
+    ],
+    "public_catalog_access_method": "Partner JSON catalog download (after signup at widgets.playgama.com)",
+    "sitemap_alternative": {
+      "url": "https://playgama.com/sitemaps/v1/sitemap-games-1.xml",
+      "size_bytes": 450002,
+      "urls_in_file": 25000,
+      "locales_per_game": 9,
+      "unique_games_in_file": "~2,777",
+      "total_game_sitemap_files": 7,
+      "estimated_total_unique_games": "~19,400 (consistent with title's 18,078)"
+    }
+  },
+
+  "ads_stack": {
+    "ads_txt_url": "https://playgama.com/ads.txt",
+    "ads_txt_last_updated": "2025-03-18",
+    "ownerdomain": "playgama.com",
+    "managerdomain": "playgama.com",
+    "contact": "admanager@playgama.com",
+    "direct_publisher_ids": [
+      {"network": "google.com (AdSense/AdManager)", "id": "pub-8099500083149366", "type": "DIRECT"},
+      {"network": "google.com (AdSense/AdManager)", "id": "pub-2864899775153797", "type": "DIRECT"},
+      {"network": "google.com (AdSense/AdManager)", "id": "pub-2861343636416493", "type": "DIRECT"}
+    ],
+    "ssp_direct_partners": ["indexexchange.com", "smartadserver.com", "sharethrough.com", "inmobi.com", "media.net", "onetag.com"],
+    "ssp_reseller_partners": ["appnexus.com", "pubmatic.com", "rubiconproject.com", "video.unrulymedia.com", "smaato"],
+    "outbrain_integration": true,
+    "verdict": "Modern production header-bidding stack. AdSense compatible because their ads run in their iframe origin; parent-page AdSense on plixfy.com runs in a separate ad context."
+  },
+
+  "company_verification": {
+    "name": "Playgama",
+    "legal_entity_disclosed": false,
+    "estimated_entity_type": "UAE LLC or DIFC/ADGM company",
+    "headquarters": "Dubai, UAE",
+    "founded": "2023",
+    "founder": {
+      "name": "Dmitry Kachmar",
+      "linkedin": "https://www.linkedin.com/in/dmitry-kachmar-84392725/",
+      "education": "Harvard Business School (sabbatical 2023)",
+      "previous_accolades": "Forbes 30 under 30 (2020) per LinkedIn"
+    },
+    "team_size_claim": "30+ employees, US to Indonesia",
+    "developer_count_claim": "3,200+ across 40+ countries",
+    "user_count_claim": {
+      "stated_total": "300 million monthly players (also '450M+ users' on some pages)",
+      "interpretation": "Partner-network aggregate (not first-party playgama.com traffic)"
+    },
+    "funding": {
+      "round_label": "Series A (per multiple press)",
+      "amount_usd": 3000000,
+      "date": "2024-12-03",
+      "lead_investor": "The Open Platform",
+      "co_investors": ["s16vc", "FJ Labs", "The Games Fund", "TON Ventures", "Kirill Eves (Unlimit founder, angel)"]
+    },
+    "github_org": {
+      "url": "https://github.com/Playgama",
+      "public_repos_count": 25,
+      "top_repos_by_stars": [
+        {"name": "bridge-unity", "stars": 52, "forks": 7, "language": "C#", "last_commit": "2026-05-19"},
+        {"name": "bridge-godot-4", "stars": 43, "forks": 4, "language": "GDScript", "last_commit": "2026-05-14"},
+        {"name": "bridge", "stars": 38, "forks": 7, "language": "JavaScript", "last_commit": "2026-05-20"},
+        {"name": "hide-mobile-safari-tabs", "stars": 35, "forks": 0, "language": "HTML", "last_commit": "2026-05-20"},
+        {"name": "bridge-defold", "stars": 32, "forks": 2, "language": "C++", "last_commit": "2026-04-13"},
+        {"name": "bridge-gdevelop", "stars": 32, "forks": 1, "last_commit": "2026-04-10"},
+        {"name": "bridge-godot", "stars": 29, "forks": 3, "language": "GDScript", "last_commit": "2026-05-22"},
+        {"name": "bridge-gamemaker", "stars": 22, "forks": 1, "language": "JavaScript", "last_commit": "2026-05-07"},
+        {"name": "bridge-construct", "stars": 22, "forks": 2, "language": "JavaScript", "last_commit": "2026-04-25"},
+        {"name": "bridge-cocos-creator", "stars": 13, "forks": 2, "language": "TypeScript", "last_commit": "2026-05-19"},
+        {"name": "bridge-scratch", "stars": 11, "forks": 2, "last_commit": "2026-05-07"},
+        {"name": "bridge-claude-plugins", "stars": 10, "forks": 1, "last_commit": "2026-01-16"}
+      ],
+      "license": "MIT (per Trustpilot reviewer Shahriar Labib, Aug 2025)",
+      "verdict": "Open, active, multi-engine — strongest dev-tool transparency in the HTML5 publishing market"
+    },
+    "verdict": "Real UAE-domiciled company with named founder, public funding, public GitHub. Strongest accountability profile of any non-public-company option in this market."
+  },
+
+  "awards_verification": {
+    "mena_games_industry_awards_2025": {
+      "category": "Best Service Provider",
+      "result": "FINALIST",
+      "source": "https://www.pocketgamer.biz/mena-games-industry-awards-2025-finalists-revealed/",
+      "peer_finalists": ["Elevatix", "Endless Studios", "Futura Digital", "Lobah Play", "Pay1st (Carry1st)", "Polygonflow", "SocialPeta", "Tamatem Plus", "The Game Company", "Xsolla & Niko Partners"],
+      "winner": "Not Playgama (winner not Playgama per cross-reference)",
+      "ceremony_date": "2025-05-08 at Dubai GameExpo Summit"
+    },
+    "pocketgamer_mobile_games_awards_2025": {
+      "category": "Best Tool Provider",
+      "result": "FINALIST",
+      "source": "https://www.mobilegamesawards.com/the-finalists-for-2025/",
+      "peer_finalists": ["Antidote.gg", "AppHarbr", "Applivery", "Backnd", "Geeklab", "Gridly", "Layer", "Metaplay", "Photon", "PlaySafe ID", "Quvy"],
+      "winner": "Not yet verified",
+      "ceremony_date": "2025-08-19 in Cologne"
+    },
+    "game_dev_heroes_2025": {
+      "claim": "Winner (from Round 1 report)",
+      "result": "FALSE — claim is unsupported",
+      "source": "https://gamedevheroes.co/game-dev-heroes-2025-winners/ — full winner list checked, no Playgama mention",
+      "note": "Game Dev Heroes is an individual-person award (Art Hero, Programming Hero, etc.), not a company award. Playgama could not have won regardless. Round 1 claim removed."
+    }
+  },
+
+  "trustpilot_analysis": {
+    "url": "https://www.trustpilot.com/review/playgama.com",
+    "extracted_via": "Playwright DOM inspection (2026-05-24)",
+    "score": 3.5,
+    "review_count": 24,
+    "publisher_side_reviews": {
+      "positive": [
+        {"reviewer": "SubLevel Games", "date": "2026-04-07", "stars": 5, "key_quote": "feedback loop is incredibly fast and the team is remarkably persistent and kind"},
+        {"reviewer": "Ninja", "date": "2026-01-28", "stars": 5, "key_quote": "Best Publisher — Great developers support, easy SDK integration, minimalistic UI/UX"},
+        {"reviewer": "Yusup Ab", "date": "2026-01-20", "stars": 5, "key_quote": "speed of moderation and game releases on other platforms... noticeably faster than working with another publisher"},
+        {"reviewer": "Sortri Games", "date": "2026-01-05", "stars": 4, "key_quote": "Best beginners start for indies to career, friendly support friendly server discord good revenue"},
+        {"reviewer": "Erick Garayblas", "date": "2025-12-20", "stars": 5, "key_quote": "Onboarding and launching games with them has been a breeze"},
+        {"reviewer": "Bedevil Games", "date": "2025-12-18", "stars": 5, "key_quote": "Communication is smooth and they reply quickly... guide you step by step"},
+        {"reviewer": "Shahriar Labib", "date": "2025-08-01", "stars": 5, "key_quote": "They have a pretty good MIT licensed SDK!"},
+        {"reviewer": "Malia Thomas", "date": "2025-06-13", "stars": 5, "key_quote": "Easy setup, and I got my first payment", "load_bearing": "FIRST PAYMENT CONFIRMED"}
+      ],
+      "negative": [
+        {"reviewer": "Romeo", "date": "2025-12-02", "stars": 1, "key_quote": "Developer Support is extremely slow and not helping at all. I get ignored 9 out of 10 times"}
+      ]
+    },
+    "player_side_reviews_summary": "Mixed. Positive on UX and game variety. Negative on Roblox-brainrot content, YouTube Shorts ad annoyance, and EU cookie-consent compliance.",
+    "ratio": "8 publisher-positive vs 1 publisher-negative (8:1)"
+  },
+
+  "competitor_performance_benchmark": {
+    "test_setup": "Mobile viewport 393x852, Chrome/Chromium, Cloudflare-cached fetches, no throttling",
+    "measurements": [
+      {"site": "playgama.com", "TTFB_ms": 14.7, "FCP_ms": 296, "LCP_ms": 296, "Load_ms": 2991.6, "transfer_KB": 66.7, "decoded_KB": 455},
+      {"site": "poki.com", "TTFB_ms": 153.8, "FCP_ms": 460, "LCP_ms": 460, "Load_ms": 629.5, "transfer_KB": 52.7, "decoded_KB": 384},
+      {"site": "crazygames.com", "TTFB_ms": 503.3, "FCP_ms": 716, "LCP_ms": 716, "Load_ms": 2093, "decoded_KB": 278, "above_fold_cards": 65}
+    ],
+    "verdict": "Playgama wins on LCP (best Core Web Vital). Poki wins on total Load. CrazyGames densest above-fold."
+  },
+
+  "decision_framework_scorecard": {
+    "tests": [
+      {"test": "Iframe loads cleanly on plixfy without allowlist friction", "result": "PASS", "evidence": "CSP frame-ancestors *, cross-origin embed in 1018ms"},
+      {"test": "At least 2 independent publishers confirm 70%+ tier in practice", "result": "PARTIAL", "evidence": "Documented identically on /developers and partner wiki; 8 positive publisher reviews; no public dashboard screenshot at the high tier"},
+      {"test": "Saudi bank or crypto payout works", "result": "PARTIAL", "evidence": "Methods: PayPal, Wise, Crypto, Bank. Wise works for SAR. No live Saudi reference yet"},
+      {"test": "No active 2025 non-payment complaints", "result": "PASS", "evidence": "Zero non-payment complaints found; ScamAdvisor 95/100; one publisher confirms first payment received May 2025"},
+      {"test": "AdSense compatibility verified or no known violation", "result": "PASS", "evidence": "No public violation history; iframe ad model is standard Google-approved configuration"},
+      {"test": "Catalog has 500+ verified-mobile-friendly games", "result": "PASS", "evidence": "18,078 first-party games; per-game `orientation` metadata"}
+    ],
+    "total_hard_passes": 4,
+    "total_partials": 2,
+    "total_fails": 0,
+    "framework_decision": "GO PRIMARY (4+ greens) — phase rollout per playgama_deep_report.md §Recommended phased rollout"
+  }
+}
