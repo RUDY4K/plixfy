@@ -90,6 +90,25 @@ test("automation validation rejects failures and stale successful runs", () => {
   assert.throws(() => validateAutomationRun(stale, { label: "Social", maxAgeHours: 14, now }), /last succeeded/);
 });
 
+test("automation freshness allows the bounded GitHub schedule grace period", () => {
+  const now = new Date("2026-08-25T07:14:00.000Z");
+  const payload = {
+    workflow_runs: [{
+      id: 456,
+      conclusion: "success",
+      created_at: "2026-08-24T17:03:00.000Z",
+      updated_at: "2026-08-24T17:05:00.000Z",
+      html_url: "https://github.com/RUDY4K/plixfy/actions/runs/456",
+    }],
+  };
+
+  assert.equal(validateAutomationRun(payload, { label: "Social", maxAgeHours: 16, now }).ageHours, 14.15);
+  assert.throws(
+    () => validateAutomationRun(payload, { label: "Social", maxAgeHours: 14, now }),
+    /last succeeded 14\.2 hours ago/,
+  );
+});
+
 test("transient failures are retried with a bounded attempt count", async () => {
   let attempts = 0;
   const result = await withRetries(async () => {
