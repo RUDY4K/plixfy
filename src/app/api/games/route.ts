@@ -17,6 +17,7 @@ export function GET(request: Request) {
           title: game.title,
           slug: game.slug,
           thumbnail: game.thumbnail,
+          thumbnailWide: game.thumbnailWide,
           category: game.category,
           categorySlug: game.categorySlug,
           badge: game.badge,

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Play, X, ArrowDown } from "lucide-react";
+import GameArtwork from "@/components/GameArtwork";
 import { localeFromPathname, getDict } from "@/lib/i18n";
 import { getPlaygamaEmbedUrl } from "@/lib/playgama";
 import { trackEvent, trackEventOnce } from "./GoogleAnalytics";
@@ -12,11 +12,12 @@ export interface GameFrameProps {
   slug: string;
   title: string;
   thumbnail: string;
+  fallbackThumbnail?: string;
   orientation?: "landscape" | "portrait" | "both";
 }
 
 export default function GameFrame(props: GameFrameProps) {
-  const { slug, title, thumbnail, orientation } = props;
+  const { slug, title, thumbnail, fallbackThumbnail, orientation } = props;
   const t = getDict(localeFromPathname(usePathname()));
   const sourceName = "playgama";
   const embedSrc = getPlaygamaEmbedUrl(slug);
@@ -143,8 +144,9 @@ export default function GameFrame(props: GameFrameProps) {
             data-game-slug={slug}
             data-placement="game-frame"
           >
-            <Image
+            <GameArtwork
               src={thumbnail}
+              fallbackSrc={fallbackThumbnail}
               alt={title}
               fill
               sizes="(max-width: 768px) 100vw, 900px"

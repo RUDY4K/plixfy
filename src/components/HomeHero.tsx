@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Gamepad2, Play, Rocket, Smartphone } from "lucide-react";
+import GameArtwork from "@/components/GameArtwork";
 import { localeHref, type Locale } from "@/lib/i18n";
 
 interface HomeHeroProps {
@@ -12,6 +12,7 @@ interface HomeHeroProps {
     title: string;
     slug: string;
     thumbnail: string;
+    thumbnailWide?: string;
     category?: string;
   };
 }
@@ -23,8 +24,9 @@ export default function HomeHero({ locale, heading, summary, gameCount, game }: 
 
   return (
     <section className="relative mx-4 mb-7 min-h-[560px] overflow-hidden rounded-[2rem] border border-white/10 bg-surface shadow-[0_30px_100px_rgba(0,0,0,.42)] md:mx-0 md:min-h-[520px] md:rounded-[2.5rem]">
-      <Image
-        src={game.thumbnail}
+      <GameArtwork
+        src={game.thumbnailWide || game.thumbnail}
+        fallbackSrc={game.thumbnail}
         alt={game.title}
         fill
         sizes="(max-width: 768px) 100vw, 1280px"
@@ -77,7 +79,7 @@ export default function HomeHero({ locale, heading, summary, gameCount, game }: 
           href={href(`/play/${game.slug}`)}
           className="mt-7 flex w-fit max-w-full items-center gap-3 rounded-2xl border border-white/10 bg-black/35 p-2 pe-4 backdrop-blur-xl transition hover:border-primary/40 hover:bg-black/50"
         >
-          <Image src={game.thumbnail} alt="" width={52} height={52} className="h-13 w-13 rounded-xl object-cover" />
+          <GameArtwork src={game.thumbnail} fallbackSrc={game.thumbnailWide} alt="" width={52} height={52} className="h-13 w-13 rounded-xl object-cover" />
           <span className="min-w-0">
             <span className="block text-[10px] font-bold text-primary">{isArabic ? "اختيار بليكسفاي اليوم" : "PLIXFY PICK TODAY"}</span>
             <span dir="ltr" className="block truncate font-latin text-sm font-extrabold text-white">{game.title}</span>

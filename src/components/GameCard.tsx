@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Crown, Flame, Play, Sparkles } from "lucide-react";
+import GameArtwork from "@/components/GameArtwork";
 import { categories } from "@/lib/games";
 import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -10,6 +10,7 @@ export type GameBadge = "hot" | "new" | "top" | null;
 export interface GameCardProps {
   title: string;
   thumbnail: string;
+  thumbnailWide?: string;
   slug: string;
   badge?: GameBadge;
   category?: string;
@@ -21,7 +22,7 @@ export interface GameCardProps {
 }
 
 export default function GameCard(props: GameCardProps) {
-  const { title, thumbnail, slug, badge, position, placement } = props;
+  const { title, thumbnail, thumbnailWide, slug, badge, position, placement } = props;
   const locale = props.locale ?? defaultLocale;
   const t = getDict(locale);
 
@@ -46,8 +47,9 @@ export default function GameCard(props: GameCardProps) {
         aria-hidden="true"
       />
       <div className="relative aspect-square overflow-hidden rounded-[1.35rem] border border-white/[0.07] bg-surface shadow-[0_12px_30px_rgba(0,0,0,.16)] transition-colors group-hover:border-white/15">
-        <Image
+        <GameArtwork
           src={thumbnail}
+          fallbackSrc={thumbnailWide}
           alt={title}
           fill
           sizes="(max-width: 768px) 33vw, 180px"

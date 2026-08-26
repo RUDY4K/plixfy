@@ -1,12 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Crown, Flame, Play } from "lucide-react";
+import GameArtwork from "@/components/GameArtwork";
 import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 
 export interface HeroTileProps {
   title: string;
   slug: string;
   thumbnail: string;
+  thumbnailWide?: string;
   category?: string;
   description?: string;
   isTopGame?: boolean;
@@ -14,7 +15,7 @@ export interface HeroTileProps {
 }
 
 export default function HeroTile(props: HeroTileProps) {
-  const { title, slug, thumbnail, category, isTopGame } = props;
+  const { title, slug, thumbnail, thumbnailWide, category, isTopGame } = props;
   const locale = props.locale ?? defaultLocale;
   const t = getDict(locale);
 
@@ -30,8 +31,9 @@ export default function HeroTile(props: HeroTileProps) {
       data-placement={isTopGame ? "hero-top-game" : "hero"}
     >
       <div className="relative aspect-[16/10] md:aspect-[21/9]">
-        <Image
+        <GameArtwork
           src={thumbnail}
+          fallbackSrc={thumbnailWide}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, 1280px"

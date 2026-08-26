@@ -304,6 +304,7 @@ export default async function PlayPage({
           slug={game.slug}
           title={game.title}
           thumbnail={game.thumbnailWide || game.thumbnail}
+          fallbackThumbnail={game.thumbnail}
           orientation={game.orientation}
         />
       </div>

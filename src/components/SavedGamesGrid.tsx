@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Clock3, Gamepad2, Heart, LoaderCircle, Play } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
+import GameArtwork from "@/components/GameArtwork";
 import { usePlayerData } from "@/components/PlayerDataProvider";
 import { localeHref, type Locale } from "@/lib/i18n";
 
@@ -12,6 +12,7 @@ interface SavedGame {
   title: string;
   slug: string;
   thumbnail: string;
+  thumbnailWide?: string;
   category: string;
   categorySlug: string;
 }
@@ -84,7 +85,7 @@ export default function SavedGamesGrid({ locale, mode }: { locale: Locale; mode:
         <article key={game.slug} className="group relative">
           <Link href={localeHref(locale, `/play/${game.slug}`)} className="block transition duration-300 hover:-translate-y-1">
             <div className="relative aspect-square overflow-hidden rounded-[1.4rem] border border-white/[0.07] bg-surface shadow-[0_14px_35px_rgba(0,0,0,.2)]">
-              <Image src={game.thumbnail} alt={game.title} fill sizes="(max-width: 640px) 50vw, 220px" quality={60} className="object-cover transition duration-500 group-hover:scale-105" />
+              <GameArtwork src={game.thumbnail} fallbackSrc={game.thumbnailWide} alt={game.title} fill sizes="(max-width: 640px) 50vw, 220px" quality={60} className="object-cover transition duration-500 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
               <span className="absolute bottom-3 start-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-xs font-black text-white backdrop-blur"><Play className="h-3 w-3 fill-current" />{t.play}</span>
             </div>

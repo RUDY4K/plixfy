@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck, ChevronDown, ChevronLeft, Clock3, Gamepad2, Grid2X2, MonitorSmartphone, Play, Search, Sparkles, Trophy, Zap } from "lucide-react";
 import GameCard from "@/components/GameCard";
+import GameArtwork from "@/components/GameArtwork";
 import TrackOnMount from "@/components/TrackOnMount";
 import { allGames, categories, getGamesByCategory, getTopPicks, getTrendingGames } from "@/lib/games";
 import { getDailyGame } from "@/lib/gameStats";
@@ -90,7 +90,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.72fr)_minmax(19rem,.78fr)]">
         <div className="group relative min-h-[500px] overflow-hidden rounded-[2rem] border border-white/10 bg-surface shadow-[0_30px_90px_rgba(0,0,0,.26)] md:min-h-[540px]">
-          <Image src={dailyGame.thumbnailWide || dailyGame.thumbnail} alt={dailyGame.title} fill priority sizes="(max-width: 1280px) 100vw, 900px" className="object-cover transition duration-700 group-hover:scale-[1.015]" />
+          <GameArtwork src={dailyGame.thumbnailWide || dailyGame.thumbnail} fallbackSrc={dailyGame.thumbnail} alt={dailyGame.title} fill priority sizes="(max-width: 1280px) 100vw, 900px" className="object-cover transition duration-700 group-hover:scale-[1.015]" />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,18,.04),rgba(7,7,18,.96)_86%)] md:bg-[linear-gradient(90deg,rgba(7,7,18,.98),rgba(7,7,18,.74)_42%,rgba(7,7,18,.12)_78%)] rtl:md:bg-[linear-gradient(270deg,rgba(7,7,18,.98),rgba(7,7,18,.74)_42%,rgba(7,7,18,.12)_78%)]" />
           <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5 md:p-8">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-bg/65 px-3 py-1.5 text-xs font-extrabold text-primary backdrop-blur-xl">
@@ -188,7 +188,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <div className="grid gap-3 sm:grid-cols-2">
             {freshGames.slice(0, 6).map((game) => (
               <Link key={game.slug} href={href(`/play/${game.slug}`)} className="group flex items-center gap-3 border-b border-white/[0.07] py-3 transition hover:bg-white/[0.025]">
-                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl"><Image src={game.thumbnail} alt={game.title} fill sizes="80px" className="object-cover transition duration-300 group-hover:scale-105" /></div>
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl"><GameArtwork src={game.thumbnail} fallbackSrc={game.thumbnailWide} alt={game.title} fill sizes="80px" className="object-cover transition duration-300 group-hover:scale-105" /></div>
                 <span className="min-w-0"><span dir="ltr" className="block truncate text-start font-latin text-sm font-black text-white">{game.title}</span><span className="mt-1 block text-xs text-text-secondary">{locale === "ar" ? game.category : game.genres[0] ?? game.category}</span><span className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-primary"><Play className="h-3 w-3 fill-current" />{locale === "ar" ? "العب" : "Play"}</span></span>
               </Link>
             ))}
@@ -201,7 +201,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <div className="scrollbar-hide flex snap-x gap-4 overflow-x-auto pb-3">
           {topPicks.slice(0, 8).map((game) => (
             <Link key={game.slug} href={href(`/play/${game.slug}`)} className="group relative min-h-52 w-[280px] shrink-0 snap-start overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-surface sm:w-[330px]">
-              <Image src={game.thumbnailWide || game.thumbnail} alt={game.title} fill sizes="330px" className="object-cover transition duration-500 group-hover:scale-105" /><div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" /><div className="absolute inset-x-0 bottom-0 p-5"><p dir="ltr" className="text-start font-latin text-lg font-black text-white">{game.title}</p><span className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary"><Play className="h-3 w-3 fill-current" />{locale === "ar" ? "تشغيل فوري" : "Instant play"}</span></div>
+              <GameArtwork src={game.thumbnailWide || game.thumbnail} fallbackSrc={game.thumbnail} alt={game.title} fill sizes="330px" className="object-cover transition duration-500 group-hover:scale-105" /><div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" /><div className="absolute inset-x-0 bottom-0 p-5"><p dir="ltr" className="text-start font-latin text-lg font-black text-white">{game.title}</p><span className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary"><Play className="h-3 w-3 fill-current" />{locale === "ar" ? "تشغيل فوري" : "Instant play"}</span></div>
             </Link>
           ))}
         </div>
