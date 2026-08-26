@@ -27,7 +27,7 @@ import { allGames } from "@/lib/games";
 
 const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "700", "800", "900"],
   variable: "--font-tajawal",
   display: "optional",
 });
