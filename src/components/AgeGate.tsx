@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import { localeFromPathname, localeHref, getDict } from "@/lib/i18n";
@@ -17,6 +17,8 @@ export default function AgeGate({ children, category }: AgeGateProps) {
   const [confirmed, setConfirmed] = useState<boolean | null>(null);
   const locale = localeFromPathname(usePathname());
   const t = getDict(locale);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     try {
@@ -25,6 +27,14 @@ export default function AgeGate({ children, category }: AgeGateProps) {
       setConfirmed(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (confirmed !== false) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (!dialog.open) dialog.showModal();
+    confirmRef.current?.focus();
+  }, [confirmed]);
 
   // While determining state, render nothing to avoid flash
   if (confirmed === null) return null;
@@ -37,14 +47,41 @@ export default function AgeGate({ children, category }: AgeGateProps) {
       // ignore
     }
     setConfirmed(true);
+    requestAnimationFrame(() => {
+      document.getElementById("main-content")?.focus();
+    });
+  }
+
+  function trapFocus(event: KeyboardEvent<HTMLDialogElement>) {
+    if (event.key !== "Tab") return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const focusable = Array.from(
+      dialog.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    );
+    const first = focusable[0];
+    const last = focusable.at(-1);
+    if (!first || !last) return;
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
+    <dialog
+      ref={dialogRef}
       aria-labelledby="age-gate-title"
-      className="fixed inset-0 z-[100] bg-bg/95 backdrop-blur flex items-center justify-center p-4"
+      aria-describedby="age-gate-description"
+      onCancel={(event) => event.preventDefault()}
+      onKeyDown={trapFocus}
+      className="fixed inset-0 z-[100] m-0 h-screen w-screen max-h-none max-w-none border-0 bg-bg/95 p-4 text-text-primary backdrop-blur open:flex open:items-center open:justify-center"
     >
       <div className="max-w-md w-full bg-surface border border-surface-elevated rounded-3xl p-6 md:p-8 shadow-2xl">
         <div className="flex items-center gap-3 mb-4">
@@ -55,7 +92,7 @@ export default function AgeGate({ children, category }: AgeGateProps) {
             {t.ageGate.title}
           </h2>
         </div>
-        <p className="text-sm md:text-base text-text-secondary leading-relaxed mb-6">
+        <p id="age-gate-description" className="text-sm md:text-base text-text-secondary leading-relaxed mb-6">
           {t.ageGate.bodyPrefix}{" "}
           <span className="font-semibold text-text-primary">{category}</span>{" "}
           {t.ageGate.bodyAgeNote} <strong>13+</strong>. {t.ageGate.bodyConfirm}
@@ -63,8 +100,9 @@ export default function AgeGate({ children, category }: AgeGateProps) {
         <div className="flex flex-col md:flex-row gap-3">
           <button
             type="button"
+            ref={confirmRef}
             onClick={confirm}
-            className="flex-1 min-h-12 bg-primary text-white font-bold py-3 rounded-xl hover:brightness-110 transition"
+            className="flex-1 min-h-12 bg-primary text-[#090913] font-bold py-3 rounded-xl hover:brightness-110 transition"
           >
             {t.ageGate.confirm}
           </button>
@@ -76,6 +114,6 @@ export default function AgeGate({ children, category }: AgeGateProps) {
           </Link>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 }

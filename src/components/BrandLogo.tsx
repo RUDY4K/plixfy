@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 
 export default function BrandLogo({
@@ -10,6 +13,7 @@ export default function BrandLogo({
   compact?: boolean;
 }) {
   const t = getDict(locale);
+  const [direct, setDirect] = useState(false);
 
   return (
     <Link
@@ -25,7 +29,10 @@ export default function BrandLogo({
           width={44}
           height={44}
           className="relative h-10 w-10 object-contain"
-          priority
+          sizes="40px"
+          loading="lazy"
+          unoptimized={direct}
+          onError={() => setDirect(true)}
         />
       </span>
       {compact ? null : (

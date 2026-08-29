@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { trackEvent } from './GoogleAnalytics';
+import { onConsentChange } from '@/lib/consent';
 
 export default function PageViewTracker() {
   const pathname = usePathname();
@@ -10,12 +11,19 @@ export default function PageViewTracker() {
 
   useEffect(() => {
     if (!pathname) return;
-    const qs = searchParams?.toString();
-    const fullPath = qs ? `${pathname}?${qs}` : pathname;
-    trackEvent('page_view', {
-      page_path: fullPath,
-      page_location: typeof window !== 'undefined' ? window.location.href : undefined,
-      page_title: typeof document !== 'undefined' ? document.title : undefined,
+    const reportCurrentPage = () => {
+      const qs = searchParams?.toString();
+      const fullPath = qs ? `${pathname}?${qs}` : pathname;
+      trackEvent('page_view', {
+        page_path: fullPath,
+        page_location: window.location.href,
+        page_title: document.title,
+      });
+    };
+
+    reportCurrentPage();
+    return onConsentChange((choice) => {
+      if (choice === 'accept') reportCurrentPage();
     });
   }, [pathname, searchParams]);
 

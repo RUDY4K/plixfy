@@ -32,7 +32,7 @@ export default function HomeHero({ locale, heading, summary, gameCount, game }: 
         sizes="(max-width: 768px) 100vw, 1280px"
         quality={75}
         className="object-cover object-center md:object-[70%_center]"
-        priority
+        preload
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,18,.08)_0%,rgba(7,7,18,.7)_55%,#070712_100%)] md:bg-[linear-gradient(90deg,#070712_0%,rgba(7,7,18,.94)_38%,rgba(7,7,18,.38)_74%,rgba(7,7,18,.12)_100%)] rtl:md:bg-[linear-gradient(270deg,#070712_0%,rgba(7,7,18,.94)_38%,rgba(7,7,18,.38)_74%,rgba(7,7,18,.12)_100%)]" />
       <div className="absolute inset-0 opacity-50 [background-image:radial-gradient(circle_at_20%_20%,rgba(0,229,255,.15),transparent_28%),radial-gradient(circle_at_75%_70%,rgba(255,45,139,.16),transparent_32%)]" />
@@ -55,7 +55,7 @@ export default function HomeHero({ locale, heading, summary, gameCount, game }: 
             href={href(`/play/${game.slug}`)}
             className="group inline-flex min-h-13 items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-black text-[#090913] shadow-[0_14px_35px_rgba(255,255,255,.16)] transition duration-200 hover:-translate-y-0.5 hover:bg-accent-2"
           >
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-white">
+            <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-[#090913]">
               <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
             </span>
             {isArabic ? "ابدأ بلعبة اليوم" : "Play today's pick"}

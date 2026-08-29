@@ -92,6 +92,8 @@ export function trackEventOnce(
   params?: EventParams,
 ): void {
   if (typeof window === 'undefined') return;
+  if (isBot()) return;
+  if (getConsent() !== 'accept') return;
   try {
     if (sessionStorage.getItem(DEDUP_PREFIX + dedupKey) === '1') return;
     sessionStorage.setItem(DEDUP_PREFIX + dedupKey, '1');
@@ -127,7 +129,6 @@ export default function GoogleAnalytics({ gaId }: { gaId: string }) {
       <Script
         id="ga-init"
         strategy="lazyOnload"
-        onLoad={flushQueuedEvents}
       >
         {`
           window.dataLayer = window.dataLayer || [];
@@ -144,6 +145,15 @@ export default function GoogleAnalytics({ gaId }: { gaId: string }) {
             anonymize_ip: true,
             transport_type: 'beacon',
           });
+          try {
+            var queuedEvents = JSON.parse(localStorage.getItem('${QUEUE_KEY}') || '[]');
+            queuedEvents.forEach(function(item) {
+              if (item && typeof item.name === 'string') {
+                gtag('event', item.name, item.params);
+              }
+            });
+            localStorage.removeItem('${QUEUE_KEY}');
+          } catch (error) {}
         `}
       </Script>
     </>

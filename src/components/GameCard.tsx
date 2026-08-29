@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { Crown, Flame, Play, Sparkles } from "lucide-react";
 import GameArtwork from "@/components/GameArtwork";
 import { categories } from "@/lib/games";
 import { localeHref, getDict, defaultLocale, type Locale } from "@/lib/i18n";
 import FavoriteButton from "@/components/FavoriteButton";
+import TrackedGameLink from "@/components/TrackedGameLink";
 
 export type GameBadge = "hot" | "new" | "top" | null;
 
@@ -19,10 +19,20 @@ export interface GameCardProps {
   placement?: string;
   showStats?: boolean;
   locale?: Locale;
+  imageSizes?: string;
 }
 
 export default function GameCard(props: GameCardProps) {
-  const { title, thumbnail, thumbnailWide, slug, badge, position, placement } = props;
+  const {
+    title,
+    thumbnail,
+    thumbnailWide,
+    slug,
+    badge,
+    position,
+    placement,
+    imageSizes = "(max-width: 767px) 50vw, (max-width: 1023px) 25vw, 180px",
+  } = props;
   const locale = props.locale ?? defaultLocale;
   const t = getDict(locale);
 
@@ -34,12 +44,12 @@ export default function GameCard(props: GameCardProps) {
 
   return (
     <article className="group relative transition duration-300 hover:-translate-y-1.5 active:scale-[0.97]">
-      <Link
+      <TrackedGameLink
         href={localeHref(locale, "/play/" + slug)}
-        className="relative block"
-        data-game-slug={slug}
-        data-position={position}
-        data-placement={placement}
+        slug={slug}
+        locale={locale}
+        position={position}
+        placement={placement}
       >
       <div
         className="game-card-glow absolute -inset-1 -z-10 rounded-[1.4rem] opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-100"
@@ -50,9 +60,9 @@ export default function GameCard(props: GameCardProps) {
         <GameArtwork
           src={thumbnail}
           fallbackSrc={thumbnailWide}
-          alt={title}
+          alt=""
           fill
-          sizes="(max-width: 768px) 33vw, 180px"
+          sizes={imageSizes}
           quality={60}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.07]"
         />
@@ -76,7 +86,7 @@ export default function GameCard(props: GameCardProps) {
           </p>
         ) : null}
       </div>
-      </Link>
+      </TrackedGameLink>
       <FavoriteButton
         slug={slug}
         locale={locale}

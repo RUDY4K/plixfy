@@ -29,7 +29,7 @@ export default function FavoriteButton({
       aria-pressed={active}
       className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-black shadow-[0_8px_24px_rgba(0,0,0,.25)] backdrop-blur-md transition hover:scale-105 ${
         active
-          ? "border-primary/40 bg-primary text-white"
+          ? "border-primary/40 bg-primary text-[#090913]"
           : "border-white/10 bg-black/55 text-white hover:bg-black/75"
       } ${className}`}
     >

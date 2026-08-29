@@ -2,9 +2,10 @@ name: Plixfy Cloud Social
 
 on:
   schedule:
-    # GitHub schedules use UTC: 09:30 and 19:30 Asia/Riyadh.
-    - cron: "30 6 * * *"
-    - cron: "30 16 * * *"
+    # UTC retries for the 09:30 and 19:30 Asia/Riyadh slots. The planner below
+    # permits only the first 60 minutes and makes all later retries no-ops.
+    - cron: "30,37,47,57 6,16 * * *"
+    - cron: "7,17,27 7,17 * * *"
   workflow_dispatch:
     inputs:
       slot:
@@ -33,7 +34,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: plixfy-cloud-social
@@ -53,10 +54,8 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Install social agent dependencies
-        run: npm ci --no-audit --no-fund
-
       - name: Restore delivery state
+        id: social-state
         uses: actions/cache/restore@v6
         with:
           path: |
@@ -67,28 +66,64 @@ jobs:
           restore-keys: |
             social-state-
 
-      - name: Select slot
+      - name: Plan due social slot
+        id: plan
+        env:
+          INPUT_SLOT: ${{ inputs.slot }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+          INPUT_FORCE: ${{ inputs.force }}
+          INPUT_PLATFORMS: ${{ inputs.platforms }}
         shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "SOCIAL_SLOT=${{ inputs.slot }}" >> "$GITHUB_ENV"
-            echo "SOCIAL_DRY_RUN=${{ inputs.dry_run }}" >> "$GITHUB_ENV"
-            echo "SOCIAL_FORCE=${{ inputs.force }}" >> "$GITHUB_ENV"
-            echo "SOCIAL_PLATFORMS=${{ inputs.platforms }}" >> "$GITHUB_ENV"
-          elif [[ "${{ github.event.schedule }}" == "30 6 * * *" ]]; then
-            echo "SOCIAL_SLOT=morning" >> "$GITHUB_ENV"
-            echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_PLATFORMS=telegram,discord,x,facebook,instagram" >> "$GITHUB_ENV"
+            if [[ ! "$INPUT_SLOT" =~ ^(auto|morning|evening)$ ]]; then
+              echo "Invalid workflow slot" >&2
+              exit 1
+            fi
+            if [[ ! "$INPUT_PLATFORMS" =~ ^[a-z]+(,[a-z]+)*$ ]]; then
+              echo "Invalid platform list" >&2
+              exit 1
+            fi
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "reason=manual_dispatch" >> "$GITHUB_OUTPUT"
+            echo "slot=$INPUT_SLOT" >> "$GITHUB_OUTPUT"
+            echo "date=" >> "$GITHUB_OUTPUT"
+            echo "dry_run=$INPUT_DRY_RUN" >> "$GITHUB_OUTPUT"
+            echo "force=$INPUT_FORCE" >> "$GITHUB_OUTPUT"
+            echo "platforms=$INPUT_PLATFORMS" >> "$GITHUB_OUTPUT"
           else
-            echo "SOCIAL_SLOT=evening" >> "$GITHUB_ENV"
-            echo "SOCIAL_DRY_RUN=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_FORCE=false" >> "$GITHUB_ENV"
-            echo "SOCIAL_PLATFORMS=telegram,discord,x,facebook,instagram" >> "$GITHUB_ENV"
+            node scripts/social-schedule-core.mjs
           fi
 
-      - name: Run scout, editor, publisher, and auditor agents
+      - name: Install social agent dependencies
+        if: steps.plan.outputs.should_run == 'true'
+        run: npm ci --no-audit --no-fund
+
+      - name: Run social agents in dry-run mode
+        if: ${{ steps.plan.outputs.should_run == 'true' && steps.plan.outputs.dry_run == 'true' }}
         env:
+          SOCIAL_SLOT: ${{ steps.plan.outputs.slot }}
+          SOCIAL_DATE: ${{ steps.plan.outputs.date }}
+          SOCIAL_FORCE: ${{ steps.plan.outputs.force }}
+          SOCIAL_PLATFORMS: ${{ steps.plan.outputs.platforms }}
+        shell: bash
+        run: |
+          args=("--slot=${SOCIAL_SLOT}" "--dry-run")
+          if [[ -n "${SOCIAL_DATE}" ]]; then
+            args+=("--date=${SOCIAL_DATE}")
+          fi
+          if [[ "${SOCIAL_FORCE}" == "true" ]]; then
+            args+=("--force")
+          fi
+          node scripts/cloud-social-runner.mjs "${args[@]}"
+
+      - name: Run scout, editor, publisher, and auditor agents
+        if: ${{ steps.plan.outputs.should_run == 'true' && steps.plan.outputs.dry_run != 'true' }}
+        env:
+          SOCIAL_SLOT: ${{ steps.plan.outputs.slot }}
+          SOCIAL_DATE: ${{ steps.plan.outputs.date }}
+          SOCIAL_FORCE: ${{ steps.plan.outputs.force }}
+          SOCIAL_PLATFORMS: ${{ steps.plan.outputs.platforms }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
@@ -100,8 +135,8 @@ jobs:
         shell: bash
         run: |
           args=("--slot=${SOCIAL_SLOT}")
-          if [[ "${SOCIAL_DRY_RUN}" == "true" ]]; then
-            args+=("--dry-run")
+          if [[ -n "${SOCIAL_DATE}" ]]; then
+            args+=("--date=${SOCIAL_DATE}")
           fi
           if [[ "${SOCIAL_FORCE}" == "true" ]]; then
             args+=("--force")
@@ -109,7 +144,7 @@ jobs:
           node scripts/cloud-social-runner.mjs "${args[@]}"
 
       - name: Save delivery state
-        if: ${{ always() && env.SOCIAL_DRY_RUN != 'true' }}
+        if: ${{ always() && steps.plan.outputs.should_run == 'true' && steps.plan.outputs.dry_run != 'true' }}
         uses: actions/cache/save@v6
         with:
           path: |
@@ -119,7 +154,7 @@ jobs:
           key: social-state-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Upload agent reports
-        if: always()
+        if: ${{ always() && steps.plan.outputs.should_run == 'true' }}
         uses: actions/upload-artifact@v7
         with:
           name: social-pack-${{ github.run_id }}-${{ github.run_attempt }}
@@ -129,7 +164,7 @@ jobs:
           retention-days: 14
 
       - name: Alert admin on failure
-        if: failure()
+        if: ${{ failure() && (github.event_name != 'workflow_dispatch' || inputs.dry_run != true) }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

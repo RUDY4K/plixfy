@@ -9,6 +9,11 @@ import {
   validateRobotsTxt,
   withRetries,
 } from "./production-health-core.mjs";
+import {
+  latestSlotTarget,
+  normalizeContentDate,
+  planSocialSchedule,
+} from "./social-schedule-core.mjs";
 
 const ORIGIN = "https://www.plixfy.com";
 
@@ -20,6 +25,82 @@ test("the production monitor runs around the clock and alerts only on failure", 
   assert.match(workflow, /if: failure\(\)/);
   assert.match(workflow, /telegram-alert\.mjs/);
   assert.doesNotMatch(workflow, /TELEGRAM_BOT_TOKEN:\s*[^$\s]/);
+});
+
+test("social schedule retries each Riyadh slot seven times inside one hour", () => {
+  const workflow = readFileSync(".github/workflows/cloud-social.yml", "utf8");
+  assert.match(workflow, /cron: "30,37,47,57 6,16 \* \* \*"/);
+  assert.match(workflow, /cron: "7,17,27 7,17 \* \* \*"/);
+  assert.match(workflow, /node scripts\/social-schedule-core\.mjs/);
+  assert.match(workflow, /if: steps\.plan\.outputs\.should_run == 'true'/);
+  assert.match(workflow, /--date=\$\{SOCIAL_DATE\}/);
+  assert.match(workflow, /cancel-in-progress: false/);
+  assert.match(workflow, /permissions:\s*\n\s*contents: read/);
+  assert.doesNotMatch(workflow, /contents: write/);
+
+  const dryRunStep = workflow.slice(
+    workflow.indexOf("- name: Run social agents in dry-run mode"),
+    workflow.indexOf("- name: Run scout, editor, publisher, and auditor agents"),
+  );
+  const publishStep = workflow.slice(
+    workflow.indexOf("- name: Run scout, editor, publisher, and auditor agents"),
+    workflow.indexOf("- name: Save delivery state"),
+  );
+  assert.match(dryRunStep, /outputs\.dry_run == 'true'/);
+  assert.match(dryRunStep, /--dry-run/);
+  assert.doesNotMatch(dryRunStep, /(?:TELEGRAM|BUFFER|DISCORD)_[A-Z_]+/);
+  assert.match(publishStep, /outputs\.dry_run != 'true'/);
+  assert.match(publishStep, /secrets\.TELEGRAM_BOT_TOKEN/);
+  assert.match(publishStep, /secrets\.BUFFER_API_KEY/);
+  assert.match(publishStep, /secrets\.DISCORD_WEBHOOK_URL/);
+  assert.match(workflow, /Alert admin on failure[\s\S]{0,160}github\.event_name != 'workflow_dispatch'[\s\S]{0,80}inputs\.dry_run != true/);
+});
+
+test("social schedule opens only the first 60 minutes and deduplicates delivered slots", () => {
+  const exact = planSocialSchedule({ now: new Date("2026-08-29T06:30:00Z") });
+  assert.deepEqual(
+    { shouldRun: exact.shouldRun, slot: exact.slot, date: exact.date, ageMinutes: exact.ageMinutes },
+    { shouldRun: true, slot: "morning", date: "2026-08-29", ageMinutes: 0 },
+  );
+
+  const retry = planSocialSchedule({ now: new Date("2026-08-29T06:37:00Z") });
+  assert.equal(retry.shouldRun, true);
+  assert.equal(retry.ageMinutes, 7);
+
+  const boundary = planSocialSchedule({ now: new Date("2026-08-29T07:30:00Z") });
+  assert.equal(boundary.shouldRun, true);
+  assert.equal(boundary.ageMinutes, 60);
+  assert.equal(planSocialSchedule({ now: new Date("2026-08-29T07:30:01Z") }).reason, "outside_window");
+
+  const state = { runs: { "2026-08-29:morning": { status: "delivered" } } };
+  const duplicate = planSocialSchedule({ now: new Date("2026-08-29T06:47:00Z"), state });
+  assert.equal(duplicate.shouldRun, false);
+  assert.equal(duplicate.reason, "already_delivered");
+});
+
+test("stale GitHub runs cannot publish a late or next-day social slot", () => {
+  const lateMorning = planSocialSchedule({ now: new Date("2026-08-28T18:54:16Z") });
+  assert.equal(lateMorning.reason, "outside_window");
+
+  const crossedMidnight = latestSlotTarget(new Date("2026-08-29T00:36:05Z"), "evening");
+  assert.equal(crossedMidnight.date, "2026-08-28");
+  assert.equal(Math.floor(crossedMidnight.ageMinutes), 486);
+  assert.equal(planSocialSchedule({ now: new Date("2026-08-29T00:36:05Z") }).reason, "outside_window");
+
+  const eveningRetry = planSocialSchedule({ now: new Date("2026-08-29T16:37:00Z") });
+  assert.equal(eveningRetry.shouldRun, true);
+  assert.equal(eveningRetry.slot, "evening");
+  assert.equal(eveningRetry.date, "2026-08-29");
+});
+
+test("explicit social content dates accept only real YYYY-MM-DD dates", () => {
+  assert.equal(normalizeContentDate("2028-02-29"), "2028-02-29");
+  for (const invalid of ["2026-02-29", "2026-13-01", "2026-08-1", "08/29/2026", ""]) {
+    assert.throws(() => normalizeContentDate(invalid), /valid calendar date/);
+  }
+  const runner = readFileSync("scripts/cloud-social-runner.mjs", "utf8");
+  assert.match(runner, /startsWith\("--date="\)/);
+  assert.match(runner, /normalizeContentDate\(dateValue\)/);
 });
 
 test("ads.txt requires the exact Plixfy AdSense publisher line", () => {

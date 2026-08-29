@@ -106,7 +106,7 @@ function RoundOverlay({
         <button
           type="button"
           onClick={onStart}
-          className="rounded-full bg-primary px-7 py-3 font-bold text-white shadow-lg shadow-primary/30 active:scale-95"
+          className="rounded-full bg-primary px-7 py-3 font-bold text-[#090913] shadow-lg shadow-primary/30 active:scale-95"
         >
           {status === "over" ? t.replay : t.start}
         </button>

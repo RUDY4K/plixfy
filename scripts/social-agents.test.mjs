@@ -1,4 +1,8 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import test from "node:test";
 import { ContentScoutAgent, EditorialAgent, PublicationAuditAgent, deliveryCounts } from "./social-agents.mjs";
 import { buildBufferPostInput } from "./buffer-client.mjs";
@@ -149,4 +153,105 @@ test("Discord payload carries the branded image and blocks mentions", () => {
   });
   assert.equal(payload.embeds[0].image.url, "https://www.plixfy.com/api/social-card?kind=news&id=test");
   assert.deepEqual(payload.allowed_mentions, { parse: [] });
+});
+
+test("publisher dry-run exits before credentials or connected channels are inspected", () => {
+  const source = fs.readFileSync(new URL("./social-publisher.mjs", import.meta.url), "utf8");
+  const environmentLoad = source.indexOf("if (!dryRun) loadEnvLocal();");
+  const dryRunGuard = source.indexOf("if (dryRun) {");
+  const channelDiscovery = source.indexOf("if (isBufferConfigured()) {");
+
+  assert.ok(environmentLoad > -1);
+  assert.ok(dryRunGuard > environmentLoad);
+  assert.ok(channelDiscovery > dryRunGuard);
+});
+
+test("publisher dry-run performs no network request even when a channel key exists", (context) => {
+  const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-social-dry-run-"));
+  context.after(() => fs.rmSync(temporaryDirectory, { recursive: true, force: true }));
+  const packFile = path.join(temporaryDirectory, "pack.json");
+  const reportFile = path.join(temporaryDirectory, "report.json");
+  fs.writeFileSync(
+    packFile,
+    JSON.stringify({ date: "2026-08-27", campaign: "ar_growth_cloud", items: [baseItem] }),
+  );
+
+  const sentinel = "PLIXFY_DRY_RUN_NETWORK_FORBIDDEN";
+  const preload = `data:text/javascript,${encodeURIComponent(`globalThis.fetch=async()=>{throw new Error("${sentinel}")}`)}`;
+  const childEnvironment = {
+    ...process.env,
+    BUFFER_API_KEY: "dry-run-test-key",
+    SOCIAL_PLATFORMS: "x",
+  };
+  for (const key of ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "TELEGRAM_CHANNEL_ID", "DISCORD_WEBHOOK_URL"]) {
+    delete childEnvironment[key];
+  }
+
+  const result = spawnSync(
+    process.execPath,
+    [
+      "--import",
+      preload,
+      path.resolve("scripts/social-publisher.mjs"),
+      packFile,
+      "--dry-run",
+      `--report=${reportFile}`,
+    ],
+    {
+      cwd: temporaryDirectory,
+      encoding: "utf8",
+      env: childEnvironment,
+    },
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.doesNotMatch(`${result.stdout}\n${result.stderr}`, new RegExp(sentinel));
+  const report = JSON.parse(fs.readFileSync(reportFile, "utf8"));
+  assert.equal(report.dryRun, true);
+  assert.deepEqual(report.connectedPublicPlatforms, []);
+  assert.deepEqual(report.deliveries.map((delivery) => delivery.status), ["dry_run"]);
+});
+
+test("cloud dry-run defaults to offline and performs no network request", (context) => {
+  const socialDirectory = path.resolve(".social");
+  const packFile = path.join(socialDirectory, "2099-01-01-morning.json");
+  const reportFile = path.join(socialDirectory, "2099-01-01-morning-delivery.json");
+  context.after(() => {
+    fs.rmSync(packFile, { force: true });
+    fs.rmSync(reportFile, { force: true });
+  });
+
+  const sentinel = "PLIXFY_OFFLINE_PREFLIGHT_NETWORK_FORBIDDEN";
+  const preload = `data:text/javascript,${encodeURIComponent(`globalThis.fetch=async()=>{throw new Error("${sentinel}")}`)}`;
+  const childEnvironment = { ...process.env, SOCIAL_PLATFORMS: "x" };
+  for (const key of [
+    "TELEGRAM_BOT_TOKEN",
+    "TELEGRAM_CHAT_ID",
+    "TELEGRAM_CHANNEL_ID",
+    "DISCORD_WEBHOOK_URL",
+    "BUFFER_API_KEY",
+  ]) {
+    delete childEnvironment[key];
+  }
+
+  const result = spawnSync(
+    process.execPath,
+    [
+      "--import",
+      preload,
+      path.resolve("scripts/cloud-social-runner.mjs"),
+      "--dry-run",
+      "--slot=morning",
+      "--date=2099-01-01",
+    ],
+    { cwd: process.cwd(), encoding: "utf8", env: childEnvironment },
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.doesNotMatch(`${result.stdout}\n${result.stderr}`, new RegExp(sentinel));
+  assert.match(result.stdout, /offline mode skipped public URL verification/);
+  const report = JSON.parse(fs.readFileSync(reportFile, "utf8"));
+  assert.equal(report.dryRun, true);
+  assert.deepEqual(report.connectedPublicPlatforms, []);
+  assert.deepEqual(report.deliveries.map((delivery) => delivery.status), ["dry_run"]);
 });

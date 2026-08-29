@@ -116,11 +116,11 @@ async function sendAdminFallback(item, pack, state, key, error) {
 }
 
 async function main() {
-  loadEnvLocal();
   const file = process.argv.find((arg) => arg.endsWith(".json") && !arg.startsWith("--report="));
   const dryRun = process.argv.includes("--dry-run");
   const force = process.argv.includes("--force");
   if (!file) throw new Error("Usage: node scripts/social-publisher.mjs <pack.json> [--dry-run] [--force] [--report=file]");
+  if (!dryRun) loadEnvLocal();
 
   const pack = loadPack(path.resolve(file));
   const state = readState();
@@ -143,6 +143,13 @@ async function main() {
   console.log(`Validated ${pack.items.length} posts; ${selected.length} enabled; ${pending.length} pending; dryRun=${dryRun}; force=${force}`);
   for (const item of pending) console.log(`- ${item.platform}/${item.contentId} (${item.text.length} chars)`);
 
+  if (dryRun) {
+    report.deliveries = pending.map((item) => receipt(item, "dry_run"));
+    writeJsonAtomic(output, report);
+    console.log(`[PublisherAgent] dry-run report written to ${output}`);
+    return;
+  }
+
   let bufferChannels = {};
   if (isBufferConfigured()) {
     try {
@@ -156,13 +163,6 @@ async function main() {
   if (process.env.TELEGRAM_CHANNEL_ID && enabled.has("telegram")) report.connectedPublicPlatforms.push("telegram");
   if (isDiscordConfigured() && enabled.has("discord")) report.connectedPublicPlatforms.push("discord");
   report.connectedPublicPlatforms.push(...Object.keys(bufferChannels).filter((platform) => enabled.has(platform)));
-
-  if (dryRun) {
-    report.deliveries = pending.map((item) => receipt(item, "dry_run"));
-    writeJsonAtomic(output, report);
-    console.log(`[PublisherAgent] dry-run report written to ${output}`);
-    return;
-  }
 
   for (const item of pending) {
     const key = itemKey(item, pack);

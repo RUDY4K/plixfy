@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Play, X, ArrowDown } from "lucide-react";
 import GameArtwork from "@/components/GameArtwork";
 import { localeFromPathname, getDict } from "@/lib/i18n";
 import { getPlaygamaEmbedUrl } from "@/lib/playgama";
-import { trackEvent, trackEventOnce } from "./GoogleAnalytics";
+import { usePlayerData } from "@/components/PlayerDataProvider";
+import { GAME_START_EVENT } from "@/components/PlayNowButton";
+import { trackEvent } from "./GoogleAnalytics";
 
 export interface GameFrameProps {
   slug: string;
@@ -24,8 +26,13 @@ export default function GameFrame(props: GameFrameProps) {
   const [playing, setPlaying] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [justEnded, setJustEnded] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const statusRef = useRef<HTMLParagraphElement>(null);
+  const startButtonRef = useRef<HTMLButtonElement>(null);
   const startedAtRef = useRef<number | null>(null);
+  const loadedForRoundRef = useRef(false);
+  const { recordGamePlay } = usePlayerData();
 
   function fireGameEnd() {
     if (startedAtRef.current === null) return;
@@ -40,17 +47,22 @@ export default function GameFrame(props: GameFrameProps) {
     trackEvent(sourceName + "_game_end", params);
   }
 
-  function start() {
+  const start = useCallback(() => {
+    if (startedAtRef.current !== null) return;
     setPlaying(true);
     setIframeLoaded(false);
     setJustEnded(false);
+    setStatusMessage(t.gameFrame.loading.replace("{title}", title));
+    loadedForRoundRef.current = false;
     startedAtRef.current = Date.now();
     const params = {
       game_slug: slug,
       game_title: title,
     };
-    trackEventOnce(`game_start:${slug}`, "game_start", params);
-    trackEventOnce(`${sourceName}_game_start:${slug}`, `${sourceName}_game_start`, params);
+    trackEvent("game_start", params);
+    trackEvent(`${sourceName}_game_start`, params);
+    recordGamePlay(slug);
+    requestAnimationFrame(() => statusRef.current?.focus());
 
     const wantsFullscreen =
       typeof window !== "undefined" &&
@@ -71,16 +83,29 @@ export default function GameFrame(props: GameFrameProps) {
         // fullscreen not supported or denied — ignore
       }
     });
-  }
+  }, [orientation, recordGamePlay, slug, t.gameFrame.loading, title]);
 
   function stop() {
     fireGameEnd();
     setPlaying(false);
     setJustEnded(true);
+    setStatusMessage("");
+    requestAnimationFrame(() => startButtonRef.current?.focus());
     if (typeof document !== "undefined" && document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
     }
   }
+
+  useEffect(() => {
+    function onExternalStart(event: Event) {
+      const detail = (event as CustomEvent<{ slug?: string }>).detail;
+      if (detail?.slug !== slug) return;
+      start();
+    }
+
+    window.addEventListener(GAME_START_EVENT, onExternalStart);
+    return () => window.removeEventListener(GAME_START_EVENT, onExternalStart);
+  }, [slug, start]);
 
   useEffect(() => {
     function onUnload() {
@@ -104,6 +129,16 @@ export default function GameFrame(props: GameFrameProps) {
 
   return (
     <div className="relative aspect-video md:aspect-[21/9] overflow-hidden rounded-2xl bg-surface">
+      <p
+        ref={statusRef}
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        tabIndex={-1}
+        className="sr-only"
+      >
+        {statusMessage}
+      </p>
       {playing ? (
         <>
           <iframe
@@ -114,7 +149,16 @@ export default function GameFrame(props: GameFrameProps) {
             sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"
             referrerPolicy="no-referrer-when-downgrade"
             loading="lazy"
-            onLoad={() => setIframeLoaded(true)}
+            onLoad={() => {
+              if (loadedForRoundRef.current) return;
+              loadedForRoundRef.current = true;
+              setIframeLoaded(true);
+              setStatusMessage(t.gameFrame.ready);
+              trackEvent("game_loaded", {
+                game_slug: slug,
+                game_title: title,
+              });
+            }}
             className="w-full h-full border-0 absolute inset-0"
           />
           {!iframeLoaded ? (
@@ -137,6 +181,7 @@ export default function GameFrame(props: GameFrameProps) {
       ) : (
         <>
           <button
+            ref={startButtonRef}
             type="button"
             onClick={start}
             aria-label={t.common.playAria + title}
@@ -151,12 +196,12 @@ export default function GameFrame(props: GameFrameProps) {
               fill
               sizes="(max-width: 768px) 100vw, 900px"
               className="object-cover"
-              priority
+              preload
             />
             <span className="absolute inset-0 bg-bg/50 flex items-center justify-center transition group-hover:bg-bg/40">
               <span className="w-20 h-20 md:w-24 md:h-24 min-w-12 min-h-12 rounded-full bg-primary flex items-center justify-center glow-pink group-hover:scale-110 transition-transform duration-200">
                 <Play
-                  className="w-10 h-10 md:w-12 md:h-12 text-white fill-white ms-1"
+                  className="w-10 h-10 md:w-12 md:h-12 text-[#090913] fill-[#090913] ms-1"
                   aria-hidden="true"
                 />
               </span>
@@ -169,7 +214,7 @@ export default function GameFrame(props: GameFrameProps) {
                 trackEvent("playgama_play_more_click", { game_slug: slug });
                 setJustEnded(false);
               }}
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-primary text-white font-bold px-5 py-3 rounded-2xl min-h-12 inline-flex items-center gap-2 glow-pink hover:scale-105 hover:brightness-110 transition-all duration-200"
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-primary text-[#090913] font-bold px-5 py-3 rounded-2xl min-h-12 inline-flex items-center gap-2 glow-pink hover:scale-105 hover:brightness-110 transition-all duration-200"
               aria-label={t.gameFrame.similarHeading}
             >
               <span>{t.gameFrame.playAnother}</span>

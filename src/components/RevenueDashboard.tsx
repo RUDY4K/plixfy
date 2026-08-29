@@ -112,7 +112,7 @@ export default function RevenueDashboard() {
           <div className="flex items-end">
             <button
               type="submit"
-              className="w-full bg-primary text-white font-bold py-3 rounded-xl min-h-12 hover:brightness-110 transition-all duration-200 neon-glow-pink hover:scale-[1.02]"
+              className="w-full bg-primary text-[#090913] font-bold py-3 rounded-xl min-h-12 hover:brightness-110 transition-all duration-200 neon-glow-pink hover:scale-[1.02]"
             >
               حفظ
             </button>

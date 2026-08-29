@@ -63,7 +63,11 @@ export default function CategoryStrip(props: CategoryStripProps) {
               key={game.slug}
               className="w-[142px] shrink-0 snap-start md:w-auto"
             >
-              <GameCard {...game} locale={locale} />
+              <GameCard
+                {...game}
+                locale={locale}
+                imageSizes="(max-width: 767px) 142px, 104px"
+              />
             </div>
           ))}
         </div>

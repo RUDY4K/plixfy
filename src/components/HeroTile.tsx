@@ -59,7 +59,7 @@ export default function HeroTile(props: HeroTileProps) {
 
         {/* Premium chip */}
         {isTopGame ? (
-          <div className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/90 backdrop-blur border border-primary text-white text-xs font-extrabold neon-glow-pink">
+          <div className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/90 backdrop-blur border border-primary text-[#090913] text-xs font-extrabold neon-glow-pink">
             <Flame className="w-3.5 h-3.5 fill-white" aria-hidden="true" />
             <span>{t.common.mostPlayed}</span>
           </div>

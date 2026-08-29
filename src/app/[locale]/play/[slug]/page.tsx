@@ -22,19 +22,37 @@ import GameFrame from "@/components/GameFrame";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ShareButton from "@/components/ShareButton";
 import FavoriteButton from "@/components/FavoriteButton";
-import TrackGamePlay from "@/components/TrackGamePlay";
+import PlayNowButton from "@/components/PlayNowButton";
 import {
   locales,
   hasLocale,
   localeHref,
   getDict,
   ogLocaleFor,
-  pageAlternates,
   type Locale,
 } from "@/lib/i18n";
 import catalogMeta from "@/data/playgama-catalog-meta.json";
 
 const SITE = "https://www.plixfy.com";
+
+function editorialAlternates(slug: string, locale: Locale): Metadata["alternates"] {
+  const path = "/play/" + slug;
+  const canonical = localeHref(locale, path);
+  if (!hasEditorialGameContent(slug, locale)) return { canonical };
+
+  const arPath = path;
+  const enPath = localeHref("en", path);
+  const hasAr = hasEditorialGameContent(slug, "ar");
+  const hasEn = hasEditorialGameContent(slug, "en");
+
+  return {
+    canonical,
+    languages: {
+      ...(hasAr ? { ar: arPath, "x-default": arPath } : {}),
+      ...(hasEn ? { en: enPath } : {}),
+    },
+  };
+}
 
 function absoluteUrl(maybeRelative: string): string {
   if (maybeRelative.startsWith("http://") || maybeRelative.startsWith("https://")) {
@@ -129,7 +147,7 @@ export async function generateMetadata({
     ...(!hasEditorialGameContent(slug, locale)
       ? { robots: { index: false, follow: true } }
       : {}),
-    alternates: pageAlternates(locale, path),
+    alternates: editorialAlternates(slug, locale),
     openGraph: {
       type: "website",
       title,
@@ -270,7 +288,6 @@ export default async function PlayPage({
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-8">
-      <TrackGamePlay slug={game.slug} />
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -319,15 +336,11 @@ export default async function PlayPage({
           <span>{t.play.free}: {t.play.yes}</span>
         </div>
 
-        <a
-          href="#play-frame"
-          className="mt-5 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-white py-4 text-lg font-black text-[#090913] shadow-[0_14px_35px_rgba(255,255,255,.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent-2"
-          aria-label={t.common.playAria + game.title}
-          data-game-slug={game.slug}
-          data-placement="play-cta"
-        >
-          {t.play.playNowCta}
-        </a>
+        <PlayNowButton
+          slug={game.slug}
+          label={t.play.playNowCta}
+          ariaLabel={t.common.playAria + game.title}
+        />
 
         <div className="mt-4 flex items-center gap-3">
           <ShareButton slug={game.slug} title={game.title} url={pageUrl} />
@@ -542,14 +555,29 @@ export default async function PlayPage({
           <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-4 pb-2" style={{ scrollbarWidth: "none" }}>
             {related.map((g, idx) => (
               <div key={g.slug} className="w-[130px] shrink-0 snap-start">
-                <GameCard {...g} locale={locale} position={idx + 1} placement="related-mobile" showStats />
+                <GameCard
+                  {...g}
+                  locale={locale}
+                  position={idx + 1}
+                  placement="related-mobile"
+                  showStats
+                  imageSizes="130px"
+                />
               </div>
             ))}
           </div>
         </div>
         <div className="hidden md:grid md:grid-cols-6 md:gap-6">
           {related.map((g, idx) => (
-            <GameCard key={g.slug} {...g} locale={locale} position={idx + 1} placement="related-desktop" showStats />
+            <GameCard
+              key={g.slug}
+              {...g}
+              locale={locale}
+              position={idx + 1}
+              placement="related-desktop"
+              showStats
+              imageSizes="(max-width: 1279px) 14vw, 180px"
+            />
           ))}
         </div>
       </section>

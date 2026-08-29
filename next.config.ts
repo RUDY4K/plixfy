@@ -32,11 +32,8 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "playgama.com",
-      },
-      {
-        protocol: "https",
-        hostname: "**.playgama.com",
+        hostname: "static.playgama.com",
+        pathname: "/p-img/**",
       },
     ],
   },
