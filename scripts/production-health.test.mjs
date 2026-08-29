@@ -143,6 +143,19 @@ test("sitemap validation enforces canonical URLs and selects live route probes",
     "Arabic article",
     "English article",
   ]);
+
+  const editorialOnlyXml = `<urlset>${[
+    `${ORIGIN}/play/editorial-game`,
+    ...Array.from({ length: 49 }, (_, index) => `${ORIGIN}/category/editorial-${index}`),
+  ].map((url) => `<url><loc>${url}</loc></url>`).join("")}</urlset>`;
+  const editorialOnlyUrls = parseSitemap(editorialOnlyXml, ORIGIN);
+  assert.deepEqual(selectSitemapProbes(editorialOnlyUrls).map((probe) => probe.label), [
+    "Arabic game",
+  ]);
+  assert.throws(
+    () => selectSitemapProbes(editorialOnlyUrls.filter((url) => !url.includes("/play/"))),
+    /editorial Arabic game route/,
+  );
   assert.throws(
     () => parseSitemap(xml.replace(`${ORIGIN}/category/example-0`, "https://attacker.example/category/example-0"), ORIGIN),
     /outside the canonical HTTPS host/,
