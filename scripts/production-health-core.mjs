@@ -70,8 +70,8 @@ export function selectSitemapProbes(urls) {
     if (url) probes.push({ label, url });
   }
 
-  if (probes.length < 2) {
-    throw new Error("sitemap does not contain enough game/article routes for production probes");
+  if (!probes.some((probe) => probe.label === "Arabic game")) {
+    throw new Error("sitemap does not contain an editorial Arabic game route for production probes");
   }
 
   return probes;
