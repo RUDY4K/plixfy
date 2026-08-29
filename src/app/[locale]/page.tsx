@@ -90,7 +90,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.72fr)_minmax(19rem,.78fr)]">
         <div className="group relative min-h-[500px] overflow-hidden rounded-[2rem] border border-white/10 bg-surface shadow-[0_30px_90px_rgba(0,0,0,.26)] md:min-h-[540px]">
-          <GameArtwork src={dailyGame.thumbnailWide || dailyGame.thumbnail} fallbackSrc={dailyGame.thumbnail} alt={dailyGame.title} fill priority sizes="(max-width: 1280px) 100vw, 900px" className="object-cover transition duration-700 group-hover:scale-[1.015]" />
+          <GameArtwork src={dailyGame.thumbnailWide || dailyGame.thumbnail} fallbackSrc={dailyGame.thumbnail} alt={dailyGame.title} fill preload sizes="(max-width: 1280px) 100vw, 900px" className="object-cover transition duration-700 group-hover:scale-[1.015]" />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,18,.04),rgba(7,7,18,.96)_86%)] md:bg-[linear-gradient(90deg,rgba(7,7,18,.98),rgba(7,7,18,.74)_42%,rgba(7,7,18,.12)_78%)] rtl:md:bg-[linear-gradient(270deg,rgba(7,7,18,.98),rgba(7,7,18,.74)_42%,rgba(7,7,18,.12)_78%)]" />
           <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5 md:p-8">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-bg/65 px-3 py-1.5 text-xs font-extrabold text-primary backdrop-blur-xl">
@@ -101,8 +101,8 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             </span>
           </div>
           <div className="relative flex min-h-[500px] max-w-2xl flex-col justify-end p-6 md:min-h-[540px] md:justify-center md:p-10 lg:p-12">
-            <p className="mb-3 text-sm font-extrabold text-accent-2">{locale === "ar" ? "جاهزة الآن — بدون تنزيل أو إنشاء حساب" : "Ready now — no download or sign-up"}</p>
-            <h1 dir="ltr" className="text-start font-latin text-4xl font-black leading-[1.02] tracking-[-.045em] text-white drop-shadow-[0_4px_18px_rgba(0,0,0,.55)] sm:text-5xl md:text-6xl">{dailyGame.title}</h1>
+            <h1 className="mb-3 text-sm font-extrabold text-accent-2">{t.home.h1}</h1>
+            <h2 dir="ltr" className="text-start font-latin text-4xl font-black leading-[1.02] tracking-[-.045em] text-white drop-shadow-[0_4px_18px_rgba(0,0,0,.55)] sm:text-5xl md:text-6xl">{dailyGame.title}</h2>
             <p className="mt-4 max-w-xl text-[15px] leading-7 text-white/72 md:text-base">
               {locale === "ar" ? `ابدأ بهذه اللعبة أو استكشف ${localizedCount} لعبة مجانية مرتبة لتصل إلى ما يناسب وقتك وجهازك بسرعة.` : `Start here or explore ${localizedCount} free games organised around your time, mood and device.`}
             </p>
@@ -111,7 +111,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               <span className="inline-flex items-center gap-2"><MonitorSmartphone className="h-4 w-4 text-accent-2" />{deviceLabel}</span>
             </div>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href={href(`/play/${dailyGame.slug}`)} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-primary px-5 font-black text-white shadow-[0_14px_36px_rgba(255,45,139,.28)] transition hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0">
+              <Link href={href(`/play/${dailyGame.slug}`)} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-primary px-5 font-black text-[#090913] shadow-[0_14px_36px_rgba(255,45,139,.28)] transition hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0">
                 <Play className="h-4 w-4 fill-current" />{locale === "ar" ? "العب الآن" : "Play now"}
               </Link>
               <Link href={href("/all-games")} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/15 bg-bg/45 px-5 font-bold text-white backdrop-blur-xl transition hover:border-white/25 hover:bg-white/10">
@@ -129,7 +129,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             </div>
             <div className="relative"><input id="home-library-search" name="q" type="search" placeholder={t.header.searchPlaceholder} className="min-h-14 w-full rounded-xl border border-white/[0.1] bg-bg/75 px-4 ps-11 text-base text-white placeholder:text-text-faint focus:border-accent-2/50 focus:shadow-[0_0_0_4px_rgba(0,229,255,.07)]" /><Search className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-faint" /></div>
             <div className="mt-4 flex flex-wrap gap-2">
-              {categories.slice(0, 4).map((category) => <Link key={category.slug} href={href(`/category/${category.slug}`)} className="rounded-lg border border-white/[0.07] px-2.5 py-1.5 text-xs font-bold text-text-secondary transition hover:border-accent-2/30 hover:text-white">{locale === "ar" ? category.labelAr : category.labelEn}</Link>)}
+              {categories.slice(0, 4).map((category) => <Link key={category.slug} href={href(`/category/${category.slug}`)} className="inline-flex min-h-11 items-center rounded-lg border border-white/[0.07] px-3 py-1.5 text-xs font-bold text-text-secondary transition hover:border-accent-2/30 hover:text-white">{locale === "ar" ? category.labelAr : category.labelEn}</Link>)}
             </div>
           </form>
 
@@ -161,7 +161,16 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <Link href={href("/category/trending")} className="inline-flex items-center gap-1 rounded-xl px-3 py-2 text-sm font-bold text-accent-2">{t.common.viewAll}<ChevronLeft className="h-4 w-4 ltr:rotate-180" /></Link>
         </div>
         <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {trending.slice(0, 12).map((game, index) => <GameCard key={game.slug} {...game} position={index + 1} placement="home-library" locale={locale} />)}
+          {trending.slice(0, 12).map((game, index) => (
+            <GameCard
+              key={game.slug}
+              {...game}
+              position={index + 1}
+              placement="home-library"
+              locale={locale}
+              imageSizes="(max-width: 639px) 50vw, (max-width: 767px) 33vw, (max-width: 1023px) 25vw, 180px"
+            />
+          ))}
         </div>
       </section>
 
@@ -188,7 +197,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <div className="grid gap-3 sm:grid-cols-2">
             {freshGames.slice(0, 6).map((game) => (
               <Link key={game.slug} href={href(`/play/${game.slug}`)} className="group flex items-center gap-3 border-b border-white/[0.07] py-3 transition hover:bg-white/[0.025]">
-                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl"><GameArtwork src={game.thumbnail} fallbackSrc={game.thumbnailWide} alt={game.title} fill sizes="80px" className="object-cover transition duration-300 group-hover:scale-105" /></div>
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl"><GameArtwork src={game.thumbnail} fallbackSrc={game.thumbnailWide} alt="" fill sizes="80px" className="object-cover transition duration-300 group-hover:scale-105" /></div>
                 <span className="min-w-0"><span dir="ltr" className="block truncate text-start font-latin text-sm font-black text-white">{game.title}</span><span className="mt-1 block text-xs text-text-secondary">{locale === "ar" ? game.category : game.genres[0] ?? game.category}</span><span className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-primary"><Play className="h-3 w-3 fill-current" />{locale === "ar" ? "العب" : "Play"}</span></span>
               </Link>
             ))}
@@ -201,7 +210,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <div className="scrollbar-hide flex snap-x gap-4 overflow-x-auto pb-3">
           {topPicks.slice(0, 8).map((game) => (
             <Link key={game.slug} href={href(`/play/${game.slug}`)} className="group relative min-h-52 w-[280px] shrink-0 snap-start overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-surface sm:w-[330px]">
-              <GameArtwork src={game.thumbnailWide || game.thumbnail} fallbackSrc={game.thumbnail} alt={game.title} fill sizes="330px" className="object-cover transition duration-500 group-hover:scale-105" /><div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" /><div className="absolute inset-x-0 bottom-0 p-5"><p dir="ltr" className="text-start font-latin text-lg font-black text-white">{game.title}</p><span className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary"><Play className="h-3 w-3 fill-current" />{locale === "ar" ? "تشغيل فوري" : "Instant play"}</span></div>
+              <GameArtwork src={game.thumbnailWide || game.thumbnail} fallbackSrc={game.thumbnail} alt="" fill sizes="330px" className="object-cover transition duration-500 group-hover:scale-105" /><div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" /><div className="absolute inset-x-0 bottom-0 p-5"><p dir="ltr" className="text-start font-latin text-lg font-black text-white">{game.title}</p><span className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary"><Play className="h-3 w-3 fill-current" />{locale === "ar" ? "تشغيل فوري" : "Instant play"}</span></div>
             </Link>
           ))}
         </div>

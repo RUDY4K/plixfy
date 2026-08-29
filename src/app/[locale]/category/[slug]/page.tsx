@@ -92,8 +92,10 @@ const uiCopy = {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps<"/[locale]/category/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
+  const query = await searchParams;
   if (!hasLocale(locale)) notFound();
   const copy = uiCopy[locale];
   const meta = getLocalizedCategoryMeta(slug, locale);
@@ -104,14 +106,23 @@ export async function generateMetadata({
     };
   }
   const games = getCategoryGames(slug);
-  const title = copy.metaTitle(meta.name, games.length);
+  const requestedPage = Number.parseInt(String(query.page ?? "1"), 10);
+  const totalPages = Math.max(1, Math.ceil(games.length / PAGE_SIZE));
+  const currentPage = Number.isFinite(requestedPage)
+    ? Math.min(Math.max(requestedPage, 1), totalPages)
+    : 1;
+  const pageSuffix = currentPage > 1 ? `?page=${currentPage}` : "";
+  const baseTitle = copy.metaTitle(meta.name, games.length);
+  const title = currentPage > 1
+    ? `${baseTitle} — ${copy.page(currentPage, totalPages)}`
+    : baseTitle;
   const description = buildCategoryDescription(
     locale,
     meta.name,
     games.length,
     meta.description
   );
-  const path = "/category/" + slug;
+  const path = "/category/" + slug + pageSuffix;
   return {
     title,
     description,
@@ -151,22 +162,23 @@ export default async function CategoryPage({
 
   const requestedPage = Number.parseInt(String(query.page ?? "1"), 10);
   const totalPages = Math.max(1, Math.ceil(games.length / PAGE_SIZE));
-  const currentPage = Number.isFinite(requestedPage)
-    ? Math.min(Math.max(requestedPage, 1), totalPages)
-    : 1;
+  if (!Number.isFinite(requestedPage) || requestedPage < 1 || requestedPage > totalPages) {
+    notFound();
+  }
+  const currentPage = requestedPage;
   const visibleGames = games.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE,
   );
 
-  const url = SITE + href("/category/" + slug);
+  const pagePath = "/category/" + slug + (currentPage > 1 ? `?page=${currentPage}` : "");
+  const url = SITE + href(pagePath);
   const description = buildCategoryDescription(
     locale,
     meta.name,
     games.length,
     meta.description
   );
-  const top10 = games.slice(0, 10);
   const localizedCategoryContent = locale === "ar" ? categoryContent : categoryContentEn;
   const content = localizedCategoryContent[slug as CategorySlug] ?? null;
   const relatedForLinks = categoryContent[slug as CategorySlug]?.related ?? [];
@@ -189,10 +201,10 @@ export default async function CategoryPage({
     },
     mainEntity: {
       "@type": "ItemList",
-      numberOfItems: games.length,
-      itemListElement: top10.map((g, idx) => ({
+      numberOfItems: visibleGames.length,
+      itemListElement: visibleGames.map((g, idx) => ({
         "@type": "ListItem",
-        position: idx + 1,
+        position: (currentPage - 1) * PAGE_SIZE + idx + 1,
         url: SITE + href("/play/" + g.slug),
         name: g.title,
       })),

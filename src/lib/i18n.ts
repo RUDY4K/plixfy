@@ -119,6 +119,8 @@ interface UIDict {
     exitFullscreen: string;
     similarHeading: string;
     playAnother: string;
+    loading: string;
+    ready: string;
   };
   consent: {
     notice: string;
@@ -236,6 +238,8 @@ const ar: UIDict = {
     exitFullscreen: "خروج من ملء الشاشة",
     similarHeading: "العب ألعاب مشابهة",
     playAnother: "العب لعبة تانية",
+    loading: "جارٍ تحميل {title}",
+    ready: "اللعبة جاهزة. اضغط Tab للدخول إلى اللعبة.",
   },
   consent: {
     notice: "إشعار ملفات تعريف الارتباط",
@@ -358,6 +362,8 @@ const en: UIDict = {
     exitFullscreen: "Exit fullscreen",
     similarHeading: "Play Similar Games",
     playAnother: "Play Another Game",
+    loading: "Loading {title}",
+    ready: "Game ready. Press Tab to enter the game.",
   },
   consent: {
     notice: "Cookie Notice",

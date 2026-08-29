@@ -114,15 +114,23 @@ export default async function RootLayout({
       className={`${tajawal.variable} ${inter.variable}`}
     >
       <head>
-        <link rel="preconnect" href="https://playgama.com" />
+        <link rel="preconnect" href="https://static.playgama.com" />
         <link rel="dns-prefetch" href="https://playgama.com" />
       </head>
       <body className="bg-bg text-text-primary antialiased min-h-screen pb-32 md:pb-0 relative ambient-glows overflow-x-hidden">
         <div className="noise-overlay" aria-hidden="true" />
         <PlayerDataProvider>
           <div className="relative z-10">
+            <a
+              href="#main-content"
+              className="fixed start-4 top-3 z-[120] -translate-y-24 rounded-xl bg-white px-4 py-3 font-bold text-[#090913] shadow-xl transition-transform focus-visible:translate-y-0"
+            >
+              {locale === "ar" ? "تجاوز إلى المحتوى" : "Skip to content"}
+            </a>
             <Header />
-            {children}
+            <div id="main-content" tabIndex={-1} className="outline-none">
+              {children}
+            </div>
             <Footer locale={locale} />
             <BottomNav />
           </div>

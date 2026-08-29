@@ -87,7 +87,7 @@ export default async function ContactPage({ params }: PageParams) {
 
       <a
         href={`mailto:${EMAIL}?subject=Plixfy%20Support`}
-        className="mt-8 inline-flex min-h-12 items-center rounded-2xl bg-primary px-6 font-bold text-white transition hover:brightness-110"
+        className="mt-8 inline-flex min-h-12 items-center rounded-2xl bg-primary px-6 font-bold text-[#090913] transition hover:brightness-110"
       >
         {c.button}
       </a>

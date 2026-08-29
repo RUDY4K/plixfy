@@ -9,18 +9,22 @@ type GameArtworkProps = Omit<ImageProps, "src" | "onError"> & {
   fallbackSrc?: string;
 };
 
+interface ArtworkAttempt {
+  src: string;
+  direct: boolean;
+}
+
 export default function GameArtwork({ src, fallbackSrc, alt, className, ...props }: GameArtworkProps) {
-  const [currentSrc, setCurrentSrc] = useState(src);
+  const [attempt, setAttempt] = useState<ArtworkAttempt>({ src, direct: false });
 
   useEffect(() => {
-    setCurrentSrc(src);
+    setAttempt({ src, direct: false });
   }, [src]);
 
-  if (!currentSrc) {
+  if (!attempt.src) {
     return (
       <span
-        role="img"
-        aria-label={alt}
+        {...(alt ? { role: "img", "aria-label": alt } : { "aria-hidden": true })}
         className={`${props.fill ? "absolute inset-0" : ""} ${className ?? ""} grid place-items-center bg-[radial-gradient(circle_at_30%_20%,rgba(118,87,255,.25),transparent_44%),linear-gradient(145deg,#121225,#090913)] text-text-faint`}
       >
         <span className="flex flex-col items-center gap-2">
@@ -34,16 +38,20 @@ export default function GameArtwork({ src, fallbackSrc, alt, className, ...props
   return (
     <Image
       {...props}
-      src={currentSrc}
+      src={attempt.src}
       alt={alt}
       className={className}
-      unoptimized
+      unoptimized={attempt.direct}
       onError={() => {
-        if (fallbackSrc && currentSrc !== fallbackSrc) {
-          setCurrentSrc(fallbackSrc);
+        if (!attempt.direct) {
+          setAttempt({ src: attempt.src, direct: true });
           return;
         }
-        setCurrentSrc("");
+        if (fallbackSrc && attempt.src !== fallbackSrc) {
+          setAttempt({ src: fallbackSrc, direct: false });
+          return;
+        }
+        setAttempt({ src: "", direct: false });
       }}
     />
   );

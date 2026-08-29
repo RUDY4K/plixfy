@@ -1525,11 +1525,18 @@ export function hasGameContent(slug: string): boolean {
   return slug in gameContent || slug in generatedGameContent;
 }
 
-/** Hand-reviewed content that is suitable for search indexing. */
+const editorialGameSlugsByLocale: Record<Locale, ReadonlySet<string>> = {
+  // Legacy Arabic entries in this file are hand-authored. New approvals must
+  // be added here deliberately after claim and gameplay review.
+  ar: new Set(Object.keys(gameContent)),
+  // topEnContent is generated display content, not an editorial approval list.
+  en: new Set<string>(),
+};
+
+/** Per-locale editorial approval gate for search indexing. */
 export function hasEditorialGameContent(
   slug: string,
   locale: Locale = "ar",
 ): boolean {
-  if (!(slug in gameContent)) return false;
-  return locale === "ar" || slug in topEnContent;
+  return editorialGameSlugsByLocale[locale].has(slug);
 }

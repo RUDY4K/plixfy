@@ -205,7 +205,7 @@ export default async function SimilarGamesPage({
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
             href={href("/play/" + slug)}
-            className="inline-flex items-center min-h-12 px-5 rounded-xl bg-primary text-white font-bold hover:brightness-110 transition"
+            className="inline-flex items-center min-h-12 px-5 rounded-xl bg-primary text-[#090913] font-bold hover:brightness-110 transition"
             dir="ltr"
           >
             ▶ {locale === "en" ? "Play" : "العب"} {game.title}

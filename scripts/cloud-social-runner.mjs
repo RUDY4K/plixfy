@@ -13,6 +13,7 @@ import {
   TrafficAcquisitionAgent,
   fetchSaudiTrends,
 } from "./traffic-acquisition-agent.mjs";
+import { normalizeContentDate } from "./social-schedule-core.mjs";
 
 const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
@@ -72,13 +73,28 @@ function parseArgs() {
   if (!["auto", "morning", "evening"].includes(value)) {
     throw new Error("--slot must be morning, evening, or auto");
   }
-  const { date, hour } = riyadhParts();
+  const { date: currentDate, hour } = riyadhParts();
+  const dateValue = process.argv.find((arg) => arg.startsWith("--date="))?.slice(7);
+  const dryRun = process.argv.includes("--dry-run");
+  const liveRead = process.argv.includes("--live-read");
+  const offline = process.argv.includes("--offline") || (dryRun && !liveRead);
+  if (offline && !dryRun) {
+    throw new Error("--offline requires --dry-run");
+  }
+  if (liveRead && !dryRun) {
+    throw new Error("--live-read requires --dry-run");
+  }
   return {
-    date,
+    date: dateValue ? normalizeContentDate(dateValue) : currentDate,
     slot: value === "auto" ? (hour < 15 ? "morning" : "evening") : value,
-    dryRun: process.argv.includes("--dry-run"),
+    dryRun,
+    offline,
     force: process.argv.includes("--force"),
   };
+}
+
+async function offlineFetch() {
+  throw new Error("Offline preflight: public reads disabled");
 }
 
 function cleanContentId(value) {
@@ -318,7 +334,10 @@ async function main() {
   }
 
   const hasTikTok = enabledPlatforms().has("tiktok");
-  const trendSnapshot = await fetchSaudiTrends({ cacheFile: TREND_CACHE_FILE });
+  const trendSnapshot = await fetchSaudiTrends({
+    cacheFile: TREND_CACHE_FILE,
+    fetchImpl: args.offline ? offlineFetch : fetch,
+  });
   console.log(
     `[TrendAgent] source=${trendSnapshot.source} status=${trendSnapshot.status} terms=${trendSnapshot.trends.length}`,
   );
@@ -361,7 +380,11 @@ async function main() {
   const pack = new EditorialAgent().review(rawPack);
   console.log(`[EditorAgent] approved ${pack.items.length} platform drafts`);
 
-  await verifyPublicUrl(pack.items[0].url);
+  if (args.offline) {
+    console.log("[Preflight] offline mode skipped public URL verification");
+  } else {
+    await verifyPublicUrl(pack.items[0].url);
+  }
   fs.mkdirSync(SOCIAL_DIR, { recursive: true });
   const packFile = path.join(SOCIAL_DIR, `${args.date}-${args.slot}.json`);
   const reportFile = path.join(SOCIAL_DIR, `${args.date}-${args.slot}-delivery.json`);
