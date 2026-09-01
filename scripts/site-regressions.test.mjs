@@ -171,6 +171,20 @@ test("keyboard and screen-reader users keep context through gates and game loadi
   assert.match(read("src/components/GameArtwork.tsx"), /alt \? \{ role: "img"/);
 });
 
+test("mobile games use an iPhone-safe full-viewport layer with an in-game exit", () => {
+  const gameFrame = read("src/components/GameFrame.tsx");
+
+  assert.match(gameFrame, /window\.visualViewport/);
+  assert.match(gameFrame, /height: mobileViewport \? `\$\{mobileViewport\.height\}px` : "100dvh"/);
+  assert.match(gameFrame, /env\(safe-area-inset-top\)/);
+  assert.match(gameFrame, /env\(safe-area-inset-bottom\)/);
+  assert.match(gameFrame, /frame\.requestFullscreen/);
+  assert.match(gameFrame, /allowFullScreen/);
+  assert.match(gameFrame, /onClick=\{stop\}/);
+  assert.match(gameFrame, /setMobileExpanded\(false\)/);
+  assert.match(gameFrame, /body\.style\.overflow = "hidden"/);
+});
+
 test("crawlers can render Next.js assets and pagination has distinct canonical URLs", () => {
   const robots = read("src/app/robots.ts");
   const categoryPage = read("src/app/[locale]/category/[slug]/page.tsx");

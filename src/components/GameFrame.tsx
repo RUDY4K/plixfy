@@ -27,6 +27,14 @@ export default function GameFrame(props: GameFrameProps) {
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [justEnded, setJustEnded] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [mobileExpanded, setMobileExpanded] = useState(false);
+  const [mobileViewport, setMobileViewport] = useState<{
+    height: number;
+    left: number;
+    top: number;
+    width: number;
+  } | null>(null);
+  const frameRootRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
   const startButtonRef = useRef<HTMLButtonElement>(null);
@@ -64,30 +72,30 @@ export default function GameFrame(props: GameFrameProps) {
     recordGamePlay(slug);
     requestAnimationFrame(() => statusRef.current?.focus());
 
-    const wantsFullscreen =
-      typeof window !== "undefined" &&
-      window.innerWidth < 768 &&
-      (orientation === "landscape" || orientation === undefined);
+    const wantsFullscreen = typeof window !== "undefined"
+      && window.matchMedia("(max-width: 767px)").matches;
 
     if (!wantsFullscreen) return;
+    setMobileExpanded(true);
 
-    requestAnimationFrame(() => {
-      const el = iframeRef.current;
-      if (!el) return;
-      try {
-        const result = el.requestFullscreen({ navigationUI: "hide" });
-        if (result && typeof result.catch === "function") {
-          result.catch(() => {});
-        }
-      } catch {
-        // fullscreen not supported or denied — ignore
+    const frame = frameRootRef.current;
+    if (!frame?.requestFullscreen) return;
+    try {
+      const result = frame.requestFullscreen({ navigationUI: "hide" });
+      if (result && typeof result.catch === "function") {
+        result.catch(() => {});
       }
-    });
-  }, [orientation, recordGamePlay, slug, t.gameFrame.loading, title]);
+    } catch {
+      // iPhone Safari may deny the Fullscreen API. The fixed mobile layer below
+      // remains the reliable fallback and still fills the visible viewport.
+    }
+  }, [recordGamePlay, slug, t.gameFrame.loading, title]);
 
   function stop() {
     fireGameEnd();
     setPlaying(false);
+    setMobileExpanded(false);
+    setMobileViewport(null);
     setJustEnded(true);
     setStatusMessage("");
     requestAnimationFrame(() => startButtonRef.current?.focus());
@@ -95,6 +103,52 @@ export default function GameFrame(props: GameFrameProps) {
       document.exitFullscreen().catch(() => {});
     }
   }
+
+  useEffect(() => {
+    if (!playing || !mobileExpanded) return;
+
+    const root = document.documentElement;
+    const body = document.body;
+    const previousRootOverflow = root.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyOverscroll = body.style.overscrollBehavior;
+
+    function syncViewport() {
+      const viewport = window.visualViewport;
+      setMobileViewport({
+        height: Math.round(viewport?.height ?? window.innerHeight),
+        left: Math.round(viewport?.offsetLeft ?? 0),
+        top: Math.round(viewport?.offsetTop ?? 0),
+        width: Math.round(viewport?.width ?? window.innerWidth),
+      });
+    }
+
+    root.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.overscrollBehavior = "none";
+    syncViewport();
+    window.addEventListener("resize", syncViewport);
+    window.visualViewport?.addEventListener("resize", syncViewport);
+    window.visualViewport?.addEventListener("scroll", syncViewport);
+
+    return () => {
+      root.style.overflow = previousRootOverflow;
+      body.style.overflow = previousBodyOverflow;
+      body.style.overscrollBehavior = previousBodyOverscroll;
+      window.removeEventListener("resize", syncViewport);
+      window.visualViewport?.removeEventListener("resize", syncViewport);
+      window.visualViewport?.removeEventListener("scroll", syncViewport);
+    };
+  }, [mobileExpanded, playing]);
+
+  useEffect(() => {
+    if (!playing) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && !document.fullscreenElement) stop();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
 
   useEffect(() => {
     function onExternalStart(event: Event) {
@@ -128,7 +182,21 @@ export default function GameFrame(props: GameFrameProps) {
   }, [slug, title, sourceName]);
 
   return (
-    <div className="relative aspect-video md:aspect-[21/9] overflow-hidden rounded-2xl bg-surface">
+    <div
+      ref={frameRootRef}
+      data-orientation={orientation}
+      className={mobileExpanded && playing
+        ? "fixed z-[200] overflow-hidden rounded-none bg-black"
+        : "relative aspect-video overflow-hidden rounded-2xl bg-surface md:aspect-[21/9]"}
+      style={mobileExpanded && playing
+        ? {
+            height: mobileViewport ? `${mobileViewport.height}px` : "100dvh",
+            left: mobileViewport ? `${mobileViewport.left}px` : 0,
+            top: mobileViewport ? `${mobileViewport.top}px` : 0,
+            width: mobileViewport ? `${mobileViewport.width}px` : "100vw",
+          }
+        : undefined}
+    >
       <p
         ref={statusRef}
         role="status"
@@ -141,26 +209,39 @@ export default function GameFrame(props: GameFrameProps) {
       </p>
       {playing ? (
         <>
-          <iframe
-            ref={iframeRef}
-            src={embedSrc}
-            title={title}
-            allow="autoplay; encrypted-media; fullscreen"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"
-            referrerPolicy="no-referrer-when-downgrade"
-            loading="lazy"
-            onLoad={() => {
-              if (loadedForRoundRef.current) return;
-              loadedForRoundRef.current = true;
-              setIframeLoaded(true);
-              setStatusMessage(t.gameFrame.ready);
-              trackEvent("game_loaded", {
-                game_slug: slug,
-                game_title: title,
-              });
-            }}
-            className="w-full h-full border-0 absolute inset-0"
-          />
+          <div
+            className="absolute bg-black"
+            style={mobileExpanded
+              ? {
+                  top: "env(safe-area-inset-top)",
+                  right: "env(safe-area-inset-right)",
+                  bottom: "env(safe-area-inset-bottom)",
+                  left: "env(safe-area-inset-left)",
+                }
+              : { inset: 0 }}
+          >
+            <iframe
+              ref={iframeRef}
+              src={embedSrc}
+              title={title}
+              allow="autoplay; encrypted-media; fullscreen"
+              allowFullScreen
+              sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"
+              referrerPolicy="no-referrer-when-downgrade"
+              loading="lazy"
+              onLoad={() => {
+                if (loadedForRoundRef.current) return;
+                loadedForRoundRef.current = true;
+                setIframeLoaded(true);
+                setStatusMessage(t.gameFrame.ready);
+                trackEvent("game_loaded", {
+                  game_slug: slug,
+                  game_title: title,
+                });
+              }}
+              className="absolute inset-0 h-full w-full border-0"
+            />
+          </div>
           {!iframeLoaded ? (
             <div
               aria-hidden="true"
@@ -173,9 +254,15 @@ export default function GameFrame(props: GameFrameProps) {
             type="button"
             onClick={stop}
             aria-label={t.gameFrame.exitFullscreen}
-            className="absolute top-3 left-3 z-10 w-12 h-12 inline-flex items-center justify-center bg-bg/80 backdrop-blur text-text-primary rounded-xl hover:bg-bg transition"
+            style={mobileExpanded
+              ? {
+                  top: "max(0.75rem, env(safe-area-inset-top))",
+                  left: "max(0.75rem, env(safe-area-inset-left))",
+                }
+              : undefined}
+            className="absolute left-3 top-3 z-[220] inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-bg/90 text-text-primary shadow-2xl backdrop-blur transition hover:bg-bg focus-visible:outline-offset-4 md:h-12 md:w-12 md:rounded-xl"
           >
-            <X className="w-5 h-5" aria-hidden="true" />
+            <X className="h-7 w-7 md:h-5 md:w-5" aria-hidden="true" />
           </button>
         </>
       ) : (
