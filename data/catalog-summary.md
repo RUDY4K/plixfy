@@ -4,9 +4,10 @@
 - Source: https://playgama.com/api/v1/partner/export/catalogue/games
 - Publisher: Playgama only
 - Reported by Playgama: 2079
-- Imported: 2079
-- Games with preview video: 1518
-- Games with multiple images: 2079
+- Imported: 2078
+- Games with preview video: 1517
+- Games with multiple images: 2078
+- Content-policy exclusions: 1
 - Invalid entries skipped: 0
 - Duplicate slugs skipped: 0
 
@@ -16,14 +17,14 @@
 - action: 473
 - puzzle: 744
 - io: 103
-- girls: 116
+- girls: 115
 - casual: 263
 - sports: 64
 - shooting: 146
 
 ## Device support
 
-- mobile-and-desktop: 1982
+- mobile-and-desktop: 1981
 - mobile-only: 5
 - desktop-only: 92
 - unknown: 0

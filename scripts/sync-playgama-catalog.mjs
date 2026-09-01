@@ -8,6 +8,18 @@ const OUTPUT = path.resolve("src/data/playgama-games.json");
 const METADATA = path.resolve("src/data/playgama-catalog-meta.json");
 const SUMMARY = path.resolve("data/catalog-summary.md");
 
+const excludedSlugs = new Set([
+  "pregnant-mother-simulator",
+]);
+
+const excludedContentMatchers = [
+  /\bpregnan(?:t|cy)\b/i,
+  /\bmaternity\b/i,
+  /\bchildbirth\b/i,
+  /\bgive birth\b/i,
+  /\bbirth simulator\b/i,
+];
+
 const categoryLabels = {
   racing: "سباق",
   action: "أكشن",
@@ -105,6 +117,18 @@ function normalizeGame(game) {
   };
 }
 
+function isExcludedGame(game) {
+  const searchableText = [
+    game.slug,
+    game.title,
+    game.description,
+    game.howToPlay,
+    ...game.genres,
+  ].join(" ");
+  return excludedSlugs.has(game.slug.toLowerCase())
+    || excludedContentMatchers.some((matcher) => matcher.test(searchableText));
+}
+
 async function fetchPage(offset) {
   const response = await fetch(ENDPOINT, {
     method: "POST",
@@ -146,9 +170,11 @@ async function main() {
   const seen = new Set();
   let invalid = 0;
   let duplicates = 0;
+  let excluded = 0;
   for (const rawGame of rawGames) {
     const game = normalizeGame(rawGame);
     if (!game) { invalid += 1; continue; }
+    if (isExcludedGame(game)) { excluded += 1; continue; }
     const key = game.slug.toLowerCase();
     if (seen.has(key)) { duplicates += 1; continue; }
     seen.add(key);
@@ -176,7 +202,7 @@ async function main() {
     if (game.images.length > 1) gamesWithMultipleImages += 1;
   }
   const now = new Date().toISOString();
-  const summary = `# Playgama catalog sync\n\n- Synced: ${now}\n- Source: ${ENDPOINT}\n- Publisher: Playgama only\n- Reported by Playgama: ${first.totalCount}\n- Imported: ${games.length}\n- Games with preview video: ${gamesWithVideo}\n- Games with multiple images: ${gamesWithMultipleImages}\n- Invalid entries skipped: ${invalid}\n- Duplicate slugs skipped: ${duplicates}\n\n## Categories\n\n${Object.entries(counts).map(([key, value]) => `- ${key}: ${value}`).join("\n")}\n\n## Device support\n\n${Object.entries(devices).map(([key, value]) => `- ${key}: ${value}`).join("\n")}\n`;
+  const summary = `# Playgama catalog sync\n\n- Synced: ${now}\n- Source: ${ENDPOINT}\n- Publisher: Playgama only\n- Reported by Playgama: ${first.totalCount}\n- Imported: ${games.length}\n- Games with preview video: ${gamesWithVideo}\n- Games with multiple images: ${gamesWithMultipleImages}\n- Content-policy exclusions: ${excluded}\n- Invalid entries skipped: ${invalid}\n- Duplicate slugs skipped: ${duplicates}\n\n## Categories\n\n${Object.entries(counts).map(([key, value]) => `- ${key}: ${value}`).join("\n")}\n\n## Device support\n\n${Object.entries(devices).map(([key, value]) => `- ${key}: ${value}`).join("\n")}\n`;
   if (catalogChanged) {
     await fs.mkdir(path.dirname(OUTPUT), { recursive: true });
     await fs.writeFile(OUTPUT, serialized, "utf8");
@@ -188,7 +214,7 @@ async function main() {
     await fs.writeFile(SUMMARY, summary, "utf8");
   }
   console.log(`Playgama sync complete: ${games.length}/${first.totalCount} games imported.`);
-  console.log(`Skipped ${invalid} invalid entries and ${duplicates} duplicate slugs.`);
+  console.log(`Skipped ${excluded} content-policy exclusions, ${invalid} invalid entries, and ${duplicates} duplicate slugs.`);
   console.log(catalogChanged ? "Catalog files updated." : "No catalog changes detected.");
 }
 
