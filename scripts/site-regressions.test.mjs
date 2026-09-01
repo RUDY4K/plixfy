@@ -38,30 +38,42 @@ test("catalog freshness and visible years stay data-driven", () => {
   assert.match(footer, /replace\("\{year\}"/);
 });
 
-test("automated Arabic social posts use canonical root-locale URLs", () => {
+test("automated Arabic news posts use canonical root-locale URLs", () => {
   const runner = read("scripts/cloud-social-runner.mjs");
-  const capture = read("scripts/capture-gameplay-video.mjs");
-  assert.match(runner, /\$\{SITE\}\/play\/\$\{encodeURIComponent\(game\.slug\)\}/);
   assert.match(runner, /\$\{SITE\}\/news\/\$\{encodeURIComponent\(news\.slug\)\}/);
-  assert.doesNotMatch(runner, /\$\{SITE\}\/ar\/(?:play|news)\//);
-  assert.match(capture, /plixfy\.com\/play\/\$\{game\.slug\}/);
-  assert.doesNotMatch(capture, /plixfy\.com\/ar\/play\//);
+  assert.doesNotMatch(runner, /\$\{SITE\}\/ar\/news\//);
 });
 
-test("traffic acquisition posts are measurable and do not automate TikTok", () => {
+test("continuous social automation publishes measurable gaming news only", () => {
   const runner = read("scripts/cloud-social-runner.mjs");
-  const acquisition = read("scripts/traffic-acquisition-agent.mjs");
+  const workflow = read(".github/workflows/cloud-social.yml");
+  const contentWorkflow = read(".github/workflows/content-engine.yml");
   const packageJson = JSON.parse(read("package.json"));
 
-  assert.match(acquisition, /ACQUISITION_CAMPAIGN = "ar_acquisition_v1"/);
-  assert.match(runner, /acquisitionContentId\("game", game\.slug, hookVariant\)/);
-  assert.match(runner, /acquisitionContentId\("news", news\.slug, hookVariant\)/);
+  assert.match(runner, /campaign: "ar_gaming_news_24h_v1"/);
+  assert.match(runner, /cleanContentId\(`news-\$\{news\.slug\}`\)/);
+  assert.match(runner, /slot: "news"/);
+  assert.match(runner, /games: \[\]/);
+  assert.match(runner, /No unpublished gaming news/);
+  assert.match(runner, /MIN_NEWS_INTERVAL_MS = 90 \* 60 \* 1000/);
   assert.doesNotMatch(runner, /platform: "tiktok"/);
-  assert.match(packageJson.scripts["social:preflight"], /--dry-run.*--slot=morning/);
-  assert.match(packageJson.scripts["social:preflight"], /--dry-run.*--slot=evening/);
+  assert.match(workflow, /cron: "25,55 \* \* \* \*"/);
+  assert.doesNotMatch(workflow, /slot=(?:morning|evening)/);
+  assert.match(contentWorkflow, /cron: "5 \* \* \* \*"/);
+  assert.match(packageJson.scripts["social:preflight"], /--dry-run.*--slot=news/);
   assert.match(packageJson.scripts["social:preflight"], /--offline/);
   assert.doesNotMatch(packageJson.scripts["social:preflight:live"], /--offline/);
   assert.match(packageJson.scripts["social:preflight:live"], /--live-read/);
+});
+
+test("gaming news comes from multiple current sources and preserves source time", () => {
+  const updater = read("scripts/update-news.mjs");
+
+  for (const source of ["GameSpot", "Eurogamer", "PlayStation Blog", "Xbox Wire", "Gematsu", "VGC"]) {
+    assert.match(updater, new RegExp(`name: "${source}"`));
+  }
+  assert.match(updater, /sourcePublishedAt:/);
+  assert.match(updater, /sort\(\(a, b\) => \(Date\.parse\(b\.pubDate\)/);
 });
 
 test("IndexNow submits only the live sitemap allow-list", () => {
@@ -178,6 +190,8 @@ test("mobile games use an iPhone-safe full-viewport layer with an in-game exit",
   assert.match(gameFrame, /height: mobileViewport \? `\$\{mobileViewport\.height\}px` : "100dvh"/);
   assert.match(gameFrame, /env\(safe-area-inset-top\)/);
   assert.match(gameFrame, /env\(safe-area-inset-bottom\)/);
+  assert.match(gameFrame, /calc\(env\(safe-area-inset-top\) \+ 3\.5rem\)/);
+  assert.match(gameFrame, /\{t\.gameFrame\.exitFullscreen\}<\/span>/);
   assert.match(gameFrame, /frame\.requestFullscreen/);
   assert.match(gameFrame, /allowFullScreen/);
   assert.match(gameFrame, /onClick=\{stop\}/);

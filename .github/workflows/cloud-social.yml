@@ -2,21 +2,18 @@ name: Plixfy Cloud Social
 
 on:
   schedule:
-    # UTC retries for the 09:30 and 19:30 Asia/Riyadh slots. The planner below
-    # permits only the first 60 minutes and makes all later retries no-ops.
-    - cron: "30,37,47,57 6,16 * * *"
-    - cron: "7,17,27 7,17 * * *"
+    # Watch for publishable gaming news around the clock. The runner applies a
+    # 90-minute cooldown and never republishes the same story.
+    - cron: "25,55 * * * *"
   workflow_dispatch:
     inputs:
       slot:
         description: Content slot
         required: true
-        default: auto
+        default: news
         type: choice
         options:
-          - auto
-          - morning
-          - evening
+          - news
       dry_run:
         description: Validate without sending anything
         required: true
@@ -66,7 +63,7 @@ jobs:
           restore-keys: |
             social-state-
 
-      - name: Plan due social slot
+      - name: Plan continuous news run
         id: plan
         env:
           INPUT_SLOT: ${{ inputs.slot }}
@@ -76,7 +73,7 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            if [[ ! "$INPUT_SLOT" =~ ^(auto|morning|evening)$ ]]; then
+            if [[ "$INPUT_SLOT" != "news" ]]; then
               echo "Invalid workflow slot" >&2
               exit 1
             fi
@@ -92,7 +89,13 @@ jobs:
             echo "force=$INPUT_FORCE" >> "$GITHUB_OUTPUT"
             echo "platforms=$INPUT_PLATFORMS" >> "$GITHUB_OUTPUT"
           else
-            node scripts/social-schedule-core.mjs
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "reason=continuous_news_watch" >> "$GITHUB_OUTPUT"
+            echo "slot=news" >> "$GITHUB_OUTPUT"
+            echo "date=" >> "$GITHUB_OUTPUT"
+            echo "dry_run=false" >> "$GITHUB_OUTPUT"
+            echo "force=false" >> "$GITHUB_OUTPUT"
+            echo "platforms=telegram,discord,x,facebook,instagram" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install social agent dependencies

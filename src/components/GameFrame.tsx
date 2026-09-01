@@ -213,7 +213,7 @@ export default function GameFrame(props: GameFrameProps) {
             className="absolute bg-black"
             style={mobileExpanded
               ? {
-                  top: "env(safe-area-inset-top)",
+                  top: "calc(env(safe-area-inset-top) + 3.5rem)",
                   right: "env(safe-area-inset-right)",
                   bottom: "env(safe-area-inset-bottom)",
                   left: "env(safe-area-inset-left)",
@@ -250,20 +250,37 @@ export default function GameFrame(props: GameFrameProps) {
               <div className="w-12 h-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
             </div>
           ) : null}
-          <button
-            type="button"
-            onClick={stop}
-            aria-label={t.gameFrame.exitFullscreen}
-            style={mobileExpanded
-              ? {
-                  top: "max(0.75rem, env(safe-area-inset-top))",
-                  left: "max(0.75rem, env(safe-area-inset-left))",
-                }
-              : undefined}
-            className="absolute left-3 top-3 z-[220] inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-bg/90 text-text-primary shadow-2xl backdrop-blur transition hover:bg-bg focus-visible:outline-offset-4 md:h-12 md:w-12 md:rounded-xl"
-          >
-            <X className="h-7 w-7 md:h-5 md:w-5" aria-hidden="true" />
-          </button>
+          {mobileExpanded ? (
+            <div
+              className="absolute inset-x-0 top-0 z-[220] flex h-[calc(3.5rem+env(safe-area-inset-top))] items-end justify-between gap-3 border-b border-white/10 bg-bg px-3 pb-2 shadow-xl"
+              style={{
+                paddingLeft: "max(0.75rem, env(safe-area-inset-left))",
+                paddingRight: "max(0.75rem, env(safe-area-inset-right))",
+              }}
+            >
+              <button
+                type="button"
+                onClick={stop}
+                aria-label={t.gameFrame.exitFullscreen}
+                className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-white/15 bg-surface-elevated px-3 font-bold text-text-primary transition hover:bg-surface focus-visible:outline-offset-4"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+                <span>{t.gameFrame.exitFullscreen}</span>
+              </button>
+              <span className="truncate font-latin text-sm font-bold text-text-secondary" dir="auto">
+                {title}
+              </span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={stop}
+              aria-label={t.gameFrame.exitFullscreen}
+              className="absolute left-3 top-3 z-[220] inline-flex h-12 w-12 items-center justify-center rounded-xl border border-white/15 bg-bg/90 text-text-primary shadow-2xl backdrop-blur transition hover:bg-bg focus-visible:outline-offset-4"
+            >
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+          )}
         </>
       ) : (
         <>

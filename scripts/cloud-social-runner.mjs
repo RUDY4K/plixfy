@@ -1,5 +1,5 @@
 // Local, deterministic social agents for GitHub Actions.
-// Usage: node scripts/cloud-social-runner.mjs [--slot=morning|evening|auto] [--dry-run] [--force]
+// Usage: node scripts/cloud-social-runner.mjs [--slot=news|auto] [--dry-run] [--force]
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -7,9 +7,7 @@ import {
   EditorialAgent,
   PublicationAuditAgent,
 } from "./social-agents.mjs";
-import { loadPlaygamaGames } from "./playgama-social-games.mjs";
 import {
-  ACQUISITION_CAMPAIGN,
   TrafficAcquisitionAgent,
   fetchSaudiTrends,
 } from "./traffic-acquisition-agent.mjs";
@@ -20,18 +18,7 @@ const SOCIAL_DIR = path.join(ROOT, ".social");
 const CLOUD_STATE_FILE = path.join(SOCIAL_DIR, "cloud-state.json");
 const TREND_CACHE_FILE = path.join(SOCIAL_DIR, "saudi-trends.json");
 const SITE = "https://www.plixfy.com";
-const VERIFIED_GAMEPLAY_IDS = new Set(["mr-racer-car-racing"]);
-
-const CATEGORY_AR = {
-  racing: "سباق",
-  action: "أكشن",
-  puzzle: "ألغاز",
-  io: "ألعاب .io",
-  girls: "تلبيس وتصميم",
-  casual: "ألعاب خفيفة",
-  sports: "رياضة",
-  shooting: "تصويب",
-};
+const MIN_NEWS_INTERVAL_MS = 90 * 60 * 1000;
 
 function readJson(file, fallback) {
   try {
@@ -70,8 +57,8 @@ function riyadhParts(now = new Date()) {
 
 function parseArgs() {
   const value = process.argv.find((arg) => arg.startsWith("--slot="))?.split("=")[1] || "auto";
-  if (!["auto", "morning", "evening"].includes(value)) {
-    throw new Error("--slot must be morning, evening, or auto");
+  if (!["auto", "news"].includes(value)) {
+    throw new Error("--slot must be news or auto");
   }
   const { date: currentDate, hour } = riyadhParts();
   const dateValue = process.argv.find((arg) => arg.startsWith("--date="))?.slice(7);
@@ -86,7 +73,7 @@ function parseArgs() {
   }
   return {
     date: dateValue ? normalizeContentDate(dateValue) : currentDate,
-    slot: value === "auto" ? (hour < 15 ? "morning" : "evening") : value,
+    slot: "news",
     dryRun,
     offline,
     force: process.argv.includes("--force"),
@@ -99,11 +86,6 @@ async function offlineFetch() {
 
 function cleanContentId(value) {
   return value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 72);
-}
-
-function acquisitionContentId(kind, slug, hookVariant) {
-  const suffix = `-h${hookVariant}`;
-  return `${cleanContentId(`${kind}-${slug}`).slice(0, 72 - suffix.length).replace(/-$/, "")}${suffix}`;
 }
 
 function truncate(text, max) {
@@ -120,179 +102,56 @@ function socialCardUrl(kind, id) {
   return url.toString();
 }
 
-function socialVideoUrl(kind, id) {
-  return `${SITE}/social/videos/${encodeURIComponent(`${kind}-${id}.mp4`)}`;
-}
-
-function enabledPlatforms() {
-  return new Set(
-    String(process.env.SOCIAL_PLATFORMS || "telegram,discord,x,facebook,instagram")
-      .split(",")
-      .map((value) => value.trim().toLowerCase())
-      .filter((value) => value && value !== "tiktok"),
-  );
-}
-
-function runRequired(command, args) {
-  const result = spawnSync(command, args, { cwd: ROOT, stdio: "inherit" });
-  if (result.status !== 0) {
-    throw new Error(`${command} exited with code ${result.status}`);
-  }
-}
-
-async function waitForPublicVideo(url) {
-  for (let attempt = 1; attempt <= 30; attempt += 1) {
-    try {
-      const response = await fetch(url, {
-        method: "HEAD",
-        redirect: "follow",
-        cache: "no-store",
-        headers: { "user-agent": "PlixfyCloudSocial/2.0" },
-        signal: AbortSignal.timeout(15_000),
-      });
-      const type = response.headers.get("content-type") || "";
-      if (response.ok && type.startsWith("video/")) return;
-    } catch {
-      // Vercel may still be deploying the commit. Retry on the next interval.
-    }
-    await new Promise((resolve) => setTimeout(resolve, 10_000));
-  }
-  throw new Error(`Generated TikTok video did not become public in time: ${url}`);
-}
-
-async function attachTikTokVideo(pack, args) {
-  const enabled = enabledPlatforms();
-  const item = pack.items.find((candidate) => candidate.platform === "tiktok");
-  if (!item || !enabled.has("tiktok") || args.dryRun) return pack;
-
-  const filename = `${pack.source.kind}-${pack.source.id}.mp4`;
-  const relativeOutput = path.join("public", "social", "videos", filename);
-  if (pack.source.kind === "game") {
-    const gameplay = spawnSync(
-      process.execPath,
-      [
-        path.join(ROOT, "scripts", "capture-gameplay-video.mjs"),
-        `--id=${pack.source.id}`,
-        `--output=${relativeOutput}`,
-      ],
-      { cwd: ROOT, stdio: "inherit" },
-    );
-    if (gameplay.status !== 0) {
-      throw new Error(`[VideoAgent] gameplay capture failed for ${pack.source.id}`);
-    }
-  } else {
-    runRequired(process.execPath, [
-      path.join(ROOT, "scripts", "generate-social-video.mjs"),
-      `--kind=${pack.source.kind}`,
-      `--id=${pack.source.id}`,
-      `--output=${relativeOutput}`,
-    ]);
-  }
-
-  if (process.env.GITHUB_ACTIONS === "true") {
-    runRequired("git", ["config", "user.name", "github-actions[bot]"]);
-    runRequired("git", ["config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"]);
-    runRequired("git", ["add", "--", relativeOutput]);
-    const changed = spawnSync("git", ["diff", "--cached", "--quiet"], { cwd: ROOT }).status !== 0;
-    if (changed) {
-      runRequired("git", ["commit", "-m", `chore: render TikTok video for ${pack.source.id}`]);
-      runRequired("git", ["push", "origin", "HEAD:main"]);
-    }
-  }
-
-  item.video = socialVideoUrl(pack.source.kind, pack.source.id);
-  await waitForPublicVideo(item.video);
-  return pack;
-}
-
-function loadGames({ recordableOnly = false } = {}) {
-  const playgamaGames = loadPlaygamaGames(ROOT);
-  const games = recordableOnly
-    ? playgamaGames.filter((game) => VERIFIED_GAMEPLAY_IDS.has(game.slug))
-    : playgamaGames;
-  return games.sort((a, b) => a.slug.localeCompare(b.slug));
-}
-
 function loadNews(referenceDate) {
-  const referenceTime = Date.parse(`${referenceDate}T23:59:59Z`);
-  const cutoffTime = referenceTime - 7 * 24 * 60 * 60 * 1000;
+  const referenceTime = Date.now();
+  const cutoffTime = referenceTime - 48 * 60 * 60 * 1000;
   return readJson(path.join(ROOT, "src", "data", "news.json"), [])
     .filter((item) => item?.slug && item?.title && item?.summary && item?.publishedAt)
     .filter((item) => {
-      const publishedTime = Date.parse(`${item.publishedAt}T00:00:00Z`);
+      const publishedTime = Date.parse(item.sourcePublishedAt || `${item.publishedAt}T00:00:00Z`);
       return Number.isFinite(publishedTime) && publishedTime >= cutoffTime && publishedTime <= referenceTime;
     })
-    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
-}
-
-function gamePack(game, date, slot, acquisition, trendSnapshot) {
-  const title = truncate(game.title, 70);
-  const category = CATEGORY_AR[game.categorySlug] || game.category || "ألعاب";
-  const url = `${SITE}/play/${encodeURIComponent(game.slug)}`;
-  const hookVariant = acquisition.hookVariant;
-  const contentId = acquisitionContentId("game", game.slug, hookVariant);
-  const image = socialCardUrl("game", game.slug);
-  const lead = {
-    a: `🎮 تحدي اليوم: ${title}`,
-    b: `⚡ تلعبها فورًا: ${title}`,
-    c: `👀 اختيار يستحق التجربة: ${title}`,
-  }[hookVariant];
-  return {
-    date,
-    campaign: ACQUISITION_CAMPAIGN,
-    slot,
-    source: { kind: "game", id: game.slug },
-    acquisition: { ...acquisition, trendSource: trendSnapshot.source, trendStatus: trendSnapshot.status },
-    items: [
-      { platform: "telegram", kind: "game", contentId, text: `${lead}\n\nلعبة ${category} تعمل مجانًا من المتصفح بدون تحميل أو تسجيل. جرّبها وشاركنا نتيجتك!`, url, image },
-      { platform: "discord", kind: "game", contentId, title: lead, text: `${lead}\n\nادخل التحدي مجانًا من المتصفح، بدون تحميل أو تسجيل، ثم شاركنا نتيجتك في الديسكورد.`, url, image },
-      { platform: "x", kind: "game", contentId, text: `${truncate(lead, 100)}\n\nمجانية من المتصفح وبدون تحميل. كم نتيجة تقدر تحقق؟ 👇\n#ألعاب #Plixfy`, url, image },
-      { platform: "facebook", kind: "game", contentId, text: `${lead}. لعبة ${category} تعمل مباشرة من المتصفح مجانًا، بدون تحميل أو إنشاء حساب. جرّبها وقل لنا: وصلت لأي نتيجة؟`, url, image },
-      { platform: "instagram", kind: "game", contentId, text: `${lead}\n\nالعبها مجانًا من المتصفح وشاركنا نتيجتك. الرابط في Plixfy.\n\n#ألعاب #ألعاب_مجانية #ألعاب_متصفح #Plixfy`, url, image },
-    ],
-  };
+    .sort((a, b) => Date.parse(b.sourcePublishedAt || b.publishedAt) - Date.parse(a.sourcePublishedAt || a.publishedAt));
 }
 
 function newsPack(news, date, slot, acquisition, trendSnapshot) {
-  const title = truncate(news.title, 110);
-  const summary = truncate(news.summary, 260);
+  const title = truncate(news.title, 100);
+  const summary = truncate(news.summary, 300);
   const url = `${SITE}/news/${encodeURIComponent(news.slug)}`;
-  const hookVariant = acquisition.hookVariant;
-  const contentId = acquisitionContentId("news", news.slug, hookVariant);
+  const contentId = cleanContentId(`news-${news.slug}`);
   const image = socialCardUrl("news", news.slug);
-  const lead = {
-    a: `📰 الخبر الذي يتداوله اللاعبون: ${title}`,
-    b: `⚡ ماذا حدث في عالم الألعاب؟ ${title}`,
-    c: `🎮 لماذا يهم هذا الخبر اللاعبين؟ ${title}`,
-  }[hookVariant];
+  const source = truncate(news.sourceName || "المصدر الأصلي", 45);
+  const xTitle = truncate(title, 88);
+  const xSummary = truncate(summary, 82);
   return {
     date,
-    campaign: ACQUISITION_CAMPAIGN,
+    campaign: "ar_gaming_news_24h_v1",
     slot,
     source: { kind: "news", id: news.slug },
     acquisition: { ...acquisition, trendSource: trendSnapshot.source, trendStatus: trendSnapshot.status },
     items: [
-      { platform: "telegram", kind: "news", contentId, text: `${lead}\n\n${summary}\n\nاقرأ التفاصيل على Plixfy:`, url, image },
-      { platform: "discord", kind: "news", contentId, title: truncate(lead, 120), text: `${truncate(summary, 420)}\n\nناقش الخبر معنا ثم اقرأ التفاصيل الكاملة على Plixfy.`, url, image },
-      { platform: "x", kind: "news", contentId, text: `${truncate(lead, 165)}\n\nالتفاصيل على Plixfy 👇\n#أخبار_الألعاب`, url, image },
-      { platform: "facebook", kind: "news", contentId, text: `${lead}\n\n${summary}\n\nما رأيكم بالخبر؟ اقرأوا التفاصيل الكاملة على Plixfy.`, url, image },
-      { platform: "instagram", kind: "news", contentId, text: `${lead}\n\n${truncate(summary, 180)}\n\nالتفاصيل على Plixfy.\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image },
+      { platform: "telegram", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nالمصدر: ${source}\nالخبر الكامل على بليكسفاي:`, url, image },
+      { platform: "discord", kind: "news", contentId, title: `📰 ${title}`, text: `${summary}\n\nالمصدر: ${source}\nاقرأ الخبر كاملًا وناقشه معنا.`, url, image },
+      { platform: "x", kind: "news", contentId, text: `📰 ${xTitle}\n\n${xSummary}\n\nالمصدر: ${source}\nالخبر الكامل 👇\n#أخبار_الألعاب`, url, image },
+      { platform: "facebook", kind: "news", contentId, text: `📰 ${title}\n\n${summary}\n\nالمصدر: ${source}\nاقرأ الخبر كاملًا على بليكسفاي.`, url, image },
+      { platform: "instagram", kind: "news", contentId, text: `📰 ${title}\n\n${truncate(summary, 220)}\n\nالمصدر: ${source}\nرابط الخبر الكامل مرفق بالمنشور.\n\n#أخبار_الألعاب #GamingNews #Plixfy`, url, image },
     ],
   };
 }
 
 function updateCloudState(state, pack, audit) {
   const now = new Date().toISOString();
-  const runKey = `${pack.date}:${pack.slot}`;
+  const runKey = `news:${pack.source.id}`;
   const next = {
     recentGames: state.recentGames || [],
     recentNews: state.recentNews || [],
     runs: state.runs || {},
+    lastPublishedAt: state.lastPublishedAt || null,
   };
   if (pack.source.kind === "game") {
     next.recentGames = [pack.source.id, ...next.recentGames.filter((id) => id !== pack.source.id)].slice(0, 30);
   } else {
-    next.recentNews = [pack.source.id, ...next.recentNews.filter((id) => id !== pack.source.id)].slice(0, 30);
+    next.recentNews = [pack.source.id, ...next.recentNews.filter((id) => id !== pack.source.id)].slice(0, 300);
   }
   next.runs[runKey] = {
     status: "delivered",
@@ -301,6 +160,7 @@ function updateCloudState(state, pack, audit) {
     counts: audit.counts,
     completedAt: now,
   };
+  next.lastPublishedAt = now;
   next.runs = Object.fromEntries(Object.entries(next.runs).slice(-90));
   return next;
 }
@@ -327,13 +187,12 @@ async function verifyPublicUrl(url) {
 async function main() {
   const args = parseArgs();
   const state = readJson(CLOUD_STATE_FILE, { recentGames: [], recentNews: [], runs: {} });
-  const runKey = `${args.date}:${args.slot}`;
-  if (!args.dryRun && !args.force && state.runs?.[runKey]?.status === "delivered") {
-    console.log(`Run ${runKey} is already complete; nothing to do.`);
+  const runKey = `news-watcher:${args.date}`;
+  const lastPublishedTime = Date.parse(state.lastPublishedAt || "");
+  if (!args.dryRun && !args.force && Number.isFinite(lastPublishedTime) && Date.now() - lastPublishedTime < MIN_NEWS_INTERVAL_MS) {
+    console.log("[NewsWatcher] Cooldown is active; the next check will reconsider any pending news.");
     return;
   }
-
-  const hasTikTok = enabledPlatforms().has("tiktok");
   const trendSnapshot = await fetchSaudiTrends({
     cacheFile: TREND_CACHE_FILE,
     fetchImpl: args.offline ? offlineFetch : fetch,
@@ -343,40 +202,27 @@ async function main() {
   );
   if (trendSnapshot.warning) console.warn(`[TrendAgent] ${trendSnapshot.warning}`);
   const scout = new TrafficAcquisitionAgent();
-  let games = loadGames({ recordableOnly: hasTikTok });
-  const newsItems = loadNews(args.date);
-  const maximumAttempts = !args.dryRun && hasTikTok ? 6 : 1;
-  let selection;
-  let rawPack;
-
-  for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
-    selection = scout.select({
-      slot: args.slot,
-      games,
-      newsItems,
-      recentGames: state.recentGames || [],
-      recentNews: state.recentNews || [],
-      trends: trendSnapshot.trends,
-      seed: `${runKey}:${attempt}`,
-      referenceDate: args.date,
-    });
-    console.log(
-      `[TrafficAcquisitionAgent] selected ${selection.kind}/${selection.item.slug} score=${selection.acquisition.score} hook=${selection.acquisition.hookVariant} reasons=${selection.acquisition.reasons.join(",")}`,
-    );
-    rawPack = selection.kind === "news"
-      ? newsPack(selection.item, args.date, args.slot, selection.acquisition, trendSnapshot)
-      : gamePack(selection.item, args.date, args.slot, selection.acquisition, trendSnapshot);
-    try {
-      await attachTikTokVideo(rawPack, args);
-      break;
-    } catch (error) {
-      if (selection.kind !== "game" || attempt === maximumAttempts - 1) throw error;
-      console.warn(`${error.message}; trying another game`);
-      games = games.filter((game) => game.slug !== selection.item.slug);
-    }
+  const allNewsItems = loadNews(args.date);
+  const recentNews = new Set(state.recentNews || []);
+  const newsItems = args.force ? allNewsItems : allNewsItems.filter((item) => !recentNews.has(item.slug));
+  if (newsItems.length === 0) {
+    console.log("[NewsWatcher] No unpublished gaming news is ready; nothing to send.");
+    return;
   }
-
-  if (!selection || !rawPack) throw new Error("TrafficAcquisitionAgent could not prepare a social pack");
+  const selection = scout.select({
+    slot: "news",
+    games: [],
+    newsItems,
+    recentGames: [],
+    recentNews: [],
+    trends: trendSnapshot.trends,
+    seed: `${runKey}:${newsItems.map((item) => item.slug).join(":")}`,
+    referenceDate: args.date,
+  });
+  console.log(
+    `[TrafficAcquisitionAgent] selected news/${selection.item.slug} score=${selection.acquisition.score} reasons=${selection.acquisition.reasons.join(",")}`,
+  );
+  const rawPack = newsPack(selection.item, args.date, "news", selection.acquisition, trendSnapshot);
   const pack = new EditorialAgent().review(rawPack);
   console.log(`[EditorAgent] approved ${pack.items.length} platform drafts`);
 

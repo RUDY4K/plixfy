@@ -214,8 +214,8 @@ test("publisher dry-run performs no network request even when a channel key exis
 
 test("cloud dry-run defaults to offline and performs no network request", (context) => {
   const socialDirectory = path.resolve(".social");
-  const packFile = path.join(socialDirectory, "2099-01-01-morning.json");
-  const reportFile = path.join(socialDirectory, "2099-01-01-morning-delivery.json");
+  const packFile = path.join(socialDirectory, "2026-09-01-news.json");
+  const reportFile = path.join(socialDirectory, "2026-09-01-news-delivery.json");
   context.after(() => {
     fs.rmSync(packFile, { force: true });
     fs.rmSync(reportFile, { force: true });
@@ -241,8 +241,8 @@ test("cloud dry-run defaults to offline and performs no network request", (conte
       preload,
       path.resolve("scripts/cloud-social-runner.mjs"),
       "--dry-run",
-      "--slot=morning",
-      "--date=2099-01-01",
+      "--slot=news",
+      "--date=2026-09-01",
     ],
     { cwd: process.cwd(), encoding: "utf8", env: childEnvironment },
   );

@@ -20,6 +20,10 @@ const FEEDS = [
   { name: "VG247", url: "https://www.vg247.com/feed/news" },
   { name: "Eurogamer", url: "https://www.eurogamer.net/feed/news" },
   { name: "PC Gamer", url: "https://www.pcgamer.com/rss/" },
+  { name: "PlayStation Blog", url: "https://blog.playstation.com/feed/" },
+  { name: "Xbox Wire", url: "https://news.xbox.com/en-us/feed/" },
+  { name: "Gematsu", url: "https://www.gematsu.com/feed" },
+  { name: "VGC", url: "https://www.videogameschronicle.com/feed/" },
 ];
 
 function decodeEntities(s) {
@@ -194,6 +198,7 @@ async function main() {
       const t = Date.parse(it.pubDate);
       return (!Number.isNaN(t) ? t >= cutoff : true) && !knownUrls.has(it.link);
     })
+    .sort((a, b) => (Date.parse(b.pubDate) || 0) - (Date.parse(a.pubDate) || 0))
     .slice(0, 40);
   const candidates = (await Promise.all(
     candidateStubs.map(async (item) => ({
@@ -295,6 +300,9 @@ async function main() {
         sourceName: candidate.source,
         sourceUrl: candidate.link,
         image: candidate.image,
+        sourcePublishedAt: Number.isNaN(Date.parse(candidate.pubDate))
+          ? new Date().toISOString()
+          : new Date(candidate.pubDate).toISOString(),
         publishedAt: today,
       };
     });

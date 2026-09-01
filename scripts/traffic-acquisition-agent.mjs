@@ -312,7 +312,7 @@ export function chooseHookVariant(seed, id) {
 
 export class TrafficAcquisitionAgent {
   select({ slot, games, newsItems, recentGames = [], recentNews = [], trends = [], seed, referenceDate }) {
-    const useNews = slot === "evening" && newsItems.length > 0;
+    const useNews = ["news", "evening"].includes(slot) && newsItems.length > 0;
     const ranked = useNews
       ? rankNews(newsItems, trends, recentNews, referenceDate, seed)
       : rankGames(games, trends, recentGames, seed);
