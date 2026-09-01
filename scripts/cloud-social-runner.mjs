@@ -19,6 +19,7 @@ const CLOUD_STATE_FILE = path.join(SOCIAL_DIR, "cloud-state.json");
 const TREND_CACHE_FILE = path.join(SOCIAL_DIR, "saudi-trends.json");
 const SITE = "https://www.plixfy.com";
 const MIN_NEWS_INTERVAL_MS = 90 * 60 * 1000;
+const MAX_NEWS_SILENCE_MS = 24 * 60 * 60 * 1000;
 
 function readJson(file, fallback) {
   try {
@@ -206,6 +207,13 @@ async function main() {
   const recentNews = new Set(state.recentNews || []);
   const newsItems = args.force ? allNewsItems : allNewsItems.filter((item) => !recentNews.has(item.slug));
   if (newsItems.length === 0) {
+    if (
+      !args.dryRun
+      && Number.isFinite(lastPublishedTime)
+      && Date.now() - lastPublishedTime >= MAX_NEWS_SILENCE_MS
+    ) {
+      throw new Error("[NewsWatcher] No public news post was recorded for 24 hours; inspect the content feed and Buffer delivery.");
+    }
     console.log("[NewsWatcher] No unpublished gaming news is ready; nothing to send.");
     return;
   }

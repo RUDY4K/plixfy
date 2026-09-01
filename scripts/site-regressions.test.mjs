@@ -56,6 +56,8 @@ test("continuous social automation publishes measurable gaming news only", () =>
   assert.match(runner, /games: \[\]/);
   assert.match(runner, /No unpublished gaming news/);
   assert.match(runner, /MIN_NEWS_INTERVAL_MS = 90 \* 60 \* 1000/);
+  assert.match(runner, /MAX_NEWS_SILENCE_MS = 24 \* 60 \* 60 \* 1000/);
+  assert.match(runner, /No public news post was recorded for 24 hours/);
   assert.doesNotMatch(runner, /platform: "tiktok"/);
   assert.match(workflow, /cron: "25,55 \* \* \* \*"/);
   assert.doesNotMatch(workflow, /slot=(?:morning|evening)/);
