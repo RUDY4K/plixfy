@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAllNews, getNewsBySlug, getNewsSlugs, formatNewsDate, newsTitle, newsSummary } from "@/lib/news";
+import {
+  getAllNews,
+  getNewsBySlug,
+  getNewsSlugs,
+  formatNewsDate,
+  isSearchEligibleNews,
+  newsKeyPoints,
+  newsSummary,
+  newsTitle,
+  newsWhyItMatters,
+} from "@/lib/news";
 import { BRAND_AR } from "@/lib/siteContent";
-import { locales, hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
+import { locales, hasLocale, localeHref, ogLocaleFor, type Locale } from "@/lib/i18n";
+import PreferredSourceCard from "@/components/PreferredSourceCard";
 
 const SITE = "https://www.plixfy.com";
 const SOCIAL_IMAGE = SITE + "/opengraph-image";
@@ -32,6 +43,8 @@ const COPY = {
     breakTitle: "خذ استراحة من الأخبار والعب مجاناً 🎮",
     breakLink: "تصفّح مئات الألعاب بدون تحميل على بليكسفاي",
     otherNews: "أخبار أخرى",
+    quickAnswer: "الخلاصة السريعة",
+    whyItMatters: "لماذا يهمك الخبر؟",
     breadcrumbAria: "مسار التنقل",
   },
   en: {
@@ -42,6 +55,8 @@ const COPY = {
     breakTitle: "Take a break from the news and play free 🎮",
     breakLink: "Browse hundreds of no-download games on Plixfy",
     otherNews: "Other News",
+    quickAnswer: "Quick answer",
+    whyItMatters: "Why it matters",
     breadcrumbAria: "Breadcrumb",
   },
 } as const;
@@ -56,11 +71,22 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const title = newsTitle(item, locale);
   const description = newsSummary(item, locale).slice(0, 155);
   const socialImage = `${SITE}/api/social-card?kind=news&id=${encodeURIComponent(item.slug)}&v=8`;
+  const path = "/news/" + item.slug;
+  const canonical = SITE + localeHref(locale, path);
+  const eligibleAr = isSearchEligibleNews(item, "ar");
+  const eligibleEn = isSearchEligibleNews(item, "en");
+  const languages = {
+    ...(eligibleAr ? { ar: SITE + localeHref("ar", path), "x-default": SITE + localeHref("ar", path) } : {}),
+    ...(eligibleEn ? { en: SITE + localeHref("en", path) } : {}),
+  };
   return {
     title: title + " | " + c.brand,
     description,
-    robots: { index: false, follow: true },
-    alternates: pageAlternates(locale, "/news/" + item.slug),
+    robots: { index: isSearchEligibleNews(item, locale), follow: true },
+    alternates: {
+      canonical,
+      ...(Object.keys(languages).length > 0 ? { languages } : {}),
+    },
     openGraph: {
       type: "article",
       title,
@@ -85,6 +111,8 @@ export default async function NewsItemPage({ params }: PageParams) {
 
   const title = newsTitle(item, locale);
   const summary = newsSummary(item, locale);
+  const keyPoints = newsKeyPoints(item, locale);
+  const whyItMatters = newsWhyItMatters(item, locale);
   const otherNews = getAllNews().filter((n) => n.slug !== item.slug).slice(0, 4);
 
   const articleLd = {
@@ -95,6 +123,9 @@ export default async function NewsItemPage({ params }: PageParams) {
     image: item.image || SOCIAL_IMAGE,
     inLanguage: locale,
     datePublished: item.publishedAt,
+    dateModified: item.reviewedAt ?? item.publishedAt,
+    articleBody: [summary, whyItMatters].filter(Boolean).join("\n\n"),
+    isAccessibleForFree: true,
     author: { "@type": "Organization", name: c.brand },
     publisher: {
       "@type": "Organization",
@@ -122,7 +153,7 @@ export default async function NewsItemPage({ params }: PageParams) {
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify([articleLd, breadcrumbLd]) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([articleLd, breadcrumbLd]).replace(/</g, "\\u003c") }}
         />
 
         <nav aria-label={c.breadcrumbAria} className="mb-6 text-sm text-slate-500">
@@ -162,6 +193,27 @@ export default async function NewsItemPage({ params }: PageParams) {
               {summary}
             </div>
 
+            {keyPoints.length >= 3 ? (
+              <section className="mt-8 rounded-2xl border border-blue-100 bg-blue-50/70 p-5">
+                <h2 className="text-lg font-extrabold text-slate-900">{c.quickAnswer}</h2>
+                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-700">
+                  {keyPoints.map((point) => (
+                    <li key={point} className="flex gap-2">
+                      <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-700" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {whyItMatters ? (
+              <section className="mt-6">
+                <h2 className="text-lg font-extrabold text-slate-900">{c.whyItMatters}</h2>
+                <p className="mt-2 text-base leading-loose text-slate-700">{whyItMatters}</p>
+              </section>
+            ) : null}
+
             <p className="mt-8 pt-5 border-t border-slate-100 text-sm text-slate-500">
               {c.source}{" "}
               <a
@@ -175,6 +227,10 @@ export default async function NewsItemPage({ params }: PageParams) {
             </p>
           </div>
         </article>
+
+        <div className="mt-8">
+          <PreferredSourceCard locale={locale} />
+        </div>
 
         <div className="mt-8 rounded-2xl bg-gradient-to-l from-[#1a1030] to-[#2a1245] p-6 text-center shadow-md">
           <p className="text-base font-bold text-white mb-1">{c.breakTitle}</p>

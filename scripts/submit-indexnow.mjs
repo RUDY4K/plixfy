@@ -1,8 +1,13 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 const SITE = "https://www.plixfy.com";
 const HOST = "www.plixfy.com";
 const KEY = "65c99b0b62a75c20021a8fd00a5c753c";
 const KEY_LOCATION = `${SITE}/${KEY}.txt`;
 const ENDPOINT = "https://api.indexnow.org/indexnow";
+const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function decodeXml(value) {
   return value
@@ -16,6 +21,26 @@ async function urlsFromSitemap() {
   if (!response.ok) throw new Error(`Sitemap request failed: HTTP ${response.status}`);
   const xml = await response.text();
   return [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => decodeXml(match[1]));
+}
+
+function eligibleNewsUrls({ recentOnly = false } = {}) {
+  const news = JSON.parse(
+    fs.readFileSync(path.join(PROJECT_ROOT, "src", "data", "news.json"), "utf8"),
+  );
+  const reviews = JSON.parse(
+    fs.readFileSync(path.join(PROJECT_ROOT, "src", "data", "news-editorial.json"), "utf8"),
+  );
+  const recentCutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
+
+  return news
+    .filter((item) => {
+      const review = reviews[item.slug];
+      if (review?.searchEligible !== true) return false;
+      if (!recentOnly) return true;
+      const reviewedAt = Date.parse(`${review.reviewedAt}T00:00:00Z`);
+      return Number.isFinite(reviewedAt) && reviewedAt >= recentCutoff;
+    })
+    .map((item) => `${SITE}/news/${encodeURIComponent(item.slug)}`);
 }
 
 async function submit(urlList) {
@@ -47,8 +72,11 @@ async function submit(urlList) {
   }
 }
 
-// The sitemap is the single source of truth for indexable URLs. News summaries
-// and generated blog posts intentionally use noindex, so they must not be sent
-// directly to IndexNow even when they are fresh.
-const urls = await urlsFromSitemap();
+const args = new Set(process.argv.slice(2));
+// Fresh automated summaries are deliberately excluded. --recent-news submits
+// only articles granted explicit eligibility in the separate editorial review
+// registry; the default/all mode continues to mirror the deployed sitemap.
+const urls = args.has("--recent-news")
+  ? eligibleNewsUrls({ recentOnly: true })
+  : await urlsFromSitemap();
 await submit(urls);

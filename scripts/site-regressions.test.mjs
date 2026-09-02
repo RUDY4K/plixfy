@@ -78,12 +78,14 @@ test("gaming news comes from multiple current sources and preserves source time"
   assert.match(updater, /sort\(\(a, b\) => \(Date\.parse\(b\.pubDate\)/);
 });
 
-test("IndexNow submits only the live sitemap allow-list", () => {
+test("IndexNow mirrors the sitemap or submits only reviewed recent news", () => {
   const submitter = read("scripts/submit-indexnow.mjs");
   const workflow = read(".github/workflows/indexnow.yml");
 
   assert.match(submitter, /sitemap\.xml/);
-  assert.doesNotMatch(submitter, /src["', ]+data["', ]+news\.json/);
+  assert.match(submitter, /news-editorial\.json/);
+  assert.match(submitter, /review\?\.searchEligible !== true/);
+  assert.match(submitter, /args\.has\("--recent-news"\)/);
   assert.match(workflow, /submit-indexnow\.mjs --all/);
 });
 
@@ -264,19 +266,57 @@ test("home page uses the localized search-intent heading before the daily game",
   assert.match(homePage, /<h2[^>]*>\{dailyGame\.title\}<\/h2>/);
 });
 
-test("template roundups and sourced news feeds stay out of the search sitemap", () => {
+test("template roundups stay out while reviewed news uses a fail-closed search gate", () => {
   const sitemap = read("src/app/sitemap.ts");
   const blogIndex = read("src/app/[locale]/blog/page.tsx");
   const blogArticle = read("src/app/[locale]/blog/[slug]/page.tsx");
   const newsIndex = read("src/app/[locale]/news/page.tsx");
+  const newsArticle = read("src/app/[locale]/news/[slug]/page.tsx");
+  const newsGate = read("src/lib/news.ts");
+  const indexNow = read("scripts/submit-indexnow.mjs");
   const adsenseLoader = read("src/components/DeferredAdSense.tsx");
 
   assert.match(blogIndex, /robots: \{ index: false, follow: true \}/);
   assert.match(blogArticle, /robots: \{ index: false, follow: true \}/);
   assert.match(newsIndex, /robots: \{ index: false, follow: true \}/);
-  assert.doesNotMatch(sitemap, /bilingual\("\/(?:blog|news)"/);
+  assert.match(newsArticle, /index: isSearchEligibleNews\(item, locale\)/);
+  assert.match(newsGate, /approved === true/);
+  assert.match(newsGate, /keyPoints\.length >= 3/);
+  assert.match(sitemap, /getSearchEligibleNews\("ar"\)/);
+  assert.match(indexNow, /args\.has\("--recent-news"\)/);
+  assert.match(indexNow, /review\?\.searchEligible !== true/);
+  assert.doesNotMatch(sitemap, /bilingual\("\/blog"/);
   assert.doesNotMatch(sitemap, /blogRoutes/);
   assert.match(adsenseLoader, /\(\?:play\|blog\|news\|search/);
+});
+
+test("news pages include Google preferred-source discovery and original context", () => {
+  const preferredSource = read("src/components/PreferredSourceCard.tsx");
+  const newsArticle = read("src/app/[locale]/news/[slug]/page.tsx");
+
+  assert.match(preferredSource, /news\.google\.com\/swg\/js\/v1\/publisher\.js/);
+  assert.match(preferredSource, /google-add-preferred-source-btn/);
+  assert.match(preferredSource, /preferred_source_click/);
+  assert.match(newsArticle, /newsKeyPoints/);
+  assert.match(newsArticle, /newsWhyItMatters/);
+  assert.match(newsArticle, /articleBody/);
+});
+
+test("ChatGPT search crawler is explicitly allowed", () => {
+  const robots = read("src/app/robots.ts");
+  assert.match(robots, /userAgent: "OAI-SearchBot"/);
+  assert.match(robots, /allow: "\/"/);
+});
+
+test("answer-engine referrals are measured without double counting", () => {
+  const tracker = read("src/components/AeoReferralTracker.tsx");
+  const layout = read("src/app/[locale]/layout.tsx");
+
+  assert.match(tracker, /chatgpt\.com/);
+  assert.match(tracker, /perplexity\.ai/);
+  assert.match(tracker, /trackEventOnce/);
+  assert.match(tracker, /ai_referral_landing/);
+  assert.match(layout, /<AeoReferralTracker \/>/);
 });
 
 test("generated English game copy cannot grant indexability or hreflang", () => {

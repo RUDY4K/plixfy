@@ -1,4 +1,5 @@
 import newsData from "@/data/news.json";
+import editorialData from "@/data/news-editorial.json";
 
 export interface NewsItem {
   slug: string;
@@ -17,9 +18,36 @@ export interface NewsItem {
   image?: string;
   /** YYYY-MM-DD */
   publishedAt: string;
+  /** Original source publication time when available. */
+  sourcePublishedAt?: string;
+  /** Human-reviewed, Plixfy-original context layered on top of the sourced report. */
+  keyPoints?: readonly string[];
+  whyItMatters?: string;
+  keyPointsEn?: readonly string[];
+  whyItMattersEn?: string;
+  /** Search eligibility is deliberately granted by a separate editorial review file. */
+  searchEligible?: boolean;
+  searchEligibleEn?: boolean;
+  /** ISO date of the latest human editorial review. */
+  reviewedAt?: string;
 }
 
-const ITEMS: readonly NewsItem[] = newsData as NewsItem[];
+type EditorialReview = Pick<
+  NewsItem,
+  | "keyPoints"
+  | "whyItMatters"
+  | "keyPointsEn"
+  | "whyItMattersEn"
+  | "searchEligible"
+  | "searchEligibleEn"
+  | "reviewedAt"
+>;
+
+const EDITORIAL_REVIEWS = editorialData as Record<string, EditorialReview>;
+const ITEMS: readonly NewsItem[] = (newsData as NewsItem[]).map((item) => ({
+  ...item,
+  ...(EDITORIAL_REVIEWS[item.slug] ?? {}),
+}));
 
 export function getAllNews(): readonly NewsItem[] {
   return [...ITEMS].sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
@@ -41,6 +69,45 @@ export function getNewsBySlug(slug: string): NewsItem | undefined {
 
 export function getNewsSlugs(): readonly string[] {
   return ITEMS.map((n) => n.slug);
+}
+
+/**
+ * Fail-closed quality gate for search landing pages. Automated news summaries
+ * remain available to visitors but cannot enter search until a separate
+ * editorial review adds useful original context.
+ */
+export function isSearchEligibleNews(
+  item: NewsItem,
+  locale: "ar" | "en" = "ar",
+): boolean {
+  const keyPoints = locale === "en" ? item.keyPointsEn : item.keyPoints;
+  const whyItMatters = locale === "en" ? item.whyItMattersEn : item.whyItMatters;
+  const approved = locale === "en" ? item.searchEligibleEn : item.searchEligible;
+  const summary = locale === "en" ? item.summaryEn : item.summary;
+
+  return Boolean(
+    approved === true &&
+      item.image &&
+      item.reviewedAt &&
+      summary &&
+      summary.length >= 450 &&
+      keyPoints &&
+      keyPoints.length >= 3 &&
+      whyItMatters &&
+      whyItMatters.length >= 90,
+  );
+}
+
+export function getSearchEligibleNews(locale: "ar" | "en" = "ar"): readonly NewsItem[] {
+  return getAllNews().filter((item) => isSearchEligibleNews(item, locale));
+}
+
+export function newsKeyPoints(item: NewsItem, locale: "ar" | "en"): readonly string[] {
+  return locale === "en" ? (item.keyPointsEn ?? []) : (item.keyPoints ?? []);
+}
+
+export function newsWhyItMatters(item: NewsItem, locale: "ar" | "en"): string | undefined {
+  return locale === "en" ? item.whyItMattersEn : item.whyItMatters;
 }
 
 export function formatNewsDate(iso: string, locale: "ar" | "en" = "ar"): string {

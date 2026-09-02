@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { allGames, categories } from "@/lib/games";
 import { hasEditorialGameContent } from "@/lib/gameContent";
+import { getSearchEligibleNews } from "@/lib/news";
 import catalogMeta from "@/data/playgama-catalog-meta.json";
 
 const SITE = "https://www.plixfy.com";
@@ -95,9 +96,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ];
   });
 
+  const newsRoutes: MetadataRoute.Sitemap = getSearchEligibleNews("ar").map((item) => {
+    const url = `${SITE}/news/${encodeURIComponent(item.slug)}`;
+    return {
+      url,
+      lastModified: new Date(`${item.reviewedAt ?? item.publishedAt}T00:00:00Z`),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+      ...(item.image ? { images: [item.image] } : {}),
+      alternates: { languages: { ar: url, "x-default": url } },
+    };
+  });
+
   return [
     ...staticRoutes,
     ...categoryRoutes,
     ...gameRoutes,
+    ...newsRoutes,
   ];
 }

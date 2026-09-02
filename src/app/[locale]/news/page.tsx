@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getAllNews, formatNewsDate, newsTitle, newsSummary } from "@/lib/news";
 import { BRAND_AR } from "@/lib/siteContent";
 import { locales, hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
+import PreferredSourceCard from "@/components/PreferredSourceCard";
 
 const SITE = "https://www.plixfy.com";
 
@@ -98,7 +99,7 @@ export default async function NewsIndexPage({
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(listLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(listLd).replace(/</g, "\\u003c") }}
         />
 
         <nav aria-label={c.breadcrumbAria} className="mb-6 text-sm text-slate-500">
@@ -125,6 +126,10 @@ export default async function NewsIndexPage({
             {c.intro}
           </p>
         </header>
+
+        <div className="mb-8">
+          <PreferredSourceCard locale={locale} />
+        </div>
 
         <div className="space-y-5">
           {items.map((item, idx) => (

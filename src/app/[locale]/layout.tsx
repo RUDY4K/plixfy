@@ -9,6 +9,7 @@ import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import PageViewTracker from "@/components/PageViewTracker";
+import AeoReferralTracker from "@/components/AeoReferralTracker";
 import WebVitals from "@/components/WebVitals";
 import MonetagServiceWorker from "@/components/MonetagServiceWorker";
 import ConsentBanner from "@/components/ConsentBanner";
@@ -143,6 +144,7 @@ export default async function RootLayout({
             <Suspense fallback={null}>
               <PageViewTracker />
             </Suspense>
+            <AeoReferralTracker />
           </>
         )}
         <DeferredAdSense client={ADSENSE_CLIENT} />
