@@ -124,9 +124,9 @@ export default function InstallAppPrompt({ locale }: { locale: Locale }) {
     <aside
       role="dialog"
       aria-label={copy.title}
-      className="fixed inset-x-3 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[70] md:hidden"
+      className="fixed inset-x-3 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[70] max-w-[calc(100vw-1.5rem)] md:hidden"
     >
-      <div className="mx-auto max-w-md rounded-2xl border border-primary/40 bg-bg/95 p-4 shadow-[0_18px_55px_rgba(0,0,0,0.65),0_0_30px_rgba(168,85,247,0.18)] backdrop-blur-xl">
+      <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-2xl border border-primary/40 bg-bg/95 p-4 shadow-[0_18px_55px_rgba(0,0,0,0.65),0_0_30px_rgba(168,85,247,0.18)] backdrop-blur-xl">
         <button
           type="button"
           onClick={dismiss}

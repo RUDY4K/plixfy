@@ -5,6 +5,7 @@ import { chromium } from "playwright-core";
 const origin = process.argv[2] || "https://www.plixfy.com";
 const outputDir = path.resolve(process.argv[3] || "artifacts/visual-image-audit");
 const failOnBroken = process.argv.includes("--fail-on-broken");
+const failOnOverflow = process.argv.includes("--fail-on-overflow");
 const verbose = process.argv.includes("--verbose");
 const includeNews = process.argv.includes("--include-news");
 const newsSlug = process.argv.find((argument) => argument.startsWith("--news-slug="))?.slice(12)
@@ -80,6 +81,47 @@ try {
       };
     }));
     const brokenImages = images.filter((image) => image.complete && image.naturalWidth === 0);
+    const horizontalOverflow = await page.evaluate(() => {
+      const viewportWidth = document.documentElement.clientWidth;
+      const documentWidth = Math.max(
+        document.documentElement.scrollWidth,
+        document.body.scrollWidth,
+      );
+      const isClippedByScrollableParent = (element) => {
+        let parent = element.parentElement;
+        while (parent && parent !== document.body) {
+          const overflowX = getComputedStyle(parent).overflowX;
+          if (["auto", "scroll", "hidden", "clip"].includes(overflowX)) return true;
+          parent = parent.parentElement;
+        }
+        return false;
+      };
+      const offenders = Array.from(document.querySelectorAll("body *"))
+        .map((element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            element: element.tagName.toLowerCase(),
+            left: Math.round(rect.left),
+            right: Math.round(rect.right),
+            width: Math.round(rect.width),
+          };
+        })
+        .filter((item, index) => {
+          const element = document.querySelectorAll("body *")[index];
+          return (
+            (item.width > viewportWidth + 1 || item.left < -1 || item.right > viewportWidth + 1)
+            && !isClippedByScrollableParent(element)
+          );
+        })
+        .slice(0, 10);
+
+      return {
+        documentWidth,
+        offenders,
+        overflow: documentWidth > viewportWidth + 1,
+        viewportWidth,
+      };
+    });
     const screenshot = path.join(outputDir, `${scenario.name}.png`);
     await page.screenshot({ path: screenshot, fullPage: true });
 
@@ -87,6 +129,7 @@ try {
       brokenImages,
       failedImageRequests: requestFailures,
       finalUrl: page.url(),
+      horizontalOverflow,
       imageResponses: imageResponses.filter((item) => item.status >= 400),
       images,
       name: scenario.name,
@@ -105,6 +148,7 @@ const output = verbose ? results : results.map((result) => ({
   brokenImages: result.brokenImages,
   failedImageRequests: result.failedImageRequests,
   finalUrl: result.finalUrl,
+  horizontalOverflow: result.horizontalOverflow,
   imageCount: result.images.length,
   imageResponses: result.imageResponses,
   name: result.name,
@@ -116,5 +160,9 @@ const output = verbose ? results : results.map((result) => ({
 console.log(JSON.stringify(output, null, 2));
 
 if (failOnBroken && results.some((result) => result.brokenImages.length > 0)) {
+  process.exitCode = 1;
+}
+
+if (failOnOverflow && results.some((result) => result.horizontalOverflow.overflow)) {
   process.exitCode = 1;
 }

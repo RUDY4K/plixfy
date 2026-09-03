@@ -25,6 +25,37 @@ test("home copy uses the live catalog count instead of a stale number", () => {
   assert.doesNotMatch(socialGuide, /\+370\b/);
 });
 
+test("mobile RTL layout cannot widen beyond the device viewport", () => {
+  const homePage = read("src/app/[locale]/page.tsx");
+  const globalStyles = read("src/app/globals.css");
+  const installPrompt = read("src/components/InstallAppPrompt.tsx");
+
+  assert.match(homePage, /lg:grid-cols-\[minmax\(0,1\.05fr\)_minmax\(0,1\.45fr\)\]/);
+  assert.match(homePage, /<aside className="min-w-0">/);
+  assert.match(homePage, /grid grid-cols-\[minmax\(0,1fr\)\] gap-3 sm:grid-cols-2/);
+  assert.match(homePage, /group flex min-w-0 items-center gap-3/);
+  assert.match(globalStyles, /html \{[\s\S]*?max-width: 100%;[\s\S]*?overflow-x: clip;/);
+  assert.match(globalStyles, /body \{[\s\S]*?max-width: 100%;[\s\S]*?overflow-x: clip;/);
+  assert.match(installPrompt, /max-w-\[calc\(100vw-1\.5rem\)\]/);
+  assert.match(installPrompt, /relative mx-auto w-full max-w-md overflow-hidden/);
+});
+
+test("mobile game exits stay compact and above install prompts in every orientation", () => {
+  const gameFrame = read("src/components/GameFrame.tsx");
+  const launchPage = read("src/app/[locale]/play/[slug]/launch/page.tsx");
+  const layout = read("src/app/[locale]/layout.tsx");
+
+  assert.match(gameFrame, /title=\{locale === "ar" \? "خروج" : "Exit"\}/);
+  assert.match(gameFrame, /inline-flex h-11 w-11 shrink-0/);
+  assert.doesNotMatch(gameFrame, /<span>\{t\.gameFrame\.exitFullscreen\}<\/span>/);
+  assert.match(launchPage, /data-game-exit[\s\S]{0,160}inline-flex h-11 w-11 shrink-0/);
+  assert.doesNotMatch(launchPage, /<span>\{exitLabel\}<\/span>/);
+  assert.match(
+    layout,
+    /<BottomNav \/>[\s\S]{0,120}<ConsentBanner \/>[\s\S]{0,120}<InstallAppPrompt locale=\{locale\} \/>/,
+  );
+});
+
 test("catalog freshness and visible years stay data-driven", () => {
   const sitemap = read("src/app/sitemap.ts");
   const sync = read("scripts/sync-playgama-catalog.mjs");
@@ -196,7 +227,7 @@ test("mobile games use an iPhone-safe full-viewport layer with an in-game exit",
   assert.match(gameFrame, /env\(safe-area-inset-top\)/);
   assert.match(gameFrame, /env\(safe-area-inset-bottom\)/);
   assert.match(gameFrame, /calc\(env\(safe-area-inset-top\) \+ 3\.5rem\)/);
-  assert.match(gameFrame, /\{t\.gameFrame\.exitFullscreen\}<\/span>/);
+  assert.match(gameFrame, /aria-label=\{t\.gameFrame\.exitFullscreen\}/);
   assert.match(gameFrame, /frame\.requestFullscreen/);
   assert.match(gameFrame, /allowFullScreen/);
   assert.match(gameFrame, /onClick=\{stop\}/);

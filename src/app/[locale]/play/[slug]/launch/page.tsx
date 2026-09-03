@@ -21,6 +21,7 @@ export default async function ProgressiveGameLaunchPage({
 
   const exitHref = localeHref(locale, `/play/${game.slug}`);
   const exitLabel = locale === "ar" ? "الخروج من اللعبة" : "Exit game";
+  const exitShortLabel = locale === "ar" ? "خروج" : "Exit";
 
   return (
     <main
@@ -38,13 +39,13 @@ export default async function ProgressiveGameLaunchPage({
         <Link
           href={exitHref}
           aria-label={exitLabel}
+          title={exitShortLabel}
           data-game-exit
-          className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-white/15 bg-surface-elevated px-3 font-bold text-text-primary"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-surface-elevated text-text-primary"
         >
           <X className="h-5 w-5" aria-hidden="true" />
-          <span>{exitLabel}</span>
         </Link>
-        <span className="truncate font-latin text-sm font-bold text-text-secondary" dir="auto">
+        <span className="min-w-0 truncate font-latin text-sm font-bold text-text-secondary" dir="auto">
           {game.title}
         </span>
       </div>

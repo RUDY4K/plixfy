@@ -134,6 +134,8 @@ export default async function RootLayout({
             </div>
             <Footer locale={locale} />
             <BottomNav />
+            <ConsentBanner />
+            <InstallAppPrompt locale={locale} />
           </div>
         </PlayerDataProvider>
         <MonetagServiceWorker />
@@ -148,8 +150,6 @@ export default async function RootLayout({
           </>
         )}
         <DeferredAdSense client={ADSENSE_CLIENT} />
-        <ConsentBanner />
-        <InstallAppPrompt locale={locale} />
         <Analytics />
       </body>
     </html>

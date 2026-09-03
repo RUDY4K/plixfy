@@ -175,8 +175,8 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         </div>
       </section>
 
-      <section className="mt-16 grid gap-8 lg:grid-cols-[1.05fr_1.45fr]">
-        <aside>
+      <section className="mt-16 grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.45fr)]">
+        <aside className="min-w-0">
           <div className="mb-5 flex items-end justify-between gap-4"><div><span className="text-xs font-extrabold text-primary">{locale === "ar" ? "نبض الألعاب" : "Gaming pulse"}</span><h2 className="mt-1 text-2xl font-black text-white">{t.common.latestNews}</h2></div><Link href={href("/news")} className="text-sm font-bold text-accent-2">{t.common.allNews}</Link></div>
           {leadNews ? (
             <Link href={href(`/news/${leadNews.slug}`)} className="group block overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-surface/70">
@@ -193,11 +193,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             ))}
           </div>
         </aside>
-        <div className="border-t border-white/[0.07] pt-6 lg:border-s lg:border-t-0 lg:ps-8 lg:pt-0">
+        <div className="min-w-0 border-t border-white/[0.07] pt-6 lg:border-s lg:border-t-0 lg:ps-8 lg:pt-0">
           <div className="mb-5 flex items-center justify-between"><div><h2 className="text-2xl font-black text-white">{locale === "ar" ? "جديد المكتبة" : "New in the library"}</h2><p className="mt-1 text-xs text-text-secondary">{locale === "ar" ? "اكتشف إضافات جديدة بسرعة" : "Discover recent additions quickly"}</p></div><Clock3 className="h-5 w-5 text-accent-2" /></div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
             {freshGames.slice(0, 6).map((game) => (
-              <Link key={game.slug} href={href(`/play/${game.slug}`)} className="group flex items-center gap-3 border-b border-white/[0.07] py-3 transition hover:bg-white/[0.025]">
+              <Link key={game.slug} href={href(`/play/${game.slug}`)} className="group flex min-w-0 items-center gap-3 border-b border-white/[0.07] py-3 transition hover:bg-white/[0.025]">
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl"><GameArtwork src={game.thumbnail} fallbackSrc={game.thumbnailWide} alt="" fill sizes="80px" className="object-cover transition duration-300 group-hover:scale-105" /></div>
                 <span className="min-w-0"><span dir="ltr" className="block truncate text-start font-latin text-sm font-black text-white">{game.title}</span><span className="mt-1 block text-xs text-text-secondary">{locale === "ar" ? game.category : game.genres[0] ?? game.category}</span><span className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-primary"><Play className="h-3 w-3 fill-current" />{locale === "ar" ? "العب" : "Play"}</span></span>
               </Link>

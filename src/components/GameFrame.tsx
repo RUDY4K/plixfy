@@ -44,7 +44,8 @@ function shouldUseTouchViewportLayer(): boolean {
 
 export default function GameFrame(props: GameFrameProps) {
   const { slug, title, thumbnail, launchHref, fallbackThumbnail, orientation } = props;
-  const t = getDict(localeFromPathname(usePathname()));
+  const locale = localeFromPathname(usePathname());
+  const t = getDict(locale);
   const sourceName = "playgama";
   const embedSrc = getPlaygamaEmbedUrl(slug);
   const [playing, setPlaying] = useState(false);
@@ -290,12 +291,12 @@ export default function GameFrame(props: GameFrameProps) {
                 type="button"
                 onClick={stop}
                 aria-label={t.gameFrame.exitFullscreen}
-                className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-white/15 bg-surface-elevated px-3 font-bold text-text-primary transition hover:bg-surface focus-visible:outline-offset-4"
+                title={locale === "ar" ? "خروج" : "Exit"}
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-surface-elevated text-text-primary transition hover:bg-surface focus-visible:outline-offset-4"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
-                <span>{t.gameFrame.exitFullscreen}</span>
               </button>
-              <span className="truncate font-latin text-sm font-bold text-text-secondary" dir="auto">
+              <span className="min-w-0 truncate font-latin text-sm font-bold text-text-secondary" dir="auto">
                 {title}
               </span>
             </div>
