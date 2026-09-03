@@ -188,6 +188,7 @@ export default async function PlayPage({
   const deviceSupport = game.supportedDevices ?? "unknown";
 
   const pageUrl = SITE + href("/play/" + slug);
+  const launchHref = href("/play/" + slug + "/launch");
   const imageUrl = absoluteUrl(game.thumbnailWide || game.thumbnail);
   const genre = meta ? meta.name : game.category;
   const categoryLabel = locale === "en" && meta ? meta.name : game.category;
@@ -321,6 +322,7 @@ export default async function PlayPage({
           slug={game.slug}
           title={game.title}
           thumbnail={game.thumbnailWide || game.thumbnail}
+          launchHref={launchHref}
           fallbackThumbnail={game.thumbnail}
           orientation={game.orientation}
         />
@@ -338,6 +340,7 @@ export default async function PlayPage({
 
         <PlayNowButton
           slug={game.slug}
+          href={launchHref}
           label={t.play.playNowCta}
           ariaLabel={t.common.playAria + game.title}
         />

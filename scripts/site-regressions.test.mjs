@@ -181,7 +181,8 @@ test("keyboard and screen-reader users keep context through gates and game loadi
   assert.match(gameFrame, /role="status"/);
   assert.match(gameFrame, /setStatusMessage\(t\.gameFrame\.ready\)/);
   assert.match(gameFrame, /startButtonRef\.current\?\.focus\(\)/);
-  assert.match(gameFrame, /<button[\s\S]{0,120}ref=\{startButtonRef\}[\s\S]{0,120}onClick=\{start\}/);
+  assert.match(gameFrame, /<a[\s\S]{0,160}ref=\{startButtonRef\}[\s\S]{0,160}href=\{launchHref\}/);
+  assert.match(gameFrame, /event\.preventDefault\(\);[\s\S]{0,80}start\(\);/);
   assert.doesNotMatch(gameFrame, /ref=\{startButtonRef\}[\s\S]{0,120}onClick=\{stop\}/);
   assert.match(gameCard, /alt=""/);
   assert.match(read("src/components/GameArtwork.tsx"), /alt \? \{ role: "img"/);

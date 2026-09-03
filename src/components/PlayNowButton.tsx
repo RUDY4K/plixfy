@@ -4,19 +4,22 @@ export const GAME_START_EVENT = "plixfy:game-start";
 
 interface PlayNowButtonProps {
   slug: string;
+  href: string;
   label: string;
   ariaLabel: string;
 }
 
 export default function PlayNowButton({
   slug,
+  href,
   label,
   ariaLabel,
 }: PlayNowButtonProps) {
   return (
     <a
-      href="#play-frame"
-      onClick={() => {
+      href={href}
+      onClick={(event) => {
+        event.preventDefault();
         window.dispatchEvent(
           new CustomEvent(GAME_START_EVENT, { detail: { slug } }),
         );

@@ -9,6 +9,7 @@ import { getDailyGame } from "@/lib/gameStats";
 import { getAllPosts } from "@/lib/blog";
 import { getAllPostsEn } from "@/lib/blogEn";
 import { formatNewsDate, getAllNews, newsTitle } from "@/lib/news";
+import { newsImageHref } from "@/lib/newsImage";
 import { getDict, hasLocale, localeHref } from "@/lib/i18n";
 import { SOCIAL_PROFILE_URLS } from "@/lib/socialProfiles";
 
@@ -179,14 +180,14 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <div className="mb-5 flex items-end justify-between gap-4"><div><span className="text-xs font-extrabold text-primary">{locale === "ar" ? "نبض الألعاب" : "Gaming pulse"}</span><h2 className="mt-1 text-2xl font-black text-white">{t.common.latestNews}</h2></div><Link href={href("/news")} className="text-sm font-bold text-accent-2">{t.common.allNews}</Link></div>
           {leadNews ? (
             <Link href={href(`/news/${leadNews.slug}`)} className="group block overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-surface/70">
-              {leadNews.image ? <div className="relative aspect-[16/9] overflow-hidden"><img src={leadNews.image} alt="" loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.025]" /><span className="absolute inset-0 bg-gradient-to-t from-bg/75 to-transparent" /></div> : null}
+              {leadNews.image ? <div className="relative aspect-[16/9] overflow-hidden"><img src={newsImageHref(leadNews.slug)} alt="" loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.025]" /><span className="absolute inset-0 bg-gradient-to-t from-bg/75 to-transparent" /></div> : null}
               <div className="p-5"><span className="text-xs font-bold text-primary">{formatNewsDate(leadNews.publishedAt, locale)}</span><h3 className="mt-2 text-lg font-black leading-8 text-white group-hover:text-accent-2">{newsTitle(leadNews, locale)}</h3></div>
             </Link>
           ) : null}
           <div className="mt-3 divide-y divide-white/[0.07]">
             {moreNews.map((item) => (
               <Link key={item.slug} href={href(`/news/${item.slug}`)} className="group flex items-center gap-3 py-3.5">
-                {item.image ? <div className="h-14 w-16 shrink-0 overflow-hidden rounded-lg"><img src={item.image} alt="" loading="lazy" className="h-full w-full object-cover" /></div> : null}
+                {item.image ? <div className="h-14 w-16 shrink-0 overflow-hidden rounded-lg"><img src={newsImageHref(item.slug)} alt="" loading="lazy" className="h-full w-full object-cover" /></div> : null}
                 <span className="min-w-0"><span className="block text-[10px] font-bold text-primary">{formatNewsDate(item.publishedAt, locale)}</span><span className="mt-1 line-clamp-2 block text-xs font-bold leading-5 text-white/80 group-hover:text-white">{newsTitle(item, locale)}</span></span>
               </Link>
             ))}

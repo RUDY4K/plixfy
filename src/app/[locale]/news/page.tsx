@@ -5,6 +5,7 @@ import { getAllNews, formatNewsDate, newsTitle, newsSummary } from "@/lib/news";
 import { BRAND_AR } from "@/lib/siteContent";
 import { locales, hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
 import PreferredSourceCard from "@/components/PreferredSourceCard";
+import { newsImageHref } from "@/lib/newsImage";
 
 const SITE = "https://www.plixfy.com";
 
@@ -139,11 +140,9 @@ export default async function NewsIndexPage({
             >
               <Link href={localeHref(locale, "/news/" + item.slug)} className="block group">
                 {item.image ? (
-                  // Source images come from several editorial CDNs, so the plain
-                  // element intentionally avoids a brittle hostname allow-list.
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={item.image}
+                    src={newsImageHref(item.slug)}
                     alt=""
                     loading="lazy"
                     className="mb-5 h-52 w-full rounded-xl object-cover md:h-64"

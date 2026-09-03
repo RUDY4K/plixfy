@@ -8,18 +8,42 @@ import { localeFromPathname, getDict } from "@/lib/i18n";
 import { getPlaygamaEmbedUrl } from "@/lib/playgama";
 import { usePlayerData } from "@/components/PlayerDataProvider";
 import { GAME_START_EVENT } from "@/components/PlayNowButton";
+import { shouldUseTouchViewportLayer as shouldUseTouchViewportLayerForDevice } from "@/lib/touchViewport.mjs";
 import { trackEvent } from "./GoogleAnalytics";
 
 export interface GameFrameProps {
   slug: string;
   title: string;
   thumbnail: string;
+  launchHref: string;
   fallbackThumbnail?: string;
   orientation?: "landscape" | "portrait" | "both";
 }
 
+function shouldUseTouchViewportLayer(): boolean {
+  if (typeof window === "undefined" || typeof navigator === "undefined") return false;
+
+  const hasCoarsePointer = window.matchMedia?.("(pointer: coarse)").matches
+    || window.matchMedia?.("(any-pointer: coarse)").matches
+    || false;
+  const screenWidth = window.screen?.width || window.innerWidth;
+  const screenHeight = window.screen?.height || window.innerHeight;
+
+  // iPadOS can request desktop websites and identify itself as Macintosh.
+  // Capability checks keep those iPads, wide phones and Android tablets in
+  // the full-viewport player without changing mouse-first desktop layouts.
+  return shouldUseTouchViewportLayerForDevice({
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    maxTouchPoints: navigator.maxTouchPoints,
+    coarsePointer: hasCoarsePointer,
+    screenWidth,
+    screenHeight,
+  });
+}
+
 export default function GameFrame(props: GameFrameProps) {
-  const { slug, title, thumbnail, fallbackThumbnail, orientation } = props;
+  const { slug, title, thumbnail, launchHref, fallbackThumbnail, orientation } = props;
   const t = getDict(localeFromPathname(usePathname()));
   const sourceName = "playgama";
   const embedSrc = getPlaygamaEmbedUrl(slug);
@@ -37,7 +61,7 @@ export default function GameFrame(props: GameFrameProps) {
   const frameRootRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
-  const startButtonRef = useRef<HTMLButtonElement>(null);
+  const startButtonRef = useRef<HTMLAnchorElement>(null);
   const startedAtRef = useRef<number | null>(null);
   const loadedForRoundRef = useRef(false);
   const { recordGamePlay } = usePlayerData();
@@ -72,8 +96,7 @@ export default function GameFrame(props: GameFrameProps) {
     recordGamePlay(slug);
     requestAnimationFrame(() => statusRef.current?.focus());
 
-    const wantsFullscreen = typeof window !== "undefined"
-      && window.matchMedia("(max-width: 767px)").matches;
+    const wantsFullscreen = shouldUseTouchViewportLayer();
 
     if (!wantsFullscreen) return;
     setMobileExpanded(true);
@@ -210,7 +233,7 @@ export default function GameFrame(props: GameFrameProps) {
       {playing ? (
         <>
           <div
-            className="absolute bg-black"
+            className="absolute flex justify-center bg-black"
             style={mobileExpanded
               ? {
                   top: "calc(env(safe-area-inset-top) + 3.5rem)",
@@ -220,27 +243,32 @@ export default function GameFrame(props: GameFrameProps) {
                 }
               : { inset: 0 }}
           >
-            <iframe
-              ref={iframeRef}
-              src={embedSrc}
-              title={title}
-              allow="autoplay; encrypted-media; fullscreen"
-              allowFullScreen
-              sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"
-              referrerPolicy="no-referrer-when-downgrade"
-              loading="lazy"
-              onLoad={() => {
-                if (loadedForRoundRef.current) return;
-                loadedForRoundRef.current = true;
-                setIframeLoaded(true);
-                setStatusMessage(t.gameFrame.ready);
-                trackEvent("game_loaded", {
-                  game_slug: slug,
-                  game_title: title,
-                });
-              }}
-              className="absolute inset-0 h-full w-full border-0"
-            />
+            <div
+              className={mobileExpanded ? "game-viewport-stage relative h-full w-full" : "relative h-full w-full"}
+              data-game-orientation={orientation ?? "both"}
+            >
+              <iframe
+                ref={iframeRef}
+                src={embedSrc}
+                title={title}
+                allow="autoplay; encrypted-media; fullscreen"
+                allowFullScreen
+                sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"
+                referrerPolicy="no-referrer-when-downgrade"
+                loading="lazy"
+                onLoad={() => {
+                  if (loadedForRoundRef.current) return;
+                  loadedForRoundRef.current = true;
+                  setIframeLoaded(true);
+                  setStatusMessage(t.gameFrame.ready);
+                  trackEvent("game_loaded", {
+                    game_slug: slug,
+                    game_title: title,
+                  });
+                }}
+                className="absolute inset-0 h-full w-full border-0"
+              />
+            </div>
           </div>
           {!iframeLoaded ? (
             <div
@@ -284,10 +312,13 @@ export default function GameFrame(props: GameFrameProps) {
         </>
       ) : (
         <>
-          <button
+          <a
             ref={startButtonRef}
-            type="button"
-            onClick={start}
+            href={launchHref}
+            onClick={(event) => {
+              event.preventDefault();
+              start();
+            }}
             aria-label={t.common.playAria + title}
             className="group absolute inset-0 block"
             data-game-slug={slug}
@@ -310,7 +341,7 @@ export default function GameFrame(props: GameFrameProps) {
                 />
               </span>
             </span>
-          </button>
+          </a>
           {justEnded ? (
             <a
               href="#related-games"

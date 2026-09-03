@@ -56,6 +56,37 @@ body {
     #070712;
 }
 
+/* Full-viewport game shells. The declaration order gives older Safari a
+   usable fallback while modern browsers follow the changing visual viewport. */
+.game-launch-viewport {
+  height: 100vh;
+  height: -webkit-fill-available;
+}
+
+@supports (height: 100svh) {
+  .game-launch-viewport {
+    height: 100svh;
+  }
+}
+
+@supports (height: 100dvh) {
+  .game-launch-viewport {
+    height: 100dvh;
+  }
+}
+
+/* A portrait game gets the tallest useful stage on tablets instead of being
+   forced into the desktop 21:9 frame. Phones keep the full available width. */
+@media (min-width: 768px) {
+  .game-viewport-stage[data-game-orientation="portrait"],
+  .game-launch-stage[data-game-orientation="portrait"] {
+    width: auto;
+    max-width: 100%;
+    aspect-ratio: 9 / 16;
+    flex: none;
+  }
+}
+
 /* قواعد عربية مهمة */
 :lang(ar) {
   letter-spacing: 0 !important;

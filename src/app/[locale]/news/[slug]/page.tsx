@@ -15,6 +15,7 @@ import {
 import { BRAND_AR } from "@/lib/siteContent";
 import { locales, hasLocale, localeHref, ogLocaleFor, type Locale } from "@/lib/i18n";
 import PreferredSourceCard from "@/components/PreferredSourceCard";
+import { newsImageHref } from "@/lib/newsImage";
 
 const SITE = "https://www.plixfy.com";
 const SOCIAL_IMAGE = SITE + "/opengraph-image";
@@ -120,7 +121,7 @@ export default async function NewsItemPage({ params }: PageParams) {
     "@type": "NewsArticle",
     headline: title,
     description: summary.slice(0, 155),
-    image: item.image || SOCIAL_IMAGE,
+    image: item.image ? SITE + newsImageHref(item.slug) : SOCIAL_IMAGE,
     inLanguage: locale,
     datePublished: item.publishedAt,
     dateModified: item.reviewedAt ?? item.publishedAt,
@@ -172,7 +173,7 @@ export default async function NewsItemPage({ params }: PageParams) {
           <div aria-hidden="true" className="h-1.5 bg-blue-700" />
           {item.image ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={item.image} alt="" className="h-64 w-full object-cover md:h-80" />
+            <img src={newsImageHref(item.slug)} alt="" className="h-64 w-full object-cover md:h-80" />
           ) : null}
           <div className="p-6 md:p-8">
             <header className="mb-6 border-b border-slate-100 pb-6">
