@@ -56,6 +56,24 @@ test("mobile game exits stay compact and above install prompts in every orientat
   );
 });
 
+test("Roblox-style mobile games lead daily, trending, and top discovery", () => {
+  const games = read("src/lib/games.ts");
+  const gameStats = read("src/lib/gameStats.ts");
+  const homePage = read("src/app/[locale]/page.tsx");
+
+  for (const signal of ["obby", "multiplayer", "tycoon", "parkour", "simulation", '"3d"', '"co-op"']) {
+    assert.match(games, new RegExp(signal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  assert.match(games, /export function getRobloxStyleScore/);
+  assert.match(games, /export function getRobloxStyleGames/);
+  assert.match(games, /game\.supportedDevices !== "desktop-only"/);
+  assert.match(games, /const priority = getRobloxStyleGames/);
+  assert.match(gameStats, /getRobloxStyleGames\(\)\.slice\(0, 40\)/);
+  assert.doesNotMatch(gameStats, /game\.badge === "top"/);
+  assert.match(homePage, /قريبة من أجواء Roblox/);
+  assert.match(homePage, /Roblox-like feel/);
+});
+
 test("catalog freshness and visible years stay data-driven", () => {
   const sitemap = read("src/app/sitemap.ts");
   const sync = read("scripts/sync-playgama-catalog.mjs");

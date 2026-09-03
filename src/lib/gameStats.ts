@@ -1,4 +1,4 @@
-import { allGames, getGameBySlug, type Game } from "./games";
+import { allGames, getGameBySlug, getRobloxStyleGames, type Game } from "./games";
 
 const FALLBACK_TOP_SLUG = "moto-x3m";
 
@@ -9,10 +9,8 @@ function riyadhDayNumber(now: Date): number {
 }
 
 export function getDailyGame(now = new Date()): Game {
-  const candidates = allGames.filter(
-    (game) => game.badge === "top" || game.badge === "hot"
-  );
-  const pool = candidates.length > 0 ? candidates : allGames;
+  const robloxStylePool = getRobloxStyleGames().slice(0, 40);
+  const pool = robloxStylePool.length > 0 ? robloxStylePool : allGames;
   return pool[riyadhDayNumber(now) % pool.length] ?? getTopGame();
 }
 

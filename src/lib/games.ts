@@ -78,13 +78,53 @@ interface ImportedPlaygamaGame {
 
 const importedGames = playgamaGamesData as ImportedPlaygamaGame[];
 
+const ROBLOX_STYLE_WEIGHTS: Readonly<Record<string, number>> = {
+  obby: 12,
+  multiplayer: 8,
+  tycoon: 7,
+  parkour: 7,
+  minecraft: 6,
+  simulation: 5,
+  "3d": 5,
+  platform: 5,
+  "co-op": 5,
+  clicker: 4,
+  pvp: 4,
+  ragdoll: 3,
+  crafting: 3,
+  survival: 3,
+  idle: 3,
+  rpg: 2,
+};
+
+const ROBLOX_STYLE_TITLE = /\b(?:obby|robby|simulator|tycoon|brainrot|parkour)\b|play with friends|online rp/i;
+const ROBLOX_STYLE_MIN_SCORE = 16;
+
+export function getRobloxStyleScore(
+  game: Pick<Game, "title" | "genres" | "supportedDevices" | "videoId">,
+): number {
+  const genreScore = game.genres.reduce(
+    (score, genre) => score + (ROBLOX_STYLE_WEIGHTS[genre.toLowerCase()] ?? 0),
+    0,
+  );
+  const titleScore = ROBLOX_STYLE_TITLE.test(game.title) ? 6 : 0;
+  const deviceScore = game.supportedDevices === "mobile-and-desktop"
+    ? 3
+    : game.supportedDevices === "mobile-only"
+      ? 2
+      : -4;
+  const mediaScore = game.videoId ? 1 : 0;
+  return genreScore + titleScore + deviceScore + mediaScore;
+}
+
 export const allGames: readonly Game[] = importedGames.map((game, index) => ({
   ...game,
-  badge: index < 12 ? "top" : index < 36 ? "new" : null,
+  badge: getRobloxStyleScore(game) >= 24 ? "hot" : index < 12 ? "top" : index < 36 ? "new" : null,
   source: "playgama",
 }));
 
 const slugToGame = new Map(allGames.map((game) => [game.slug, game]));
+const catalogIndexBySlug = new Map(allGames.map((game, index) => [game.slug, index]));
 const gamesByCategoryMap = categories.reduce(
   (result, category) => {
     result[category.slug] = allGames.filter((game) => game.categorySlug === category.slug);
@@ -110,12 +150,38 @@ export function getGamesByCategory(
 
 export function getTrendingGames(excludeSlugs?: Iterable<string>): readonly Game[] {
   const excluded = toExcludeSet(excludeSlugs);
-  return allGames.filter((game) => !excluded?.has(game.slug)).slice(0, 12);
+  const priority = getRobloxStyleGames(excluded ?? undefined);
+  const prioritySlugs = new Set(priority.map((game) => game.slug));
+  const fallback = allGames.filter(
+    (game) => !excluded?.has(game.slug) && !prioritySlugs.has(game.slug),
+  );
+  return [...priority, ...fallback].slice(0, 12);
 }
 
 export function getTopPicks(excludeSlugs?: Iterable<string>): readonly Game[] {
   const excluded = toExcludeSet(excludeSlugs);
-  return allGames.filter((game) => !excluded?.has(game.slug)).slice(0, 24);
+  const priority = getRobloxStyleGames(excluded ?? undefined);
+  const prioritySlugs = new Set(priority.map((game) => game.slug));
+  const fallback = allGames.filter(
+    (game) => !excluded?.has(game.slug) && !prioritySlugs.has(game.slug),
+  );
+  return [...priority, ...fallback].slice(0, 24);
+}
+
+export function getRobloxStyleGames(excludeSlugs?: Iterable<string>): readonly Game[] {
+  const excluded = toExcludeSet(excludeSlugs);
+  return allGames
+    .filter(
+      (game) =>
+        !excluded?.has(game.slug)
+        && game.supportedDevices !== "desktop-only"
+        && getRobloxStyleScore(game) >= ROBLOX_STYLE_MIN_SCORE,
+    )
+    .sort((left, right) => {
+      const scoreDifference = getRobloxStyleScore(right) - getRobloxStyleScore(left);
+      if (scoreDifference !== 0) return scoreDifference;
+      return (catalogIndexBySlug.get(left.slug) ?? 0) - (catalogIndexBySlug.get(right.slug) ?? 0);
+    });
 }
 
 /** A stable Riyadh-day rotation keeps the homepage fresh without changing mid-session. */

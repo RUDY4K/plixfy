@@ -158,7 +158,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
       <section className="mt-12">
         <div className="mb-5 flex items-end justify-between">
-          <div><h2 className="text-2xl font-black text-white md:text-3xl">{locale === "ar" ? "الأكثر لعبًا الآن" : "Most played now"}</h2><p className="mt-1 text-sm text-text-secondary">{locale === "ar" ? "شبكة سريعة تعرض اختيارات أكثر من أول نظرة" : "A faster grid with more choices at first glance"}</p></div>
+          <div><h2 className="text-2xl font-black text-white md:text-3xl">{locale === "ar" ? "في الواجهة الآن" : "In the spotlight"}</h2><p className="mt-1 text-sm text-text-secondary">{locale === "ar" ? "عوالم ثلاثية الأبعاد وObby ومحاكاة وتحديات جماعية قريبة من أجواء Roblox" : "3D worlds, obbies, simulators and social challenges with a Roblox-like feel"}</p></div>
           <Link href={href("/category/trending")} className="inline-flex items-center gap-1 rounded-xl px-3 py-2 text-sm font-bold text-accent-2">{t.common.viewAll}<ChevronLeft className="h-4 w-4 ltr:rotate-180" /></Link>
         </div>
         <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
