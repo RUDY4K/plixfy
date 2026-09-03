@@ -62,6 +62,15 @@ body {
     #070712;
 }
 
+/* Google Preferred Sources injects this invisible service iframe at
+   left:-10px. In RTL documents that widens the scrollable canvas by 10px. */
+iframe[title="Subscribe with Google Service"] {
+  left: 0 !important;
+  right: auto !important;
+  top: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Full-viewport game shells. The declaration order gives older Safari a
    usable fallback while modern browsers follow the changing visual viewport. */
 .game-launch-viewport {

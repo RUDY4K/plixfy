@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Script from "next/script";
 import { trackEvent } from "@/components/GoogleAnalytics";
 import type { Locale } from "@/lib/i18n";
@@ -24,6 +25,34 @@ const COPY = {
 
 export default function PreferredSourceCard({ locale }: { locale: Locale }) {
   const c = COPY[locale];
+
+  useEffect(() => {
+    const keepServiceFrameInsideViewport = () => {
+      document
+        .querySelectorAll<HTMLIFrameElement>('iframe[title="Subscribe with Google Service"]')
+        .forEach((frame) => {
+          if (frame.style.getPropertyValue("left") !== "0px") {
+            frame.style.setProperty("left", "0px", "important");
+          }
+          if (frame.style.getPropertyValue("right") !== "auto") {
+            frame.style.setProperty("right", "auto", "important");
+          }
+          if (frame.style.getPropertyValue("top") !== "0px") {
+            frame.style.setProperty("top", "0px", "important");
+          }
+        });
+    };
+
+    keepServiceFrameInsideViewport();
+    const observer = new MutationObserver(keepServiceFrameInsideViewport);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["style", "title"],
+      childList: true,
+      subtree: true,
+    });
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section

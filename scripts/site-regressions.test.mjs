@@ -40,6 +40,17 @@ test("mobile RTL layout cannot widen beyond the device viewport", () => {
   assert.match(installPrompt, /relative mx-auto w-full max-w-md overflow-hidden/);
 });
 
+test("Google Preferred Sources service iframe cannot widen RTL news pages", () => {
+  const globalStyles = read("src/app/globals.css");
+  const preferredSource = read("src/components/PreferredSourceCard.tsx");
+
+  assert.match(globalStyles, /iframe\[title="Subscribe with Google Service"\]/);
+  assert.match(globalStyles, /left:\s*0\s*!important/);
+  assert.match(globalStyles, /right:\s*auto\s*!important/);
+  assert.match(preferredSource, /MutationObserver\(keepServiceFrameInsideViewport\)/);
+  assert.match(preferredSource, /setProperty\("left", "0px", "important"\)/);
+});
+
 test("mobile game exits stay compact and above install prompts in every orientation", () => {
   const gameFrame = read("src/components/GameFrame.tsx");
   const launchPage = read("src/app/[locale]/play/[slug]/launch/page.tsx");
