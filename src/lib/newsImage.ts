@@ -2,6 +2,7 @@ const NEWS_IMAGE_HOSTS = new Set([
   "assetsio.gnwcdn.com",
   "blog.playstation.com",
   "cdn.mos.cms.futurecdn.net",
+  "i.ytimg.com",
   "www.gamespot.com",
   "www.gematsu.com",
   "www.videogameschronicle.com",
