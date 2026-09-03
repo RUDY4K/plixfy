@@ -27,11 +27,11 @@ test("the production monitor runs around the clock and alerts only on failure", 
   assert.doesNotMatch(workflow, /TELEGRAM_BOT_TOKEN:\s*[^$\s]/);
 });
 
-test("social schedule retries each Riyadh slot seven times inside one hour", () => {
+test("social workflow checks continuously for fresh news twice per hour", () => {
   const workflow = readFileSync(".github/workflows/cloud-social.yml", "utf8");
-  assert.match(workflow, /cron: "30,37,47,57 6,16 \* \* \*"/);
-  assert.match(workflow, /cron: "7,17,27 7,17 \* \* \*"/);
-  assert.match(workflow, /node scripts\/social-schedule-core\.mjs/);
+  assert.match(workflow, /cron: "25,55 \* \* \* \*"/);
+  assert.match(workflow, /reason=continuous_news_watch/);
+  assert.match(workflow, /echo "slot=news"/);
   assert.match(workflow, /if: steps\.plan\.outputs\.should_run == 'true'/);
   assert.match(workflow, /--date=\$\{SOCIAL_DATE\}/);
   assert.match(workflow, /cancel-in-progress: false/);

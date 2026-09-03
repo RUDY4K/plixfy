@@ -192,7 +192,7 @@ test("player data sync reads the latest local values after auth resolves", () =>
   );
 });
 
-test("game artwork uses responsive Next image optimization for the catalog host", () => {
+test("game artwork bypasses the unavailable optimizer for the catalog host", () => {
   const config = read("next.config.ts");
   const artwork = read("src/components/GameArtwork.tsx");
   const brandLogo = read("src/components/BrandLogo.tsx");
@@ -203,10 +203,13 @@ test("game artwork uses responsive Next image optimization for the catalog host"
   assert.match(config, /hostname: "static\.playgama\.com"/);
   assert.match(config, /pathname: "\/p-img\/\*\*"/);
   assert.doesNotMatch(config, /hostname: "\*\*\.playgama\.com"/);
+  assert.match(artwork, /hostname === "static\.playgama\.com"/);
+  assert.match(artwork, /useState<ArtworkAttempt>\(\(\) => createAttempt\(src\)\)/);
+  assert.match(artwork, /setAttempt\(createAttempt\(src\)\)/);
   assert.match(artwork, /unoptimized=\{attempt\.direct\}/);
   assert.match(artwork, /if \(!attempt\.direct\)/);
   assert.match(artwork, /setAttempt\(\{ src: attempt\.src, direct: true \}\)/);
-  assert.match(artwork, /setAttempt\(\{ src: fallbackSrc, direct: false \}\)/);
+  assert.match(artwork, /setAttempt\(createAttempt\(fallbackSrc\)\)/);
   assert.match(homePage, /<GameArtwork[^>]+\bpreload\b/);
   assert.match(gameFrame, /<GameArtwork[\s\S]{0,300}\bpreload\b/);
   assert.doesNotMatch(homePage, /<GameArtwork[^>]+\bpriority\b/);

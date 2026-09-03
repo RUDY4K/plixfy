@@ -14,11 +14,23 @@ interface ArtworkAttempt {
   direct: boolean;
 }
 
+function createAttempt(src: string): ArtworkAttempt {
+  let direct = false;
+
+  try {
+    direct = new URL(src).hostname === "static.playgama.com";
+  } catch {
+    // Relative site assets can continue through the Next.js image optimizer.
+  }
+
+  return { src, direct };
+}
+
 export default function GameArtwork({ src, fallbackSrc, alt, className, ...props }: GameArtworkProps) {
-  const [attempt, setAttempt] = useState<ArtworkAttempt>({ src, direct: false });
+  const [attempt, setAttempt] = useState<ArtworkAttempt>(() => createAttempt(src));
 
   useEffect(() => {
-    setAttempt({ src, direct: false });
+    setAttempt(createAttempt(src));
   }, [src]);
 
   if (!attempt.src) {
@@ -48,7 +60,7 @@ export default function GameArtwork({ src, fallbackSrc, alt, className, ...props
           return;
         }
         if (fallbackSrc && attempt.src !== fallbackSrc) {
-          setAttempt({ src: fallbackSrc, direct: false });
+          setAttempt(createAttempt(fallbackSrc));
           return;
         }
         setAttempt({ src: "", direct: false });
