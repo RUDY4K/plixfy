@@ -104,6 +104,20 @@ test("automated Arabic news posts use canonical root-locale URLs", () => {
   assert.doesNotMatch(runner, /\$\{SITE\}\/ar\/news\//);
 });
 
+test("Arabic PlayStation LEGO news title names each partner once", () => {
+  const news = JSON.parse(read("src/data/news.json"));
+  const item = news.find(
+    (entry) => entry.slug === "sony-and-lego-announce-replica-original-playstation-console-set",
+  );
+
+  assert.ok(item, "the PlayStation LEGO news item must remain available");
+  assert.equal(
+    item.title,
+    "سوني وLEGO تعلنان رسميًا عن مجسم مكعبات لجهاز PlayStation الأول",
+  );
+  assert.doesNotMatch(item.title, /سوني.*سوني/);
+});
+
 test("continuous social automation publishes measurable gaming news only", () => {
   const runner = read("scripts/cloud-social-runner.mjs");
   const workflow = read(".github/workflows/cloud-social.yml");

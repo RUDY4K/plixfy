@@ -6,6 +6,7 @@ const NEWS_IMAGE_HOSTS = new Set([
   "www.gamespot.com",
   "www.gematsu.com",
   "www.videogameschronicle.com",
+  "xboxwire.thesourcemediaassets.com",
 ]);
 
 export {
