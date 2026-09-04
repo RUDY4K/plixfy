@@ -14,7 +14,6 @@ import WebVitals from "@/components/WebVitals";
 import MonetagServiceWorker from "@/components/MonetagServiceWorker";
 import ConsentBanner from "@/components/ConsentBanner";
 import InstallAppPrompt from "@/components/InstallAppPrompt";
-import DeferredAdSense from "@/components/DeferredAdSense";
 import PlayerDataProvider from "@/components/PlayerDataProvider";
 import {
   locales,
@@ -33,6 +32,9 @@ const tajawal = Tajawal({
   display: "optional",
 });
 
+// Keep the account meta tag for ownership verification while automatic ads are
+// disabled. The catalog embeds third-party games, so loading the site-wide
+// AdSense script would make those replicated-content screens eligible for ads.
 const ADSENSE_CLIENT = "ca-pub-7564871953180369";
 
 const inter = Inter({
@@ -149,7 +151,6 @@ export default async function RootLayout({
             <AeoReferralTracker />
           </>
         )}
-        <DeferredAdSense client={ADSENSE_CLIENT} />
         <Analytics />
       </body>
     </html>

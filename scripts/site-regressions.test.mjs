@@ -338,7 +338,7 @@ test("template roundups stay out while reviewed news uses a fail-closed search g
   const newsArticle = read("src/app/[locale]/news/[slug]/page.tsx");
   const newsGate = read("src/lib/news.ts");
   const indexNow = read("scripts/submit-indexnow.mjs");
-  const adsenseLoader = read("src/components/DeferredAdSense.tsx");
+  const localeLayout = read("src/app/[locale]/layout.tsx");
 
   assert.match(blogIndex, /robots: \{ index: false, follow: true \}/);
   assert.match(blogArticle, /robots: \{ index: false, follow: true \}/);
@@ -351,7 +351,8 @@ test("template roundups stay out while reviewed news uses a fail-closed search g
   assert.match(indexNow, /review\?\.searchEligible !== true/);
   assert.doesNotMatch(sitemap, /bilingual\("\/blog"/);
   assert.doesNotMatch(sitemap, /blogRoutes/);
-  assert.match(adsenseLoader, /\(\?:play\|blog\|news\|search/);
+  assert.match(localeLayout, /"google-adsense-account": ADSENSE_CLIENT/);
+  assert.doesNotMatch(localeLayout, /DeferredAdSense/);
 });
 
 test("news pages include Google preferred-source discovery and original context", () => {
