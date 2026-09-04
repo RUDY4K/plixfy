@@ -118,6 +118,19 @@ test("Arabic PlayStation LEGO news title names each partner once", () => {
   assert.doesNotMatch(item.title, /سوني.*سوني/);
 });
 
+test("Final Fantasy Revelation news keeps its matching source and artwork", () => {
+  const news = JSON.parse(read("src/data/news.json"));
+  const item = news.find(
+    (entry) => entry.slug === "final-fantasy-7-revelation-physical-edition-requires-data-download",
+  );
+
+  assert.ok(item, "the Final Fantasy Revelation news item must remain available");
+  assert.equal(item.sourceName, "GamesRadar+");
+  assert.match(item.sourceUrl, /^https:\/\/www\.gamesradar\.com\/games\/final-fantasy\//);
+  assert.match(item.image, /^https:\/\/cdn\.mos\.cms\.futurecdn\.net\//);
+  assert.doesNotMatch(item.sourceUrl, /steam-has-generated/);
+});
+
 test("continuous social automation publishes measurable gaming news only", () => {
   const runner = read("scripts/cloud-social-runner.mjs");
   const workflow = read(".github/workflows/cloud-social.yml");
