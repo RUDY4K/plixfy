@@ -1,18 +1,11 @@
-// يولّد محتوى مدوّنة إنجليزي أصلي (title/h1/description/keywords/intro/sections/faq)
-// لنفس الـ 15 موضوعاً الموجودة بالعربية في src/lib/blog.ts، عبر claude -p
-// (الفوترة على الاشتراك المحلي). المحتوى أصلي وليس ترجمة حرفية.
-//
-// الحالة قابلة للاستئناف: النتائج تتراكم في scripts/.en-blog-state.json
-// ثم تُصدَّر إلى src/lib/blogEn.ts في نهاية كل دفعة.
-//
-// الاستخدام: node scripts/generate-en-blog.mjs
-
+// Prepare English blog revision drafts; never overwrite live blogEn.ts.
 import fs from "node:fs";
+import { readDrafts, saveDrafts, contentHash } from "./content-draft-store.mjs";
 import path from "node:path";
 import { runClaude, extractJson } from "./claude-cli.mjs";
 
 const BATCH = 2;
-const STATE_FILE = path.join("scripts", ".en-blog-state.json");
+
 const OUT_FILE = path.join("src", "lib", "blogEn.ts");
 
 // نفس الـ 15 موضوعاً والتصنيفات الموجودة في src/lib/blog.ts — arH1 للسياق فقط.
@@ -61,70 +54,10 @@ Return ONLY a JSON object mapping each slug to its content object:
 {"<slug>": {"title": "...", "h1": "...", "description": "...", "keywords": [...], "intro": "...", "sections": [...], "faq": [...]}}`;
 }
 
-function emitTs(state) {
-  const entries = TOPICS.filter((t) => state[t.slug])
-    .map((t) => {
-      const c = state[t.slug];
-      return `  {
-    slug: ${JSON.stringify(t.slug)},
-    title: ${JSON.stringify(c.title)},
-    h1: ${JSON.stringify(c.h1)},
-    description: ${JSON.stringify(c.description)},
-    keywords: ${JSON.stringify(c.keywords)},
-    intro: ${JSON.stringify(c.intro)},
-    sections: ${JSON.stringify(c.sections, null, 6).replace(/\n(?=\s*\])/, "\n    ")},
-    faq: ${JSON.stringify(c.faq, null, 6).replace(/\n(?=\s*\])/, "\n    ")},
-    relatedCategory: ${JSON.stringify(t.categorySlug)},
-  },`;
-    })
-    .join("\n");
-
-  const out = `import type { CategorySlug } from "@/lib/games";
-import type { BlogSection, BlogFaq } from "@/lib/blog";
-
-export interface BlogPostEn {
-  slug: string;
-  title: string;
-  h1: string;
-  description: string;
-  keywords: readonly string[];
-  intro: string;
-  sections: readonly BlogSection[];
-  faq: readonly BlogFaq[];
-  relatedCategory: CategorySlug;
-}
-
-// محتوى إنجليزي أصلي مولَّد عبر scripts/generate-en-blog.mjs — لا تحرّر يدويًا.
-const POSTS_EN: readonly BlogPostEn[] = [
-${entries}
-];
-
-export function getAllPostsEn(): readonly BlogPostEn[] {
-  return POSTS_EN;
-}
-
-export function getPostEnBySlug(slug: string): BlogPostEn | undefined {
-  return POSTS_EN.find((p) => p.slug === slug);
-}
-
-export function getPostEnSlugs(): readonly string[] {
-  return POSTS_EN.map((p) => p.slug);
-}
-
-export function getPostsEnByCategory(category: CategorySlug): readonly BlogPostEn[] {
-  return POSTS_EN.filter((p) => p.relatedCategory === category);
-}
-`;
-  fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
-  fs.writeFileSync(OUT_FILE, out, "utf8");
-}
-
 function main() {
-  const state = fs.existsSync(STATE_FILE)
-    ? JSON.parse(fs.readFileSync(STATE_FILE, "utf8"))
-    : {};
-
-  const targets = TOPICS.filter((t) => !(t.slug in state));
+  const original = fs.readFileSync(OUT_FILE, "utf8");
+  const pending = new Set(readDrafts(process.cwd(), "blog-en-revisions").map((draft) => draft.slug));
+  const targets = TOPICS.filter((t) => !pending.has(t.slug));
   console.log(`${targets.length}/${TOPICS.length} remaining to generate.`);
 
   for (let i = 0; i < targets.length; i += BATCH) {
@@ -137,6 +70,7 @@ function main() {
     });
     const json = extractJson(raw);
 
+    const drafts = [];
     let ok = 0;
     for (const t of batch) {
       const c = json[t.slug];
@@ -151,18 +85,18 @@ function main() {
         c.sections.length === 3 &&
         Array.isArray(c.faq)
       ) {
-        state[t.slug] = c;
+        drafts.push({ content: { ...c, slug: t.slug }, baseHash: contentHash(original),
+          evidence: { generator: "claude-cli", topic: t, originalFile: "src/lib/blogEn.ts", limitation: "Topic-only draft; claims require verification" } });
         ok++;
       } else {
         console.warn(`  ! missing/invalid content for ${t.slug} — will retry on next run`);
       }
     }
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), "utf8");
-    emitTs(state);
-    console.log(`  ✓ ${ok}/${batch.length} saved (total ${Object.keys(state).length}/${TOPICS.length})`);
+    saveDrafts(process.cwd(), "blog-en-revisions", drafts, { revision: true });
+    console.log(`Saved ${ok} revision drafts; live English blog unchanged.`);
   }
 
-  console.log(`Done. ${Object.keys(state).length}/${TOPICS.length} posts in ${OUT_FILE}`);
+  console.log("Done. Review drafts in content-drafts/blog-en-revisions.json before any publication.");
 }
 
 main();

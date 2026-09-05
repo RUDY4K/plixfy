@@ -28,7 +28,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   const topPicks = getTopPicks(new Set([dailyGame.slug, ...trending.map((game) => game.slug)]));
   const freshGames = allGames.slice(36, 48);
   const guides = (locale === "en" ? getAllPostsEn() : getAllPosts()).slice(0, 4);
-  const news = getAllNews().slice(0, 5);
+  const news = getAllNews(locale).slice(0, 5);
   const leadNews = news[0];
   const moreNews = news.slice(1);
   const localizedCount = allGames.length.toLocaleString(locale === "ar" ? "ar-SA" : "en-US");
@@ -43,13 +43,13 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         ["كيف أبدأ اللعب؟", "اختر أي لعبة من المكتبة واضغط زر اللعب، وستعمل مباشرة داخل المتصفح."],
         ["هل الألعاب مجانية؟", "نعم، جميع ألعاب Plixfy المتاحة مجانية ولا تتطلب تنزيلًا."],
         ["هل تعمل على الجوال والكمبيوتر؟", "توضح بطاقة كل لعبة الأجهزة المدعومة، وتشمل المكتبة ألعابًا للجوال والكمبيوتر."],
-        ["هل تتغير ترشيحات الصفحة؟", "نعم، يتغير اختيار اليوم وتُحدّث قوائم الألعاب الرائجة والمختارة باستمرار."],
+        ["هل تتغير ترشيحات الصفحة؟", "يتغير اختيار اليوم تلقائيًا من المكتبة؛ ترتيب القوائم يعتمد على بيانات الكتالوج وليس قياس الشعبية أو مراجعة كل لعبة."],
       ]
     : [
         ["How do I start playing?", "Choose any game and press play. It runs directly inside your browser."],
         ["Are the games free?", "Yes. Available Plixfy games are free and require no download."],
         ["Do they work on mobile and desktop?", "Each game card shows supported devices across mobile and desktop."],
-        ["Do recommendations change?", "Yes. The daily pick rotates and discovery lists are refreshed regularly."],
+        ["Do recommendations change?", "The daily pick rotates automatically. Discovery lists use catalog data, not popularity measurements or a review of every game."],
       ];
 
   const structuredData = [
@@ -101,7 +101,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               <BadgeCheck className="h-3.5 w-3.5 text-success" />{locale === "ar" ? "من كتالوج Playgama" : "From Playgama"}
             </span>
           </div>
-          <div className="relative flex min-h-[500px] max-w-2xl flex-col justify-end p-6 md:min-h-[540px] md:justify-center md:p-10 lg:p-12">
+          <div className="relative flex min-h-[500px] max-w-2xl flex-col justify-end p-6 pt-24 md:min-h-[540px] md:justify-center md:p-10 md:pt-28 lg:p-12 lg:pt-28">
             <h1 className="mb-3 text-sm font-extrabold text-accent-2">{t.home.h1}</h1>
             <h2 dir="ltr" className="text-start font-latin text-4xl font-black leading-[1.02] tracking-[-.045em] text-white drop-shadow-[0_4px_18px_rgba(0,0,0,.55)] sm:text-5xl md:text-6xl">{dailyGame.title}</h2>
             <p className="mt-4 max-w-xl text-[15px] leading-7 text-white/72 md:text-base">
@@ -140,7 +140,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               <div className="p-5 md:p-6"><MonitorSmartphone className="h-5 w-5 text-accent-2" /><strong className="mt-5 block text-lg text-white">{locale === "ar" ? "حسب اللعبة" : "Varies by game"}</strong><span className="mt-1 block text-xs text-text-secondary">{locale === "ar" ? "جوال وكمبيوتر" : "mobile and desktop"}</span></div>
             </div>
             <Link href={href("/category/top")} className="flex items-center justify-between gap-4 border-t border-white/[0.07] bg-[linear-gradient(115deg,rgba(118,87,255,.16),rgba(0,229,255,.045))] p-5 transition hover:bg-white/[0.05] md:p-6">
-              <span><strong className="block text-base text-white">{locale === "ar" ? "اختيارات تتجدد يوميًا" : "Fresh picks every day"}</strong><span className="mt-1 block text-xs leading-5 text-text-secondary">{locale === "ar" ? "ترشيحات منتقاة من كتالوج Playgama." : "Curated from the Playgama catalog."}</span></span>
+              <span><strong className="block text-base text-white">{locale === "ar" ? "استكشف من المكتبة" : "Explore the library"}</strong><span className="mt-1 block text-xs leading-5 text-text-secondary">{locale === "ar" ? "مجموعة مرتبة آليًا من كتالوج Playgama." : "Automatically ordered from the Playgama catalog."}</span></span>
               <Sparkles className="h-5 w-5 shrink-0 text-accent-2" />
             </Link>
           </div>
@@ -200,7 +200,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </aside>
         <div className="min-w-0 border-t border-white/[0.07] pt-6 lg:border-s lg:border-t-0 lg:ps-8 lg:pt-0">
-          <div className="mb-5 flex items-center justify-between"><div><h2 className="text-2xl font-black text-white">{locale === "ar" ? "جديد المكتبة" : "New in the library"}</h2><p className="mt-1 text-xs text-text-secondary">{locale === "ar" ? "اكتشف إضافات جديدة بسرعة" : "Discover recent additions quickly"}</p></div><Clock3 className="h-5 w-5 text-accent-2" /></div>
+          <div className="mb-5 flex items-center justify-between"><div><h2 className="text-2xl font-black text-white">{locale === "ar" ? "من المكتبة" : "From the library"}</h2><p className="mt-1 text-xs text-text-secondary">{locale === "ar" ? "استكشف ألعابًا أخرى من الكتالوج" : "Explore more games from the catalog"}</p></div><Clock3 className="h-5 w-5 text-accent-2" /></div>
           <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
             {freshGames.slice(0, 6).map((game) => (
               <Link key={game.slug} href={href(`/play/${game.slug}`)} className="group flex min-w-0 items-center gap-3 border-b border-white/[0.07] py-3 transition hover:bg-white/[0.025]">
@@ -223,13 +223,13 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         </div>
       </section>
 
-      <section className="mt-16 grid gap-10 border-y border-white/[0.07] py-10 lg:grid-cols-2">
-        <div>
+      <section className={`mt-16 grid gap-10 border-y border-white/[0.07] py-10 ${guides.length > 0 ? "lg:grid-cols-2" : ""}`}>
+        {guides.length > 0 && <div>
           <div className="mb-5 flex items-center justify-between"><h2 className="text-2xl font-black text-white">{t.common.fromBlog}</h2><Link href={href("/blog")} className="text-sm font-bold text-accent-2">{t.common.allPosts}</Link></div>
           <div className="divide-y divide-white/[0.07]">
             {guides.map((post, index) => <Link key={post.slug} href={href(`/blog/${post.slug}`)} className="group grid grid-cols-[2.25rem_1fr] gap-3 py-4"><span className="font-latin text-xs font-black text-primary">0{index + 1}</span><span><h3 className="line-clamp-2 font-bold leading-6 text-white group-hover:text-accent-2">{post.h1}</h3><p className="mt-1 line-clamp-2 text-xs leading-5 text-text-secondary">{post.description}</p></span></Link>)}
           </div>
-        </div>
+        </div>}
         <div>
           <h2 className="mb-5 text-2xl font-black text-white">{locale === "ar" ? "أسئلة سريعة" : "Quick answers"}</h2>
           <div className="divide-y divide-white/[0.07]">{faq.map(([question, answer]) => <details key={question} className="group py-4 first:pt-0"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold text-white"><span>{question}</span><ChevronDown className="h-4 w-4 shrink-0 text-text-faint transition group-open:rotate-180" /></summary><p className="mt-3 max-w-xl text-sm leading-7 text-text-secondary">{answer}</p></details>)}</div>

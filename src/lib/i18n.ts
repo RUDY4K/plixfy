@@ -200,7 +200,7 @@ const ar: UIDict = {
     viewAllAria: "عرض الكل: ",
     playNow: "العب الآن",
     playAria: "العب ",
-    mostPlayed: "الأكثر لعباً",
+    mostPlayed: "من المكتبة",
     featured: "مميز",
     newBadge: "جديد",
     fromBlog: "من المدونة",
@@ -211,8 +211,8 @@ const ar: UIDict = {
     browseAllSub: "مرتّبة حسب التصنيف، بدون تحميل",
   },
   strips: {
-    trending: "ألعاب رائجة الآن",
-    topPicks: "ترشيحات بليكسفاي",
+    trending: "استكشف الألعاب",
+    topPicks: "من مكتبة بليكسفاي",
     racing: "ألعاب السباق",
     action: "أكشن وقتال",
     puzzle: "ألغاز ومخ",
@@ -239,7 +239,7 @@ const ar: UIDict = {
     similarHeading: "العب ألعاب مشابهة",
     playAnother: "العب لعبة تانية",
     loading: "جارٍ تحميل {title}",
-    ready: "اللعبة جاهزة. اضغط Tab للدخول إلى اللعبة.",
+    ready: "فُتحت نافذة المشغّل، وقد تستمر اللعبة في التحميل. اضغط Tab للدخول إلى النافذة.",
   },
   consent: {
     notice: "إشعار ملفات تعريف الارتباط",
@@ -284,7 +284,7 @@ const ar: UIDict = {
   home: {
     h1: "ألعاب أونلاين مجانية - بليكسفاي",
     intro:
-      "بليكسفاي منصة ألعاب أونلاين مجانية تعمل من المتصفح مباشرة بدون أي تحميل أو تسجيل. تجد لدينا {count} لعبة موزّعة على ثمانية تصنيفات رئيسية: السباق، الأكشن، الألغاز، الرياضة، التصويب، ألعاب البنات، ألعاب آيو، والألعاب الخفيفة المناسبة لجميع الأعمار. كل لعبة محمّلة من خوادم سريعة وتعمل بسلاسة على الجوال والحاسوب، مع واجهة عربية بالكامل تدعم الكتابة من اليمين إلى اليسار. تستطيع أن تبدأ اللعب في ثوانٍ، أن تحفظ ألعابك المفضّلة، وأن تكتشف ألعاباً جديدة كل أسبوع من قائمتنا المختارة بعناية. سواء كنت تبحث عن جلسة سريعة بين الفصول، عن لعبة عائلية تشاركها مع إخوتك، أو عن تحدٍّ جاد يستهلك ساعات، فإن مكتبتنا تضمّ كل ما تحتاجه من ألعاب أونلاين مجانية بدون تحميل.",
+      "استكشف {count} لعبة متصفح من كتالوج Playgama، مع بحث وتصنيفات ومفضلة. تعرض صفحة اللعبة الأجهزة واللغات والمشتريات الداخلية بحسب المصدر، ولا يعني إدراجها أننا اختبرنا كل جهاز أو تحققنا من ملاءمتها لكل الأعمار.",
   },
 };
 
@@ -324,7 +324,7 @@ const en: UIDict = {
     viewAllAria: "View all: ",
     playNow: "Play Now",
     playAria: "Play ",
-    mostPlayed: "Most Played",
+    mostPlayed: "From the library",
     featured: "Featured",
     newBadge: "NEW",
     fromBlog: "From the Blog",
@@ -335,8 +335,8 @@ const en: UIDict = {
     browseAllSub: "Sorted by category, no downloads",
   },
   strips: {
-    trending: "Trending Now",
-    topPicks: "Plixfy Top Picks",
+    trending: "Explore games",
+    topPicks: "From the Plixfy library",
     racing: "Racing Games",
     action: "Action & Fighting",
     puzzle: "Puzzle & Brain",
@@ -363,7 +363,7 @@ const en: UIDict = {
     similarHeading: "Play Similar Games",
     playAnother: "Play Another Game",
     loading: "Loading {title}",
-    ready: "Game ready. Press Tab to enter the game.",
+    ready: "The player window has opened; the game may still be loading. Press Tab to enter the window.",
   },
   consent: {
     notice: "Cookie Notice",
@@ -408,7 +408,7 @@ const en: UIDict = {
   home: {
     h1: "Free Online Games - Play Instantly on Plixfy",
     intro:
-      "Plixfy is a free online gaming platform that runs directly in your browser — no downloads, no sign-up. Explore {count} games across eight main categories: racing, action, puzzle, sports, shooting, girls games, .io games, and casual games suitable for all ages. Every game loads from fast servers and runs smoothly on both mobile and desktop. Start playing in seconds, save your favorite games, and discover new hand-picked titles every week. Whether you want a quick session between classes, a family-friendly game to share, or a serious challenge that lasts for hours, our library has all the free online games you need — no download required.",
+      "Explore {count} browser games from the Playgama catalog, with search, categories, and favorites. Game pages show source-declared devices, languages, and in-game purchases. A listing does not mean we tested every device or verified suitability for every age.",
   },
 };
 

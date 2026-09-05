@@ -23,6 +23,8 @@ const content = {
     launch: "٢. افهم الفرق بين الصفحة واللعبة",
     launchBody: "صفحة اللعبة هي مكان قراءة المعلومات والتعليمات والعودة إلى ألعاب أخرى. الضغط على «العب الآن» يفتح اللعبة المقدمة من Playgama داخل مساحة تشغيل؛ وقد تتوسع المساحة على أجهزة اللمس أو تفتح شاشة تشغيل مستقلة. زر الخروج يعيدك إلى صفحة اللعبة أو يغلق مساحة اللعب. لا يعني ظهور صفحة بليكسفاي بنجاح أن ملفات اللعبة نفسها اكتمل تحميلها.",
     checklistTitle: "قائمة البداية القصيرة",
+    providerTitle: "إذا ظهرت شاشة ثانية أو إعلان قبل اللعب",
+    providerBody: "قد تظهر داخل مساحة اللعب شاشة بدء أخرى من مزوّد اللعبة، مثل Let's Play، أو إعلان قبل قائمة المراحل. ظهور مساحة اللعب لا يثبت أن المرحلة بدأت. انتظر زر الإغلاق الواضح إن ظهر إعلان؛ لا تضغط على الإعلان للوصول إلى اللعبة. بعد الإغلاق ابحث عن قائمة اللعبة أو زر البدء الخاص بها. إعلانات المزوّد المضمّن منفصلة عن إعلانات صفحات بليكسفاي، وقد تظهر حتى عند تعطيل إعلانات الموقع. إذا بقيت الشاشة عالقة، أغلق مساحة اللعب من زر بليكسفاي وأرسل اسم اللعبة وصورة المشكلة، بدل تكرار الضغط داخل الإعلان.",
     checklist: [
       "اقرأ تعليمات التحكم، ثم جرّب حركة واحدة أو زرًا واحدًا داخل اللعبة.",
       "تأكد من رؤية الأزرار المهمة كاملة، ومن ملاءمة اتجاه الشاشة قبل بدء الجولة.",
@@ -62,6 +64,8 @@ const content = {
     launch: "2. Understand the page and the player",
     launchBody: "The game page provides information, instructions, and a way to browse other titles. Play Now opens the Playgama game in a playing area, which may expand on touch devices or open a separate launch screen. The exit control returns you to the game page or closes the playing area. A successfully loaded Plixfy page does not mean the game itself has finished loading.",
     checklistTitle: "A short starting checklist",
+    providerTitle: "A second start screen or an ad before play",
+    providerBody: "The playing area may first show another provider start screen, such as Let's Play, or an advertisement before the level menu. Opening the player does not prove that a level has started. If an ad appears, wait for its clearly marked close control; do not click the advertisement to reach the game. After closing it, look for the game's menu or start control. Embedded provider advertising is separate from Plixfy page advertising and may appear even when site ads are disabled. If the screen stays stuck, close the playing area with Plixfy's exit control and report the game name and a screenshot instead of repeatedly clicking inside the advertisement.",
     checklist: [
       "Read the controls, then try one movement or button inside the game.",
       "Check that essential controls fit on screen and the orientation suits the game.",
@@ -126,6 +130,8 @@ export default async function BrowserGamesGuide({ params }: Props) {
         <section className="mt-10" aria-labelledby="launch-game">
           <h2 id="launch-game" className={headingClass}>{c.launch}</h2>
           <p className={paragraphClass}>{c.launchBody}</p>
+          <h3 className="mt-6 text-lg font-bold text-text-primary">{c.providerTitle}</h3>
+          <p className={paragraphClass}>{c.providerBody}</p>
           <h3 className="mt-6 text-lg font-bold text-text-primary">{c.checklistTitle}</h3>
           <ul className="mt-3 list-disc space-y-2 ps-6 leading-8 text-text-secondary">{c.checklist.map((item) => <li key={item}>{item}</li>)}</ul>
         </section>

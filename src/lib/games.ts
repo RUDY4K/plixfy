@@ -117,9 +117,10 @@ export function getRobloxStyleScore(
   return genreScore + titleScore + deviceScore + mediaScore;
 }
 
-export const allGames: readonly Game[] = importedGames.map((game, index) => ({
+export const allGames: readonly Game[] = importedGames.map((game) => ({
   ...game,
-  badge: getRobloxStyleScore(game) >= 24 ? "hot" : index < 12 ? "top" : index < 36 ? "new" : null,
+  // Catalog position and genre matching are not popularity or arrival evidence.
+  badge: null,
   source: "playgama",
 }));
 
@@ -225,8 +226,8 @@ export const categoryMeta: Record<string, CategoryMeta> = {
   casual: { name: "ألعاب خفيفة", icon: "🎯", description: "ألعاب ممتعة لكل الأوقات" },
   sports: { name: "ألعاب رياضية", icon: "⚽", description: "كرة، كرة سلة، وتنس" },
   shooting: { name: "ألعاب إطلاق نار", icon: "🎯", description: "صوّب ودافع وانتصر" },
-  trending: { name: "ألعاب رائجة الآن", icon: "🔥", description: "أكثر الألعاب لعباً هذا الأسبوع" },
-  top: { name: "ترشيحات بليكسفاي", icon: "👑", description: "أفضل ألعاب اخترناها لك" },
+  trending: { name: "استكشف ألعابًا بأسلوب Roblox", icon: "🔥", description: "اختيارات آلية بحسب وسوم النوع واسم اللعبة من الكتالوج" },
+  top: { name: "استكشف من المكتبة", icon: "👑", description: "مجموعة لاكتشاف ألعاب من الكتالوج" },
 };
 
 export function getCategoryMeta(slug: string): CategoryMeta | null {

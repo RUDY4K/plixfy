@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CategoryStrip from "@/components/CategoryStrip";
-import { getPostBySlug, getPostSlugs, getAllPosts, type BlogPost } from "@/lib/blog";
-import { getPostEnBySlug, getPostEnSlugs, getAllPostsEn, type BlogPostEn } from "@/lib/blogEn";
+import { getPostBySlug, getKnownPostSlugs, getAllPosts, type BlogPost } from "@/lib/blog";
+import { getPostEnBySlug, getKnownPostEnSlugs, getAllPostsEn, type BlogPostEn } from "@/lib/blogEn";
 import { getGamesByCategory } from "@/lib/games";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import { BRAND_AR } from "@/lib/siteContent";
@@ -20,8 +20,8 @@ interface PageParams {
 
 export async function generateStaticParams() {
   return [
-    ...getPostSlugs().map((slug) => ({ locale: "ar", slug })),
-    ...getPostEnSlugs().map((slug) => ({ locale: "en", slug })),
+    ...getKnownPostSlugs().map((slug) => ({ locale: "ar", slug })),
+    ...getKnownPostEnSlugs().map((slug) => ({ locale: "en", slug })),
   ];
 }
 
@@ -48,6 +48,16 @@ function getPost(locale: Locale, slug: string) {
   return locale === "en" ? getPostEnBySlug(slug) : getPostBySlug(slug);
 }
 
+function isKnownPost(locale: Locale, slug: string) {
+  return (locale === "en" ? getKnownPostEnSlugs() : getKnownPostSlugs()).includes(slug);
+}
+
+function revisionCopy(locale: Locale) {
+  return locale === "ar"
+    ? { title: "هذا الدليل قيد المراجعة", description: "أوقفنا عرض النسخة السابقة لأن بعض توصياتها ومعلوماتها تحتاج إلى التحقق. يمكنك الآن قراءة دليل اختيار ألعاب المتصفح وحل مشكلات التشغيل، أو تصفح مكتبة الألعاب.", guide: "دليل اللعب من المتصفح", games: "تصفح الألعاب" }
+    : { title: "This guide is under review", description: "We have withdrawn the previous version while we verify its recommendations and claims. Read our guide to choosing browser games and troubleshooting playback, or explore the game library.", guide: "Browser game guide", games: "Explore games" };
+}
+
 /** يفرّق بين النسخة العربية (فيها تواريخ نشر وعنوان تصنيف) والإنجليزية */
 function isArPost(post: BlogPost | BlogPostEn): post is BlogPost {
   return "relatedCategoryTitle" in post;
@@ -63,16 +73,17 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const { locale, slug } = await params;
   if (!hasLocale(locale)) return {};
   const post = getPost(locale, slug);
-  if (!post) return {};
+  if (!post) {
+    if (!isKnownPost(locale, slug)) notFound();
+    const copy = revisionCopy(locale);
+    return { title: copy.title, description: copy.description, robots: { index: false, follow: true }, alternates: { canonical: localeHref(locale, "/blog/" + slug) } };
+  }
 
   return {
     title: post.title,
     description: post.description,
     keywords: [...post.keywords],
-    // The current category roundups remain available to readers, but are kept
-    // out of search until each one is rebuilt around verified, first-hand
-    // comparisons. This prevents template-style articles from weakening the
-    // site's overall content-quality signals.
+    // Publication approval is separate from search indexing eligibility.
     robots: { index: false, follow: true },
     alternates: pageAlternates(locale, "/blog/" + post.slug),
     openGraph: {
@@ -94,7 +105,18 @@ export default async function BlogPostPage({ params }: PageParams) {
   const locale = rawLocale as Locale;
   const c = COPY[locale];
   const post = getPost(locale, slug);
-  if (!post) notFound();
+  if (!post) {
+    if (!isKnownPost(locale, slug)) notFound();
+    const copy = revisionCopy(locale);
+    return <main className="mx-auto max-w-3xl px-4 py-10 md:px-6">
+      <h1 className="text-2xl font-bold text-text-primary">{copy.title}</h1>
+      <p className="mt-4 leading-8 text-text-secondary">{copy.description}</p>
+      <div className="mt-6 flex flex-wrap gap-6">
+        <Link className="text-primary underline" href={localeHref(locale, "/guides/browser-games")}>{copy.guide}</Link>
+        <Link className="text-primary underline" href={localeHref(locale, "/all-games")}>{copy.games}</Link>
+      </div>
+    </main>;
+  }
 
   const relatedGames = getGamesByCategory(post.relatedCategory).slice(0, 12);
   const allPosts = locale === "en" ? getAllPostsEn() : getAllPosts();
@@ -149,7 +171,7 @@ export default async function BlogPostPage({ params }: PageParams) {
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([articleLd, faqLd, breadcrumbLd]) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([articleLd, faqLd, breadcrumbLd]).replace(/</g, "\\u003c") }}
       />
       <Breadcrumbs
         locale={locale}

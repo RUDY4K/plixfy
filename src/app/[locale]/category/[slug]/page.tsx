@@ -24,7 +24,6 @@ import {
 
 const SITE = "https://www.plixfy.com";
 const PAGE_SIZE = 60;
-const YEAR = new Date().getFullYear();
 
 // trending و top صفحات ديناميكية إضافية إلى جانب التصنيفات الثابتة
 const extraSlugs = ["trending", "top"] as const;
@@ -72,7 +71,7 @@ const uiCopy = {
     page: (current: number, total: number) => `صفحة ${current} من ${total}`,
     backAria: "العودة إلى الفئات",
     back: "العودة",
-    bestIn: (name: string) => "🏆 أفضل " + name + " في " + YEAR,
+    bestIn: (name: string) => "استكشف مجموعة " + name,
     relatedCats: "تصنيفات ذات صلة",
   },
   en: {
@@ -85,7 +84,7 @@ const uiCopy = {
     page: (current: number, total: number) => `Page ${current} of ${total}`,
     backAria: "Back to categories",
     back: "Back",
-    bestIn: (name: string) => "🏆 Best " + name + " in " + YEAR,
+    bestIn: (name: string) => "Explore the " + name + " collection",
     relatedCats: "Related Categories",
   },
 } as const;
@@ -285,7 +284,7 @@ export default async function CategoryPage({
             {content.intro}
           </div>
         ) : null}
-        <div className="mt-4 flex flex-wrap gap-3">
+        {(relatedPosts.length > 0 || (slug !== "trending" && slug !== "top")) && <div className="mt-4 flex flex-wrap gap-3">
           {slug !== "trending" && slug !== "top" ? (
             <Link
               href={href("/best/" + slug)}
@@ -303,7 +302,7 @@ export default async function CategoryPage({
               📖 {post.h1}
             </Link>
           ))}
-        </div>
+        </div>}
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-6">

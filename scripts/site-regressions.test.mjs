@@ -85,7 +85,7 @@ test("Roblox-style mobile games lead daily, trending, and top discovery", () => 
   assert.match(homePage, /Roblox-like feel/);
 });
 
-test("catalog freshness and visible years stay data-driven", () => {
+test("catalog timestamps stay data-driven without implying annual category reviews", () => {
   const sitemap = read("src/app/sitemap.ts");
   const sync = read("scripts/sync-playgama-catalog.mjs");
   const categoryPage = read("src/app/[locale]/category/[slug]/page.tsx");
@@ -94,7 +94,8 @@ test("catalog freshness and visible years stay data-driven", () => {
   assert.match(sitemap, /new Date\(catalogMeta\.syncedAt\)/);
   assert.doesNotMatch(sitemap, /GAME_CATALOG_LAST_MODIFIED = new Date\("20/);
   assert.match(sync, /playgama-catalog-meta\.json/);
-  assert.match(categoryPage, /const YEAR = new Date\(\)\.getFullYear\(\)/);
+  assert.doesNotMatch(categoryPage, /const YEAR = new Date\(\)\.getFullYear\(\)/);
+  assert.doesNotMatch(categoryPage, /🏆 Best |🏆 أفضل /);
   assert.match(footer, /replace\("\{year\}"/);
 });
 

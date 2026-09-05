@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { getAllNews, formatNewsDate, newsTitle, newsSummary } from "@/lib/news";
 import { BRAND_AR } from "@/lib/siteContent";
 import { locales, hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
-import PreferredSourceCard from "@/components/PreferredSourceCard";
 import { newsImageHref } from "@/lib/newsImage";
 
 const SITE = "https://www.plixfy.com";
@@ -19,13 +18,13 @@ const COPY = {
   ar: {
     metaTitle: `أخبار الألعاب - ${BRAND_AR} | آخر أخبار عالم ألعاب الفيديو بالعربية`,
     metaDescription:
-      "آخر أخبار ألعاب الفيديو بالعربية: بلايستيشن، إكس بوكس، نينتندو، وأهم إصدارات وتحديثات الألعاب حول العالم — ملخّصة ومحدّثة يومياً على بليكسفاي.",
-    ogDescription: "آخر أخبار عالم ألعاب الفيديو بالعربية، محدّثة يومياً.",
+      "أخبار الألعاب على بليكسفاي: لا تُعرض المواد قبل مراجعة مصادرها ودقتها.",
+    ogDescription: "أخبار الألعاب بعد مراجعة المصادر والدقة.",
     home: "الرئيسية",
     news: "أخبار الألعاب",
     h1: "أخبار الألعاب",
     intro:
-      "آخر أخبار عالم ألعاب الفيديو: إصدارات، تحديثات، وقرارات كبرى من بلايستيشن وإكس بوكس ونينتندو وغيرها — ملخّصة بعناية مع روابط المصادر الأصلية. تُحدَّث القائمة يومياً.",
+      "ننشر الأخبار بعد مراجعة مصادرها ودقتها وإضافتها للقارئ. لا نلتزم بتحديث يومي على حساب اكتمال المراجعة.",
     latest: "الأحدث",
     readMore: "اقرأ الخبر كاملاً ←",
     breakTitle: "خذ استراحة من الأخبار والعب مجاناً 🎮",
@@ -35,13 +34,13 @@ const COPY = {
   en: {
     metaTitle: "Gaming News - Plixfy | Latest Video Game News",
     metaDescription:
-      "Latest video game news: PlayStation, Xbox, Nintendo, and the biggest game releases and updates worldwide — summarized and updated daily on Plixfy.",
-    ogDescription: "Latest video game news, updated daily.",
+      "Gaming news on Plixfy: stories appear after their sources and accuracy have been reviewed.",
+    ogDescription: "Gaming news after source and accuracy checks.",
     home: "Home",
     news: "Gaming News",
     h1: "Gaming News",
     intro:
-      "The latest in video game news: releases, updates, and major decisions from PlayStation, Xbox, Nintendo and more — carefully summarized with links to original sources. Updated daily.",
+      "Stories are published after checks of their sources, accuracy and value to readers. Publication follows completed review rather than a daily quota.",
     latest: "Latest",
     readMore: "Read full story →",
     breakTitle: "Take a break from the news and play free 🎮",
@@ -82,7 +81,7 @@ export default async function NewsIndexPage({
   if (!hasLocale(rawLocale)) notFound();
   const locale = rawLocale as Locale;
   const c = COPY[locale];
-  const items = getAllNews();
+  const items = getAllNews(locale);
 
   const listLd = {
     "@context": "https://schema.org",
@@ -128,9 +127,12 @@ export default async function NewsIndexPage({
           </p>
         </header>
 
-        <div className="mb-8">
-          <PreferredSourceCard locale={locale} />
-        </div>
+        {items.length === 0 && <section className="mb-8 rounded-xl bg-white border border-slate-200 p-6 space-y-4 text-slate-700">
+          <h2 className="text-xl font-bold">{locale === "ar" ? "نعيد مراجعة مواد هذا القسم" : "We are reviewing this section"}</h2>
+          <p>{locale === "ar" ? "لا توجد أخبار معتمدة للنشر حالياً. أوقفنا عرض الملخصات السابقة إلى أن نتحقق من مصادرها ودقتها وما تضيفه للقارئ." : "No stories are currently approved for publication. Previous summaries are paused pending checks of their sources, accuracy and value to readers."}</p>
+          <p>{locale === "ar" ? "يمكنك الاستفادة الآن من دليلنا لبدء ألعاب المتصفح، وفهم التحكم والحفظ، والتعامل مع تعطل التحميل." : "Our browser games guide is available now, with help on starting games, controls, saves and loading problems."}</p>
+          <Link className="inline-block text-blue-700 underline" href={localeHref(locale, "/guides/browser-games")}>{locale === "ar" ? "اقرأ دليل ألعاب المتصفح" : "Read the browser games guide"}</Link>
+        </section>}
 
         <div className="space-y-5">
           {items.map((item, idx) => (

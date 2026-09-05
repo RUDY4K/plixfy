@@ -1,6 +1,7 @@
-// يجلب أحدث أخبار الألعاب من مصادر RSS، ثم ينشئ نسختين أصليتين بالعربية والإنجليزية.
+// Prepares unverified bilingual RSS drafts; never changes published news.
 // يستخدم Gemini API في GitHub Actions، مع Claude CLI كخيار محلي عند التشغيل اليدوي.
 import fs from "node:fs";
+import { readDrafts, saveDrafts } from "./content-draft-store.mjs";
 import path from "node:path";
 import { runClaude, extractJson } from "./claude-cli.mjs";
 import { runGeminiJson } from "./gemini-content-client.mjs";
@@ -11,7 +12,7 @@ import {
 } from "./text-encoding.mjs";
 
 const NEWS_FILE = path.join(process.cwd(), "src", "data", "news.json");
-const MAX_STORED = 60;
+const ROOT = process.cwd();
 const MAX_NEW_PER_RUN = 4;
 const CANDIDATE_WINDOW_HOURS = 36;
 
@@ -119,19 +120,6 @@ async function fetchArticleImage(articleUrl) {
   return fetchMetadataServiceImage(articleUrl);
 }
 
-async function backfillMissingImages(items, limit = 12) {
-  const targets = items.filter((item) => item?.sourceUrl && !item.image).slice(0, limit);
-  const images = await Promise.all(targets.map((item) => fetchArticleImage(item.sourceUrl)));
-  let updated = 0;
-  targets.forEach((item, index) => {
-    if (images[index]) {
-      item.image = images[index];
-      updated += 1;
-    }
-  });
-  return updated;
-}
-
 async function fetchFeed(feed) {
   try {
     const res = await fetch(feed.url, {
@@ -166,11 +154,8 @@ async function fetchFeed(feed) {
 function loadExisting() {
   try {
     const original = JSON.parse(fs.readFileSync(NEWS_FILE, "utf8"));
-    const repairable = findRepairableMojibake(original);
-    return {
-      items: repairObjectStrings(original),
-      encodingWasRepaired: repairable.length > 0,
-    };
+    if (!Array.isArray(original)) throw new Error("news.json must contain an array");
+    return repairObjectStrings(original);
   } catch (err) {
     console.error(`Cannot read ${NEWS_FILE}: ${err.message}`);
     process.exit(1);
@@ -178,16 +163,14 @@ function loadExisting() {
 }
 
 async function main() {
-  const { items: existing, encodingWasRepaired } = loadExisting();
-  const imagesOnly = process.argv.includes("--images-only");
-  const backfilledImages = await backfillMissingImages(existing, imagesOnly ? MAX_STORED : 12);
-  if (imagesOnly) {
-    fs.writeFileSync(NEWS_FILE, JSON.stringify(existing, null, 2) + "\n", "utf8");
-    console.log(`Added source images to ${backfilledImages} existing news items.`);
-    return;
+  const existing = loadExisting();
+  if (process.argv.includes("--images-only")) {
+    throw new Error("Automatic edits to published images are disabled; prepare a reviewed revision instead.");
   }
-  const knownUrls = new Set(existing.map((n) => n.sourceUrl));
-  const knownSlugs = new Set(existing.map((n) => n.slug));
+  const pending = readDrafts(ROOT, "news").map((draft) => draft.content);
+  const known = [...existing, ...pending];
+  const knownUrls = new Set(known.map((n) => n.sourceUrl));
+  const knownSlugs = new Set(known.map((n) => n.slug));
 
   const feedResults = await Promise.all(FEEDS.map(fetchFeed));
   const cutoff = Date.now() - CANDIDATE_WINDOW_HOURS * 3600 * 1000;
@@ -209,10 +192,6 @@ async function main() {
 
   console.log(`Candidates: ${candidates.length}`);
   if (candidates.length === 0) {
-    if (encodingWasRepaired || backfilledImages > 0) {
-      fs.writeFileSync(NEWS_FILE, JSON.stringify(existing, null, 2) + "\n", "utf8");
-      console.log("Repaired existing news encoding.");
-    }
     console.log("No new candidates — nothing to do.");
     return;
   }
@@ -237,7 +216,7 @@ async function main() {
     "تجاهل الأخبار الإعلانية والمحتوى غير المناسب للعائلات. إن لم تجد أخباراً تستحق، أعد قائمة فارغة.",
     "",
     "مهم: هذه عناوين الأخبار المنشورة لدينا مسبقاً — تجاهل أي خبر مرشّح يغطي نفس القصة حتى لو كان من مصدر مختلف:",
-    existing.slice(0, 20).map((n) => "- " + n.title).join("\n"),
+    known.slice(0, 20).map((n) => "- " + n.title).join("\n"),
     "",
     "الأخبار المرشّحة (JSON):",
     JSON.stringify(promptCandidates, null, 1),
@@ -303,32 +282,27 @@ async function main() {
         sourcePublishedAt: Number.isNaN(Date.parse(candidate.pubDate))
           ? new Date().toISOString()
           : new Date(candidate.pubDate).toISOString(),
-        publishedAt: today,
+        generatedDate: today,
       };
     });
 
   console.log(`New items accepted: ${fresh.length}`);
   if (fresh.length === 0) {
-    if (encodingWasRepaired || backfilledImages > 0) {
-      fs.writeFileSync(NEWS_FILE, JSON.stringify(existing, null, 2) + "\n", "utf8");
-      console.log("Repaired existing news encoding.");
-    }
     console.log("Nothing new to write.");
     return;
   }
 
-  const merged = [...fresh, ...existing]
-    .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
-    .slice(0, MAX_STORED);
-
-  const invalidEncoding = findRepairableMojibake(merged);
-  if (invalidEncoding.length > 0) {
-    throw new Error(`Refusing to publish mojibake: ${invalidEncoding.slice(0, 5).join(", ")}`);
-  }
-
-  fs.writeFileSync(NEWS_FILE, JSON.stringify(merged, null, 2) + "\n", "utf8");
-  console.log(`Wrote ${merged.length} items to news.json`);
-  for (const it of fresh) console.log(`  + ${it.slug}`);
+  const invalidEncoding = findRepairableMojibake(fresh);
+  if (invalidEncoding.length) throw new Error("Generated draft contains invalid encoding");
+  const count = saveDrafts(ROOT, "news", fresh.map((content) => ({
+    content,
+    evidence: {
+      generator: process.env.GEMINI_API_KEY ? "gemini" : "claude-cli",
+      source: candidates.find((candidate) => candidate.link === content.sourceUrl),
+      limitation: "RSS excerpt only; facts and image rights require editorial verification",
+    },
+  })), { published: existing });
+  console.log(`Saved ${count} pending news drafts; published content unchanged.`);
 }
 
 main().catch((err) => {

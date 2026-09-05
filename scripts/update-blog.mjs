@@ -1,6 +1,7 @@
-// Publishes one validated bilingual evergreen article from a fixed editorial queue.
+// Prepares one bilingual draft for editorial review; never publishes.
 // Usage: GEMINI_API_KEY=... node scripts/update-blog.mjs [--dry-run]
 import fs from "node:fs";
+import { readArray, readDrafts, saveDrafts } from "./content-draft-store.mjs";
 import path from "node:path";
 import { runGeminiJson } from "./gemini-content-client.mjs";
 
@@ -95,13 +96,7 @@ const TOPICS = [
   },
 ];
 
-function readJson(file, fallback = []) {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    return fallback;
-  }
-}
+function readJson(file) { return readArray(file); }
 
 function todayInRiyadh() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -113,7 +108,7 @@ function todayInRiyadh() {
 }
 
 function loadGames(category) {
-  return ["gd-games.json", "gm-games.json"]
+  return ["playgama-games.json"]
     .flatMap((name) => readJson(path.join(ROOT, "src", "data", name)))
     .filter((game) => game?.categorySlug === category && game?.slug && game?.title)
     .sort((a, b) => {
@@ -181,6 +176,7 @@ async function main() {
   const staticSource = fs.readFileSync(STATIC_BLOG_FILE, "utf8");
   const existingSlugs = new Set([
     ...generated.map((post) => post.slug),
+    ...readDrafts(ROOT, "blog").map((post) => post.slug),
     ...[...staticSource.matchAll(/\bslug:\s*"([^"]+)"/g)].map((match) => match[1]),
   ]);
   const topic = TOPICS.find((candidate) => !existingSlugs.has(candidate.slug));
@@ -219,8 +215,7 @@ Write Arabic naturally for Gulf readers and write the English version independen
 
   const finalRecord = {
     slug: topic.slug,
-    publishedAt: date,
-    updatedAt: date,
+    generatedDate: date,
     relatedCategory: topic.category,
     relatedCategoryTitle: CATEGORY_AR[topic.category],
     ar: record.ar,
@@ -232,9 +227,11 @@ Write Arabic naturally for Gulf readers and write the English version independen
     return;
   }
 
-  const next = [finalRecord, ...generated].slice(0, 24);
-  fs.writeFileSync(OUT_FILE, JSON.stringify(next, null, 2) + "\n", "utf8");
-  console.log(`Published bilingual blog post ${topic.slug}.`);
+  const count = saveDrafts(ROOT, "blog", [{ content: finalRecord, evidence: {
+    generator: "gemini", topic, catalogue: games,
+    limitation: "Catalogue descriptions only; no firsthand gameplay verification",
+  } }], { published: generated });
+  console.log(`Saved ${count} pending blog drafts; published content unchanged.`);
 }
 
 try {

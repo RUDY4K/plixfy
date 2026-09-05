@@ -19,9 +19,9 @@ const copyByLocale = {
     subtitle: "تعرّف على منصة بليكسفاي",
     homeLabel: "الرئيسية",
     paragraphs: [
-      "بليكسفاي منصة عربية متخصصة في تقديم الألعاب المجانية اونلاين، صُمّمت لتمنح اللاعب العربي تجربة سريعة وسلسة من متصفحه دون الحاجة إلى أي تنزيلات أو تسجيلات. هدفنا أن تكون الوجهة الأولى للترفيه الخفيف والممتع لكل أفراد العائلة.",
-      `نختار لك بعناية ${AR_GAME_COUNT} لعبة تغطي تصنيفات متنوّعة: السباق، الأكشن، الألغاز، الرياضة، ألعاب البنات، والألعاب الخفيفة. نُحدّث المكتبة باستمرار لإضافة أحدث وأشهر الألعاب، مع التركيز على الجودة وسرعة الأداء على الجوال والكمبيوتر.`,
-      "نؤمن بأن الألعاب يجب أن تكون متاحة للجميع ومجانية، لذلك تعتمد المنصة على عرض الإعلانات بشكل مدروس لا يُخلّ بتجربة اللعب. شكراً لاختيارك بليكسفاي، ونتمنى لك أوقاتاً ممتعة!",
+      "بليكسفاي مكتبة لألعاب المتصفح تساعدك على اكتشاف لعبة وقراءة معلوماتها قبل التشغيل، بواجهة عربية وإنجليزية.",
+      `تضم المكتبة ${AR_GAME_COUNT} لعبة من كتالوج Playgama ضمن تصنيفات مثل السباق والأكشن والألغاز والرياضة. الترتيب الآلي يستخدم بيانات الكتالوج، ولا يعني اختبار كل لعبة أو قياس شعبيتها.`,
+      "تختلف الأجهزة المدعومة واللغات والمشتريات الداخلية وحفظ التقدم بحسب اللعبة. بيانات المصدر نقطة بداية للاختيار؛ لا نضمن أداء كل عنوان على كل جهاز أو ملاءمته لكل الأعمار.",
     ],
     sections: [
       ["ما الذي نقدّمه؟", "لا نكتفي بعرض كتالوج ألعاب. نوضّح في صفحة كل لعبة الفئة، الأجهزة التي يعلن المصدر دعمها، اللغات، وجود مشتريات داخل اللعبة، وطريقة التحكم. وعندما تحمل الصفحة صفة دليل تحريري، يضيف فريقنا شرحاً عربياً ونصائح وأسئلة شائعة تساعدك على فهم اللعبة قبل تشغيلها."],
@@ -41,9 +41,9 @@ const copyByLocale = {
     subtitle: "Get to know the Plixfy platform",
     homeLabel: "Home",
     paragraphs: [
-      "Plixfy is a platform dedicated to free online games, built to give players a fast, smooth experience straight from the browser — no downloads, no sign-ups. Our goal is to be the go-to destination for light, fun entertainment for the whole family.",
-      `We hand-pick ${EN_GAME_COUNT} games covering a wide range of categories: racing, action, puzzle, sports, girls games, and casual titles. The library is updated constantly with the newest and most popular games, with a focus on quality and fast performance on mobile and desktop.`,
-      "We believe games should be free and accessible to everyone, so the platform is supported by carefully placed ads that never get in the way of gameplay. Thanks for choosing Plixfy — have fun!",
+      "Plixfy is a browser game library that helps you discover a game and read its information before playing, with Arabic and English navigation.",
+      `The library contains ${EN_GAME_COUNT} games from Playgama across categories including racing, action, puzzles, and sports. Automatic ordering uses catalog data; it does not establish that every title was tested or measure popularity.`,
+      "Device support, languages, in-game purchases, and saved progress vary by title. Source information is a starting point for choosing; we do not guarantee every game's performance on every device or suitability for every age.",
     ],
     sections: [
       ["What do we add?", "Plixfy is more than a catalog. A game page identifies the category, source-declared device support, languages, in-game purchases, and controls. Pages marked as editorial guides also include explanations, practical tips, and answers written for Plixfy readers."],

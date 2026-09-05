@@ -19,6 +19,9 @@ const csp = [
 
 const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
+  outputFileTracingIncludes: {
+    "/*": ["./docs/editorial-evidence/**/*.md"],
+  },
   images: {
     qualities: [60, 70, 75],
     remotePatterns: [
