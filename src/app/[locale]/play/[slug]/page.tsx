@@ -136,7 +136,8 @@ export async function generateMetadata({
       alternates: { canonical: localeHref(locale, "/") },
     };
   }
-  const content = getGameContent(slug, locale);
+  // Automated drafts are not published as an editorial guide.
+  const content = hasEditorialGameContent(slug, locale) ? getGameContent(slug, locale) : null;
   const title = game.title + t.play.metaTitleSuffix;
   const description = buildDescription(locale, game, slug, content);
   const path = "/play/" + slug;
@@ -183,7 +184,8 @@ export default async function PlayPage({
     .filter((g) => g.slug !== game.slug)
     .slice(0, 6);
 
-  const content = getGameContent(slug, locale);
+  // Automated drafts are not published as an editorial guide.
+  const content = hasEditorialGameContent(slug, locale) ? getGameContent(slug, locale) : null;
   const isEditorial = hasEditorialGameContent(slug, locale);
   const deviceSupport = game.supportedDevices ?? "unknown";
 
@@ -212,13 +214,7 @@ export default async function PlayPage({
             ? ["Web Browser", "Mobile", "Desktop"]
             : ["Web Browser"],
     applicationCategory: "Game",
-    operatingSystem:
-      deviceSupport === "mobile-only"
-        ? "Android, iOS"
-        : deviceSupport === "desktop-only"
-          ? "Windows, macOS, Linux"
-          : "Any",
-    inLanguage: locale,
+    ...(game.supportedLanguages.length > 0 ? { inLanguage: [...game.supportedLanguages] } : {}),
     offers: {
       "@type": "Offer",
       price: "0",
@@ -455,7 +451,24 @@ export default async function PlayPage({
             </div>
           </div>
         </aside>
-      ) : null}
+      ) : (
+        <aside className="mt-6 rounded-2xl border border-white/10 bg-surface p-5" aria-label={locale === "ar" ? "مصدر معلومات اللعبة" : "Game information source"}>
+          <h2 className="font-bold text-text-primary">{locale === "ar" ? "وصف من كتالوج Playgama" : "Description from the Playgama catalog"}</h2>
+          <p className="mt-2 text-sm leading-7 text-text-secondary">
+            {locale === "ar"
+              ? "اللعبة ووصفها وتعليمات التحكم وبيانات الأجهزة واللغات أدناه مقدمة من Playgama. هذه صفحة كتالوج وليست مراجعة لتجربة لعب أجراها بليكسفاي. قد يبقى الوصف بلغة المصدر، واختيار العربية للموقع لا يغيّر لغة اللعبة."
+              : "Playgama supplies the game, description, controls, and device and language data below. This is a catalog page, not a first-hand Plixfy review. Text may remain in its source language; changing the site language does not change the game language."}
+          </p>
+        </aside>
+      )}
+
+      <aside className="mt-5 rounded-2xl border border-primary/20 p-5">
+        <h2 className="font-bold text-text-primary">{locale === "ar" ? "قبل أن تبدأ" : "Before you start"}</h2>
+        <p className="mt-2 text-sm leading-7 text-text-secondary">{locale === "ar"
+          ? "قارن الأجهزة واللغات المعلنة أعلاه بجهازك. دعم الجوال لا يضمن الأداء على كل هاتف، وحفظ اللعبة في المفضلة لا يحفظ تقدمك داخلها."
+          : "Compare the declared devices and languages above with your setup. Mobile support does not guarantee performance on every phone, and adding a favorite does not save progress inside the game."}</p>
+        <Link href={href("/guides/browser-games")} className="mt-3 inline-flex min-h-11 items-center text-sm font-bold text-primary hover:underline">{locale === "ar" ? "دليل اختيار اللعبة وحل مشكلات التشغيل" : "Choosing a game and solving launch problems"}</Link>
+      </aside>
 
       {descriptionParagraphs.length > 0 ? (
         <section className="mt-6 pt-6 border-t border-surface-elevated">

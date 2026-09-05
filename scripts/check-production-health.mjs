@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import {
   parseSitemap,
@@ -172,6 +173,17 @@ await Promise.all([
 ]);
 
 const sitemapUrls = await checkStaticFiles();
+// Playability is monitored independently of search eligibility. Catalog pages
+// remain important even when no game guide is approved for the sitemap.
+try {
+  const catalog = JSON.parse(readFileSync(new URL("../src/data/playgama-games.json", import.meta.url), "utf8"));
+  const slug = catalog[0]?.slug;
+  if (typeof slug !== "string" || !/^[a-z0-9-]+$/.test(slug)) throw new Error("no valid catalog game probe");
+  await checkPage("Arabic catalog game", `${canonicalOrigin}/play/${slug}`);
+  await checkPage("English catalog game", `${canonicalOrigin}/en/play/${slug}`);
+} catch (error) {
+  recordFailure("catalog game probes", error);
+}
 if (sitemapUrls.length) {
   try {
     const probes = selectSitemapProbes(sitemapUrls);

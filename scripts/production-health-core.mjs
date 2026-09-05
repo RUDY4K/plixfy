@@ -36,7 +36,8 @@ export function validateRobotsTxt(text, canonicalOrigin) {
   return { sitemap: `${canonicalOrigin}/sitemap.xml` };
 }
 
-export function parseSitemap(text, canonicalOrigin, minimumUrlCount = 50) {
+// 38 stable bilingual routes remain while legacy game guides await review.
+export function parseSitemap(text, canonicalOrigin, minimumUrlCount = 38) {
   const canonical = new URL(canonicalOrigin);
   const urls = [...text.matchAll(/<loc>([\s\S]*?)<\/loc>/gi)]
     .map((match) => decodeXml(match[1].trim()))
@@ -62,6 +63,8 @@ export function selectSitemapProbes(urls) {
     ["English game", /^https:\/\/[^/]+\/en\/play\/[^/]+$/],
     ["Arabic article", /^https:\/\/[^/]+\/(?:news|blog)\/[^/]+$/],
     ["English article", /^https:\/\/[^/]+\/en\/(?:news|blog)\/[^/]+$/],
+    ["Arabic browser guide", /^https:\/\/[^/]+\/guides\/browser-games$/],
+    ["English browser guide", /^https:\/\/[^/]+\/en\/guides\/browser-games$/],
   ];
 
   const probes = [];
@@ -70,8 +73,10 @@ export function selectSitemapProbes(urls) {
     if (url) probes.push({ label, url });
   }
 
-  if (!probes.some((probe) => probe.label === "Arabic game")) {
-    throw new Error("sitemap does not contain an editorial Arabic game route for production probes");
+  if (!probes.some((probe) => probe.label === "Arabic game") &&
+      !(probes.some((probe) => probe.label === "Arabic browser guide") &&
+        probes.some((probe) => probe.label === "English browser guide"))) {
+    throw new Error("sitemap needs an editorial Arabic game route or both browser guide locales");
   }
 
   return probes;

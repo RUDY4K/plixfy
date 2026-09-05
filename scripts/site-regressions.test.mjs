@@ -466,5 +466,5 @@ test("trust pages explain sources, corrections, funding, and automation", () => 
   assert.match(about, /تواصل وتصحيح/);
   assert.match(editorial, /مصدر البيانات وحدوده/);
   assert.match(editorial, /الأتمتة والذكاء الاصطناعي/);
-  assert.match(editorial, /25 أغسطس 2026/);
+  assert.match(editorial, /5 سبتمبر 2026/);
 });

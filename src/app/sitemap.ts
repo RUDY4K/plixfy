@@ -52,6 +52,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...bilingual("/categories", "weekly", 0.8),
     ...bilingual("/category/top", "daily", 0.8),
     ...bilingual("/category/trending", "daily", 0.8),
+    ...bilingual("/guides/browser-games", "monthly", 0.7),
     ...bilingual("/about", "monthly", 0.3),
     ...bilingual("/contact", "monthly", 0.4),
     ...bilingual("/editorial-policy", "monthly", 0.4),

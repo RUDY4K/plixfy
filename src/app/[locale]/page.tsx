@@ -137,7 +137,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <div className="overflow-hidden rounded-[2rem] border border-white/[0.08] bg-surface/80">
             <div className="grid grid-cols-2 divide-x divide-white/[0.07] rtl:divide-x-reverse">
               <div className="p-5 md:p-6"><Gamepad2 className="h-5 w-5 text-primary" /><strong className="mt-5 block font-latin text-3xl text-white">{localizedCount}</strong><span className="mt-1 block text-xs text-text-secondary">{locale === "ar" ? "لعبة جاهزة الآن" : "games ready now"}</span></div>
-              <div className="p-5 md:p-6"><MonitorSmartphone className="h-5 w-5 text-accent-2" /><strong className="mt-5 block text-lg text-white">{locale === "ar" ? "كل الأجهزة" : "Every device"}</strong><span className="mt-1 block text-xs text-text-secondary">{locale === "ar" ? "جوال وكمبيوتر" : "mobile and desktop"}</span></div>
+              <div className="p-5 md:p-6"><MonitorSmartphone className="h-5 w-5 text-accent-2" /><strong className="mt-5 block text-lg text-white">{locale === "ar" ? "حسب اللعبة" : "Varies by game"}</strong><span className="mt-1 block text-xs text-text-secondary">{locale === "ar" ? "جوال وكمبيوتر" : "mobile and desktop"}</span></div>
             </div>
             <Link href={href("/category/top")} className="flex items-center justify-between gap-4 border-t border-white/[0.07] bg-[linear-gradient(115deg,rgba(118,87,255,.16),rgba(0,229,255,.045))] p-5 transition hover:bg-white/[0.05] md:p-6">
               <span><strong className="block text-base text-white">{locale === "ar" ? "اختيارات تتجدد يوميًا" : "Fresh picks every day"}</strong><span className="mt-1 block text-xs leading-5 text-text-secondary">{locale === "ar" ? "ترشيحات منتقاة من كتالوج Playgama." : "Curated from the Playgama catalog."}</span></span>
@@ -155,6 +155,12 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </Link>
         ))}
       </nav>
+
+      <section className="mt-8 rounded-2xl border border-primary/20 bg-surface p-5 md:p-7">
+        <h2 className="text-xl font-bold text-text-primary">{locale === "ar" ? "اختر لعبة تناسب جهازك، واعرف ما تفعله إذا لم تعمل" : "Choose a game for your device and know what to do if it will not run"}</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">{locale === "ar" ? "دليل بليكسفاي لقراءة معلومات الأجهزة واللغات، التمييز بين المفضلة وحفظ التقدم، وتشخيص الشاشة الفارغة ومشكلات اللمس والصوت خطوة بخطوة." : "A Plixfy guide to device and language information, favorites versus saved progress, and step-by-step checks for blank screens, touch controls, and sound."}</p>
+        <Link href={href("/guides/browser-games")} className="mt-3 inline-flex min-h-11 items-center font-bold text-primary hover:underline">{locale === "ar" ? "اقرأ دليل اللعب من المتصفح" : "Read the browser game guide"}</Link>
+      </section>
 
       <section className="mt-12">
         <div className="mb-5 flex items-end justify-between">
