@@ -12,24 +12,24 @@ function genericFaqAr(
       answer:
         "نعم، " +
         title +
-        " مجانية بنسبة 100% على بليكسفاي. لا تحتاج إلى اشتراك ولا حساب؛ ادخل والعب مباشرة.",
+        " متاحة لبدء اللعب دون رسم دخول على بليكسفاي. قد تتضمن اللعبة إعلانات أو مشتريات اختيارية؛ راجع بياناتها وشروطها داخل اللعبة.",
     },
     {
       question: "هل أحتاج إلى تحميل أو تثبيت أي شيء؟",
       answer:
         "لا، " +
         title +
-        " تعمل من المتصفح مباشرة. بمجرد فتح الصفحة والضغط على زر العب الآن، تبدأ اللعبة فوراً بدون تحميل.",
+        " تعمل من المتصفح دون تثبيت تطبيق. افتح شاشة اللعب وانتظر تحميل ملفات اللعبة؛ يعتمد الوقت على الشبكة والجهاز.",
     },
     {
       question: "ما الأجهزة التي تدعمها " + title + "؟",
       answer:
         support === "mobile-only"
-          ? title + " مخصّصة للجوال وتعمل من متصفح الهاتف بأزرار اللمس."
+          ? title + " مدرجة في كتالوج Playgama كداعمة للجوال. راجع تعليمات التحكم؛ الأداء والتوافق يختلفان حسب الهاتف والمتصفح."
           : support === "desktop-only"
-            ? title + " مخصّصة للكمبيوتر وتحتاج لوحة مفاتيح أو فأرة، لذلك لا نوصي بتشغيلها على الجوال."
+            ? title + " مدرجة في كتالوج Playgama كداعمة للكمبيوتر فقط. راجع تعليمات التحكم قبل التشغيل."
             : support === "mobile-and-desktop"
-              ? title + " تعمل على الجوال والكمبيوتر من المتصفح، ويتغير أسلوب التحكم بين اللمس ولوحة المفاتيح."
+              ? title + " مدرجة في كتالوج Playgama كداعمة للجوال والكمبيوتر. هذا لا يثبت توافقها مع كل جهاز؛ راجع تعليمات التحكم وجرّبها على جهازك."
               : "لم يؤكد الناشر الأجهزة المتوافقة مع " + title + " حتى الآن؛ راجع خانة الأجهزة المدعومة في الصفحة بعد تحديث بيانات اللعبة.",
     },
   ];
@@ -45,24 +45,24 @@ function genericFaqEn(
       answer:
         "Yes, " +
         title +
-        " is 100% free on Plixfy. No subscription and no account needed — just open the page and play.",
+        " is available to start without an entry fee on Plixfy. The game may contain ads or optional purchases; check its details and in-game terms.",
     },
     {
       question: "Do I need to download or install anything?",
       answer:
         "No, " +
         title +
-        " runs directly in your browser. Open the page, hit the Play button, and the game starts instantly with no download.",
+        " runs in your browser without installing an app. Open the play screen and allow the game files to load; loading time depends on your connection and device.",
     },
     {
       question: "Which devices support " + title + "?",
       answer:
         support === "mobile-only"
-          ? title + " is made for mobile browsers and uses touch controls."
+          ? title + " is listed by Playgama as supporting mobile. Check its control instructions; performance and compatibility vary by phone and browser."
           : support === "desktop-only"
-            ? title + " is designed for desktop computers and requires a keyboard or mouse, so mobile play is not recommended."
+            ? title + " is listed by Playgama as supporting desktop only. Check its control instructions before launching."
             : support === "mobile-and-desktop"
-              ? title + " works in mobile and desktop browsers, switching between touch and keyboard controls as needed."
+              ? title + " is listed by Playgama as supporting mobile and desktop. This does not verify every device; check its control instructions and try it on your device."
               : "The publisher has not confirmed device compatibility for " + title + " yet; check the supported-devices field after the game's data is updated.",
     },
   ];

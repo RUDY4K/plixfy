@@ -1526,9 +1526,10 @@ export function hasGameContent(slug: string): boolean {
 }
 
 const editorialGameSlugsByLocale: Record<Locale, ReadonlySet<string>> = {
-  // Legacy Arabic entries in this file are hand-authored. New approvals must
-  // be added here deliberately after claim and gameplay review.
-  ar: new Set(Object.keys(gameContent)),
+  // Legacy copy is retained for revision, but its existence is not evidence of
+  // claim or gameplay review. Grant a slug only after documenting that review;
+  // do not restore blanket approval from Object.keys(gameContent).
+  ar: new Set<string>(),
   // topEnContent is generated display content, not an editorial approval list.
   en: new Set<string>(),
 };

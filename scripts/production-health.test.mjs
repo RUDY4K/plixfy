@@ -162,6 +162,17 @@ test("sitemap validation enforces canonical URLs and selects live route probes",
   );
 });
 
+test("content quarantine accepts both practical guide locales but rejects incomplete guides", () => {
+  const guideUrls = [`${ORIGIN}/guides/browser-games`, `${ORIGIN}/en/guides/browser-games`];
+  const urls = [...guideUrls, ...Array.from({ length: 36 }, (_, i) => `${ORIGIN}/category/item-${i}`)];
+  const xml = `<urlset>${urls.map((url) => `<url><loc>${url}</loc></url>`).join("")}</urlset>`;
+  assert.equal(parseSitemap(xml, ORIGIN).length, 38);
+  assert.deepEqual(selectSitemapProbes(urls).map((probe) => probe.label), ["Arabic browser guide", "English browser guide"]);
+  assert.throws(() => selectSitemapProbes(urls.filter((url) => url !== guideUrls[1])), /both browser guide locales/);
+  assert.throws(() => selectSitemapProbes(urls.map((url) => url.replace("browser-games", "unreviewed"))), /both browser guide locales/);
+  assert.throws(() => parseSitemap("<urlset></urlset>", ORIGIN), /expected at least 38/);
+});
+
 test("automation validation rejects failures and stale successful runs", () => {
   const now = new Date("2026-08-24T20:00:00.000Z");
   const run = {
