@@ -101,7 +101,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               <BadgeCheck className="h-3.5 w-3.5 text-success" />{locale === "ar" ? "من كتالوج Playgama" : "From Playgama"}
             </span>
           </div>
-          <div className="relative flex min-h-[500px] max-w-2xl flex-col justify-end p-6 md:min-h-[540px] md:justify-center md:p-10 lg:p-12">
+          <div className="relative flex min-h-[500px] max-w-2xl flex-col justify-end p-6 pt-24 md:min-h-[540px] md:justify-center md:p-10 md:pt-28 lg:p-12 lg:pt-28">
             <h1 className="mb-3 text-sm font-extrabold text-accent-2">{t.home.h1}</h1>
             <h2 dir="ltr" className="text-start font-latin text-4xl font-black leading-[1.02] tracking-[-.045em] text-white drop-shadow-[0_4px_18px_rgba(0,0,0,.55)] sm:text-5xl md:text-6xl">{dailyGame.title}</h2>
             <p className="mt-4 max-w-xl text-[15px] leading-7 text-white/72 md:text-base">
