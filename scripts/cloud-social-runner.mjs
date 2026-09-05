@@ -1,6 +1,7 @@
 // Local, deterministic social agents for GitHub Actions.
 // Usage: node scripts/cloud-social-runner.mjs [--slot=news|auto] [--dry-run] [--force]
 import fs from "node:fs";
+import { getPublishedNews } from "./news-publication.mjs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import {
@@ -106,7 +107,12 @@ function socialCardUrl(kind, id) {
 function loadNews(referenceDate) {
   const referenceTime = Date.now();
   const cutoffTime = referenceTime - 48 * 60 * 60 * 1000;
-  return readJson(path.join(ROOT, "src", "data", "news.json"), [])
+  return getPublishedNews(
+    readJson(path.join(ROOT, "src", "data", "news.json"), []),
+    readJson(path.join(ROOT, "src", "data", "news-editorial.json"), {}),
+    readJson(path.join(ROOT, "src", "data", "news-publication-review.json"), []),
+    "ar", ROOT,
+  )
     .filter((item) => item?.slug && item?.title && item?.summary && item?.publishedAt)
     .filter((item) => {
       const publishedTime = Date.parse(item.sourcePublishedAt || `${item.publishedAt}T00:00:00Z`);

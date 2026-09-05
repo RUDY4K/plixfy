@@ -1,5 +1,7 @@
 import newsData from "@/data/news.json";
 import editorialData from "@/data/news-editorial.json";
+import publicationReviews from "@/data/news-publication-review.json";
+import { isNewsPublicationApproved } from "../../scripts/news-publication.mjs";
 
 export interface NewsItem {
   slug: string;
@@ -49,8 +51,8 @@ const ITEMS: readonly NewsItem[] = (newsData as NewsItem[]).map((item) => ({
   ...(EDITORIAL_REVIEWS[item.slug] ?? {}),
 }));
 
-export function getAllNews(): readonly NewsItem[] {
-  return [...ITEMS].sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
+export function getAllNews(locale: "ar" | "en" = "ar"): readonly NewsItem[] {
+  return ITEMS.filter(item => isNewsPublicationApproved(item, locale, publicationReviews)).sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
 }
 
 /** الـ slug يصل من الرابط مُرمَّزًا (percent-encoded) للعناوين العربية — نفكّ الترميز قبل المقارنة */
@@ -62,9 +64,13 @@ function normalizeSlug(slug: string): string {
   }
 }
 
-export function getNewsBySlug(slug: string): NewsItem | undefined {
+export function getNewsBySlug(slug: string, locale: "ar" | "en" = "ar"): NewsItem | undefined {
   const decoded = normalizeSlug(slug);
-  return ITEMS.find((n) => n.slug === decoded);
+  return getAllNews(locale).find((n) => n.slug === decoded);
+}
+
+export function isKnownNewsSlug(slug: string): boolean {
+  return ITEMS.some(item => item.slug === normalizeSlug(slug));
 }
 
 export function getNewsSlugs(): readonly string[] {
@@ -72,9 +78,8 @@ export function getNewsSlugs(): readonly string[] {
 }
 
 /**
- * Fail-closed quality gate for search landing pages. Automated news summaries
- * remain available to visitors but cannot enter search until a separate
- * editorial review adds useful original context.
+ * Fail-closed quality gate for search landing pages. Publication approval is required before an item can be considered for search.
+ * Legacy flags alone cannot approve changed content or missing evidence.
  */
 export function isSearchEligibleNews(
   item: NewsItem,
@@ -86,6 +91,7 @@ export function isSearchEligibleNews(
   const summary = locale === "en" ? item.summaryEn : item.summary;
 
   return Boolean(
+    isNewsPublicationApproved(item, locale, publicationReviews) &&
     approved === true &&
       item.image &&
       item.reviewedAt &&
@@ -99,7 +105,7 @@ export function isSearchEligibleNews(
 }
 
 export function getSearchEligibleNews(locale: "ar" | "en" = "ar"): readonly NewsItem[] {
-  return getAllNews().filter((item) => isSearchEligibleNews(item, locale));
+  return getAllNews(locale).filter((item) => isSearchEligibleNews(item, locale));
 }
 
 export function newsKeyPoints(item: NewsItem, locale: "ar" | "en"): readonly string[] {

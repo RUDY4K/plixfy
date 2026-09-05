@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Trophy } from "lucide-react";
+import { Grid2X2 } from "lucide-react";
 import {
   categories,
   getCategoryGames,
-  type CategorySlug,
 } from "@/lib/games";
-import { categoryContent } from "@/lib/categoryContent";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import GameCard from "@/components/GameCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -21,7 +19,6 @@ import {
 } from "@/lib/i18n";
 
 const SITE = "https://www.plixfy.com";
-const YEAR = new Date().getFullYear();
 const TOP_N = 15;
 
 export async function generateStaticParams() {
@@ -34,36 +31,36 @@ const uiCopy = {
   ar: {
     notFoundTitle: "الفئة غير موجودة | بليكسفاي",
     metaTitle: (name: string) =>
-      `أفضل ${name} ${YEAR} - أعلى ${TOP_N} لعبة | بليكسفاي`,
+      `استكشف ${name} - مجموعة من المكتبة | بليكسفاي`,
     metaDescription: (name: string) =>
-      `اختيارات فريق بليكسفاي من ألعاب ${name} لسنة ${YEAR}. ألعاب مجانية تعمل من المتصفح بدون تحميل.`,
-    h1: (name: string) => `أفضل ${name} ${YEAR}`,
-    bestN: `أفضل ${TOP_N}`,
-    ldName: (name: string) => `أفضل ${name} ${YEAR}`,
+      `مجموعة من ${name} بترتيب الكتالوج. اقرأ معلومات الأجهزة واللغات والتحكم قبل تشغيل اللعبة.`,
+    h1: (name: string) => `استكشف ${name}`,
+    bestN: "مجموعة من المكتبة",
+    ldName: (name: string) => `استكشف ${name}`,
     ldDescription: (n: number, name: string) =>
-      `قائمة أفضل ${n} لعبة في ${name} على بليكسفاي`,
+      `مجموعة من ${n} لعبة في ${name} من كتالوج بليكسفاي`,
     ldItemDescription: (title: string) =>
-      `${title} — من اختيارات فريق بليكسفاي`,
-    intro: (n: number, name: string, hook: string) =>
-      `${n} لعبة مختارة من فئة ${name} راجعها فريق بليكسفاي. ${hook}. كلها مجانية وتعمل من المتصفح بدون تحميل.`,
+      `${title} — من كتالوج الألعاب`,
+    intro: (n: number, name: string) =>
+      `${n} لعبة من فئة ${name} بترتيب الكتالوج، وليست ترتيبًا للشعبية أو نتيجة مراجعة لعب لكل عنوان. افتح صفحة اللعبة لقراءة الأجهزة واللغات والتحكم بحسب المصدر قبل التشغيل.`,
     exploreMore: "استكشف المزيد",
     viewAll: (name: string, n: number) => `عرض كل ${name} (${n}) ←`,
   },
   en: {
     notFoundTitle: "Category Not Found | Plixfy",
     metaTitle: (name: string) =>
-      `Best ${name} ${YEAR} - Top ${TOP_N} Games | Plixfy`,
+      `Explore ${name} - A Library Collection | Plixfy`,
     metaDescription: (name: string) =>
-      `Plixfy's editorial picks for ${name} in ${YEAR}. Free browser games with no download required.`,
-    h1: (name: string) => `Best ${name} ${YEAR}`,
-    bestN: `Top ${TOP_N}`,
-    ldName: (name: string) => `Best ${name} ${YEAR}`,
+      `A ${name} collection in catalog order. Read device, language, and control information before playing.`,
+    h1: (name: string) => `Explore ${name}`,
+    bestN: "Library collection",
+    ldName: (name: string) => `Explore ${name}`,
     ldDescription: (n: number, name: string) =>
-      `The top ${n} games in ${name} on Plixfy`,
+      `A collection of ${n} ${name} games from the Plixfy catalog`,
     ldItemDescription: (title: string) =>
-      `${title} — selected by the Plixfy editorial team`,
+      `${title} — from the game catalog`,
     intro: (n: number, name: string) =>
-      `${n} ${name} games selected by the Plixfy editorial team. All are free to play in your browser with no download.`,
+      `${n} ${name} games in catalog order. This is not a popularity ranking or a first-hand review of every title. Open a game page to read source-declared device, language, and control information before playing.`,
     exploreMore: "Explore More",
     viewAll: (name: string, n: number) => `View all ${name} (${n}) →`,
   },
@@ -118,11 +115,9 @@ export default async function BestCategoryPage({
   const allInCat = getCategoryGames(category);
   if (allInCat.length === 0) notFound();
 
-  // Curated catalogue order. We do not claim popularity or player counts until
-  // those figures come from real, audited analytics.
+  // Display order follows the catalog; list positions do not indicate quality.
   const ranked = allInCat.slice(0, TOP_N);
 
-  const content = locale === "ar" ? categoryContent[category as CategorySlug] : undefined;
   const url = SITE + href("/best/" + category);
 
   const itemListLd = {
@@ -164,7 +159,7 @@ export default async function BestCategoryPage({
 
   const intro =
     locale === "ar"
-      ? uiCopy.ar.intro(ranked.length, meta.name, content?.metaHooks?.[0] ?? "")
+      ? uiCopy.ar.intro(ranked.length, meta.name)
       : uiCopy.en.intro(ranked.length, meta.name);
 
   return (
@@ -173,7 +168,7 @@ export default async function BestCategoryPage({
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([itemListLd, breadcrumbLd]),
+          __html: JSON.stringify([itemListLd, breadcrumbLd]).replace(/</g, "\\u003c"),
         }}
       />
       <Breadcrumbs
@@ -188,7 +183,7 @@ export default async function BestCategoryPage({
       <header className="mb-6 md:mb-8">
         <div className="flex items-center gap-3 mb-3">
           <div className="p-2.5 rounded-2xl bg-primary/15 text-primary">
-            <Trophy className="w-6 h-6 md:w-7 md:h-7" aria-hidden="true" />
+            <Grid2X2 className="w-6 h-6 md:w-7 md:h-7" aria-hidden="true" />
           </div>
           <h1 className="text-2xl md:text-4xl font-bold text-text-primary">
             {copy.h1(meta.name)}

@@ -32,25 +32,25 @@ const COPY = {
   ar: {
     metaTitle: `المدوّنة - ${BRAND_AR} | أدلّة ونصائح الألعاب`,
     metaDescription:
-      "مقالات وأدلّة عن أفضل الألعاب المجانية أونلاين: ألعاب سباق، بنات، آيو، وأكثر. نصائح للّعب وترشيحات مختارة من بليكسفاي.",
-    ogDescription: "أدلّة ونصائح وترشيحات لأفضل الألعاب المجانية أونلاين.",
+      "إرشادات لقراءة معلومات الألعاب واختيار الجهاز وحل مشكلات التشغيل في المتصفح.",
+    ogDescription: "إرشادات لاختيار ألعاب المتصفح وحل مشكلات التشغيل.",
     home: "الرئيسية",
     blog: "المدوّنة",
     h1: "مدوّنة بليكسفاي",
     intro:
-      "أدلّة ونصائح وترشيحات مختارة لأفضل الألعاب المجانية أونلاين. اكتشف ألعاباً جديدة وتعلّم كيف تتفوّق فيها.",
+      "ابدأ بدليل اللعب من المتصفح: كيف تقرأ دعم الأجهزة واللغات، وما الفرق بين حفظ المفضلة وحفظ تقدم اللعبة، وماذا تفعل عند تعذر التشغيل. نراجع المقالات السابقة قبل إتاحتها مجددًا.",
     readMore: "اقرأ المقال ←",
   },
   en: {
     metaTitle: "Blog - Plixfy | Game Guides & Tips",
     metaDescription:
-      "Articles and guides on the best free online games: racing, girls games, .io, and more. Tips and hand-picked recommendations from Plixfy.",
-    ogDescription: "Guides, tips, and hand-picked recommendations for the best free online games.",
+      "Guidance for reading game information, choosing a device, and troubleshooting browser playback.",
+    ogDescription: "Guidance for choosing browser games and troubleshooting playback.",
     home: "Home",
     blog: "Blog",
     h1: "Plixfy Blog",
     intro:
-      "Hand-picked guides, tips, and recommendations for the best free online games. Discover new games and learn how to master them.",
+      "Start with our browser game guide: how to read device and language information, distinguish favorites from saved game progress, and troubleshoot playback. Earlier articles are being reviewed before republication.",
     readMore: "Read article →",
   },
 } as const;
@@ -109,7 +109,7 @@ export default async function BlogIndexPage({
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogLd).replace(/</g, "\\u003c") }}
       />
       <Breadcrumbs
         locale={locale}
@@ -123,6 +123,11 @@ export default async function BlogIndexPage({
         </p>
       </header>
 
+      <section className="mb-8 rounded-2xl border border-primary/20 bg-surface p-6">
+        <h2 className="text-xl font-bold text-text-primary">{locale === "ar" ? "اختر لعبة واعرف ما تفعله إذا لم تعمل" : "Choose a game and know what to do if it will not run"}</h2>
+        <p className="mt-3 leading-7 text-text-secondary">{locale === "ar" ? "شرح عملي لمعلومات الأجهزة واللغات، وحفظ التقدم، والشاشة الفارغة، والتحكم باللمس والصوت." : "Practical guidance on devices, languages, saved progress, blank screens, touch controls, and sound."}</p>
+        <Link href={localeHref(locale, "/guides/browser-games")} className="mt-4 inline-flex min-h-11 items-center font-bold text-primary underline">{locale === "ar" ? "اقرأ دليل اللعب من المتصفح" : "Read the browser game guide"}</Link>
+      </section>
       <div className="grid gap-4 md:grid-cols-2">
         {posts.map((post) => (
           <Link

@@ -1,129 +1,59 @@
-name: Plixfy Content Engine
+name: Plixfy Content Drafts
 
 on:
   schedule:
-    # Monitor gaming-news feeds every hour, 24 hours a day.
     - cron: "5 * * * *"
-    # 09:15 Asia/Riyadh every Sunday: one long-form bilingual article.
     - cron: "15 6 * * 0"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: plixfy-content-engine
   cancel-in-progress: false
 
 jobs:
-  update-content:
+  prepare-drafts:
     if: github.event_name == 'workflow_dispatch' || vars.CONTENT_AI_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Check out the site
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Use Node.js 24
-        uses: actions/setup-node@v7
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
-
-      - name: Validate automation scripts
-        run: |
-          node --check scripts/gemini-content-client.mjs
-          node --check scripts/text-encoding.mjs
-          node --check scripts/repair-news-encoding.mjs
-          node --check scripts/update-news.mjs
-          node --check scripts/update-blog.mjs
-          node --test scripts/content-engine.test.mjs
-
-      - name: Fetch and rewrite current gaming news
+      - name: Restore pending draft queue
+        uses: actions/cache/restore@v6
+        with:
+          path: content-drafts
+          key: content-drafts-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: content-drafts-
+      - name: Validate draft boundary
+        run: node --test scripts/content-engine.test.mjs scripts/content-draft-store.test.mjs
+      - name: Prepare news drafts for review
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/update-news.mjs
-
-      - name: Validate generated news
-        run: |
-          node scripts/repair-news-encoding.mjs --check
-          node -e "const fs=require('fs');const items=JSON.parse(fs.readFileSync('src/data/news.json','utf8'));if(!Array.isArray(items)||items.length<1)throw new Error('news.json is empty');for(const n of items){for(const k of ['slug','title','summary','titleEn','summaryEn','sourceName','sourceUrl','publishedAt'])if(typeof n[k]!=='string'||!n[k].trim())throw new Error('Invalid '+k+' in '+(n.slug||'unknown'));if(n.image&&(typeof n.image!=='string'||!n.image.startsWith('https://')))throw new Error('Invalid image in '+n.slug);}console.log('Validated '+items.length+' news items.');"
-
-      - name: Detect content changes
-        id: changes
-        shell: bash
-        run: |
-          if git diff --quiet -- src/data/news.json; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Commit and publish new content
-        if: steps.changes.outputs.changed == 'true'
-        shell: bash
-        run: |
-          git config user.name "plixfy-content-bot"
-          git config user.email "plixfy-content-bot@users.noreply.github.com"
-          git add src/data/news.json
-          git commit -m "content(news): publish latest gaming updates [skip ci]"
-          git pull --rebase origin main
-          git push origin HEAD:main
-
-      - name: Notify admin when news was published
-        if: steps.changes.outputs.changed == 'true'
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          ALERT_MESSAGE: "✅ تم تحديث أخبار Plixfy سحابيًا، وسيبدأ Vercel نشر الصفحات الجديدة الآن."
-        run: node scripts/telegram-alert.mjs
-
-      - name: Generate the weekly bilingual blog article
+      - name: Prepare weekly blog draft for review
         if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 6 * * 0'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/update-blog.mjs
-
-      - name: Validate generated blog data
-        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 6 * * 0'
-        run: |
-          node -e "const fs=require('fs');const items=JSON.parse(fs.readFileSync('src/data/blog-generated.json','utf8'));if(!Array.isArray(items))throw new Error('blog-generated.json is invalid');for(const p of items){for(const k of ['slug','publishedAt','updatedAt','relatedCategory','relatedCategoryTitle'])if(typeof p[k]!=='string'||!p[k].trim())throw new Error('Invalid '+k);for(const l of ['ar','en']){if(!p[l]||!Array.isArray(p[l].sections)||p[l].sections.length!==3||!Array.isArray(p[l].faq)||p[l].faq.length!==3)throw new Error('Invalid '+l+' content in '+p.slug);}}console.log('Validated '+items.length+' generated blog posts.');"
-
-      - name: Detect blog changes
-        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 6 * * 0'
-        id: blog_changes
-        shell: bash
-        run: |
-          if git diff --quiet -- src/data/blog-generated.json; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Commit and publish the weekly article
-        if: steps.blog_changes.outputs.changed == 'true'
-        shell: bash
-        run: |
-          git config user.name "plixfy-content-bot"
-          git config user.email "plixfy-content-bot@users.noreply.github.com"
-          git add src/data/blog-generated.json
-          git commit -m "content(blog): publish weekly bilingual guide [skip ci]"
-          git pull --rebase origin main
-          git push origin HEAD:main
-
-      - name: Notify admin when the blog was published
-        if: steps.blog_changes.outputs.changed == 'true'
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          ALERT_MESSAGE: "✅ تم نشر مقال عربي وإنجليزي جديد في مدونة Plixfy."
-        run: node scripts/telegram-alert.mjs
-
-      - name: Alert admin if the content job fails
-        if: failure()
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          ALERT_MESSAGE: "🚨 فشل تحديث أخبار Plixfy السحابي. راجع تشغيل Plixfy Content Engine في GitHub Actions."
-        run: node scripts/telegram-alert.mjs
+      - name: Verify published files are unchanged
+        if: always()
+        run: git diff --exit-code -- src public
+      - name: Preserve pending drafts as review artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pending-content-review-${{ github.run_id }}-${{ github.run_attempt }}
+          path: content-drafts/*.json
+          if-no-files-found: ignore
+          retention-days: 90
+      - name: Retain queue for the next draft run
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: content-drafts
+          key: content-drafts-${{ github.run_id }}-${{ github.run_attempt }}

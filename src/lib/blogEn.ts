@@ -1,6 +1,7 @@
 import type { CategorySlug } from "@/lib/games";
 import type { BlogSection, BlogFaq } from "@/lib/blog";
 import { getGeneratedBlogRecords } from "@/lib/generatedBlog";
+import { isBlogPublicationApproved } from "@/lib/blog-publication";
 
 export interface BlogPostEn {
   slug: string;
@@ -749,8 +750,16 @@ function getGeneratedPostsEn(): readonly BlogPostEn[] {
   }));
 }
 
-export function getAllPostsEn(): readonly BlogPostEn[] {
+function getRawPostsEn(): readonly BlogPostEn[] {
   return [...getGeneratedPostsEn(), ...POSTS_EN];
+}
+
+export function getKnownPostEnSlugs(): readonly string[] {
+  return getRawPostsEn().map((post) => post.slug);
+}
+
+export function getAllPostsEn(): readonly BlogPostEn[] {
+  return getRawPostsEn().filter((post) => isBlogPublicationApproved(post, "en"));
 }
 
 export function getPostEnBySlug(slug: string): BlogPostEn | undefined {

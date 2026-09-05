@@ -11,8 +11,8 @@ const categoryMetaEn: Record<string, CategoryMeta> = {
   casual: { name: "Casual Games", icon: "🎯", description: "Fun games for any time" },
   sports: { name: "Sports Games", icon: "⚽", description: "Football, basketball and tennis" },
   shooting: { name: "Shooting Games", icon: "🎯", description: "Aim, defend and win" },
-  trending: { name: "Trending Now", icon: "🔥", description: "The most played games this week" },
-  top: { name: "Plixfy Top Picks", icon: "👑", description: "The best games, hand-picked for you" },
+  trending: { name: "Explore Roblox-style games", icon: "🔥", description: "Automatic selections using catalog genre tags and game titles" },
+  top: { name: "Explore the library", icon: "👑", description: "A selection for discovering games from the catalog" },
 };
 
 export function getLocalizedCategoryMeta(

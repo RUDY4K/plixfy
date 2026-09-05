@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   getAllNews,
   getNewsBySlug,
+  isKnownNewsSlug,
   getNewsSlugs,
   formatNewsDate,
   isSearchEligibleNews,
@@ -65,8 +66,12 @@ const COPY = {
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(locale)) return {};
-  const item = getNewsBySlug(slug);
-  if (!item) return {};
+  const item = getNewsBySlug(slug, locale);
+  if (!item) return isKnownNewsSlug(slug) ? {
+    title: locale === "ar" ? "خبر قيد المراجعة | بليكسفاي" : "Story under review | Plixfy",
+    description: locale === "ar" ? "هذه المادة غير متاحة حتى اكتمال مراجعتها." : "This story is unavailable pending editorial review.",
+    robots: { index: false, follow: true },
+  } : {};
   const c = COPY[locale];
 
   const title = newsTitle(item, locale);
@@ -107,14 +112,23 @@ export default async function NewsItemPage({ params }: PageParams) {
   if (!hasLocale(rawLocale)) notFound();
   const locale = rawLocale as Locale;
   const c = COPY[locale];
-  const item = getNewsBySlug(slug);
-  if (!item) notFound();
+  const item = getNewsBySlug(slug, locale);
+  if (!item) {
+    if (!isKnownNewsSlug(slug)) notFound();
+    return <section className="mx-auto max-w-3xl px-5 py-12 space-y-5">
+      <h1 className="text-3xl font-bold">{locale === "ar" ? "هذا الخبر قيد المراجعة" : "This story is under review"}</h1>
+      <p>{locale === "ar" ? "أوقفنا عرض هذه المادة إلى أن نتحقق من مصادرها ونراجع دقتها وما تضيفه للقارئ. رابطها محفوظ، لكن الملخص السابق لا يُعرض أثناء المراجعة." : "We have paused this story while its sources, accuracy and contribution to readers are reviewed. Its address is retained, but the previous summary is unavailable during review."}</p>
+      <p>{locale === "ar" ? "إذا كنت تبحث عن مساعدة في اللعب، يشرح دليلنا بدء ألعاب المتصفح وحل مشكلات التحميل والتحكم والحفظ." : "For help playing, our guide covers starting browser games and troubleshooting loading, controls and saves."}</p>
+      <Link className="inline-block underline" href={localeHref(locale, "/guides/browser-games")}>{locale === "ar" ? "دليل ألعاب المتصفح" : "Browser games guide"}</Link>
+      <Link className="block underline" href={localeHref(locale, "/news")}>{c.news}</Link>
+    </section>;
+  }
 
   const title = newsTitle(item, locale);
   const summary = newsSummary(item, locale);
   const keyPoints = newsKeyPoints(item, locale);
   const whyItMatters = newsWhyItMatters(item, locale);
-  const otherNews = getAllNews().filter((n) => n.slug !== item.slug).slice(0, 4);
+  const otherNews = getAllNews(locale).filter((n) => n.slug !== item.slug).slice(0, 4);
 
   const articleLd = {
     "@context": "https://schema.org",

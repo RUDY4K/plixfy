@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { newsContentHash } from "./news-publication.mjs";
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
@@ -212,41 +214,41 @@ test("publisher dry-run performs no network request even when a channel key exis
   assert.deepEqual(report.deliveries.map((delivery) => delivery.status), ["dry_run"]);
 });
 
-test("cloud dry-run defaults to offline and performs no network request", (context) => {
-  const socialDirectory = path.resolve(".social");
-  const packFile = path.join(socialDirectory, "2026-09-01-news.json");
-  const reportFile = path.join(socialDirectory, "2026-09-01-news-delivery.json");
+test("cloud dry-run only selects evidence-approved news and remains offline", (context) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-cloud-review-"));
   context.after(() => {
-    fs.rmSync(packFile, { force: true });
-    fs.rmSync(reportFile, { force: true });
+    assert.equal(path.dirname(path.resolve(root)), path.resolve(os.tmpdir()));
+    assert.ok(path.basename(root).startsWith("plixfy-cloud-review-"));
+    fs.rmSync(root, { recursive: true, force: true });
   });
-
+  fs.mkdirSync(path.join(root, "src/data"), { recursive: true });
+  fs.mkdirSync(path.join(root, "scripts"));
+  // Copy only public source modules; no credentials, state or environment files.
+  for (const name of fs.readdirSync(path.resolve("scripts"))) {
+    if (name.endsWith(".mjs")) fs.copyFileSync(path.resolve("scripts", name), path.join(root, "scripts", name));
+  }
+  const item = { slug: "reviewed-fixture", title: "تحديث جديد للعبة يضيف مراحل وتجربة تحكم جديدة للاعبين", summary: "أعلنت الشركة عن تحديث جديد للعبة يضيف مراحل وتعديلات على التحكم. نراجع هنا تفاصيل التغيير وما يعنيه للاعبين قبل بدء التجربة في الإصدار الجديد.", sourceName: "مصدر الاختبار", sourceUrl: "https://example.com/news", publishedAt: new Date().toISOString().slice(0, 10), sourcePublishedAt: new Date(Date.now() - 1000).toISOString() };
+  const data = path.join(root, "src/data");
+  fs.writeFileSync(path.join(data, "news.json"), JSON.stringify([item]));
+  fs.writeFileSync(path.join(data, "news-editorial.json"), "{}");
+  fs.writeFileSync(path.join(data, "news-publication-review.json"), "[]");
   const sentinel = "PLIXFY_OFFLINE_PREFLIGHT_NETWORK_FORBIDDEN";
   const preload = `data:text/javascript,${encodeURIComponent(`globalThis.fetch=async()=>{throw new Error("${sentinel}")}`)}`;
-  const childEnvironment = { ...process.env, SOCIAL_PLATFORMS: "x" };
-  for (const key of [
-    "TELEGRAM_BOT_TOKEN",
-    "TELEGRAM_CHAT_ID",
-    "TELEGRAM_CHANNEL_ID",
-    "DISCORD_WEBHOOK_URL",
-    "BUFFER_API_KEY",
-  ]) {
-    delete childEnvironment[key];
-  }
-
-  const result = spawnSync(
-    process.execPath,
-    [
-      "--import",
-      preload,
-      path.resolve("scripts/cloud-social-runner.mjs"),
-      "--dry-run",
-      "--slot=news",
-      "--date=2026-09-01",
-    ],
-    { cwd: process.cwd(), encoding: "utf8", env: childEnvironment },
-  );
-
+  const childEnvironment = { ...process.env, SOCIAL_PLATFORMS: "x", NODE_OPTIONS: `--import=${preload}` };
+  for (const key of ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "TELEGRAM_CHANNEL_ID", "DISCORD_WEBHOOK_URL", "BUFFER_API_KEY"]) delete childEnvironment[key];
+  const run = () => spawnSync(process.execPath, [path.join(root, "scripts/cloud-social-runner.mjs"), "--dry-run", "--slot=news", "--date=2026-09-01"], { cwd: root, encoding: "utf8", env: childEnvironment });
+  const unapproved = run();
+  assert.equal(unapproved.status, 0, unapproved.stderr || unapproved.stdout);
+  assert.match(unapproved.stdout, /nothing to send/);
+  assert.doesNotMatch(unapproved.stdout + unapproved.stderr, new RegExp(sentinel));
+  const reportFile = path.join(root, ".social/2026-09-01-news-delivery.json");
+  assert.equal(fs.existsSync(reportFile), false);
+  const evidencePath = "docs/editorial-evidence/fixture.md";
+  const evidence = "Fixture evidence of source review and original analysis.";
+  fs.mkdirSync(path.join(root, "docs/editorial-evidence"), { recursive: true });
+  fs.writeFileSync(path.join(root, evidencePath), evidence);
+  fs.writeFileSync(path.join(data, "news-publication-review.json"), JSON.stringify([{ slug: item.slug, locale: "ar", contentSha256: newsContentHash(item), evidencePath, evidenceSha256: createHash("sha256").update(evidence).digest("hex"), reviewer: "Fixture reviewer", reviewedAt: new Date().toISOString() }]));
+  const result = run();
   assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.doesNotMatch(`${result.stdout}\n${result.stderr}`, new RegExp(sentinel));
   assert.match(result.stdout, /offline mode skipped public URL verification/);
