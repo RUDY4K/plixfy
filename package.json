@@ -21,7 +21,7 @@
     "social:gameplay": "node scripts/capture-gameplay-video.mjs",
     "social:buffer:check": "node scripts/check-buffer.mjs",
     "test:social-agents": "node --test scripts/social-agents.test.mjs scripts/traffic-acquisition-agent.test.mjs",
-    "test:site": "node --test scripts/site-regressions.test.mjs scripts/news-images.test.mjs scripts/game-progressive-launch.test.mjs scripts/security-regressions.test.mjs",
+    "test:site": "node --test scripts/site-regressions.test.mjs scripts/news-images.test.mjs scripts/game-progressive-launch.test.mjs scripts/security-regressions.test.mjs scripts/analytics-consent.test.mjs",
     "test:browserstack:ios15": "node scripts/browserstack-ios15-game.mjs --expect-start",
     "test:content-engine": "node --test scripts/content-engine.test.mjs scripts/content-draft-store.test.mjs scripts/content-promote.test.mjs scripts/blog-publication.test.mjs scripts/news-publication.test.mjs",
     "content:promote": "node scripts/content-promote.mjs",

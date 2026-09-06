@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Script from 'next/script';
-import { getConsent, onConsentChange } from '@/lib/consent';
+import { getConsent, onConsentChange, onConsentCleared } from '@/lib/consent';
 
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
     dataLayer?: unknown[];
+    plixfyAnalyticsInitialized?: string;
   }
 }
 
@@ -17,17 +18,18 @@ const MAX_QUEUE = 50;
 const BOT_REGEX = /bot|crawl|spider|headless|lighthouse|pingdom|gtmetrix|preview|insights/i;
 
 function applyConsent(choice: 'accept' | 'reject'): void {
-  if (typeof window === 'undefined' || !window.gtag) return;
+  if (typeof window === 'undefined') return;
   const granted = choice === 'accept';
+  if (!granted) {
+    try { localStorage.removeItem(QUEUE_KEY); } catch { /* storage unavailable */ }
+  }
+  if (!window.gtag) return;
   window.gtag('consent', 'update', {
     ad_storage: granted ? 'granted' : 'denied',
     ad_user_data: granted ? 'granted' : 'denied',
     ad_personalization: granted ? 'granted' : 'denied',
     analytics_storage: granted ? 'granted' : 'denied',
   });
-  if (granted) {
-    window.gtag('event', 'consent_accept', { source: 'banner' });
-  }
 }
 
 type EventParams = Record<string, unknown>;
@@ -58,6 +60,7 @@ function writeQueue(queue: QueuedEvent[]): void {
 
 export function flushQueuedEvents(): void {
   if (typeof window === 'undefined' || !window.gtag) return;
+  if (getConsent() !== 'accept' || isBot()) return;
   const queue = readQueue();
   if (queue.length === 0) return;
   for (const { name, params } of queue) {
@@ -103,59 +106,56 @@ export function trackEventOnce(
   trackEvent(eventName, params);
 }
 
+// onReady runs after the first load and again on later Script mounts. Checking
+// consent here allows recovery if an earlier load completed while consent was off.
+function initializeAnalytics(gaId: string): void {
+  if (typeof window === 'undefined' || getConsent() !== 'accept' || isBot()) return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function () { window.dataLayer!.push(arguments); };
+  applyConsent('accept');
+  if (window.plixfyAnalyticsInitialized !== gaId) {
+    window.gtag('js', new Date());
+    window.gtag('config', gaId, {
+      send_page_view: false,
+      anonymize_ip: true,
+      transport_type: 'beacon',
+    });
+    window.plixfyAnalyticsInitialized = gaId;
+  }
+  flushQueuedEvents();
+}
+
 export default function GoogleAnalytics({ gaId }: { gaId: string }) {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    const existing = getConsent();
-    if (existing) {
-      applyConsent(existing);
-      setEnabled(existing === 'accept');
-    }
-    return onConsentChange((choice) => {
+    let previous = getConsent();
+    applyConsent(previous ?? 'reject');
+    setEnabled(previous === 'accept');
+    const unsubscribeChange = onConsentChange((choice) => {
+      const acceptedNow = choice === 'accept' && previous !== 'accept';
+      previous = choice;
       applyConsent(choice);
       setEnabled(choice === 'accept');
+      if (acceptedNow) {
+        trackEvent('consent_accept', { consent_source: 'banner' });
+      }
     });
+    const unsubscribeClear = onConsentCleared(() => {
+      previous = null;
+      applyConsent('reject');
+      setEnabled(false);
+    });
+    return () => { unsubscribeChange(); unsubscribeClear(); };
   }, []);
 
   if (!gaId || !enabled) return null;
 
   return (
-    <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-        strategy="lazyOnload"
-      />
-      <Script
-        id="ga-init"
-        strategy="lazyOnload"
-      >
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('consent', 'default', {
-            ad_storage: 'granted',
-            ad_user_data: 'granted',
-            ad_personalization: 'granted',
-            analytics_storage: 'granted',
-          });
-          gtag('js', new Date());
-          gtag('config', '${gaId}', {
-            send_page_view: false,
-            anonymize_ip: true,
-            transport_type: 'beacon',
-          });
-          try {
-            var queuedEvents = JSON.parse(localStorage.getItem('${QUEUE_KEY}') || '[]');
-            queuedEvents.forEach(function(item) {
-              if (item && typeof item.name === 'string') {
-                gtag('event', item.name, item.params);
-              }
-            });
-            localStorage.removeItem('${QUEUE_KEY}');
-          } catch (error) {}
-        `}
-      </Script>
-    </>
+    <Script
+      src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+      strategy="lazyOnload"
+      onReady={() => initializeAnalytics(gaId)}
+    />
   );
 }
