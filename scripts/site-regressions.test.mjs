@@ -316,8 +316,9 @@ test("analytics consent does not consume once-only events and acceptance reports
   assert.ok(consentCheck > 0 && consentCheck < dedupWrite);
   assert.match(pageViews, /onConsentChange\(\(choice\) =>/);
   assert.match(pageViews, /if \(choice === 'accept'\) reportCurrentPage\(\)/);
-  assert.match(analytics, /queuedEvents\.forEach/);
-  assert.match(analytics, /localStorage\.removeItem\('\$\{QUEUE_KEY\}'\)/);
+  // Queue delivery and consent revocation are exercised in analytics-consent.test.mjs.
+  assert.match(analytics, /onReady=\{\(\) => initializeAnalytics\(gaId\)\}/);
+  assert.match(analytics, /function initializeAnalytics[\s\S]*?flushQueuedEvents\(\)/);
   assert.doesNotMatch(analytics, /id="ga-init"[\s\S]{0,80}onLoad=/);
   assert.match(gameCard, /<TrackedGameLink/);
   assert.match(trackedGameLink, /trackEvent\("select_game"/);
