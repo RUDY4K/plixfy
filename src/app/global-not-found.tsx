@@ -48,7 +48,11 @@ async function currentCopy(): Promise<Copy> {
 
 export async function generateMetadata(): Promise<Metadata> {
   const current = await currentCopy();
-  return { title: current.title, description: current.description };
+  return {
+    title: current.title,
+    description: current.description,
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function GlobalNotFound() {
