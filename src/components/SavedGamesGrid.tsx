@@ -53,13 +53,13 @@ export default function SavedGamesGrid({ locale, mode }: { locale: Locale; mode:
     }
     const controller = new AbortController();
     setLoading(true);
-    fetch(`/api/games?slugs=${encodeURIComponent(slugs.join(","))}`, { signal: controller.signal })
+    fetch(`/api/games?locale=${locale}&slugs=${encodeURIComponent(slugs.join(","))}`, { signal: controller.signal })
       .then((response) => response.json())
       .then((payload) => setGames(Array.isArray(payload.games) ? payload.games : []))
       .catch(() => setGames([]))
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [slugs.join(",")]);
+  }, [locale, slugs.join(",")]);
 
   if (loading && games.length === 0) {
     return <div className="grid min-h-48 place-items-center"><LoaderCircle className="h-7 w-7 animate-spin text-accent-2" aria-label="Loading" /></div>;

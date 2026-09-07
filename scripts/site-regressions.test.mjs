@@ -220,6 +220,15 @@ test("player data sync reads the latest local values after auth resolves", () =>
   );
 });
 
+test("saved-game cards request and render localized category labels", () => {
+  const savedGames = read("src/components/SavedGamesGrid.tsx");
+  const gamesApi = read("src/app/api/games/route.ts");
+
+  assert.match(savedGames, /games\?locale=\$\{locale\}&slugs=/);
+  assert.match(savedGames, /\[locale, slugs\.join\(","\)\]/);
+  assert.match(gamesApi, /categoryShortLabel\(game\.categorySlug, locale, game\.category\)/);
+});
+
 test("game artwork bypasses the unavailable optimizer for the catalog host", () => {
   const config = read("next.config.ts");
   const artwork = read("src/components/GameArtwork.tsx");
