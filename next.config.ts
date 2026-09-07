@@ -19,6 +19,9 @@ const csp = [
 
 const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
+  experimental: {
+    globalNotFound: true,
+  },
   outputFileTracingIncludes: {
     "/*": ["./docs/editorial-evidence/**/*.md"],
   },

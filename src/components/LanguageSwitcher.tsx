@@ -1,26 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Suspense } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Globe } from "lucide-react";
 import { localeFromPathname } from "@/lib/i18n";
 
 /** رابط النسخة المقابلة للصفحة الحالية — نفس الـ slug متوفر بالعربي والإنجليزي */
-function targetFor(pathname: string): { href: string; label: string } {
+function targetFor(pathname: string, query: string): { href: string; label: string } {
   const locale = localeFromPathname(pathname);
+  const withQuery = (href: string) => (query ? `${href}?${query}` : href);
   if (locale === "en") {
     const stripped = pathname === "/en" ? "/" : pathname.slice(3);
-    return { href: stripped, label: "العربية" };
+    return { href: withQuery(stripped), label: "العربية" };
   }
   // أثناء الـ prerender يحمل المسار العربي بادئة /ar رغم أن المتصفح يعرضه بدونها
   const path =
     pathname === "/ar" ? "/" : pathname.startsWith("/ar/") ? pathname.slice(3) : pathname;
-  return { href: path === "/" ? "/en" : "/en" + path, label: "English" };
+  return { href: withQuery(path === "/" ? "/en" : "/en" + path), label: "English" };
 }
 
-export default function LanguageSwitcher({ className }: { className?: string }) {
+function LanguageSwitcherLink({ className }: { className?: string }) {
   const pathname = usePathname();
-  const { href, label } = targetFor(pathname);
+  const searchParams = useSearchParams();
+  const { href, label } = targetFor(pathname, searchParams.toString());
 
   return (
     <Link
@@ -34,5 +37,13 @@ export default function LanguageSwitcher({ className }: { className?: string }) 
       <Globe className="w-4 h-4" aria-hidden="true" />
       <span>{label}</span>
     </Link>
+  );
+}
+
+export default function LanguageSwitcher({ className }: { className?: string }) {
+  return (
+    <Suspense fallback={<span aria-hidden="true" className={className} />}>
+      <LanguageSwitcherLink className={className} />
+    </Suspense>
   );
 }

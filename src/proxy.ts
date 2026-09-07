@@ -40,6 +40,12 @@ function isDashboardPath(pathname: string): boolean {
   return stripped === "/dashboard" || stripped.startsWith("/dashboard/");
 }
 
+function requestHeadersForLocale(req: NextRequest, locale: "ar" | "en"): Headers {
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-plixfy-locale", locale);
+  return requestHeaders;
+}
+
 function dashboardAuth(req: NextRequest): NextResponse | null {
   const user = process.env.DASHBOARD_USER?.trim();
   const pass = (process.env.DASHBOARD_PASSWORD ?? process.env.DASHBOARD_PASS)?.trim();
@@ -101,13 +107,15 @@ export function proxy(req: NextRequest) {
   }
 
   if (pathname === "/en" || pathname.startsWith("/en/")) {
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeadersForLocale(req, "en") } });
   }
 
   if (pathname === "/ar" || pathname.startsWith("/ar/")) {
     // Local rewrites re-enter the proxy in development. Let the internal /ar
     // route render instead of redirecting it back to / and creating a loop.
-    if (isLocalPreview) return NextResponse.next();
+    if (isLocalPreview) {
+      return NextResponse.next({ request: { headers: requestHeadersForLocale(req, "ar") } });
+    }
     const stripped = pathname === "/ar" ? "/" : pathname.slice(3);
     const url = req.nextUrl.clone();
     url.pathname = stripped;
@@ -116,5 +124,7 @@ export function proxy(req: NextRequest) {
 
   const url = req.nextUrl.clone();
   url.pathname = "/ar" + pathname;
-  return NextResponse.rewrite(url);
+  return NextResponse.rewrite(url, {
+    request: { headers: requestHeadersForLocale(req, "ar") },
+  });
 }
