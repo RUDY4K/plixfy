@@ -239,6 +239,14 @@ test("publisher catalog copy renders as clean plain text", () => {
     "Discover My Town and play now.",
   );
   assert.equal(cleanCatalogText("<b>Safe</b> ~~old~~ `copy`"), "Safe old copy");
+  assert.equal(
+    cleanCatalogText("Useful public summary. Core Gameplay & Story Q: Internal questionnaire answer."),
+    "Useful public summary.",
+  );
+  assert.equal(
+    cleanCatalogText("Useful public summary. \"[Core Gameplay & Story] Q: Internal questionnaire answer."),
+    "Useful public summary.",
+  );
   assert.match(playPage, /cleanCatalogText\(game\.description\)/);
   assert.match(playPage, /cleanCatalogText\(game\.howToPlay\)/);
   assert.match(sync, /description: cleanCatalogText\(game\.description\)/);

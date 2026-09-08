@@ -7,7 +7,7 @@ export function cleanCatalogText(value, maxLength = 1200) {
   if (typeof value !== "string") return "";
 
   const withoutInternalQa = value.split(
-    /\s*["']?\[(?:Core Gameplay|Mechanics & Progression|Economy & Customization|Retention & Engagement)\]/i,
+    /\s*["']?\[?(?:Core Gameplay(?:\s*&\s*Story)?|Mechanics\s*&\s*Progression|Economy\s*&\s*Customization|Retention\s*&\s*Engagement)\]?(?=\s*(?:Q:|$))/i,
   )[0];
   const normalized = withoutInternalQa
     .replace(/<[^>]+>/g, " ")
