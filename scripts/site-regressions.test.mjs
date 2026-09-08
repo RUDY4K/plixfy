@@ -245,6 +245,19 @@ test("publisher catalog copy renders as clean plain text", () => {
   assert.match(sync, /howToPlay: cleanCatalogText\(game\.howToPlayText, 1200\)/);
 });
 
+test("password recovery pages localize metadata for both languages", () => {
+  for (const route of ["forgot", "reset"]) {
+    const page = read(`src/app/[locale]/auth/${route}/page.tsx`);
+
+    assert.match(page, /export async function generateMetadata/);
+    assert.match(page, /locale === "ar"/);
+    assert.match(page, /\| بليكسفاي/);
+    assert.match(page, /\| Plixfy/);
+    assert.match(page, new RegExp(`pageAlternates\\(locale, "\\/auth\\/${route}"\\)`));
+    assert.doesNotMatch(page, /export const metadata/);
+  }
+});
+
 test("game artwork bypasses the unavailable optimizer for the catalog host", () => {
   const config = read("next.config.ts");
   const artwork = read("src/components/GameArtwork.tsx");
