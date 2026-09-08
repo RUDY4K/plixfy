@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import { cleanCatalogText } from "../src/lib/catalogText.mjs";
 
 const ENDPOINT = "https://playgama.com/api/v1/partner/export/catalogue/games";
 const PAGE_SIZE = 1000;
@@ -41,14 +42,6 @@ const categoryMatchers = [
   ["action", ["action", "fighting", "combat", "parkour", "zombie", "tower-defense", "adventure", "survival", "horror", "role"]],
 ];
 
-function cleanText(value, maxLength = 1200) {
-  if (typeof value !== "string") return "";
-  const withoutInternalQa = value.split(/\s*["']?\[(?:Core Gameplay|Mechanics & Progression|Economy & Customization|Retention & Engagement)\]/i)[0];
-  const normalized = withoutInternalQa.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-  if (normalized.length <= maxLength) return normalized;
-  return normalized.slice(0, maxLength - 1).trimEnd() + "…";
-}
-
 function categoryFor(game) {
   const values = [
     ...(Array.isArray(game.genres) ? game.genres : []),
@@ -81,7 +74,7 @@ function orientation(screenOrientation) {
 
 function normalizeGame(game) {
   const slug = typeof game.slug === "string" ? game.slug.trim() : "";
-  const title = cleanText(game.title, 180);
+  const title = cleanCatalogText(game.title, 180);
   const images = Array.isArray(game.images)
     ? [...new Set(game.images.filter((image) => typeof image === "string" && image.startsWith("https://")))]
     : [];
@@ -96,7 +89,7 @@ function normalizeGame(game) {
     ? [...new Set(game.supportedLanguages.map((value) => String(value).trim()).filter(Boolean))]
     : [];
   const genres = Array.isArray(game.genres)
-    ? [...new Set(game.genres.map((value) => cleanText(String(value), 80)).filter(Boolean))]
+    ? [...new Set(game.genres.map((value) => cleanCatalogText(String(value), 80)).filter(Boolean))]
     : [];
   return {
     title,
@@ -107,8 +100,8 @@ function normalizeGame(game) {
     videoId: video?.playgama_id.trim() || undefined,
     category: categoryLabels[categorySlug],
     categorySlug,
-    description: cleanText(game.description),
-    howToPlay: cleanText(game.howToPlayText, 1200),
+    description: cleanCatalogText(game.description),
+    howToPlay: cleanCatalogText(game.howToPlayText, 1200),
     supportedLanguages,
     genres,
     inGamePurchases: String(game.inGamePurchases ?? "").toLowerCase() === "yes",

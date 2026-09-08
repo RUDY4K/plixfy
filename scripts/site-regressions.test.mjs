@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
+import { cleanCatalogText } from "../src/lib/catalogText.mjs";
 
 const ROOT = process.cwd();
 const read = (file) => readFileSync(path.join(ROOT, file), "utf8");
@@ -227,6 +228,21 @@ test("saved-game cards request and render localized category labels", () => {
   assert.match(savedGames, /games\?locale=\$\{locale\}&slugs=/);
   assert.match(savedGames, /\[locale, slugs\.join\(","\)\]/);
   assert.match(gamesApi, /categoryShortLabel\(game\.categorySlug, locale, game\.category\)/);
+});
+
+test("publisher catalog copy renders as clean plain text", () => {
+  const playPage = read("src/app/[locale]/play/[slug]/page.tsx");
+  const sync = read("scripts/sync-playgama-catalog.mjs");
+
+  assert.equal(
+    cleanCatalogText("Discover **My Town** and *play* [now](https://example.com)."),
+    "Discover My Town and play now.",
+  );
+  assert.equal(cleanCatalogText("<b>Safe</b> ~~old~~ `copy`"), "Safe old copy");
+  assert.match(playPage, /cleanCatalogText\(game\.description\)/);
+  assert.match(playPage, /cleanCatalogText\(game\.howToPlay\)/);
+  assert.match(sync, /description: cleanCatalogText\(game\.description\)/);
+  assert.match(sync, /howToPlay: cleanCatalogText\(game\.howToPlayText, 1200\)/);
 });
 
 test("game artwork bypasses the unavailable optimizer for the catalog host", () => {

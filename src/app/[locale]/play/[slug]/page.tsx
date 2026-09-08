@@ -32,6 +32,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import catalogMeta from "@/data/playgama-catalog-meta.json";
+import { cleanCatalogText } from "@/lib/catalogText.mjs";
 
 const SITE = "https://www.plixfy.com";
 
@@ -194,8 +195,8 @@ export default async function PlayPage({
   const imageUrl = absoluteUrl(game.thumbnailWide || game.thumbnail);
   const genre = meta ? meta.name : game.category;
   const categoryLabel = locale === "en" && meta ? meta.name : game.category;
-  const ldDescription =
-    content?.metaDescription ?? game.description ?? game.title;
+  const ldDescription = content?.metaDescription
+    ?? (game.description ? cleanCatalogText(game.description) : game.title);
 
   const videoGameLd = {
     "@context": "https://schema.org",
@@ -273,7 +274,7 @@ export default async function PlayPage({
   const descriptionParagraphs = content
     ? content.longDescription.split("\n\n").filter((p) => p.trim().length > 0)
     : game.description
-      ? game.description.split("\n\n").filter((p) => p.trim().length > 0)
+      ? cleanCatalogText(game.description).split("\n\n").filter((p) => p.trim().length > 0)
       : [];
   const videoUrl = game.videoId ? getPlaygamaVideoUrl(game.videoId) : null;
   const catalogDate = new Intl.DateTimeFormat(locale === "ar" ? "ar-SA" : "en-US", {
@@ -503,7 +504,7 @@ export default async function PlayPage({
           </ol>
         ) : game.howToPlay ? (
           <p dir="auto" className="text-text-secondary leading-relaxed">
-            {game.howToPlay}
+            {cleanCatalogText(game.howToPlay)}
           </p>
         ) : (
           <p className="text-text-secondary leading-relaxed">{t.play.genericControls}</p>
