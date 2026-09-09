@@ -228,7 +228,7 @@ const ar: UIDict = {
   },
   ageGate: {
     title: "تأكيد العمر مطلوب",
-    bodyPrefix: "ألعاب",
+    bodyPrefix: "فئة",
     bodyAgeNote: "قد تحتوي على محتوى موجّه للفئة العمرية",
     bodyConfirm: "الرجاء تأكيد عمرك للمتابعة.",
     confirm: "أنا فوق 13 سنة — متابعة",
@@ -352,7 +352,7 @@ const en: UIDict = {
   },
   ageGate: {
     title: "Age Verification Required",
-    bodyPrefix: "Games in",
+    bodyPrefix: "Titles in",
     bodyAgeNote: "may contain content intended for ages",
     bodyConfirm: "Please confirm your age to continue.",
     confirm: "I am over 13 — Continue",

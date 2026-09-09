@@ -325,6 +325,15 @@ test("keyboard and screen-reader users keep context through gates and game loadi
   assert.match(read("src/components/GameArtwork.tsx"), /alt \? \{ role: "img"/);
 });
 
+test("age gate copy does not repeat the word games around localized category names", () => {
+  const i18n = read("src/lib/i18n.ts");
+
+  assert.match(i18n, /bodyPrefix: "فئة"/);
+  assert.match(i18n, /bodyPrefix: "Titles in"/);
+  assert.doesNotMatch(i18n, /bodyPrefix: "ألعاب"/);
+  assert.doesNotMatch(i18n, /bodyPrefix: "Games in"/);
+});
+
 test("mobile games use an iPhone-safe full-viewport layer with an in-game exit", () => {
   const gameFrame = read("src/components/GameFrame.tsx");
 
