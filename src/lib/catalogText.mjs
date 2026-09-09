@@ -15,7 +15,17 @@ export function cleanCatalogText(value, maxLength = 1200) {
     .replace(/\*{1,3}|_{1,3}|~~|`+/g, "")
     .replace(/\s+/g, " ")
     .trim();
+  const seenSentences = new Set();
+  const deduplicated = normalized
+    .split(/(?<=[.!?؟…])\s+/u)
+    .filter((sentence) => {
+      const key = sentence.toLocaleLowerCase().replace(/\s+/g, " ").trim();
+      if (!key || seenSentences.has(key)) return false;
+      seenSentences.add(key);
+      return true;
+    })
+    .join(" ");
 
-  if (normalized.length <= maxLength) return normalized;
-  return normalized.slice(0, maxLength - 1).trimEnd() + "…";
+  if (deduplicated.length <= maxLength) return deduplicated;
+  return deduplicated.slice(0, maxLength - 1).trimEnd() + "…";
 }

@@ -247,6 +247,12 @@ test("publisher catalog copy renders as clean plain text", () => {
     cleanCatalogText("Useful public summary. \"[Core Gameplay & Story] Q: Internal questionnaire answer."),
     "Useful public summary.",
   );
+  assert.equal(
+    cleanCatalogText(
+      "Aim for the longest shot. Collect coins to upgrade. Aim for the longest shot. Keep improving.",
+    ),
+    "Aim for the longest shot. Collect coins to upgrade. Keep improving.",
+  );
   assert.match(playPage, /cleanCatalogText\(game\.description\)/);
   assert.match(playPage, /cleanCatalogText\(game\.howToPlay\)/);
   assert.match(sync, /description: cleanCatalogText\(game\.description\)/);
