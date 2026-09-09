@@ -2,6 +2,10 @@ import type { GameContentFAQ } from "@/lib/gameContent";
 import type { GameDeviceSupport } from "@/lib/games";
 import type { Locale } from "@/lib/i18n";
 
+function terminalQuestionTitle(title: string): string {
+  return title.replace(/[!?؟]+$/u, "");
+}
+
 function genericFaqAr(
   title: string,
   support: GameDeviceSupport
@@ -22,7 +26,7 @@ function genericFaqAr(
         " تعمل من المتصفح دون تثبيت تطبيق. افتح شاشة اللعب وانتظر تحميل ملفات اللعبة؛ يعتمد الوقت على الشبكة والجهاز.",
     },
     {
-      question: "ما الأجهزة التي تدعمها " + title + "؟",
+      question: "ما الأجهزة التي تدعمها " + terminalQuestionTitle(title) + "؟",
       answer:
         support === "mobile-only"
           ? title + " مدرجة في كتالوج Playgama كداعمة للجوال. راجع تعليمات التحكم؛ الأداء والتوافق يختلفان حسب الهاتف والمتصفح."
@@ -55,7 +59,7 @@ function genericFaqEn(
         " runs in your browser without installing an app. Open the play screen and allow the game files to load; loading time depends on your connection and device.",
     },
     {
-      question: "Which devices support " + title + "?",
+      question: "Which devices support " + terminalQuestionTitle(title) + "?",
       answer:
         support === "mobile-only"
           ? title + " is listed by Playgama as supporting mobile. Check its control instructions; performance and compatibility vary by phone and browser."

@@ -334,6 +334,15 @@ test("age gate copy does not repeat the word games around localized category nam
   assert.doesNotMatch(i18n, /bodyPrefix: "Games in"/);
 });
 
+test("generic device FAQs do not stack punctuation after punctuated game titles", () => {
+  const faq = read("src/lib/gameFaqFallback.ts");
+
+  assert.match(faq, /return title\.replace\(\/\[!\?؟\]\+\$\/u, ""\)/);
+  assert.equal(faq.match(/terminalQuestionTitle\(title\)/g)?.length, 2);
+  assert.doesNotMatch(faq, /support " \+ title \+ "\?"/);
+  assert.doesNotMatch(faq, /تدعمها " \+ title \+ "؟"/);
+});
+
 test("mobile games use an iPhone-safe full-viewport layer with an in-game exit", () => {
   const gameFrame = read("src/components/GameFrame.tsx");
 
