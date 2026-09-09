@@ -21,6 +21,12 @@ import {
 const SITE = "https://www.plixfy.com";
 const TOP_N = 15;
 
+function gameCountLabel(name: string) {
+  return /\sGames$/u.test(name)
+    ? name.replace(/\sGames$/u, " games")
+    : `${name} games`;
+}
+
 export async function generateStaticParams() {
   return locales.flatMap((locale) =>
     categories.map((c) => ({ locale, category: c.slug }))
@@ -51,16 +57,16 @@ const uiCopy = {
     metaTitle: (name: string) =>
       `Explore ${name} - A Library Collection | Plixfy`,
     metaDescription: (name: string) =>
-      `A ${name} collection in catalog order. Read device, language, and control information before playing.`,
+      `${gameCountLabel(name)} in catalog order. Read device, language, and control information before playing.`,
     h1: (name: string) => `Explore ${name}`,
     bestN: "Library collection",
     ldName: (name: string) => `Explore ${name}`,
     ldDescription: (n: number, name: string) =>
-      `A collection of ${n} ${name} games from the Plixfy catalog`,
+      `A collection of ${n} ${gameCountLabel(name)} from the Plixfy catalog`,
     ldItemDescription: (title: string) =>
       `${title} — from the game catalog`,
     intro: (n: number, name: string) =>
-      `${n} ${name} games in catalog order. This is not a popularity ranking or a first-hand review of every title. Open a game page to read source-declared device, language, and control information before playing.`,
+      `${n} ${gameCountLabel(name)} in catalog order. This is not a popularity ranking or a first-hand review of every title. Open a game page to read source-declared device, language, and control information before playing.`,
     exploreMore: "Explore More",
     viewAll: (name: string, n: number) => `View all ${name} (${n}) →`,
   },

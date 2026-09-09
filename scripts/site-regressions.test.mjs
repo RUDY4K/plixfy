@@ -340,6 +340,16 @@ test("age gate copy does not repeat the word games around localized category nam
   assert.doesNotMatch(i18n, /bodyPrefix: "Games in"/);
 });
 
+test("English library collections add the game noun only when the category needs it", () => {
+  const bestCategory = read("src/app/[locale]/best/[category]/page.tsx");
+
+  assert.match(bestCategory, /function gameCountLabel\(name: string\)/);
+  assert.match(bestCategory, /\/\\sGames\$\/u\.test\(name\)/);
+  assert.match(bestCategory, /gameCountLabel\(name\).*in catalog order/);
+  assert.doesNotMatch(bestCategory, /\$\{n\} \$\{name\} games in catalog order/);
+  assert.doesNotMatch(bestCategory, /\$\{n\} \$\{name\} games from the Plixfy catalog/);
+});
+
 test("generic device FAQs do not stack punctuation after punctuated game titles", () => {
   const faq = read("src/lib/gameFaqFallback.ts");
 
