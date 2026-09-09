@@ -3,6 +3,7 @@
 import fs from "node:fs";
 import { readDrafts, saveDrafts } from "./content-draft-store.mjs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { runClaude, extractJson } from "./claude-cli.mjs";
 import { runGeminiJson } from "./gemini-content-client.mjs";
 import {
@@ -11,9 +12,9 @@ import {
   repairUtf8Mojibake,
 } from "./text-encoding.mjs";
 
-const NEWS_FILE = path.join(process.cwd(), "src", "data", "news.json");
 const ROOT = process.cwd();
 const MAX_NEW_PER_RUN = 4;
+const MAX_PENDING_NEWS_DRAFTS = 12;
 const CANDIDATE_WINDOW_HOURS = 36;
 
 const FEEDS = [
@@ -151,23 +152,41 @@ async function fetchFeed(feed) {
   }
 }
 
-function loadExisting() {
+function loadExisting(root = ROOT) {
+  const newsFile = path.join(root, "src", "data", "news.json");
   try {
-    const original = JSON.parse(fs.readFileSync(NEWS_FILE, "utf8"));
+    const original = JSON.parse(fs.readFileSync(newsFile, "utf8"));
     if (!Array.isArray(original)) throw new Error("news.json must contain an array");
     return repairObjectStrings(original);
   } catch (err) {
-    console.error(`Cannot read ${NEWS_FILE}: ${err.message}`);
+    console.error(`Cannot read ${newsFile}: ${err.message}`);
     process.exit(1);
   }
 }
 
-async function main() {
-  const existing = loadExisting();
+export function pendingNewsDraftCount(drafts) {
+  return drafts.filter((draft) => draft?.status === "pending_review").length;
+}
+
+export function oldestPendingNewsDraft(drafts) {
+  return drafts
+    .filter((draft) => draft?.status === "pending_review" && Number.isFinite(Date.parse(draft.generatedAt)))
+    .sort((a, b) => Date.parse(a.generatedAt) - Date.parse(b.generatedAt))[0]?.generatedAt ?? null;
+}
+
+export async function main({ root = ROOT } = {}) {
+  const existing = loadExisting(root);
   if (process.argv.includes("--images-only")) {
     throw new Error("Automatic edits to published images are disabled; prepare a reviewed revision instead.");
   }
-  const pending = readDrafts(ROOT, "news").map((draft) => draft.content);
+  const pendingDrafts = readDrafts(root, "news");
+  const pendingCount = pendingNewsDraftCount(pendingDrafts);
+  if (pendingCount >= MAX_PENDING_NEWS_DRAFTS) {
+    const oldest = oldestPendingNewsDraft(pendingDrafts) ?? "unknown";
+    console.log(`waiting_for_editorial: ${pendingCount} pending news drafts; oldest ${oldest}. No generation performed.`);
+    return;
+  }
+  const pending = pendingDrafts.map((draft) => draft.content);
   const known = [...existing, ...pending];
   const knownUrls = new Set(known.map((n) => n.sourceUrl));
   const knownSlugs = new Set(known.map((n) => n.slug));
@@ -294,7 +313,7 @@ async function main() {
 
   const invalidEncoding = findRepairableMojibake(fresh);
   if (invalidEncoding.length) throw new Error("Generated draft contains invalid encoding");
-  const count = saveDrafts(ROOT, "news", fresh.map((content) => ({
+  const count = saveDrafts(root, "news", fresh.map((content) => ({
     content,
     evidence: {
       generator: process.env.GEMINI_API_KEY ? "gemini" : "claude-cli",
@@ -305,7 +324,9 @@ async function main() {
   console.log(`Saved ${count} pending news drafts; published content unchanged.`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
