@@ -133,7 +133,7 @@ test("Final Fantasy Revelation news keeps its matching source and artwork", () =
   assert.doesNotMatch(item.sourceUrl, /steam-has-generated/);
 });
 
-test("continuous social automation publishes measurable gaming news only", () => {
+test("continuous social automation publishes reviewed news or allowlisted evergreen pages", () => {
   const runner = read("scripts/cloud-social-runner.mjs");
   const workflow = read(".github/workflows/cloud-social.yml");
   const contentWorkflow = read(".github/workflows/content-engine.yml");
@@ -146,7 +146,11 @@ test("continuous social automation publishes measurable gaming news only", () =>
   assert.match(runner, /No unpublished gaming news/);
   assert.match(runner, /MIN_NEWS_INTERVAL_MS = 90 \* 60 \* 1000/);
   assert.match(runner, /MAX_NEWS_SILENCE_MS = 24 \* 60 \* 60 \* 1000/);
-  assert.match(runner, /No public news post was recorded for 24 hours/);
+  assert.match(runner, /campaign: "ar_evergreen_social_v1"/);
+  assert.match(runner, /EVERGREEN_REPEAT_MS = 7 \* 24 \* 60 \* 60 \* 1000/);
+  assert.match(runner, /\$\{SITE\}\/guides\/browser-games/);
+  assert.match(runner, /platformHistory/);
+  assert.doesNotMatch(runner, /No public news post was recorded for 24 hours/);
   assert.doesNotMatch(runner, /platform: "tiktok"/);
   assert.match(workflow, /cron: "25,55 \* \* \* \*"/);
   assert.doesNotMatch(workflow, /slot=(?:morning|evening)/);
