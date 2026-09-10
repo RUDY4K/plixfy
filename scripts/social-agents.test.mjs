@@ -540,3 +540,187 @@ test("documented manual history starts the 24-hour fallback clock when cloud sta
   const pack = JSON.parse(fs.readFileSync(packFile, "utf8"));
   assert.equal(pack.source.kind, "evergreen");
 });
+
+test("a manual Plixfy news post counts toward today's platform limit without becoming fallback content", (context) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-cloud-manual-news-history-"));
+  context.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(root, "src/data"), { recursive: true });
+  fs.mkdirSync(path.join(root, "scripts"));
+  fs.mkdirSync(path.join(root, "docs/editorial-evidence"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".social"));
+  for (const name of fs.readdirSync(path.resolve("scripts"))) {
+    if (name.endsWith(".mjs")) fs.copyFileSync(path.resolve("scripts", name), path.join(root, "scripts", name));
+  }
+  const item = {
+    slug: "approved-cloud-fixture",
+    title: "تحديث ألعاب موثّق للاختبار يضيف تفاصيل جديدة للاعبين",
+    summary: "خبر اختباري موثّق بمراجعة مستقلة ومحتوى عربي أصلي يشرح التغيير دون ادعاءات غير مثبتة.",
+    sourceName: "مصدر الاختبار",
+    sourceUrl: "https://example.com/approved-cloud-fixture",
+    publishedAt: new Date().toISOString().slice(0, 10),
+    sourcePublishedAt: new Date(Date.now() - 1000).toISOString(),
+  };
+  const evidencePath = "docs/editorial-evidence/approved-cloud-fixture.md";
+  const evidence = "Reviewed fixture evidence.";
+  fs.writeFileSync(path.join(root, "src/data/news.json"), JSON.stringify([item]));
+  fs.writeFileSync(path.join(root, "src/data/news-editorial.json"), "{}");
+  fs.writeFileSync(path.join(root, evidencePath), evidence);
+  fs.writeFileSync(path.join(root, "src/data/news-publication-review.json"), JSON.stringify([{
+    slug: item.slug,
+    locale: "ar",
+    contentSha256: newsContentHash(item),
+    evidencePath,
+    evidenceSha256: createHash("sha256").update(evidence).digest("hex"),
+    reviewer: "Fixture reviewer",
+    reviewedAt: new Date().toISOString(),
+  }]));
+  fs.writeFileSync(path.join(root, "src/data/social-publication-history.json"), JSON.stringify([{
+    platform: "x",
+    url: "https://www.plixfy.com/news/manually-published-story",
+    publishedAt: new Date().toISOString(),
+  }]));
+  fs.writeFileSync(path.join(root, ".social/cloud-state.json"), JSON.stringify({
+    recentGames: [], recentNews: [], runs: {},
+    lastPublishedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
+  }));
+  const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh" }).format(new Date());
+  const result = spawnSync(
+    process.execPath,
+    [path.join(root, "scripts/cloud-social-runner.mjs"), "--dry-run", "--offline", `--date=${date}`],
+    { cwd: root, encoding: "utf8", env: { ...process.env, SOCIAL_PLATFORMS: "x,facebook" } },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const pack = JSON.parse(fs.readFileSync(path.join(root, `.social/${date}-news.json`), "utf8"));
+  assert.equal(pack.source.kind, "news");
+  assert.deepEqual(pack.items.map((entry) => entry.platform), ["facebook"]);
+  assert.notEqual(pack.items[0].url, "https://www.plixfy.com/news/manually-published-story");
+});
+
+test("evergreen partial delivery saves the successful platform then fails the runner", (context) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-cloud-partial-evergreen-"));
+  context.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(root, "src/data"), { recursive: true });
+  fs.mkdirSync(path.join(root, "scripts"));
+  fs.mkdirSync(path.join(root, ".social"));
+  for (const name of fs.readdirSync(path.resolve("scripts"))) {
+    if (name.endsWith(".mjs")) fs.copyFileSync(path.resolve("scripts", name), path.join(root, "scripts", name));
+  }
+  for (const [name, value] of [["news.json", "[]"], ["news-editorial.json", "{}"], ["news-publication-review.json", "[]"], ["social-publication-history.json", "[]"]]) {
+    fs.writeFileSync(path.join(root, "src/data", name), value);
+  }
+  fs.writeFileSync(path.join(root, ".social/cloud-state.json"), JSON.stringify({
+    recentGames: [], recentNews: [], runs: {},
+    lastPublishedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
+  }));
+  fs.writeFileSync(path.join(root, "scripts/social-publisher.mjs"), `
+    import fs from "node:fs";
+    import path from "node:path";
+    const packFile = process.argv.find((value) => value.endsWith(".json") && !value.startsWith("--report="));
+    const reportFile = process.argv.find((value) => value.startsWith("--report="))?.slice(9);
+    const pack = JSON.parse(fs.readFileSync(packFile, "utf8"));
+    fs.mkdirSync(path.dirname(reportFile), { recursive: true });
+    fs.writeFileSync(reportFile, JSON.stringify({ deliveries: pack.items.map((item, index) => ({
+      platform: item.platform,
+      contentId: item.contentId,
+      status: index === 0 ? "published_public" : "failed",
+      public: index === 0,
+      attemptedAt: new Date().toISOString(),
+    })) }));
+  `);
+  const preloadSource = `globalThis.fetch = async (url, options = {}) => {
+    if (String(url).includes("trends.google.com")) return new Response("<rss><channel><item><title>ألعاب</title><ht:approx_traffic>1000</ht:approx_traffic><pubDate>Wed, 10 Sep 2026 12:00:00 GMT</pubDate></item></channel></rss>", { status: 200 });
+    if (options.method === "HEAD" && String(url).startsWith("https://www.plixfy.com/")) return new Response(null, { status: 200 });
+    throw new Error("Unexpected test request: " + url);
+  };`;
+  const result = spawnSync(process.execPath, [path.join(root, "scripts/cloud-social-runner.mjs")], {
+    cwd: root,
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      SOCIAL_PLATFORMS: "x,facebook",
+      NODE_OPTIONS: `--import=data:text/javascript,${encodeURIComponent(preloadSource)}`,
+    },
+  });
+  assert.equal(result.status, 1, result.stdout + result.stderr);
+  assert.match(result.stderr, /partial delivery/i);
+  const state = JSON.parse(fs.readFileSync(path.join(root, ".social/cloud-state.json"), "utf8"));
+  assert.equal(state.platformHistory.x.length, 1);
+  assert.equal(state.platformHistory.facebook, undefined);
+  assert.equal(state.runs["evergreen:browser-games-guide"].status, "partial");
+});
+
+test("news partial delivery saves the successful platform then fails the runner", (context) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-cloud-partial-news-"));
+  context.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(root, "src/data"), { recursive: true });
+  fs.mkdirSync(path.join(root, "scripts"));
+  fs.mkdirSync(path.join(root, "docs/editorial-evidence"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".social"));
+  for (const name of fs.readdirSync(path.resolve("scripts"))) {
+    if (name.endsWith(".mjs")) fs.copyFileSync(path.resolve("scripts", name), path.join(root, "scripts", name));
+  }
+  const item = {
+    slug: "approved-partial-news-fixture",
+    title: "خبر ألعاب موثّق لاختبار حفظ النجاح عند فشل قناة أخرى",
+    summary: "ملخص عربي أصلي ومراجع يختبر التسليم الجزئي دون السماح لمحتوى غير معتمد بالمرور إلى النشر.",
+    sourceName: "مصدر الاختبار",
+    sourceUrl: "https://example.com/approved-partial-news-fixture",
+    publishedAt: new Date().toISOString().slice(0, 10),
+    sourcePublishedAt: new Date(Date.now() - 1000).toISOString(),
+  };
+  const evidencePath = "docs/editorial-evidence/approved-partial-news-fixture.md";
+  const evidence = "Reviewed partial delivery fixture evidence.";
+  fs.writeFileSync(path.join(root, "src/data/news.json"), JSON.stringify([item]));
+  fs.writeFileSync(path.join(root, "src/data/news-editorial.json"), "{}");
+  fs.writeFileSync(path.join(root, "src/data/social-publication-history.json"), "[]");
+  fs.writeFileSync(path.join(root, evidencePath), evidence);
+  fs.writeFileSync(path.join(root, "src/data/news-publication-review.json"), JSON.stringify([{
+    slug: item.slug,
+    locale: "ar",
+    contentSha256: newsContentHash(item),
+    evidencePath,
+    evidenceSha256: createHash("sha256").update(evidence).digest("hex"),
+    reviewer: "Fixture reviewer",
+    reviewedAt: new Date().toISOString(),
+  }]));
+  fs.writeFileSync(path.join(root, ".social/cloud-state.json"), JSON.stringify({
+    recentGames: [], recentNews: [], runs: {},
+    lastPublishedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
+  }));
+  fs.writeFileSync(path.join(root, "scripts/social-publisher.mjs"), `
+    import fs from "node:fs";
+    import path from "node:path";
+    const packFile = process.argv.find((value) => value.endsWith(".json") && !value.startsWith("--report="));
+    const reportFile = process.argv.find((value) => value.startsWith("--report="))?.slice(9);
+    const pack = JSON.parse(fs.readFileSync(packFile, "utf8"));
+    fs.mkdirSync(path.dirname(reportFile), { recursive: true });
+    fs.writeFileSync(reportFile, JSON.stringify({ deliveries: pack.items.map((entry, index) => ({
+      platform: entry.platform,
+      contentId: entry.contentId,
+      status: index === 0 ? "published_public" : "failed",
+      public: index === 0,
+      attemptedAt: new Date().toISOString(),
+    })) }));
+  `);
+  const preloadSource = `globalThis.fetch = async (url, options = {}) => {
+    if (String(url).includes("trends.google.com")) return new Response("<rss><channel><item><title>ألعاب</title><ht:approx_traffic>1000</ht:approx_traffic><pubDate>Wed, 10 Sep 2026 12:00:00 GMT</pubDate></item></channel></rss>", { status: 200 });
+    if (options.method === "HEAD" && String(url).startsWith("https://www.plixfy.com/")) return new Response(null, { status: 200 });
+    throw new Error("Unexpected test request: " + url);
+  };`;
+  const result = spawnSync(process.execPath, [path.join(root, "scripts/cloud-social-runner.mjs")], {
+    cwd: root,
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      SOCIAL_PLATFORMS: "x,facebook",
+      NODE_OPTIONS: `--import=data:text/javascript,${encodeURIComponent(preloadSource)}`,
+    },
+  });
+  assert.equal(result.status, 1, result.stdout + result.stderr);
+  assert.match(result.stderr, /partial delivery/i);
+  const state = JSON.parse(fs.readFileSync(path.join(root, ".social/cloud-state.json"), "utf8"));
+  assert.deepEqual(state.recentNews, []);
+  assert.equal(state.platformHistory.x.length, 1);
+  assert.equal(state.platformHistory.facebook, undefined);
+  assert.equal(state.runs[`news:${item.slug}`].status, "partial");
+});

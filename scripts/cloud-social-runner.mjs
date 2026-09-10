@@ -170,22 +170,28 @@ function newsPack(news, date, slot, acquisition, trendSnapshot) {
 }
 
 function mergeManualHistory(state) {
-  const allowedUrls = new Set(EVERGREEN_PAGES.map((page) => page.url));
   const manualHistory = readJson(MANUAL_HISTORY_FILE, []);
   const platformHistory = { ...(state.platformHistory || {}) };
   let lastPublishedAt = state.lastPublishedAt || null;
   let lastPublishedTime = Date.parse(lastPublishedAt || "");
   if (!Array.isArray(manualHistory)) return { ...state, platformHistory };
   for (const entry of manualHistory) {
+    let historyUrl;
+    try {
+      const parsed = new URL(entry?.url || "");
+      if (parsed.origin !== SITE) continue;
+      historyUrl = `${parsed.origin}${parsed.pathname}`;
+    } catch {
+      continue;
+    }
     if (
       !PUBLIC_PLATFORMS.includes(entry?.platform)
-      || !allowedUrls.has(entry?.url)
       || !Number.isFinite(Date.parse(entry?.publishedAt || ""))
     ) continue;
     const history = platformHistory[entry.platform] || [];
-    const key = `${entry.url}|${entry.publishedAt}`;
+    const key = `${historyUrl}|${entry.publishedAt}`;
     if (!history.some((candidate) => `${candidate.url}|${candidate.publishedAt}` === key)) {
-      platformHistory[entry.platform] = [{ url: entry.url, publishedAt: entry.publishedAt }, ...history];
+      platformHistory[entry.platform] = [{ url: historyUrl, publishedAt: entry.publishedAt }, ...history];
     }
     const publishedTime = Date.parse(entry.publishedAt);
     if (!Number.isFinite(lastPublishedTime) || publishedTime > lastPublishedTime) {
@@ -265,13 +271,13 @@ function updateCloudState(state, pack, audit, report) {
     lastPublishedAt: state.lastPublishedAt || null,
     platformHistory: { ...(state.platformHistory || {}) },
   };
-  if (pack.source.kind === "game") {
+  if (audit.ok && pack.source.kind === "game") {
     next.recentGames = [pack.source.id, ...next.recentGames.filter((id) => id !== pack.source.id)].slice(0, 30);
-  } else if (pack.source.kind === "news") {
+  } else if (audit.ok && pack.source.kind === "news") {
     next.recentNews = [pack.source.id, ...next.recentNews.filter((id) => id !== pack.source.id)].slice(0, 300);
   }
   next.runs[runKey] = {
-    status: "delivered",
+    status: audit.ok ? "delivered" : "partial",
     source: pack.source,
     acquisition: pack.acquisition,
     counts: audit.counts,
@@ -372,6 +378,9 @@ async function main() {
     console.log(`[AuditAgent] public=${audit.counts.publishedPublic}, accepted=${audit.counts.acceptedByBuffer}, fallback=${audit.counts.fallbackAdmin}, disconnected=${audit.counts.skippedDisconnected}, failed=${audit.counts.failed}`);
     if (!args.dryRun) {
       writeJson(CLOUD_STATE_FILE, updateCloudState(state, pack, audit, report));
+      if (!audit.ok) {
+        throw new Error(`[AuditAgent] Partial delivery recorded with ${audit.counts.failed} failed platform(s).`);
+      }
       console.log(`Recorded successful run evergreen:${pack.source.id}.`);
     }
     return;
@@ -421,6 +430,9 @@ async function main() {
 
   if (!args.dryRun) {
     writeJson(CLOUD_STATE_FILE, updateCloudState(state, pack, audit, report));
+    if (!audit.ok) {
+      throw new Error(`[AuditAgent] Partial delivery recorded with ${audit.counts.failed} failed platform(s).`);
+    }
     console.log(`Recorded successful run ${runKey}.`);
   }
 }
