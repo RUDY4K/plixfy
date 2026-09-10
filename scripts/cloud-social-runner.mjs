@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import {
   EditorialAgent,
   PublicationAuditAgent,
+  normalizePublicUrl,
 } from "./social-agents.mjs";
 import {
   TrafficAcquisitionAgent,
@@ -178,9 +179,7 @@ function mergeManualHistory(state) {
   for (const entry of manualHistory) {
     let historyUrl;
     try {
-      const parsed = new URL(entry?.url || "");
-      if (parsed.origin !== SITE) continue;
-      historyUrl = `${parsed.origin}${parsed.pathname}`;
+      historyUrl = normalizePublicUrl(entry?.url || "");
     } catch {
       continue;
     }
@@ -229,7 +228,13 @@ function platformPublishedToday(state, platform, date) {
 function platformUsedUrlRecently(state, platform, url, now) {
   return (state.platformHistory?.[platform] || []).some((entry) => {
     const publishedTime = Date.parse(entry?.publishedAt || "");
-    return entry?.url === url
+    let matchesUrl = false;
+    try {
+      matchesUrl = normalizePublicUrl(entry?.url || "") === normalizePublicUrl(url);
+    } catch {
+      matchesUrl = false;
+    }
+    return matchesUrl
       && Number.isFinite(publishedTime)
       && now.getTime() - publishedTime < EVERGREEN_REPEAT_MS;
   });
@@ -291,7 +296,7 @@ function updateCloudState(state, pack, audit, report) {
     if (!item?.url) continue;
     const history = next.platformHistory[delivery.platform] || [];
     next.platformHistory[delivery.platform] = [
-      { url: item.url, publishedAt: delivery.attemptedAt || now },
+      { url: normalizePublicUrl(item.url), publishedAt: delivery.attemptedAt || now },
       ...history,
     ].filter((entry) => {
       const publishedTime = Date.parse(entry.publishedAt || "");
@@ -399,7 +404,10 @@ async function main() {
     `[TrafficAcquisitionAgent] selected news/${selection.item.slug} score=${selection.acquisition.score} reasons=${selection.acquisition.reasons.join(",")}`,
   );
   const rawPack = newsPack(selection.item, args.date, "news", selection.acquisition, trendSnapshot);
-  const availablePlatforms = new Set(eligiblePlatforms(state, args.date));
+  const availablePlatforms = new Set(eligiblePlatforms(state, args.date, {
+    url: rawPack.items[0]?.url,
+    preventRecentUrl: true,
+  }));
   rawPack.items = rawPack.items.filter((item) => availablePlatforms.has(item.platform));
   if (rawPack.items.length === 0) {
     console.log("[SocialPolicy] Every enabled platform has already published today; nothing to send.");
