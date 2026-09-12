@@ -399,7 +399,11 @@ test("analytics consent does not consume once-only events and acceptance reports
 
   assert.ok(consentCheck > 0 && consentCheck < dedupWrite);
   assert.match(pageViews, /onConsentChange\(\(choice\) =>/);
-  assert.match(pageViews, /if \(choice === 'accept'\) reportCurrentPage\(\)/);
+  assert.match(pageViews, /const acceptedNow = choice === 'accept' && !acceptedRef\.current/);
+  assert.match(pageViews, /pageViewsAfterConsent\(pendingLandingRef\.current, current\)/);
+  assert.match(pageViews, /const unsubscribeChange = onConsentChange/);
+  assert.match(pageViews, /const unsubscribeClear = onConsentCleared/);
+  assert.match(pageViews, /acceptedRef\.current = false/);
   // Queue delivery and consent revocation are exercised in analytics-consent.test.mjs.
   assert.match(analytics, /onReady=\{\(\) => initializeAnalytics\(gaId\)\}/);
   assert.match(analytics, /function initializeAnalytics[\s\S]*?flushQueuedEvents\(\)/);
