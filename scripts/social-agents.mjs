@@ -30,6 +30,16 @@ const SECRET_PATTERNS = [
 // Typical byte-decoding artifacts. Real Arabic text does not need these Latin
 // characters, so rejecting them prevents the broken Arabic seen in old feeds.
 const MOJIBAKE_PATTERN = /[\uFFFD\u00C2\u00C3\u00D8\u00D9]|\u00F0\u0178/u;
+const PUBLIC_ORIGIN = "https://www.plixfy.com";
+
+export function normalizePublicUrl(value) {
+  const url = new URL(value);
+  if (url.origin !== PUBLIC_ORIGIN) {
+    throw new Error("Public URL must use the canonical Plixfy HTTPS origin");
+  }
+  const pathname = url.pathname === "/" ? "/" : url.pathname.replace(/\/+$/, "");
+  return `${url.origin}${pathname}`;
+}
 
 function stableIndex(seed, length) {
   if (length < 1) throw new Error("ScoutAgent received an empty content pool");
@@ -185,8 +195,9 @@ export class PublicationAuditAgent {
         `AuditAgent: zero public posts; fallback=${counts.fallbackAdmin}, disconnected=${counts.skippedDisconnected}, failed=${counts.failed}`,
       );
     }
+    const incompleteDeliveries = counts.failed + counts.fallbackAdmin + counts.skippedDisconnected;
     return {
-      ok: counts.failed === 0 && (!requirePublicDelivery || handedToPublicChannel > 0),
+      ok: incompleteDeliveries === 0 && (!requirePublicDelivery || handedToPublicChannel > 0),
       counts,
     };
   }

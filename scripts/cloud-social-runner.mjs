@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import {
   EditorialAgent,
   PublicationAuditAgent,
+  normalizePublicUrl,
 } from "./social-agents.mjs";
 import {
   TrafficAcquisitionAgent,
@@ -18,9 +19,32 @@ const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
 const CLOUD_STATE_FILE = path.join(SOCIAL_DIR, "cloud-state.json");
 const TREND_CACHE_FILE = path.join(SOCIAL_DIR, "saudi-trends.json");
+const MANUAL_HISTORY_FILE = path.join(ROOT, "src", "data", "social-publication-history.json");
 const SITE = "https://www.plixfy.com";
 const MIN_NEWS_INTERVAL_MS = 90 * 60 * 1000;
 const MAX_NEWS_SILENCE_MS = 24 * 60 * 60 * 1000;
+const EVERGREEN_REPEAT_MS = 7 * 24 * 60 * 60 * 1000;
+const PUBLIC_PLATFORMS = Object.freeze(["telegram", "discord", "x", "facebook", "instagram"]);
+const EVERGREEN_PAGES = Object.freeze([
+  {
+    id: "browser-games-guide",
+    url: `${SITE}/guides/browser-games`,
+    title: "دليل اختيار ألعاب المتصفح",
+    summary: "كيف تختار لعبة مناسبة لجهازك، وتفهم التحكم والحفظ، وتعالج مشاكل التحميل قبل بدء اللعب.",
+  },
+  {
+    id: "all-games",
+    url: `${SITE}/all-games`,
+    title: "مكتبة ألعاب بليكسفاي",
+    summary: "تصفّح مكتبة الألعاب حسب التصنيف واختر ما يناسب جلستك من مكان واحد.",
+  },
+  {
+    id: "puzzle-games",
+    url: `${SITE}/category/puzzle`,
+    title: "ألعاب الألغاز",
+    summary: "اختر من ألعاب الألغاز والتفكير التي تعمل مباشرة من المتصفح.",
+  },
+]);
 
 function readJson(file, fallback) {
   try {
@@ -146,28 +170,139 @@ function newsPack(news, date, slot, acquisition, trendSnapshot) {
   };
 }
 
-function updateCloudState(state, pack, audit) {
+function mergeManualHistory(state) {
+  const manualHistory = readJson(MANUAL_HISTORY_FILE, []);
+  const platformHistory = { ...(state.platformHistory || {}) };
+  let lastPublishedAt = state.lastPublishedAt || null;
+  let lastPublishedTime = Date.parse(lastPublishedAt || "");
+  if (!Array.isArray(manualHistory)) return { ...state, platformHistory };
+  for (const entry of manualHistory) {
+    let historyUrl;
+    try {
+      historyUrl = normalizePublicUrl(entry?.url || "");
+    } catch {
+      continue;
+    }
+    if (
+      !PUBLIC_PLATFORMS.includes(entry?.platform)
+      || !Number.isFinite(Date.parse(entry?.publishedAt || ""))
+    ) continue;
+    const history = platformHistory[entry.platform] || [];
+    const key = `${historyUrl}|${entry.publishedAt}`;
+    if (!history.some((candidate) => `${candidate.url}|${candidate.publishedAt}` === key)) {
+      platformHistory[entry.platform] = [{ url: historyUrl, publishedAt: entry.publishedAt }, ...history];
+    }
+    const publishedTime = Date.parse(entry.publishedAt);
+    if (!Number.isFinite(lastPublishedTime) || publishedTime > lastPublishedTime) {
+      lastPublishedAt = entry.publishedAt;
+      lastPublishedTime = publishedTime;
+    }
+  }
+  return { ...state, lastPublishedAt, platformHistory };
+}
+
+function enabledPlatforms() {
+  const configured = process.env.SOCIAL_PLATFORMS || PUBLIC_PLATFORMS.join(",");
+  const allowed = new Set(PUBLIC_PLATFORMS);
+  return configured
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter((value) => allowed.has(value));
+}
+
+function platformPublishedToday(state, platform, date) {
+  const history = state.platformHistory?.[platform];
+  if (Array.isArray(history)) {
+    return history.some((entry) => {
+      const publishedAt = new Date(entry?.publishedAt || "");
+      return Number.isFinite(publishedAt.getTime()) && riyadhParts(publishedAt).date === date;
+    });
+  }
+  if (!state.platformHistory || Object.keys(state.platformHistory).length === 0) {
+    const legacyPublishedAt = new Date(state.lastPublishedAt || "");
+    return Number.isFinite(legacyPublishedAt.getTime()) && riyadhParts(legacyPublishedAt).date === date;
+  }
+  return false;
+}
+
+function platformUsedUrlRecently(state, platform, url, now) {
+  return (state.platformHistory?.[platform] || []).some((entry) => {
+    const publishedTime = Date.parse(entry?.publishedAt || "");
+    let matchesUrl = false;
+    try {
+      matchesUrl = normalizePublicUrl(entry?.url || "") === normalizePublicUrl(url);
+    } catch {
+      matchesUrl = false;
+    }
+    return matchesUrl
+      && Number.isFinite(publishedTime)
+      && now.getTime() - publishedTime < EVERGREEN_REPEAT_MS;
+  });
+}
+
+function eligiblePlatforms(state, date, { url = "", preventRecentUrl = false, now = new Date() } = {}) {
+  return enabledPlatforms().filter((platform) =>
+    !platformPublishedToday(state, platform, date)
+    && (!preventRecentUrl || !platformUsedUrlRecently(state, platform, url, now)),
+  );
+}
+
+function evergreenPack(page, date, slot, state, now = new Date()) {
+  const contentId = cleanContentId(`evergreen-${page.id}-${date.replaceAll("-", "")}`);
+  const shared = `${page.summary}\n\n${page.title} على بليكسفاي:`;
+  return {
+    date,
+    campaign: "ar_evergreen_social_v1",
+    slot,
+    source: { kind: "evergreen", id: page.id },
+    items: eligiblePlatforms(state, date, { url: page.url, preventRecentUrl: true, now }).map((platform) => ({
+      platform,
+      kind: "evergreen",
+      contentId,
+      text: shared,
+      url: page.url,
+      image: `${SITE}/opengraph-image`,
+    })),
+  };
+}
+
+function updateCloudState(state, pack, audit, report) {
   const now = new Date().toISOString();
-  const runKey = `news:${pack.source.id}`;
+  const runKey = `${pack.source.kind}:${pack.source.id}`;
   const next = {
     recentGames: state.recentGames || [],
     recentNews: state.recentNews || [],
     runs: state.runs || {},
     lastPublishedAt: state.lastPublishedAt || null,
+    platformHistory: { ...(state.platformHistory || {}) },
   };
-  if (pack.source.kind === "game") {
+  if (audit.ok && pack.source.kind === "game") {
     next.recentGames = [pack.source.id, ...next.recentGames.filter((id) => id !== pack.source.id)].slice(0, 30);
-  } else {
+  } else if (audit.ok && pack.source.kind === "news") {
     next.recentNews = [pack.source.id, ...next.recentNews.filter((id) => id !== pack.source.id)].slice(0, 300);
   }
   next.runs[runKey] = {
-    status: "delivered",
+    status: audit.ok ? "delivered" : "partial",
     source: pack.source,
     acquisition: pack.acquisition,
     counts: audit.counts,
     completedAt: now,
   };
   next.lastPublishedAt = now;
+  const successfulStatuses = new Set(["published_public", "accepted_by_buffer"]);
+  for (const delivery of report?.deliveries || []) {
+    if (!successfulStatuses.has(delivery.status)) continue;
+    const item = pack.items.find((candidate) => candidate.platform === delivery.platform);
+    if (!item?.url) continue;
+    const history = next.platformHistory[delivery.platform] || [];
+    next.platformHistory[delivery.platform] = [
+      { url: normalizePublicUrl(item.url), publishedAt: delivery.attemptedAt || now },
+      ...history,
+    ].filter((entry) => {
+      const publishedTime = Date.parse(entry.publishedAt || "");
+      return Number.isFinite(publishedTime) && Date.now() - publishedTime < 30 * 24 * 60 * 60 * 1000;
+    }).slice(0, 60);
+  }
   next.runs = Object.fromEntries(Object.entries(next.runs).slice(-90));
   return next;
 }
@@ -193,7 +328,7 @@ async function verifyPublicUrl(url) {
 
 async function main() {
   const args = parseArgs();
-  const state = readJson(CLOUD_STATE_FILE, { recentGames: [], recentNews: [], runs: {} });
+  const state = mergeManualHistory(readJson(CLOUD_STATE_FILE, { recentGames: [], recentNews: [], runs: {} }));
   const runKey = `news-watcher:${args.date}`;
   const lastPublishedTime = Date.parse(state.lastPublishedAt || "");
   if (!args.dryRun && !args.force && Number.isFinite(lastPublishedTime) && Date.now() - lastPublishedTime < MIN_NEWS_INTERVAL_MS) {
@@ -213,14 +348,46 @@ async function main() {
   const recentNews = new Set(state.recentNews || []);
   const newsItems = args.force ? allNewsItems : allNewsItems.filter((item) => !recentNews.has(item.slug));
   if (newsItems.length === 0) {
-    if (
-      !args.dryRun
-      && Number.isFinite(lastPublishedTime)
-      && Date.now() - lastPublishedTime >= MAX_NEWS_SILENCE_MS
-    ) {
-      throw new Error("[NewsWatcher] No public news post was recorded for 24 hours; inspect the content feed and Buffer delivery.");
+    const silenceExceeded = Number.isFinite(lastPublishedTime)
+      && Date.now() - lastPublishedTime >= MAX_NEWS_SILENCE_MS;
+    if (!silenceExceeded) {
+      console.log("[NewsWatcher] No unpublished gaming news is ready; nothing to send.");
+      return;
     }
-    console.log("[NewsWatcher] No unpublished gaming news is ready; nothing to send.");
+    const now = new Date();
+    const candidatePacks = EVERGREEN_PAGES
+      .map((page) => evergreenPack(page, args.date, args.slot, state, now))
+      .sort((left, right) => right.items.length - left.items.length);
+    const rawPack = candidatePacks.find((candidate) => candidate.items.length > 0);
+    if (!rawPack) {
+      console.log("[EvergreenFallback] Daily platform limit or seven-day link limit is active; nothing to send.");
+      return;
+    }
+    const pack = new EditorialAgent().review(rawPack);
+    console.log(`[EvergreenFallback] selected ${pack.source.id} after 24 hours without approved news`);
+    if (args.offline) {
+      console.log("[Preflight] offline mode skipped public URL verification");
+    } else {
+      await verifyPublicUrl(pack.items[0].url);
+    }
+    fs.mkdirSync(SOCIAL_DIR, { recursive: true });
+    const packFile = path.join(SOCIAL_DIR, `${args.date}-${args.slot}.json`);
+    const reportFile = path.join(SOCIAL_DIR, `${args.date}-${args.slot}-delivery.json`);
+    writeJson(packFile, pack);
+    const publisherArgs = [path.join(ROOT, "scripts", "social-publisher.mjs"), packFile, `--report=${reportFile}`];
+    if (args.dryRun) publisherArgs.push("--dry-run");
+    const result = spawnSync(process.execPath, publisherArgs, { cwd: ROOT, stdio: "inherit" });
+    if (result.status !== 0) throw new Error(`PublisherAgent exited with code ${result.status}`);
+    const report = readJson(reportFile, null);
+    const audit = new PublicationAuditAgent().evaluate(report, { requirePublicDelivery: !args.dryRun });
+    console.log(`[AuditAgent] public=${audit.counts.publishedPublic}, accepted=${audit.counts.acceptedByBuffer}, fallback=${audit.counts.fallbackAdmin}, disconnected=${audit.counts.skippedDisconnected}, failed=${audit.counts.failed}`);
+    if (!args.dryRun) {
+      writeJson(CLOUD_STATE_FILE, updateCloudState(state, pack, audit, report));
+      if (!audit.ok) {
+        throw new Error(`[AuditAgent] Partial delivery recorded: failed=${audit.counts.failed}, fallback=${audit.counts.fallbackAdmin}, disconnected=${audit.counts.skippedDisconnected}.`);
+      }
+      console.log(`Recorded successful run evergreen:${pack.source.id}.`);
+    }
     return;
   }
   const selection = scout.select({
@@ -237,6 +404,15 @@ async function main() {
     `[TrafficAcquisitionAgent] selected news/${selection.item.slug} score=${selection.acquisition.score} reasons=${selection.acquisition.reasons.join(",")}`,
   );
   const rawPack = newsPack(selection.item, args.date, "news", selection.acquisition, trendSnapshot);
+  const availablePlatforms = new Set(eligiblePlatforms(state, args.date, {
+    url: rawPack.items[0]?.url,
+    preventRecentUrl: true,
+  }));
+  rawPack.items = rawPack.items.filter((item) => availablePlatforms.has(item.platform));
+  if (rawPack.items.length === 0) {
+    console.log("[SocialPolicy] Every enabled platform has already published today; nothing to send.");
+    return;
+  }
   const pack = new EditorialAgent().review(rawPack);
   console.log(`[EditorAgent] approved ${pack.items.length} platform drafts`);
 
@@ -261,7 +437,10 @@ async function main() {
   console.log(`[AuditAgent] public=${audit.counts.publishedPublic}, accepted=${audit.counts.acceptedByBuffer}, fallback=${audit.counts.fallbackAdmin}, disconnected=${audit.counts.skippedDisconnected}, failed=${audit.counts.failed}`);
 
   if (!args.dryRun) {
-    writeJson(CLOUD_STATE_FILE, updateCloudState(state, pack, audit));
+    writeJson(CLOUD_STATE_FILE, updateCloudState(state, pack, audit, report));
+    if (!audit.ok) {
+      throw new Error(`[AuditAgent] Partial delivery recorded: failed=${audit.counts.failed}, fallback=${audit.counts.fallbackAdmin}, disconnected=${audit.counts.skippedDisconnected}.`);
+    }
     console.log(`Recorded successful run ${runKey}.`);
   }
 }
