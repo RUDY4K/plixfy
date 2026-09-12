@@ -195,8 +195,9 @@ export class PublicationAuditAgent {
         `AuditAgent: zero public posts; fallback=${counts.fallbackAdmin}, disconnected=${counts.skippedDisconnected}, failed=${counts.failed}`,
       );
     }
+    const incompleteDeliveries = counts.failed + counts.fallbackAdmin + counts.skippedDisconnected;
     return {
-      ok: counts.failed === 0 && (!requirePublicDelivery || handedToPublicChannel > 0),
+      ok: incompleteDeliveries === 0 && (!requirePublicDelivery || handedToPublicChannel > 0),
       counts,
     };
   }

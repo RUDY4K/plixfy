@@ -88,10 +88,11 @@ test("AuditAgent never counts Telegram fallback as a public post", () => {
   assert.throws(() => new PublicationAuditAgent().evaluate(report), /zero public posts/);
 });
 
-test("AuditAgent accepts one real public post and reports fallbacks separately", () => {
+test("AuditAgent reports one real public post plus fallback as partial", () => {
   const report = { deliveries: [{ platform: "x", status: "published_public", public: true }, { platform: "instagram", status: "fallback_admin", public: false }] };
   const result = new PublicationAuditAgent().evaluate(report);
   assert.equal(result.counts.publishedPublic, 1); assert.equal(result.counts.fallbackAdmin, 1);
+  assert.equal(result.ok, false);
   assert.deepEqual(deliveryCounts(report.deliveries), result.counts);
 });
 
@@ -791,3 +792,102 @@ test("news partial recovery on the next day retries only the platform that faile
   assert.equal(pack.source.id, item.slug);
   assert.deepEqual(pack.items.map((entry) => entry.platform), ["facebook"]);
 });
+
+function exerciseNonPublicNewsDelivery(context, secondaryStatus) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `plixfy-cloud-${secondaryStatus}-news-`));
+  context.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(root, "src/data"), { recursive: true });
+  fs.mkdirSync(path.join(root, "scripts"));
+  fs.mkdirSync(path.join(root, "docs/editorial-evidence"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".social"));
+  for (const name of fs.readdirSync(path.resolve("scripts"))) {
+    if (name.endsWith(".mjs")) fs.copyFileSync(path.resolve("scripts", name), path.join(root, "scripts", name));
+  }
+  const item = {
+    slug: `approved-${secondaryStatus}-fixture`,
+    title: "خبر ألعاب موثّق لاختبار استكمال القناة غير المنشورة",
+    summary: "محتوى عربي أصلي ومراجع يثبت حفظ القناة الناجحة وإعادة محاولة القناة التي لم تنشر دون وسم الخبر كمكتمل.",
+    sourceName: "مصدر الاختبار",
+    sourceUrl: `https://example.com/approved-${secondaryStatus}-fixture`,
+    publishedAt: new Date().toISOString().slice(0, 10),
+    sourcePublishedAt: new Date(Date.now() - 1000).toISOString(),
+  };
+  const evidencePath = `docs/editorial-evidence/${item.slug}.md`;
+  const evidence = `Reviewed ${secondaryStatus} delivery fixture evidence.`;
+  fs.writeFileSync(path.join(root, "src/data/news.json"), JSON.stringify([item]));
+  fs.writeFileSync(path.join(root, "src/data/news-editorial.json"), "{}");
+  fs.writeFileSync(path.join(root, "src/data/social-publication-history.json"), "[]");
+  fs.writeFileSync(path.join(root, evidencePath), evidence);
+  fs.writeFileSync(path.join(root, "src/data/news-publication-review.json"), JSON.stringify([{
+    slug: item.slug,
+    locale: "ar",
+    contentSha256: newsContentHash(item),
+    evidencePath,
+    evidenceSha256: createHash("sha256").update(evidence).digest("hex"),
+    reviewer: "Fixture reviewer",
+    reviewedAt: new Date().toISOString(),
+  }]));
+  fs.writeFileSync(path.join(root, ".social/cloud-state.json"), JSON.stringify({
+    recentGames: [], recentNews: [], runs: {},
+    lastPublishedAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
+  }));
+  fs.writeFileSync(path.join(root, "scripts/social-publisher.mjs"), `
+    import fs from "node:fs";
+    import path from "node:path";
+    const packFile = process.argv.find((value) => value.endsWith(".json") && !value.startsWith("--report="));
+    const reportFile = process.argv.find((value) => value.startsWith("--report="))?.slice(9);
+    const pack = JSON.parse(fs.readFileSync(packFile, "utf8"));
+    const dryRun = process.argv.includes("--dry-run");
+    fs.mkdirSync(path.dirname(reportFile), { recursive: true });
+    fs.writeFileSync(reportFile, JSON.stringify({ deliveries: pack.items.map((entry, index) => ({
+      platform: entry.platform,
+      contentId: entry.contentId,
+      status: dryRun ? "dry_run" : (index === 0 ? "published_public" : ${JSON.stringify(secondaryStatus)}),
+      public: !dryRun && index === 0,
+      attemptedAt: new Date().toISOString(),
+    })) }));
+  `);
+  const preloadSource = `globalThis.fetch = async (url, options = {}) => {
+    if (String(url).includes("trends.google.com")) return new Response("<rss><channel><item><title>ألعاب</title><ht:approx_traffic>1000</ht:approx_traffic><pubDate>Wed, 10 Sep 2026 12:00:00 GMT</pubDate></item></channel></rss>", { status: 200 });
+    if (options.method === "HEAD" && String(url).startsWith("https://www.plixfy.com/")) return new Response(null, { status: 200 });
+    throw new Error("Unexpected test request: " + url);
+  };`;
+  const environment = {
+    ...process.env,
+    SOCIAL_PLATFORMS: "x,facebook",
+    NODE_OPTIONS: `--import=data:text/javascript,${encodeURIComponent(preloadSource)}`,
+  };
+  const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh" }).format(new Date());
+  const firstResult = spawnSync(
+    process.execPath,
+    [path.join(root, "scripts/cloud-social-runner.mjs"), `--date=${date}`],
+    { cwd: root, encoding: "utf8", env: environment },
+  );
+  assert.equal(firstResult.status, 1, firstResult.stdout + firstResult.stderr);
+  assert.match(firstResult.stderr, /partial delivery/i);
+  const state = JSON.parse(fs.readFileSync(path.join(root, ".social/cloud-state.json"), "utf8"));
+  assert.deepEqual(state.recentNews, []);
+  assert.equal(state.platformHistory.x.length, 1);
+  assert.equal(state.platformHistory.facebook, undefined);
+  assert.equal(state.runs[`news:${item.slug}`].status, "partial");
+
+  state.lastPublishedAt = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
+  fs.writeFileSync(path.join(root, ".social/cloud-state.json"), JSON.stringify(state));
+  const recoveryDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh" }).format(
+    new Date(Date.now() + 24 * 60 * 60 * 1000),
+  );
+  const recoveryResult = spawnSync(
+    process.execPath,
+    [path.join(root, "scripts/cloud-social-runner.mjs"), "--dry-run", "--offline", `--date=${recoveryDate}`],
+    { cwd: root, encoding: "utf8", env: environment },
+  );
+  assert.equal(recoveryResult.status, 0, recoveryResult.stdout + recoveryResult.stderr);
+  const recoveryPack = JSON.parse(fs.readFileSync(path.join(root, `.social/${recoveryDate}-news.json`), "utf8"));
+  assert.deepEqual(recoveryPack.items.map((entry) => entry.platform), ["facebook"]);
+}
+
+for (const secondaryStatus of ["fallback_admin", "skipped_disconnected"]) {
+  test(`news delivery treats ${secondaryStatus} as partial and retries only that platform`, (context) => {
+    exerciseNonPublicNewsDelivery(context, secondaryStatus);
+  });
+}

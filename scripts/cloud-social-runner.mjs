@@ -384,7 +384,7 @@ async function main() {
     if (!args.dryRun) {
       writeJson(CLOUD_STATE_FILE, updateCloudState(state, pack, audit, report));
       if (!audit.ok) {
-        throw new Error(`[AuditAgent] Partial delivery recorded with ${audit.counts.failed} failed platform(s).`);
+        throw new Error(`[AuditAgent] Partial delivery recorded: failed=${audit.counts.failed}, fallback=${audit.counts.fallbackAdmin}, disconnected=${audit.counts.skippedDisconnected}.`);
       }
       console.log(`Recorded successful run evergreen:${pack.source.id}.`);
     }
@@ -439,7 +439,7 @@ async function main() {
   if (!args.dryRun) {
     writeJson(CLOUD_STATE_FILE, updateCloudState(state, pack, audit, report));
     if (!audit.ok) {
-      throw new Error(`[AuditAgent] Partial delivery recorded with ${audit.counts.failed} failed platform(s).`);
+      throw new Error(`[AuditAgent] Partial delivery recorded: failed=${audit.counts.failed}, fallback=${audit.counts.fallbackAdmin}, disconnected=${audit.counts.skippedDisconnected}.`);
     }
     console.log(`Recorded successful run ${runKey}.`);
   }
