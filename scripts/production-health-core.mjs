@@ -22,6 +22,10 @@ export function validateAdsTxt(text, publisherId) {
     throw new Error(`ads.txt is missing the exact AdSense authorization for ${publisherId}`);
   }
 
+  if (normalizedLines.length !== 1) {
+    throw new Error("ads.txt contains unexpected or duplicate seller entries");
+  }
+
   return { publisherId, sellerLines: normalizedLines.length };
 }
 
