@@ -103,15 +103,23 @@ test("explicit social content dates accept only real YYYY-MM-DD dates", () => {
   assert.match(runner, /normalizeContentDate\(dateValue\)/);
 });
 
-test("ads.txt requires the exact Plixfy AdSense publisher line", () => {
+test("ads.txt allows only the exact Plixfy AdSense publisher line", () => {
   const expected = "google.com, pub-7564871953180369, DIRECT, f08c47fec0942fa0";
-  assert.deepEqual(validateAdsTxt(`\uFEFF${expected}\n# comment\nexample.com, 1, RESELLER`, "pub-7564871953180369"), {
+  assert.deepEqual(validateAdsTxt(`\uFEFF${expected}\n# Plixfy AdSense`, "pub-7564871953180369"), {
     publisherId: "pub-7564871953180369",
-    sellerLines: 2,
+    sellerLines: 1,
   });
   assert.throws(
     () => validateAdsTxt("google.com, pub-wrong, DIRECT, f08c47fec0942fa0", "pub-7564871953180369"),
     /missing the exact AdSense authorization/,
+  );
+  assert.throws(
+    () => validateAdsTxt(`${expected}\nexample.com, 1, RESELLER`, "pub-7564871953180369"),
+    /unexpected or duplicate seller entries/,
+  );
+  assert.throws(
+    () => validateAdsTxt(`${expected}\n${expected}`, "pub-7564871953180369"),
+    /unexpected or duplicate seller entries/,
   );
 });
 
