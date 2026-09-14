@@ -126,6 +126,7 @@ export default async function NewsItemPage({ params }: PageParams) {
 
   const title = newsTitle(item, locale);
   const summary = newsSummary(item, locale);
+  const imageCaption = locale === "en" ? (item.imageCaptionEn ?? item.imageCaption) : item.imageCaption;
   const keyPoints = newsKeyPoints(item, locale);
   const whyItMatters = newsWhyItMatters(item, locale);
   const otherNews = getAllNews(locale).filter((n) => n.slug !== item.slug).slice(0, 4);
@@ -186,8 +187,15 @@ export default async function NewsItemPage({ params }: PageParams) {
         <article className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
           <div aria-hidden="true" className="h-1.5 bg-blue-700" />
           {item.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={newsImageHref(item.slug)} alt="" className="h-64 w-full object-cover md:h-80" />
+            <figure>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={newsImageHref(item.slug)} alt="" className="h-64 w-full object-cover md:h-80" />
+              {imageCaption ? (
+                <figcaption className="border-b border-slate-100 bg-slate-50 px-5 py-2 text-xs text-slate-500">
+                  {imageCaption}
+                </figcaption>
+              ) : null}
+            </figure>
           ) : null}
           <div className="p-6 md:p-8">
             <header className="mb-6 border-b border-slate-100 pb-6">

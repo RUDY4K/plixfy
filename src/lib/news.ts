@@ -18,6 +18,9 @@ export interface NewsItem {
   sourceUrl: string;
   /** Original editorial image used on the news page and branded social card. */
   image?: string;
+  /** Visible disclosure for illustrations that are not source screenshots. */
+  imageCaption?: string;
+  imageCaptionEn?: string;
   /** YYYY-MM-DD */
   publishedAt: string;
   /** Original source publication time when available. */

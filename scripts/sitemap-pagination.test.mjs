@@ -33,7 +33,7 @@ function loadGames() {
   return compileTypeScript("src/lib/games.ts", require);
 }
 
-function loadSitemap(games) {
+function loadSitemap(games, newsByLocale = {}) {
   const require = (specifier) => {
     if (specifier === "@/lib/games") return games;
     if (specifier === "@/data/playgama-catalog-meta.json") {
@@ -41,7 +41,7 @@ function loadSitemap(games) {
     }
     // These routes are outside this collection-pagination contract.
     if (specifier === "@/lib/gameContent") return { hasEditorialGameContent: () => false };
-    if (specifier === "@/lib/news") return { getSearchEligibleNews: () => [] };
+    if (specifier === "@/lib/news") return { getSearchEligibleNews: (locale) => newsByLocale[locale] ?? [] };
     if (specifier === "@/lib/newsImage") return { newsImageHref: (slug) => `/api/news-image/${slug}` };
     if (specifier === "@/lib/blog") return { getAllPosts: () => [] };
     if (specifier === "@/lib/blogEn") return { getAllPostsEn: () => [] };
@@ -101,4 +101,31 @@ test("sitemap exposes every populated category page after page 1 in Arabic and E
   assert.equal(arabicPage?.lastModified?.toISOString(), meta.syncedAt);
   assert.equal(games.length, meta.gameCount);
   assert.equal(entries.some((entry) => /\/category\/(?:top|trending)\?page=/.test(entry.url)), false);
+});
+
+test("sitemap emits each independently eligible news locale with matching hreflang", () => {
+  const gameLibrary = loadGames();
+  const slug = "reviewed-story";
+  const item = {
+    slug,
+    publishedAt: "2026-09-14",
+    reviewedAt: "2026-09-14",
+    image: "https://www.plixfy.com/news/reviewed-story.webp",
+  };
+  const entries = loadSitemap(gameLibrary, { ar: [item], en: [item] })();
+  const arUrl = `${SITE}/news/${slug}`;
+  const enUrl = `${SITE}/en/news/${slug}`;
+  const newsEntries = entries.filter((entry) => entry.url === arUrl || entry.url === enUrl);
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(newsEntries.map((entry) => entry.url).sort())),
+    [arUrl, enUrl].sort(),
+  );
+  for (const entry of newsEntries) {
+    assert.deepEqual(JSON.parse(JSON.stringify(entry.alternates.languages)), {
+      ar: arUrl,
+      en: enUrl,
+      "x-default": arUrl,
+    });
+  }
 });

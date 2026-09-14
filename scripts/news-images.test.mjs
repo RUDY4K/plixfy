@@ -23,6 +23,17 @@ test("every current news image source is explicitly allowed by the same-origin p
   }
 });
 
+test("original Plixfy newsroom assets are accepted by the image proxy", () => {
+  const helper = read("src/lib/newsImage.ts");
+  const route = read("src/app/api/news-image/[slug]/route.ts");
+
+  assert.match(helper, /^\s+"www\.plixfy\.com",$/m);
+  assert.match(helper, /export function firstPartyNewsImagePath/);
+  assert.match(helper, /\/news\\\/\[a-z0-9-\]\+\\\.webp/);
+  assert.match(route, /firstPartyNewsImagePath/);
+  assert.match(route, /new URL\(firstPartyPath, request\.url\)/);
+});
+
 test("news pages never embed third-party editorial images directly", () => {
   const files = [
     "src/app/[locale]/page.tsx",
