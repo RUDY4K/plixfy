@@ -79,3 +79,19 @@ test("search eligibility is explicit and inherits every exact publication check"
   assert.equal(loadModule([eligibleReview, eligibleReview]).isBlogSearchEligible(post, "en"), false);
   assert.equal(loadModule([eligibleReview], "Changed evidence").isBlogSearchEligible(post, "en"), false);
 });
+
+test("search alternates keep each eligible locale independent and choose a safe default", () => {
+  const en = { ...review, searchEligible: true };
+  const ar = { ...en, locale: "ar" };
+  const alternates = (reviews) => JSON.parse(JSON.stringify(
+    loadModule(reviews).getBlogSearchAlternates({ ar: post, en: post }),
+  ));
+  const arUrl = "https://www.plixfy.com/blog/sample";
+  const enUrl = "https://www.plixfy.com/en/blog/sample";
+
+  assert.deepEqual(alternates([ar]), { ar: arUrl, "x-default": arUrl });
+  assert.deepEqual(alternates([en]), { en: enUrl, "x-default": enUrl });
+  assert.deepEqual(alternates([ar, en]), { ar: arUrl, en: enUrl, "x-default": arUrl });
+  assert.deepEqual(alternates([ar, { ...en, evidenceSha256: hash("bad evidence") }]), { ar: arUrl, "x-default": arUrl });
+  assert.deepEqual(alternates([{ ...ar, contentSha256: hash("bad content") }, en]), { en: enUrl, "x-default": enUrl });
+});

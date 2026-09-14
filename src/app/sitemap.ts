@@ -4,8 +4,8 @@ import { hasEditorialGameContent } from "@/lib/gameContent";
 import { getSearchEligibleNews } from "@/lib/news";
 import { newsImageHref } from "@/lib/newsImage";
 import { getAllPosts } from "@/lib/blog";
-import { getPostEnBySlug } from "@/lib/blogEn";
-import { isBlogSearchEligible } from "@/lib/blog-publication";
+import { getAllPostsEn } from "@/lib/blogEn";
+import { getBlogSearchAlternates } from "@/lib/blog-publication";
 import catalogMeta from "@/data/playgama-catalog-meta.json";
 
 const SITE = "https://www.plixfy.com";
@@ -130,12 +130,32 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
-  const blogRoutes: MetadataRoute.Sitemap = getAllPosts().flatMap((post) => {
-    const englishPost = getPostEnBySlug(post.slug);
-    if (!isBlogSearchEligible(post, "ar") || !englishPost || !isBlogSearchEligible(englishPost, "en")) return [];
-    return bilingual("/blog/" + post.slug, "monthly", 0.7, 0.6, {
-      lastModified: new Date(post.updatedAt),
-    });
+  const arabicPosts = getAllPosts();
+  const englishPosts = getAllPostsEn();
+  const arabicPostsBySlug = new Map(arabicPosts.map((post) => [post.slug, post]));
+  const englishPostsBySlug = new Map(englishPosts.map((post) => [post.slug, post]));
+  const blogSlugs = new Set([...arabicPosts.map((post) => post.slug), ...englishPosts.map((post) => post.slug)]);
+  const blogRoutes: MetadataRoute.Sitemap = [...blogSlugs].flatMap((slug) => {
+    const arPost = arabicPostsBySlug.get(slug);
+    const enPost = englishPostsBySlug.get(slug);
+    const eligibleLanguages = getBlogSearchAlternates({ ar: arPost, en: enPost });
+    if (!eligibleLanguages) return [];
+    return [
+      ...(eligibleLanguages.ar && arPost ? [{
+        url: eligibleLanguages.ar,
+        lastModified: new Date(arPost.updatedAt),
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+        alternates: { languages: eligibleLanguages },
+      }] : []),
+      ...(eligibleLanguages.en && enPost ? [{
+        url: eligibleLanguages.en,
+        ...(enPost.updatedAt ? { lastModified: new Date(enPost.updatedAt) } : {}),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+        alternates: { languages: eligibleLanguages },
+      }] : []),
+    ];
   });
 
   return [

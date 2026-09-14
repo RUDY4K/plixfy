@@ -10,8 +10,8 @@ import { getPostEnBySlug, getKnownPostEnSlugs, getAllPostsEn, type BlogPostEn } 
 import { getGameBySlug, getGamesByCategory } from "@/lib/games";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import { BRAND_AR } from "@/lib/siteContent";
-import { hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
-import { isBlogSearchEligible } from "@/lib/blog-publication";
+import { hasLocale, localeHref, ogLocaleFor, type Locale } from "@/lib/i18n";
+import { getBlogSearchAlternates } from "@/lib/blog-publication";
 
 const SITE = "https://www.plixfy.com";
 
@@ -83,14 +83,19 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     const copy = revisionCopy(locale);
     return { title: copy.title, description: copy.description, robots: { index: false, follow: true }, alternates: { canonical: localeHref(locale, "/blog/" + slug) } };
   }
+  const eligibleLanguages = getBlogSearchAlternates({
+    ar: getPostBySlug(slug),
+    en: getPostEnBySlug(slug),
+  });
+  const currentLocaleIsEligible = Boolean(eligibleLanguages?.[locale]);
 
   return {
     title: post.title,
     description: post.description,
     keywords: [...post.keywords],
-    robots: { index: isBlogSearchEligible(post, locale), follow: true },
-    alternates: isBlogSearchEligible(post, locale)
-      ? pageAlternates(locale, "/blog/" + post.slug)
+    robots: { index: currentLocaleIsEligible, follow: true },
+    alternates: currentLocaleIsEligible
+      ? { canonical: localeHref(locale, "/blog/" + post.slug), languages: eligibleLanguages }
       : { canonical: localeHref(locale, "/blog/" + post.slug) },
     openGraph: {
       type: "article",

@@ -57,3 +57,24 @@ export function isBlogSearchEligible(post: { slug: string }, locale: Locale): bo
     return false;
   }
 }
+
+type BlogSearchCandidates = Partial<Record<Locale, { slug: string }>>;
+export type BlogSearchLanguages = Partial<Record<Locale, string>> & { "x-default": string };
+
+/** Build hreflang values only from locale records that independently pass the search gate. */
+export function getBlogSearchAlternates(candidates: BlogSearchCandidates): BlogSearchLanguages | undefined {
+  const presentSlugs = Object.values(candidates).map((post) => post?.slug).filter(Boolean);
+  if (new Set(presentSlugs).size > 1) return undefined;
+  const ar = candidates.ar && isBlogSearchEligible(candidates.ar, "ar")
+    ? `https://www.plixfy.com/blog/${candidates.ar.slug}`
+    : undefined;
+  const en = candidates.en && isBlogSearchEligible(candidates.en, "en")
+    ? `https://www.plixfy.com/en/blog/${candidates.en.slug}`
+    : undefined;
+  if (!ar && !en) return undefined;
+  return {
+    ...(ar ? { ar } : {}),
+    ...(en ? { en } : {}),
+    "x-default": ar ?? en!,
+  };
+}

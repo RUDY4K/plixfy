@@ -89,7 +89,11 @@ test("only the reviewed racing guide is explicitly search eligible in both local
 
   const page = read("src/app/[locale]/blog/[slug]/page.tsx");
   const sitemap = read("src/app/sitemap.ts");
-  assert.match(page, /isBlogSearchEligible\(post, locale\)/);
-  assert.match(sitemap, /lastModified: new Date\(post\.updatedAt\)/);
-  assert.match(sitemap, /bilingual\("\/blog\/" \+ post\.slug/);
+  assert.match(page, /getBlogSearchAlternates/);
+  assert.match(page, /eligibleLanguages\?\.\[locale\]/);
+  assert.match(sitemap, /new Set\(\[\.\.\.arabicPosts\.map/);
+  assert.match(sitemap, /\.\.\.englishPosts\.map/);
+  assert.match(sitemap, /getBlogSearchAlternates/);
+  assert.match(sitemap, /lastModified: new Date\(arPost\.updatedAt\)/);
+  assert.match(sitemap, /lastModified: new Date\(enPost\.updatedAt\)/);
 });
