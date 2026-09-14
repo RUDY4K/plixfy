@@ -7,7 +7,6 @@ import ts from "typescript";
 
 const ROOT = process.cwd();
 const SITE = "https://www.plixfy.com";
-const CATEGORY_SLUGS = ["racing", "action", "puzzle", "io", "girls", "casual", "sports", "shooting"];
 
 function readJson(relativePath) {
   return JSON.parse(readFileSync(path.join(ROOT, relativePath), "utf8"));
@@ -23,16 +22,20 @@ function compileTypeScript(relativePath, require) {
   return module.exports;
 }
 
-function loadSitemap() {
-  let games;
+function loadGames() {
   const require = (specifier) => {
-    if (specifier === "@/lib/games") {
-      games ??= compileTypeScript("src/lib/games.ts", require);
-      return games;
-    }
     if (specifier === "@/data/playgama-games.json") {
       return { default: readJson("src/data/playgama-games.json") };
     }
+    throw new Error(`Unexpected dependency: ${specifier}`);
+  };
+
+  return compileTypeScript("src/lib/games.ts", require);
+}
+
+function loadSitemap(games) {
+  const require = (specifier) => {
+    if (specifier === "@/lib/games") return games;
     if (specifier === "@/data/playgama-catalog-meta.json") {
       return { default: readJson("src/data/playgama-catalog-meta.json") };
     }
@@ -49,26 +52,50 @@ function loadSitemap() {
 test("sitemap exposes every populated category page after page 1 in Arabic and English", () => {
   const games = readJson("src/data/playgama-games.json");
   const meta = readJson("src/data/playgama-catalog-meta.json");
-  const entries = loadSitemap()();
+  const gameLibrary = loadGames();
+  const entries = loadSitemap(gameLibrary)();
+  const categoryPages = gameLibrary.categories.map((category) => ({
+    slug: category.slug,
+    totalPages: Math.max(
+      1,
+      Math.ceil(gameLibrary.getCategoryGames(category.slug).length / gameLibrary.CATEGORY_PAGE_SIZE),
+    ),
+  }));
   const paginatedEntries = entries.filter((entry) =>
-    CATEGORY_SLUGS.some((slug) =>
+    categoryPages.some(({ slug }) =>
       [`${SITE}/category/${slug}?page=`, `${SITE}/en/category/${slug}?page=`]
         .some((prefix) => entry.url.startsWith(prefix)),
     ),
   );
+  const expectedUrls = categoryPages.flatMap(({ slug, totalPages }) =>
+    Array.from({ length: totalPages - 1 }, (_, index) => index + 2).flatMap((page) => [
+      `${SITE}/category/${slug}?page=${page}`,
+      `${SITE}/en/category/${slug}?page=${page}`,
+    ]),
+  );
 
-  // The current catalog has 32 additional category collections, each localized twice.
-  assert.equal(paginatedEntries.length, 64);
-  assert.ok(entries.some((entry) => entry.url === `${SITE}/category/puzzle?page=13`));
-  assert.ok(entries.some((entry) => entry.url === `${SITE}/en/category/puzzle?page=13`));
+  assert.deepEqual(
+    Array.from(paginatedEntries, (entry) => entry.url).sort(),
+    Array.from(expectedUrls).sort(),
+  );
 
-  const arabicPuzzlePage = entries.find((entry) => entry.url === `${SITE}/category/puzzle?page=2`);
-  assert.deepEqual(JSON.parse(JSON.stringify(arabicPuzzlePage?.alternates?.languages)), {
-    ar: `${SITE}/category/puzzle?page=2`,
-    en: `${SITE}/en/category/puzzle?page=2`,
-    "x-default": `${SITE}/category/puzzle?page=2`,
+  const paginatedCategory = categoryPages.find(({ totalPages }) => totalPages > 1);
+  assert.ok(paginatedCategory, "the fixture needs a category with page 2");
+  const { slug, totalPages } = paginatedCategory;
+  const arabicLastPageUrl = `${SITE}/category/${slug}?page=${totalPages}`;
+  const englishLastPageUrl = `${SITE}/en/category/${slug}?page=${totalPages}`;
+  assert.ok(entries.some((entry) => entry.url === arabicLastPageUrl));
+  assert.ok(entries.some((entry) => entry.url === englishLastPageUrl));
+  assert.equal(entries.some((entry) => entry.url === `${SITE}/category/${slug}?page=${totalPages + 1}`), false);
+  assert.equal(entries.some((entry) => entry.url === `${SITE}/en/category/${slug}?page=${totalPages + 1}`), false);
+
+  const arabicPage = entries.find((entry) => entry.url === `${SITE}/category/${slug}?page=2`);
+  assert.deepEqual(JSON.parse(JSON.stringify(arabicPage?.alternates?.languages)), {
+    ar: `${SITE}/category/${slug}?page=2`,
+    en: `${SITE}/en/category/${slug}?page=2`,
+    "x-default": `${SITE}/category/${slug}?page=2`,
   });
-  assert.equal(arabicPuzzlePage?.lastModified?.toISOString(), meta.syncedAt);
+  assert.equal(arabicPage?.lastModified?.toISOString(), meta.syncedAt);
   assert.equal(games.length, meta.gameCount);
   assert.equal(entries.some((entry) => /\/category\/(?:top|trending)\?page=/.test(entry.url)), false);
 });
