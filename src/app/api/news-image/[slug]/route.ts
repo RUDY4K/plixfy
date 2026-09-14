@@ -1,5 +1,6 @@
 import { getNewsBySlug } from "@/lib/news";
 import {
+  firstPartyNewsImagePath,
   MAX_NEWS_IMAGE_BYTES,
   newsImageFallbackSvg,
   parseAllowedNewsImageUrl,
@@ -65,11 +66,22 @@ async function fetchAllowedImage(initialUrl: URL): Promise<Response | null> {
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
   const item = getNewsBySlug(slug);
+  const firstPartyPath = item?.image ? firstPartyNewsImagePath(item.image) : null;
+  if (firstPartyPath) {
+    return new Response(null, {
+      status: 307,
+      headers: {
+        "Cache-Control": SUCCESS_CACHE,
+        Location: new URL(firstPartyPath, request.url).toString(),
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  }
   const sourceUrl = item?.image ? parseAllowedNewsImageUrl(item.image) : null;
   if (!sourceUrl) return fallbackResponse();
 

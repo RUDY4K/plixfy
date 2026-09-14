@@ -118,16 +118,35 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ];
   });
 
-  const newsRoutes: MetadataRoute.Sitemap = getSearchEligibleNews("ar").map((item) => {
-    const url = `${SITE}/news/${encodeURIComponent(item.slug)}`;
-    return {
+  const arabicNews = getSearchEligibleNews("ar");
+  const englishNews = getSearchEligibleNews("en");
+  const arabicNewsBySlug = new Map(arabicNews.map((item) => [item.slug, item]));
+  const englishNewsBySlug = new Map(englishNews.map((item) => [item.slug, item]));
+  const newsSlugs = new Set([...arabicNewsBySlug.keys(), ...englishNewsBySlug.keys()]);
+  const newsRoutes: MetadataRoute.Sitemap = [...newsSlugs].flatMap((slug) => {
+    const arItem = arabicNewsBySlug.get(slug);
+    const enItem = englishNewsBySlug.get(slug);
+    const encodedSlug = encodeURIComponent(slug);
+    const arUrl = arItem ? `${SITE}/news/${encodedSlug}` : undefined;
+    const enUrl = enItem ? `${SITE}/en/news/${encodedSlug}` : undefined;
+    const languages = {
+      ...(arUrl ? { ar: arUrl } : {}),
+      ...(enUrl ? { en: enUrl } : {}),
+      "x-default": arUrl ?? enUrl!,
+    };
+    const entry = (item: NonNullable<typeof arItem>, url: string, priority: number) => ({
       url,
       lastModified: new Date(`${item.reviewedAt ?? item.publishedAt}T00:00:00Z`),
       changeFrequency: "weekly" as const,
-      priority: 0.7,
+      priority,
       ...(item.image ? { images: [SITE + newsImageHref(item.slug)] } : {}),
-      alternates: { languages: { ar: url, "x-default": url } },
-    };
+      alternates: { languages },
+    });
+
+    return [
+      ...(arItem && arUrl ? [entry(arItem, arUrl, 0.7)] : []),
+      ...(enItem && enUrl ? [entry(enItem, enUrl, 0.6)] : []),
+    ];
   });
 
   const arabicPosts = getAllPosts();

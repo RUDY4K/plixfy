@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "slug": "melty-blood-twi-lumina-release-date",
+    "locale": "ar",
+    "contentSha256": "492e74685aee4c3fd75d4744a9a6040b51e0df442270affb6815941747978e80",
+    "evidencePath": "docs/editorial-evidence/2026-09-14-melty-blood-twi-lumina.md",
+    "evidenceSha256": "4871091d1aa25fca0308f48c99937eb92a824531e966494b922e921568829577",
+    "reviewer": "daily-growth-review + daily-ops-review (independent passes)",
+    "reviewedAt": "2026-09-14T19:33:48.951Z"
+  },
+  {
+    "slug": "melty-blood-twi-lumina-release-date",
+    "locale": "en",
+    "contentSha256": "492e74685aee4c3fd75d4744a9a6040b51e0df442270affb6815941747978e80",
+    "evidencePath": "docs/editorial-evidence/2026-09-14-melty-blood-twi-lumina.md",
+    "evidenceSha256": "4871091d1aa25fca0308f48c99937eb92a824531e966494b922e921568829577",
+    "reviewer": "daily-growth-review + daily-ops-review (independent passes)",
+    "reviewedAt": "2026-09-14T19:33:48.951Z"
+  }
+]

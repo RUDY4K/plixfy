@@ -42,5 +42,24 @@
     "searchEligible": true,
     "searchEligibleEn": false,
     "reviewedAt": "2026-09-02"
+  },
+  "melty-blood-twi-lumina-release-date": {
+    "keyPoints": [
+      "موعد الإصدار الرسمي هو 22 أبريل 2027.",
+      "المنصات المؤكدة: PS5 وPS4 وNintendo Switch 2 وNintendo Switch وXbox One وSteam.",
+      "اللعبة تنافسية ثنائية الأبعاد وتدعم لاعبًا أو لاعبين واللعب عبر الإنترنت.",
+      "French-Bread تتولى التطوير وAniplex تتولى النشر."
+    ],
+    "whyItMatters": "تثبيت الموعد والمنصات يتيح للاعب متابعة صفحة المتجر المناسبة، لكن عبارة اللعب عبر الإنترنت لا تثبت اللعب المشترك بين الأجهزة. وللقارئ العربي، غياب العربية من قائمة اللغات الحالية معلومة ينبغي الانتباه لها قبل الشراء.",
+    "keyPointsEn": [
+      "The official release date is April 22, 2027.",
+      "Confirmed platforms are PS5, PS4, Nintendo Switch 2, Nintendo Switch, Xbox One, and Steam.",
+      "The competitive 2D fighter supports one or two players and online play.",
+      "French-Bread is developing the game and Aniplex is publishing it."
+    ],
+    "whyItMattersEn": "A fixed date and platform list help players follow the relevant store version, but online support does not by itself confirm cross-play. Arabic is also absent from the current language list, a practical detail for Arabic-speaking buyers.",
+    "searchEligible": true,
+    "searchEligibleEn": true,
+    "reviewedAt": "2026-09-14"
   }
 }

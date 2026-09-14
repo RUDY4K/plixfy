@@ -1,0 +1,18 @@
+{
+  "kind": "news",
+  "slug": "melty-blood-twi-lumina-release-date",
+  "draftHash": "36b163ac97551d8301ef7ab92775a0c993d8efa6581ea1467bbff6313bdb2f87",
+  "reviewer": "daily-growth-review + daily-ops-review (independent passes)",
+  "reviewedAt": "2026-09-14T19:33:48.951Z",
+  "originalValue": "Verified the primary source and added practical context about language support, cross-play limits, and the Steam release without reusing source artwork.",
+  "locales": [
+    "ar",
+    "en"
+  ],
+  "evidenceFile": "docs/editorial-evidence/2026-09-14-melty-blood-twi-lumina.md",
+  "evidenceHash": "4871091d1aa25fca0308f48c99937eb92a824531e966494b922e921568829577",
+  "target": "src/data/news.json",
+  "previousFileHash": "fda40c94f2117da082b8382fc50b40bd730646b65950d843d2f5c309538b3a98",
+  "proposedFileHash": "ee9f106355b9699c6b9727dadb942d39bd13ce1450c83f044ec1e8dd48cd0401",
+  "status": "prepared"
+}

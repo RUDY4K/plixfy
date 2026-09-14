@@ -5,6 +5,7 @@ const NEWS_IMAGE_HOSTS = new Set([
   "i.ytimg.com",
   "www.gamespot.com",
   "www.gematsu.com",
+  "www.plixfy.com",
   "www.videogameschronicle.com",
   "xboxwire.thesourcemediaassets.com",
 ]);
@@ -38,6 +39,20 @@ export function parseAllowedNewsImageUrl(value: string): URL | null {
 
 export function isAllowedNewsImageUrl(value: string): boolean {
   return parseAllowedNewsImageUrl(value) !== null;
+}
+
+export function firstPartyNewsImagePath(value: string): string | null {
+  const url = parseAllowedNewsImageUrl(value);
+  if (
+    !url ||
+    url.hostname.toLowerCase() !== "www.plixfy.com" ||
+    url.search !== "" ||
+    url.hash !== "" ||
+    !/^\/news\/[a-z0-9-]+\.webp$/.test(url.pathname)
+  ) {
+    return null;
+  }
+  return url.pathname;
 }
 
 export function newsImageFallbackSvg(): string {
