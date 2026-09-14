@@ -41,6 +41,14 @@ export function saveDraftStatus(root, kind, status) {
   }
 }
 
+export function clearDraftStatus(root, kind) {
+  try {
+    fs.unlinkSync(path.join(root, "content-drafts", `${kind}-status.json`));
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
+}
+
 export function saveDrafts(root, kind, candidates, { published = [], revision = false } = {}) {
   const file = draftFile(root, kind);
   fs.mkdirSync(path.dirname(file), { recursive: true });

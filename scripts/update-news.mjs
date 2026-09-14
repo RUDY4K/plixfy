@@ -1,7 +1,7 @@
 // Prepares unverified bilingual RSS drafts; never changes published news.
 // يستخدم Gemini API في GitHub Actions، مع Claude CLI كخيار محلي عند التشغيل اليدوي.
 import fs from "node:fs";
-import { readDrafts, saveDraftStatus, saveDrafts } from "./content-draft-store.mjs";
+import { clearDraftStatus, readDrafts, saveDraftStatus, saveDrafts } from "./content-draft-store.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runClaude, extractJson } from "./claude-cli.mjs";
@@ -188,10 +188,13 @@ export async function main({ root = ROOT } = {}) {
       pendingCount,
       limit: MAX_PENDING_NEWS_DRAFTS,
       oldestPendingAt: oldest,
+      generationAttempted: false,
+      nextAction: "editorial_review_required",
     });
     console.log(`waiting_for_editorial: ${pendingCount} pending news drafts; oldest ${oldest}. No generation performed.`);
     return;
   }
+  clearDraftStatus(root, "news");
   const pending = pendingDrafts.map((draft) => draft.content);
   const known = [...existing, ...pending];
   const knownUrls = new Set(known.map((n) => n.sourceUrl));
