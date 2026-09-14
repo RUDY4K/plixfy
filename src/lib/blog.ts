@@ -26,6 +26,10 @@ export interface BlogPost {
   /** التصنيف المرتبط — تُعرض ألعابه أسفل المقال كروابط داخلية */
   relatedCategory: CategorySlug;
   relatedCategoryTitle: string;
+  featuredGameSlugs?: readonly string[];
+  primaryCtaLabel?: string;
+  featuredGamesHeading?: string;
+  featuredGamesIntro?: string;
 }
 
 const POSTS: readonly BlogPost[] = [
@@ -907,6 +911,10 @@ function getGeneratedPosts(): readonly BlogPost[] {
     faq: post.ar.faq,
     relatedCategory: post.relatedCategory,
     relatedCategoryTitle: post.relatedCategoryTitle,
+    featuredGameSlugs: post.featuredGameSlugs,
+    primaryCtaLabel: post.ar.primaryCtaLabel,
+    featuredGamesHeading: post.ar.featuredGamesHeading,
+    featuredGamesIntro: post.ar.featuredGamesIntro,
   }));
 }
 

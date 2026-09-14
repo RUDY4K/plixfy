@@ -30,7 +30,7 @@ jobs:
           key: content-drafts-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: content-drafts-
       - name: Validate draft boundary
-        run: node --test scripts/content-engine.test.mjs scripts/content-draft-store.test.mjs
+        run: node --test scripts/content-engine.test.mjs scripts/content-draft-store.test.mjs scripts/update-news.test.mjs
       - name: Prepare news drafts for review
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

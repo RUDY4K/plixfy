@@ -12,6 +12,7 @@ interface PublicationReview {
   evidenceSha256: string;
   reviewer: string;
   reviewedAt: string;
+  searchEligible?: boolean;
 }
 
 /** Hash the complete rendered post, including metadata, in its normalized shape. */
@@ -37,4 +38,43 @@ export function isBlogPublicationApproved(post: { slug: string }, locale: Locale
   } catch {
     return false;
   }
+}
+
+/** Search indexing is an explicit grant layered on top of exact publication approval. */
+export function isBlogSearchEligible(post: { slug: string }, locale: Locale): boolean {
+  if (!isBlogPublicationApproved(post, locale)) return false;
+  const reviews = reviewData as PublicationReview[];
+  const matches = reviews.filter((entry) => entry?.slug === post.slug && entry.locale === locale);
+  if (matches.length !== 1) return false;
+  const review = matches[0];
+  if (review.searchEligible !== true || review.contentSha256 !== blogContentHash(post)) return false;
+  if (!/^docs\/editorial-evidence\/[a-zA-Z0-9_/-]+\.md$/.test(review.evidencePath)) return false;
+  try {
+    const evidenceName = review.evidencePath.slice("docs/editorial-evidence/".length);
+    const evidence = readFileSync(path.join(process.cwd(), "docs/editorial-evidence", evidenceName));
+    return evidence.toString("utf8").trim().length > 0 && createHash("sha256").update(evidence).digest("hex") === review.evidenceSha256;
+  } catch {
+    return false;
+  }
+}
+
+type BlogSearchCandidates = Partial<Record<Locale, { slug: string }>>;
+export type BlogSearchLanguages = Partial<Record<Locale, string>> & { "x-default": string };
+
+/** Build hreflang values only from locale records that independently pass the search gate. */
+export function getBlogSearchAlternates(candidates: BlogSearchCandidates): BlogSearchLanguages | undefined {
+  const presentSlugs = Object.values(candidates).map((post) => post?.slug).filter(Boolean);
+  if (new Set(presentSlugs).size > 1) return undefined;
+  const ar = candidates.ar && isBlogSearchEligible(candidates.ar, "ar")
+    ? `https://www.plixfy.com/blog/${candidates.ar.slug}`
+    : undefined;
+  const en = candidates.en && isBlogSearchEligible(candidates.en, "en")
+    ? `https://www.plixfy.com/en/blog/${candidates.en.slug}`
+    : undefined;
+  if (!ar && !en) return undefined;
+  return {
+    ...(ar ? { ar } : {}),
+    ...(en ? { en } : {}),
+    "x-default": ar ?? en!,
+  };
 }

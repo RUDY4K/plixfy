@@ -437,7 +437,7 @@ test("paginated category JSON-LD describes the visible canonical page", () => {
   assert.match(categoryPage, /const url = SITE \+ href\(pagePath\)/);
   assert.match(categoryPage, /numberOfItems: visibleGames\.length/);
   assert.match(categoryPage, /itemListElement: visibleGames\.map/);
-  assert.match(categoryPage, /position: \(currentPage - 1\) \* PAGE_SIZE \+ idx \+ 1/);
+  assert.match(categoryPage, /position: \(currentPage - 1\) \* CATEGORY_PAGE_SIZE \+ idx \+ 1/);
 });
 
 test("home page uses the localized search-intent heading before the daily game", () => {
@@ -458,7 +458,8 @@ test("template roundups stay out while reviewed news uses a fail-closed search g
   const localeLayout = read("src/app/[locale]/layout.tsx");
 
   assert.match(blogIndex, /robots: \{ index: false, follow: true \}/);
-  assert.match(blogArticle, /robots: \{ index: false, follow: true \}/);
+  assert.match(blogArticle, /getBlogSearchAlternates/);
+  assert.match(blogArticle, /index: currentLocaleIsEligible/);
   assert.match(newsIndex, /robots: \{ index: false, follow: true \}/);
   assert.match(newsArticle, /index: isSearchEligibleNews\(item, locale\)/);
   assert.match(newsGate, /approved === true/);
@@ -466,8 +467,11 @@ test("template roundups stay out while reviewed news uses a fail-closed search g
   assert.match(sitemap, /getSearchEligibleNews\("ar"\)/);
   assert.match(indexNow, /args\.has\("--recent-news"\)/);
   assert.match(indexNow, /review\?\.searchEligible !== true/);
-  assert.doesNotMatch(sitemap, /bilingual\("\/blog"/);
-  assert.doesNotMatch(sitemap, /blogRoutes/);
+  assert.match(sitemap, /getBlogSearchAlternates/);
+  assert.match(sitemap, /const blogSlugs = new Set/);
+  assert.match(sitemap, /eligibleLanguages\.ar/);
+  assert.match(sitemap, /eligibleLanguages\.en/);
+  assert.match(sitemap, /const blogRoutes/);
   assert.match(localeLayout, /"google-adsense-account": ADSENSE_CLIENT/);
   assert.doesNotMatch(localeLayout, /DeferredAdSense/);
 });

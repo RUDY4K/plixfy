@@ -6,6 +6,9 @@ assert.ok(['127.0.0.1', 'localhost'].includes(origin.hostname), 'local build onl
 const news = JSON.parse(readFileSync('src/data/news.json', 'utf8'));
 assert.ok(news.length);
 const oldBlog = 'afdal-alaab-sibaq-online-2026';
+const reviewedBlog = JSON.parse(readFileSync('src/data/blog-generated.json', 'utf8'))
+  .find((post) => post.slug === 'alaab-sibaq-jawal-w-computer-2026');
+assert.ok(reviewedBlog, 'reviewed racing guide is present');
 async function read(route, status = 200) {
   const response = await fetch(new URL(route, origin));
   assert.equal(response.status, status, route);
@@ -28,6 +31,20 @@ for (const prefix of ['', '/en']) {
   assert.ok(detail.includes(`${prefix}/guides/browser-games`));
   await read(`${prefix}/news/never-existed-editorial-smoke-672184`, 404);
   const blog = await read(`${prefix}/blog`);
+  assert.match(blog, /noindex/);
+  const reviewedTitle = prefix ? reviewedBlog.en.h1 : reviewedBlog.ar.h1;
+  const reviewedCta = prefix ? reviewedBlog.en.primaryCtaLabel : reviewedBlog.ar.primaryCtaLabel;
+  assert.ok(blog.includes(reviewedTitle));
+  const reviewed = await read(`${prefix}/blog/${reviewedBlog.slug}`);
+  assert.ok(reviewed.includes(reviewedTitle));
+  assert.ok(reviewed.includes(reviewedCta));
+  assert.ok(reviewed.includes(`${prefix}/play/bike-stunt-game`));
+  assert.ok(reviewed.includes(`${prefix}/category/racing`));
+  assert.doesNotMatch(reviewed, /utm_(?:source|medium|campaign)/i);
+  assert.doesNotMatch(reviewed, /noindex/);
+  assert.match(reviewed, /hrefLang="ar"/);
+  assert.match(reviewed, /hrefLang="en"/);
+  assert.match(reviewed, /hrefLang="x-default"/);
   assert.ok(blog.includes(`${prefix}/guides/browser-games`));
   const old = await read(`${prefix}/blog/${oldBlog}`);
   assert.match(old, /noindex/);
@@ -39,8 +56,17 @@ for (const prefix of ['', '/en']) {
   for (const body of [home, blog, old, category]) assert.ok(!body.includes(legacyTitle));
   await read(`${prefix}/blog/never-existed-editorial-smoke-672184`, 404);
 }
-for (const path of ['/news/rss.xml', '/blog/rss.xml']) {
-  const rss = await read(path);
-  assert.doesNotMatch(rss, /<item>/);
-}
-console.log('PASS: unreviewed news/blog absent from rendered pages and RSS; useful bilingual revision routes; unknown routes 404.');
+const newsRss = await read('/news/rss.xml');
+assert.doesNotMatch(newsRss, /<item>/);
+const blogRss = await read('/blog/rss.xml');
+assert.match(blogRss, new RegExp(`<link>https://www\\.plixfy\\.com/blog/${reviewedBlog.slug}</link>`));
+assert.equal((blogRss.match(/<item>/g) ?? []).length, 1);
+const sitemap = await read('/sitemap.xml');
+const blogLocations = [...sitemap.matchAll(/<loc>(https:\/\/www\.plixfy\.com\/(?:en\/)?blog\/[^<]+)<\/loc>/g)].map((match) => match[1]);
+assert.deepEqual(blogLocations, [
+  `https://www.plixfy.com/blog/${reviewedBlog.slug}`,
+  `https://www.plixfy.com/en/blog/${reviewedBlog.slug}`,
+]);
+for (const locale of ['ar', 'en', 'x-default']) assert.match(sitemap, new RegExp(`hreflang="${locale}"`));
+assert.match(sitemap, new RegExp(`<lastmod>${reviewedBlog.updatedAt}T00:00:00\\.000Z</lastmod>`));
+console.log('PASS: only the eligible bilingual guide is indexable and in the sitemap/RSS; blog indexes and unreviewed content remain noindex; unknown routes 404.');

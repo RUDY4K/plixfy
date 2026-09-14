@@ -29,6 +29,26 @@ export function readDrafts(root, kind) {
   return readArray(draftFile(root, kind), { missing: true });
 }
 
+export function saveDraftStatus(root, kind, status) {
+  const file = path.join(root, "content-drafts", `${kind}-status.json`);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const temporary = `${file}.${randomUUID()}.tmp`;
+  try {
+    fs.writeFileSync(temporary, JSON.stringify(status, null, 2) + "\n", { encoding: "utf8", flag: "wx" });
+    fs.renameSync(temporary, file);
+  } finally {
+    if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+  }
+}
+
+export function clearDraftStatus(root, kind) {
+  try {
+    fs.unlinkSync(path.join(root, "content-drafts", `${kind}-status.json`));
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
+}
+
 export function saveDrafts(root, kind, candidates, { published = [], revision = false } = {}) {
   const file = draftFile(root, kind);
   fs.mkdirSync(path.dirname(file), { recursive: true });

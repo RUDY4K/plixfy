@@ -48,3 +48,75 @@ test("a full review queue skips source fetching and leaves drafts unchanged", as
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("a full review queue records an editorial-wait status for the review artifact", async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-news-status-"));
+  const drafts = Array.from({ length: 12 }, (_, index) => ({
+    slug: `draft-${index}`,
+    status: "pending_review",
+    generatedAt: `2026-09-0${(index % 8) + 1}T08:00:00.000Z`,
+    content: { slug: `draft-${index}` },
+  }));
+  const draftFile = path.join(root, "content-drafts", "news.json");
+  fs.mkdirSync(path.dirname(draftFile), { recursive: true });
+  fs.mkdirSync(path.join(root, "src", "data"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src", "data", "news.json"), "[]\n");
+  fs.writeFileSync(draftFile, JSON.stringify(drafts, null, 2) + "\n");
+  try {
+    await main({ root });
+    const status = JSON.parse(fs.readFileSync(path.join(root, "content-drafts", "news-status.json"), "utf8"));
+    const { updatedAt, ...withoutTimestamp } = status;
+    assert.deepEqual(withoutTimestamp, {
+      status: "waiting_for_editorial",
+      pendingCount: 12,
+      limit: 12,
+      oldestPendingAt: "2026-09-01T08:00:00.000Z",
+      generationAttempted: false,
+      nextAction: "editorial_review_required",
+    });
+    assert.ok(Number.isFinite(Date.parse(updatedAt)));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a malformed queue clears a stale editorial-wait status before failing closed", async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-news-status-corrupt-"));
+  const draftDirectory = path.join(root, "content-drafts");
+  fs.mkdirSync(draftDirectory, { recursive: true });
+  fs.mkdirSync(path.join(root, "src", "data"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src", "data", "news.json"), "[]\n");
+  fs.writeFileSync(path.join(draftDirectory, "news.json"), "{not-json");
+  fs.writeFileSync(path.join(draftDirectory, "news-status.json"), JSON.stringify({ status: "waiting_for_editorial" }) + "\n");
+  try {
+    await assert.rejects(main({ root }));
+    assert.equal(fs.existsSync(path.join(draftDirectory, "news-status.json")), false);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("a resumed queue clears a stale editorial-wait status before checking feeds", async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-news-status-clear-"));
+  const drafts = Array.from({ length: 11 }, (_, index) => ({
+    slug: `draft-${index}`,
+    status: "pending_review",
+    generatedAt: `2026-09-0${(index % 8) + 1}T08:00:00.000Z`,
+    content: { slug: `draft-${index}` },
+  }));
+  const draftDirectory = path.join(root, "content-drafts");
+  fs.mkdirSync(draftDirectory, { recursive: true });
+  fs.mkdirSync(path.join(root, "src", "data"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src", "data", "news.json"), "[]\n");
+  fs.writeFileSync(path.join(draftDirectory, "news.json"), JSON.stringify(drafts, null, 2) + "\n");
+  fs.writeFileSync(path.join(draftDirectory, "news-status.json"), JSON.stringify({ status: "waiting_for_editorial" }) + "\n");
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => ({ ok: true, text: async () => "" });
+  try {
+    await main({ root });
+    assert.equal(fs.existsSync(path.join(draftDirectory, "news-status.json")), false);
+  } finally {
+    globalThis.fetch = originalFetch;
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

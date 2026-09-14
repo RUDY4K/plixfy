@@ -3,12 +3,15 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CategoryStrip from "@/components/CategoryStrip";
+import GameCard from "@/components/GameCard";
+import TrackedGameLink from "@/components/TrackedGameLink";
 import { getPostBySlug, getKnownPostSlugs, getAllPosts, type BlogPost } from "@/lib/blog";
 import { getPostEnBySlug, getKnownPostEnSlugs, getAllPostsEn, type BlogPostEn } from "@/lib/blogEn";
-import { getGamesByCategory } from "@/lib/games";
+import { getGameBySlug, getGamesByCategory } from "@/lib/games";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import { BRAND_AR } from "@/lib/siteContent";
-import { hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
+import { hasLocale, localeHref, ogLocaleFor, type Locale } from "@/lib/i18n";
+import { getBlogSearchAlternates } from "@/lib/blog-publication";
 
 const SITE = "https://www.plixfy.com";
 
@@ -32,6 +35,7 @@ const COPY = {
     blog: "المدوّنة",
     faqHeading: "أسئلة شائعة",
     playNow: (category: string) => "جرّب " + category + " الآن",
+    browseCategory: (category: string) => "تصفح " + category,
     otherPosts: "مقالات أخرى",
   },
   en: {
@@ -40,6 +44,7 @@ const COPY = {
     blog: "Blog",
     faqHeading: "FAQ",
     playNow: (category: string) => "Try " + category + " Now",
+    browseCategory: (category: string) => "Browse " + category,
     otherPosts: "Other Articles",
   },
 } as const;
@@ -78,14 +83,20 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     const copy = revisionCopy(locale);
     return { title: copy.title, description: copy.description, robots: { index: false, follow: true }, alternates: { canonical: localeHref(locale, "/blog/" + slug) } };
   }
+  const eligibleLanguages = getBlogSearchAlternates({
+    ar: getPostBySlug(slug),
+    en: getPostEnBySlug(slug),
+  });
+  const currentLocaleIsEligible = Boolean(eligibleLanguages?.[locale]);
 
   return {
     title: post.title,
     description: post.description,
     keywords: [...post.keywords],
-    // Publication approval is separate from search indexing eligibility.
-    robots: { index: false, follow: true },
-    alternates: pageAlternates(locale, "/blog/" + post.slug),
+    robots: { index: currentLocaleIsEligible, follow: true },
+    alternates: currentLocaleIsEligible
+      ? { canonical: localeHref(locale, "/blog/" + post.slug), languages: eligibleLanguages }
+      : { canonical: localeHref(locale, "/blog/" + post.slug) },
     openGraph: {
       type: "article",
       title: post.title,
@@ -119,6 +130,10 @@ export default async function BlogPostPage({ params }: PageParams) {
   }
 
   const relatedGames = getGamesByCategory(post.relatedCategory).slice(0, 12);
+  const featuredGames = (post.featuredGameSlugs ?? [])
+    .map((gameSlug) => getGameBySlug(gameSlug))
+    .filter((game) => game !== undefined);
+  const primaryGame = featuredGames[0];
   const allPosts = locale === "en" ? getAllPostsEn() : getAllPosts();
   const others = allPosts.filter((p) => p.slug !== post.slug);
   const otherPosts = [
@@ -190,6 +205,27 @@ export default async function BlogPostPage({ params }: PageParams) {
           <p className="text-sm md:text-base text-text-secondary mt-4 leading-loose">
             {post.intro}
           </p>
+          {primaryGame && post.primaryCtaLabel ? (
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <TrackedGameLink
+                href={localeHref(locale, "/play/" + primaryGame.slug)}
+                slug={primaryGame.slug}
+                locale={locale}
+                position={1}
+                placement="blog-primary-cta"
+              >
+                <span className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-5 py-3 font-bold text-[#090913] transition hover:bg-primary/90 sm:w-auto">
+                  {post.primaryCtaLabel}
+                </span>
+              </TrackedGameLink>
+              <Link
+                href={localeHref(locale, "/category/" + post.relatedCategory)}
+                className="inline-flex min-h-12 items-center justify-center px-3 font-bold text-primary underline underline-offset-4"
+              >
+                {c.browseCategory(categoryTitle)}
+              </Link>
+            </div>
+          ) : null}
         </header>
 
         {post.sections.map((section) => (
@@ -207,6 +243,31 @@ export default async function BlogPostPage({ params }: PageParams) {
             ))}
           </section>
         ))}
+
+        {featuredGames.length > 0 && post.featuredGamesHeading ? (
+          <section className="mb-8 rounded-2xl border border-white/10 bg-surface p-4 md:p-5">
+            <h2 className="text-xl font-bold text-text-primary md:text-2xl">
+              {post.featuredGamesHeading}
+            </h2>
+            {post.featuredGamesIntro ? (
+              <p className="mt-2 text-sm leading-loose text-text-secondary md:text-base">
+                {post.featuredGamesIntro}
+              </p>
+            ) : null}
+            <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
+              {featuredGames.map((game, index) => (
+                <GameCard
+                  key={game.slug}
+                  {...game}
+                  locale={locale}
+                  position={index + 1}
+                  placement="blog-featured-games"
+                  imageSizes="(max-width: 639px) 50vw, 180px"
+                />
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="mb-8">
           <h2 className="text-xl md:text-2xl font-bold text-text-primary mb-4">

@@ -1,8 +1,11 @@
 import type { MetadataRoute } from "next";
-import { allGames, categories } from "@/lib/games";
+import { allGames, CATEGORY_PAGE_SIZE, categories, getCategoryGames } from "@/lib/games";
 import { hasEditorialGameContent } from "@/lib/gameContent";
 import { getSearchEligibleNews } from "@/lib/news";
 import { newsImageHref } from "@/lib/newsImage";
+import { getAllPosts } from "@/lib/blog";
+import { getAllPostsEn } from "@/lib/blogEn";
+import { getBlogSearchAlternates } from "@/lib/blog-publication";
 import catalogMeta from "@/data/playgama-catalog-meta.json";
 
 const SITE = "https://www.plixfy.com";
@@ -64,6 +67,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     bilingual("/category/" + c.slug, "weekly", 0.7)
   );
 
+  const categoryPaginationRoutes: MetadataRoute.Sitemap = categories.flatMap((category) => {
+    const totalPages = Math.max(
+      1,
+      Math.ceil(getCategoryGames(category.slug).length / CATEGORY_PAGE_SIZE),
+    );
+
+    return Array.from({ length: totalPages - 1 }, (_, index) => index + 2).flatMap((page) =>
+      bilingual(
+        `/category/${category.slug}?page=${page}`,
+        "weekly",
+        0.5,
+        0.4,
+        { lastModified: GAME_CATALOG_LAST_MODIFIED },
+      )
+    );
+  });
+
   const gameRoutes: MetadataRoute.Sitemap = allGames.flatMap((game) => {
     const hasAr = hasEditorialGameContent(game.slug, "ar");
     const hasEn = hasEditorialGameContent(game.slug, "en");
@@ -110,10 +130,40 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
+  const arabicPosts = getAllPosts();
+  const englishPosts = getAllPostsEn();
+  const arabicPostsBySlug = new Map(arabicPosts.map((post) => [post.slug, post]));
+  const englishPostsBySlug = new Map(englishPosts.map((post) => [post.slug, post]));
+  const blogSlugs = new Set([...arabicPosts.map((post) => post.slug), ...englishPosts.map((post) => post.slug)]);
+  const blogRoutes: MetadataRoute.Sitemap = [...blogSlugs].flatMap((slug) => {
+    const arPost = arabicPostsBySlug.get(slug);
+    const enPost = englishPostsBySlug.get(slug);
+    const eligibleLanguages = getBlogSearchAlternates({ ar: arPost, en: enPost });
+    if (!eligibleLanguages) return [];
+    return [
+      ...(eligibleLanguages.ar && arPost ? [{
+        url: eligibleLanguages.ar,
+        lastModified: new Date(arPost.updatedAt),
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+        alternates: { languages: eligibleLanguages },
+      }] : []),
+      ...(eligibleLanguages.en && enPost ? [{
+        url: eligibleLanguages.en,
+        ...(enPost.updatedAt ? { lastModified: new Date(enPost.updatedAt) } : {}),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+        alternates: { languages: eligibleLanguages },
+      }] : []),
+    ];
+  });
+
   return [
     ...staticRoutes,
     ...categoryRoutes,
+    ...categoryPaginationRoutes,
     ...gameRoutes,
     ...newsRoutes,
+    ...blogRoutes,
   ];
 }

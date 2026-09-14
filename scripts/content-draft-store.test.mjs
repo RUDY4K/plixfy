@@ -74,6 +74,7 @@ test("all generation entrypoints use draft storage and contain no direct content
   }
   const workflow = fs.readFileSync(path.join(repository, ".github/workflows/content-engine.yml"), "utf8");
   assert.match(workflow, /contents: read/);
+  assert.match(workflow, /scripts\/update-news\.test\.mjs/);
   assert.match(workflow, /upload-artifact/);
   assert.doesNotMatch(workflow, /git (?:push|commit|add)|telegram-alert|submit-indexnow/);
   const local = fs.readFileSync(path.join(repository, "scripts/news-cron.cmd"), "utf8");

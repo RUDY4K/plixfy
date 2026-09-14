@@ -11,6 +11,11 @@ function required(value, label) {
   if (typeof value !== "string" || !value.trim()) throw new Error(`Missing ${label}`);
   return value;
 }
+function containsSearchEligibilityFlag(value) {
+  if (!value || typeof value !== "object") return false;
+  if (Object.hasOwn(value, "searchEligible") || Object.hasOwn(value, "searchEligibleEn")) return true;
+  return Object.values(value).some(containsSearchEligibilityFlag);
+}
 function localFile(root, relative) {
   required(relative, "relative file path");
   const target = path.resolve(root, relative);
@@ -64,6 +69,7 @@ export function promoteContent(root, review) {
           for (const key of ["title", "summary", "titleEn", "summaryEn", "sourceName", "sourceUrl"]) required(content[key], key);
           if (new URL(content.sourceUrl).protocol !== "https:") throw new Error("News source must use HTTPS");
         } else {
+          if (containsSearchEligibilityFlag(content)) throw new Error("Generated content cannot set search eligibility");
           for (const language of ["ar", "en"]) {
             const localized = content[language];
             for (const key of ["title", "h1", "description", "intro"]) required(localized?.[key], `${language}.${key}`);
@@ -81,6 +87,12 @@ export function promoteContent(root, review) {
           }
           required(content.relatedCategory, "category");
           required(content.relatedCategoryTitle, "category title");
+          if (content.featuredGameSlugs !== undefined) {
+            if (!Array.isArray(content.featuredGameSlugs) || !content.featuredGameSlugs.length || content.featuredGameSlugs.length > 6 || new Set(content.featuredGameSlugs).size !== content.featuredGameSlugs.length || content.featuredGameSlugs.some((slug) => typeof slug !== "string" || !slug.trim())) throw new Error("Invalid featured game slugs");
+            for (const language of ["ar", "en"]) {
+              for (const key of ["primaryCtaLabel", "featuredGamesHeading", "featuredGamesIntro"]) required(content[language]?.[key], `${language}.${key}`);
+            }
+          }
         }
         items.unshift({ ...content, publishedAt: date, ...(review.kind === "blog" ? { updatedAt: date } : {}) });
       }
@@ -98,15 +110,22 @@ export function promoteContent(root, review) {
           publishedAt: approvedRecord.publishedAt, updatedAt: approvedRecord.updatedAt,
           keywords: c.keywords, intro: c.intro, sections: c.sections, faq: c.faq,
           relatedCategory: approvedRecord.relatedCategory, relatedCategoryTitle: approvedRecord.relatedCategoryTitle,
+          featuredGameSlugs: approvedRecord.featuredGameSlugs,
+          primaryCtaLabel: c.primaryCtaLabel, featuredGamesHeading: c.featuredGamesHeading,
+          featuredGamesIntro: c.featuredGamesIntro,
         } : {
           slug: approvedRecord.slug, title: c.title, h1: c.h1, description: c.description,
           keywords: c.keywords, intro: c.intro, sections: c.sections, faq: c.faq,
           relatedCategory: approvedRecord.relatedCategory, publishedAt: approvedRecord.publishedAt, updatedAt: approvedRecord.updatedAt,
+          featuredGameSlugs: approvedRecord.featuredGameSlugs,
+          primaryCtaLabel: c.primaryCtaLabel, featuredGamesHeading: c.featuredGamesHeading,
+          featuredGamesIntro: c.featuredGamesIntro,
         };
         hash = contentHash(post);
       } else hash = newsContentHash(mergeNewsEditorial(approvedRecord, editorial));
       return { slug: review.slug, locale, contentSha256: hash, evidencePath: review.evidenceFile,
-        evidenceSha256: review.evidenceHash, reviewer: review.reviewer, reviewedAt: review.reviewedAt };
+        evidenceSha256: review.evidenceHash, reviewer: review.reviewer, reviewedAt: review.reviewedAt,
+        ...(review.kind === "blog" ? { searchEligible: review.searchEligible === true } : {}) };
     });
     const nextRegistry = [...registry.filter((entry) => !(entry.slug === review.slug && review.locales.includes(entry.locale))), ...entries];
     const registryOutput = JSON.stringify(nextRegistry, null, 2) + "\n";

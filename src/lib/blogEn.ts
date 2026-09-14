@@ -15,6 +15,10 @@ export interface BlogPostEn {
   relatedCategory: CategorySlug;
   publishedAt?: string;
   updatedAt?: string;
+  featuredGameSlugs?: readonly string[];
+  primaryCtaLabel?: string;
+  featuredGamesHeading?: string;
+  featuredGamesIntro?: string;
 }
 
 // محتوى إنجليزي أصلي مولَّد عبر scripts/generate-en-blog.mjs — لا تحرّر يدويًا.
@@ -747,6 +751,10 @@ function getGeneratedPostsEn(): readonly BlogPostEn[] {
     relatedCategory: post.relatedCategory,
     publishedAt: post.publishedAt,
     updatedAt: post.updatedAt,
+    featuredGameSlugs: post.featuredGameSlugs,
+    primaryCtaLabel: post.en.primaryCtaLabel,
+    featuredGamesHeading: post.en.featuredGamesHeading,
+    featuredGamesIntro: post.en.featuredGamesIntro,
   }));
 }
 

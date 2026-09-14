@@ -1,7 +1,7 @@
 // Prepares unverified bilingual RSS drafts; never changes published news.
 // يستخدم Gemini API في GitHub Actions، مع Claude CLI كخيار محلي عند التشغيل اليدوي.
 import fs from "node:fs";
-import { readDrafts, saveDrafts } from "./content-draft-store.mjs";
+import { clearDraftStatus, readDrafts, saveDraftStatus, saveDrafts } from "./content-draft-store.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runClaude, extractJson } from "./claude-cli.mjs";
@@ -175,6 +175,7 @@ export function oldestPendingNewsDraft(drafts) {
 }
 
 export async function main({ root = ROOT } = {}) {
+  clearDraftStatus(root, "news");
   const existing = loadExisting(root);
   if (process.argv.includes("--images-only")) {
     throw new Error("Automatic edits to published images are disabled; prepare a reviewed revision instead.");
@@ -183,6 +184,15 @@ export async function main({ root = ROOT } = {}) {
   const pendingCount = pendingNewsDraftCount(pendingDrafts);
   if (pendingCount >= MAX_PENDING_NEWS_DRAFTS) {
     const oldest = oldestPendingNewsDraft(pendingDrafts) ?? "unknown";
+    saveDraftStatus(root, "news", {
+      status: "waiting_for_editorial",
+      pendingCount,
+      limit: MAX_PENDING_NEWS_DRAFTS,
+      oldestPendingAt: oldest,
+      generationAttempted: false,
+      nextAction: "editorial_review_required",
+      updatedAt: new Date().toISOString(),
+    });
     console.log(`waiting_for_editorial: ${pendingCount} pending news drafts; oldest ${oldest}. No generation performed.`);
     return;
   }
