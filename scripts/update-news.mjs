@@ -175,6 +175,7 @@ export function oldestPendingNewsDraft(drafts) {
 }
 
 export async function main({ root = ROOT } = {}) {
+  clearDraftStatus(root, "news");
   const existing = loadExisting(root);
   if (process.argv.includes("--images-only")) {
     throw new Error("Automatic edits to published images are disabled; prepare a reviewed revision instead.");
@@ -190,11 +191,11 @@ export async function main({ root = ROOT } = {}) {
       oldestPendingAt: oldest,
       generationAttempted: false,
       nextAction: "editorial_review_required",
+      updatedAt: new Date().toISOString(),
     });
     console.log(`waiting_for_editorial: ${pendingCount} pending news drafts; oldest ${oldest}. No generation performed.`);
     return;
   }
-  clearDraftStatus(root, "news");
   const pending = pendingDrafts.map((draft) => draft.content);
   const known = [...existing, ...pending];
   const knownUrls = new Set(known.map((n) => n.sourceUrl));
