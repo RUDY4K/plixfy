@@ -6,7 +6,8 @@
     "evidencePath": "docs/editorial-evidence/2026-09-14-racing-device-guide.md",
     "evidenceSha256": "053862e948c0dfe9535b365acb7c190210f0e5d0738b635f929e4536c1462dd4",
     "reviewer": "editorial-triage-first-pass",
-    "reviewedAt": "2026-09-14T11:40:33.398Z"
+    "reviewedAt": "2026-09-14T11:40:33.398Z",
+    "searchEligible": true
   },
   {
     "slug": "alaab-sibaq-jawal-w-computer-2026",
@@ -15,6 +16,7 @@
     "evidencePath": "docs/editorial-evidence/2026-09-14-racing-device-guide.md",
     "evidenceSha256": "053862e948c0dfe9535b365acb7c190210f0e5d0738b635f929e4536c1462dd4",
     "reviewer": "editorial-triage-first-pass",
-    "reviewedAt": "2026-09-14T11:40:33.398Z"
+    "reviewedAt": "2026-09-14T11:40:33.398Z",
+    "searchEligible": true
   }
 ]

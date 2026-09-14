@@ -458,7 +458,7 @@ test("template roundups stay out while reviewed news uses a fail-closed search g
   const localeLayout = read("src/app/[locale]/layout.tsx");
 
   assert.match(blogIndex, /robots: \{ index: false, follow: true \}/);
-  assert.match(blogArticle, /robots: \{ index: false, follow: true \}/);
+  assert.match(blogArticle, /index: isBlogSearchEligible\(post, locale\)/);
   assert.match(newsIndex, /robots: \{ index: false, follow: true \}/);
   assert.match(newsArticle, /index: isSearchEligibleNews\(item, locale\)/);
   assert.match(newsGate, /approved === true/);
@@ -466,8 +466,9 @@ test("template roundups stay out while reviewed news uses a fail-closed search g
   assert.match(sitemap, /getSearchEligibleNews\("ar"\)/);
   assert.match(indexNow, /args\.has\("--recent-news"\)/);
   assert.match(indexNow, /review\?\.searchEligible !== true/);
-  assert.doesNotMatch(sitemap, /bilingual\("\/blog"/);
-  assert.doesNotMatch(sitemap, /blogRoutes/);
+  assert.match(sitemap, /isBlogSearchEligible\(post, "ar"\)/);
+  assert.match(sitemap, /isBlogSearchEligible\(englishPost, "en"\)/);
+  assert.match(sitemap, /const blogRoutes/);
   assert.match(localeLayout, /"google-adsense-account": ADSENSE_CLIENT/);
   assert.doesNotMatch(localeLayout, /DeferredAdSense/);
 });

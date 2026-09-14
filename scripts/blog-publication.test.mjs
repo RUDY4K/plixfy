@@ -21,7 +21,7 @@ const review = {
   reviewer: "Test fixture reviewer", reviewedAt: "2026-01-01T00:00:00Z",
 };
 
-function load(reviews, evidenceText = evidence) {
+function loadModule(reviews, evidenceText = evidence) {
   const exports = {};
   vm.runInNewContext(compiled, {
     exports, process,
@@ -35,7 +35,11 @@ function load(reviews, evidenceText = evidence) {
       return require(specifier);
     },
   });
-  return exports.isBlogPublicationApproved;
+  return exports;
+}
+
+function load(reviews, evidenceText = evidence) {
+  return loadModule(reviews, evidenceText).isBlogPublicationApproved;
 }
 
 test("publication requires approval for the exact locale and full article content", () => {
@@ -63,4 +67,15 @@ test("publication rejects ambiguous reviews and missing review accountability", 
   assert.equal(load([{ ...review, reviewer: " " }])(post, "en"), false);
   assert.equal(load([{ ...review, reviewedAt: "invalid" }])(post, "en"), false);
   assert.equal(load([{ ...review, reviewedAt: "2999-01-01" }])(post, "en"), false);
+});
+
+test("search eligibility is explicit and inherits every exact publication check", () => {
+  const eligibleReview = { ...review, searchEligible: true };
+  assert.equal(loadModule([review]).isBlogSearchEligible(post, "en"), false);
+  assert.equal(loadModule([{ ...review, searchEligible: false }]).isBlogSearchEligible(post, "en"), false);
+  assert.equal(loadModule([eligibleReview]).isBlogSearchEligible(post, "en"), true);
+  assert.equal(loadModule([eligibleReview]).isBlogSearchEligible(post, "ar"), false);
+  assert.equal(loadModule([eligibleReview]).isBlogSearchEligible({ ...post, title: "Changed" }, "en"), false);
+  assert.equal(loadModule([eligibleReview, eligibleReview]).isBlogSearchEligible(post, "en"), false);
+  assert.equal(loadModule([eligibleReview], "Changed evidence").isBlogSearchEligible(post, "en"), false);
 });

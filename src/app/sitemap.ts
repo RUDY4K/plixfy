@@ -3,6 +3,9 @@ import { allGames, CATEGORY_PAGE_SIZE, categories, getCategoryGames } from "@/li
 import { hasEditorialGameContent } from "@/lib/gameContent";
 import { getSearchEligibleNews } from "@/lib/news";
 import { newsImageHref } from "@/lib/newsImage";
+import { getAllPosts } from "@/lib/blog";
+import { getPostEnBySlug } from "@/lib/blogEn";
+import { isBlogSearchEligible } from "@/lib/blog-publication";
 import catalogMeta from "@/data/playgama-catalog-meta.json";
 
 const SITE = "https://www.plixfy.com";
@@ -127,11 +130,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
+  const blogRoutes: MetadataRoute.Sitemap = getAllPosts().flatMap((post) => {
+    const englishPost = getPostEnBySlug(post.slug);
+    if (!isBlogSearchEligible(post, "ar") || !englishPost || !isBlogSearchEligible(englishPost, "en")) return [];
+    return bilingual("/blog/" + post.slug, "monthly", 0.7, 0.6, {
+      lastModified: new Date(post.updatedAt),
+    });
+  });
+
   return [
     ...staticRoutes,
     ...categoryRoutes,
     ...categoryPaginationRoutes,
     ...gameRoutes,
     ...newsRoutes,
+    ...blogRoutes,
   ];
 }

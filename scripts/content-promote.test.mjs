@@ -61,6 +61,37 @@ test("blog registry hashes normalized rendered records for each explicitly revie
   const ar = { slug: post.slug, title: c.title, h1: c.h1, description: c.description, publishedAt: post.publishedAt, updatedAt: post.updatedAt, keywords: c.keywords, intro: c.intro, sections: c.sections, faq: c.faq, relatedCategory: post.relatedCategory, relatedCategoryTitle: post.relatedCategoryTitle, featuredGameSlugs: post.featuredGameSlugs, primaryCtaLabel: c.primaryCtaLabel, featuredGamesHeading: c.featuredGamesHeading, featuredGamesIntro: c.featuredGamesIntro };
   assert.equal(reviews.find((entry) => entry.locale === "en").contentSha256, contentHash(en));
   assert.equal(reviews.find((entry) => entry.locale === "ar").contentSha256, contentHash(ar));
+  assert.ok(reviews.every((entry) => entry.searchEligible === false));
+});
+
+test("blog promotion accepts search eligibility only from the external review", (t) => {
+  const { root, review } = setup(t);
+  fs.writeFileSync(path.join(root, "src/data/blog-generated.json"), "[]");
+  fs.writeFileSync(path.join(root, "src/data/blog-publication-review.json"), "[]");
+  const localized = { title: "Title", h1: "Heading", description: "Description", keywords: [], intro: "Intro", sections: [{ heading: "Controls", paragraphs: ["Click"] }], faq: [] };
+  const content = { slug: "eligible-guide", relatedCategory: "puzzle", relatedCategoryTitle: "Puzzles", ar: localized, en: localized };
+  saveDrafts(root, "blog", [{ content, evidence: {} }]);
+  const draft = readDrafts(root, "blog")[0];
+  promoteContent(root, { ...review, kind: "blog", slug: content.slug, draftHash: draft.contentHash, locales: ["ar", "en"], reviewedAt: new Date().toISOString(), searchEligible: true });
+  const reviews = JSON.parse(fs.readFileSync(path.join(root, "src/data/blog-publication-review.json")));
+  assert.ok(reviews.every((entry) => entry.searchEligible === true));
+});
+
+test("blog promotion rejects search flags embedded in generated content", (t) => {
+  for (const [name, injectFlag] of [
+    ["root", (content) => ({ ...content, searchEligible: true })],
+    ["ar", (content) => ({ ...content, ar: { ...content.ar, searchEligible: true } })],
+    ["en", (content) => ({ ...content, en: { ...content.en, searchEligibleEn: true } })],
+  ]) {
+    const { root, review } = setup(t);
+    fs.writeFileSync(path.join(root, "src/data/blog-generated.json"), "[]");
+    fs.writeFileSync(path.join(root, "src/data/blog-publication-review.json"), "[]");
+    const localized = { title: "Title", h1: "Heading", description: "Description", keywords: [], intro: "Intro", sections: [{ heading: "Controls", paragraphs: ["Click"] }], faq: [] };
+    const content = injectFlag({ slug: `flagged-${name}`, relatedCategory: "puzzle", relatedCategoryTitle: "Puzzles", ar: localized, en: localized });
+    saveDrafts(root, "blog", [{ content, evidence: {} }]);
+    const draft = readDrafts(root, "blog")[0];
+    assert.throws(() => promoteContent(root, { ...review, kind: "blog", slug: content.slug, draftHash: draft.contentHash, locales: ["ar", "en"], reviewedAt: new Date().toISOString() }), /search eligibility/i);
+  }
 });
 
 test("malformed blog fields leave content and review registry unchanged", (t) => {

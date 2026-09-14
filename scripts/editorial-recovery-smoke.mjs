@@ -31,6 +31,7 @@ for (const prefix of ['', '/en']) {
   assert.ok(detail.includes(`${prefix}/guides/browser-games`));
   await read(`${prefix}/news/never-existed-editorial-smoke-672184`, 404);
   const blog = await read(`${prefix}/blog`);
+  assert.match(blog, /noindex/);
   const reviewedTitle = prefix ? reviewedBlog.en.h1 : reviewedBlog.ar.h1;
   const reviewedCta = prefix ? reviewedBlog.en.primaryCtaLabel : reviewedBlog.ar.primaryCtaLabel;
   assert.ok(blog.includes(reviewedTitle));
@@ -40,7 +41,10 @@ for (const prefix of ['', '/en']) {
   assert.ok(reviewed.includes(`${prefix}/play/bike-stunt-game`));
   assert.ok(reviewed.includes(`${prefix}/category/racing`));
   assert.doesNotMatch(reviewed, /utm_(?:source|medium|campaign)/i);
-  assert.match(reviewed, /noindex/);
+  assert.doesNotMatch(reviewed, /noindex/);
+  assert.match(reviewed, /hrefLang="ar"/);
+  assert.match(reviewed, /hrefLang="en"/);
+  assert.match(reviewed, /hrefLang="x-default"/);
   assert.ok(blog.includes(`${prefix}/guides/browser-games`));
   const old = await read(`${prefix}/blog/${oldBlog}`);
   assert.match(old, /noindex/);
@@ -57,4 +61,12 @@ assert.doesNotMatch(newsRss, /<item>/);
 const blogRss = await read('/blog/rss.xml');
 assert.match(blogRss, new RegExp(`<link>https://www\\.plixfy\\.com/blog/${reviewedBlog.slug}</link>`));
 assert.equal((blogRss.match(/<item>/g) ?? []).length, 1);
-console.log('PASS: the reviewed bilingual guide is rendered and in blog RSS; unreviewed news/blog remain absent; unknown routes 404.');
+const sitemap = await read('/sitemap.xml');
+const blogLocations = [...sitemap.matchAll(/<loc>(https:\/\/www\.plixfy\.com\/(?:en\/)?blog\/[^<]+)<\/loc>/g)].map((match) => match[1]);
+assert.deepEqual(blogLocations, [
+  `https://www.plixfy.com/blog/${reviewedBlog.slug}`,
+  `https://www.plixfy.com/en/blog/${reviewedBlog.slug}`,
+]);
+for (const locale of ['ar', 'en', 'x-default']) assert.match(sitemap, new RegExp(`hreflang="${locale}"`));
+assert.match(sitemap, new RegExp(`<lastmod>${reviewedBlog.updatedAt}T00:00:00\\.000Z</lastmod>`));
+console.log('PASS: only the eligible bilingual guide is indexable and in the sitemap/RSS; blog indexes and unreviewed content remain noindex; unknown routes 404.');

@@ -11,6 +11,7 @@ import { getGameBySlug, getGamesByCategory } from "@/lib/games";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
 import { BRAND_AR } from "@/lib/siteContent";
 import { hasLocale, localeHref, ogLocaleFor, pageAlternates, type Locale } from "@/lib/i18n";
+import { isBlogSearchEligible } from "@/lib/blog-publication";
 
 const SITE = "https://www.plixfy.com";
 
@@ -87,9 +88,10 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title: post.title,
     description: post.description,
     keywords: [...post.keywords],
-    // Publication approval is separate from search indexing eligibility.
-    robots: { index: false, follow: true },
-    alternates: pageAlternates(locale, "/blog/" + post.slug),
+    robots: { index: isBlogSearchEligible(post, locale), follow: true },
+    alternates: isBlogSearchEligible(post, locale)
+      ? pageAlternates(locale, "/blog/" + post.slug)
+      : { canonical: localeHref(locale, "/blog/" + post.slug) },
     openGraph: {
       type: "article",
       title: post.title,

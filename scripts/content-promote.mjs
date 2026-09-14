@@ -11,6 +11,11 @@ function required(value, label) {
   if (typeof value !== "string" || !value.trim()) throw new Error(`Missing ${label}`);
   return value;
 }
+function containsSearchEligibilityFlag(value) {
+  if (!value || typeof value !== "object") return false;
+  if (Object.hasOwn(value, "searchEligible") || Object.hasOwn(value, "searchEligibleEn")) return true;
+  return Object.values(value).some(containsSearchEligibilityFlag);
+}
 function localFile(root, relative) {
   required(relative, "relative file path");
   const target = path.resolve(root, relative);
@@ -64,6 +69,7 @@ export function promoteContent(root, review) {
           for (const key of ["title", "summary", "titleEn", "summaryEn", "sourceName", "sourceUrl"]) required(content[key], key);
           if (new URL(content.sourceUrl).protocol !== "https:") throw new Error("News source must use HTTPS");
         } else {
+          if (containsSearchEligibilityFlag(content)) throw new Error("Generated content cannot set search eligibility");
           for (const language of ["ar", "en"]) {
             const localized = content[language];
             for (const key of ["title", "h1", "description", "intro"]) required(localized?.[key], `${language}.${key}`);
@@ -118,7 +124,8 @@ export function promoteContent(root, review) {
         hash = contentHash(post);
       } else hash = newsContentHash(mergeNewsEditorial(approvedRecord, editorial));
       return { slug: review.slug, locale, contentSha256: hash, evidencePath: review.evidenceFile,
-        evidenceSha256: review.evidenceHash, reviewer: review.reviewer, reviewedAt: review.reviewedAt };
+        evidenceSha256: review.evidenceHash, reviewer: review.reviewer, reviewedAt: review.reviewedAt,
+        ...(review.kind === "blog" ? { searchEligible: review.searchEligible === true } : {}) };
     });
     const nextRegistry = [...registry.filter((entry) => !(entry.slug === review.slug && review.locales.includes(entry.locale))), ...entries];
     const registryOutput = JSON.stringify(nextRegistry, null, 2) + "\n";

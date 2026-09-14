@@ -75,3 +75,21 @@ test("the blog page measures curated game links without internal UTM parameters"
     assert.match(promotion, new RegExp(field));
   }
 });
+
+test("only the reviewed racing guide is explicitly search eligible in both locales", () => {
+  const reviews = JSON.parse(read("src/data/blog-publication-review.json"));
+  const eligible = reviews.filter((entry) => entry.searchEligible === true);
+  assert.deepEqual(
+    eligible.map(({ slug, locale }) => ({ slug, locale })),
+    [
+      { slug: "alaab-sibaq-jawal-w-computer-2026", locale: "ar" },
+      { slug: "alaab-sibaq-jawal-w-computer-2026", locale: "en" },
+    ],
+  );
+
+  const page = read("src/app/[locale]/blog/[slug]/page.tsx");
+  const sitemap = read("src/app/sitemap.ts");
+  assert.match(page, /isBlogSearchEligible\(post, locale\)/);
+  assert.match(sitemap, /lastModified: new Date\(post\.updatedAt\)/);
+  assert.match(sitemap, /bilingual\("\/blog\/" \+ post\.slug/);
+});
