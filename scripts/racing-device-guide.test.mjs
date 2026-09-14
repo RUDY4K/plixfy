@@ -1,10 +1,25 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
 const ROOT = process.cwd();
 const read = (file) => readFileSync(path.join(ROOT, file), "utf8");
+
+test("review evidence keeps a cross-platform hash after checkout", () => {
+  const evidencePath = "docs/editorial-evidence/2026-09-14-racing-device-guide.md";
+  const evidence = readFileSync(path.join(ROOT, evidencePath));
+  const reviews = JSON.parse(read("src/data/blog-publication-review.json"));
+  const hashes = new Set(
+    reviews
+      .filter((review) => review.slug === "alaab-sibaq-jawal-w-computer-2026")
+      .map((review) => review.evidenceSha256),
+  );
+
+  assert.match(read(".gitattributes"), /^docs\/editorial-evidence\/\*\.md text eol=lf$/m);
+  assert.deepEqual([...hashes], [createHash("sha256").update(evidence).digest("hex")]);
+});
 
 test("the racing device guide is factual, bilingual, and links only verified dual-device games", () => {
   const posts = JSON.parse(read("src/data/blog-generated.json"));
