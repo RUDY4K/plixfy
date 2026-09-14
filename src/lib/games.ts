@@ -58,6 +58,8 @@ export const categories: readonly Category[] = [
   { slug: "shooting", labelAr: "تصويب", labelEn: "Shooting", iconSeed: "shooting-icon" },
 ];
 
+export const CATEGORY_PAGE_SIZE = 60;
+
 interface ImportedPlaygamaGame {
   title: string;
   slug: string;

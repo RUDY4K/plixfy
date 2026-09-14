@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { allGames, categories } from "@/lib/games";
+import { allGames, CATEGORY_PAGE_SIZE, categories, getCategoryGames } from "@/lib/games";
 import { hasEditorialGameContent } from "@/lib/gameContent";
 import { getSearchEligibleNews } from "@/lib/news";
 import { newsImageHref } from "@/lib/newsImage";
@@ -64,6 +64,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     bilingual("/category/" + c.slug, "weekly", 0.7)
   );
 
+  const categoryPaginationRoutes: MetadataRoute.Sitemap = categories.flatMap((category) => {
+    const totalPages = Math.max(
+      1,
+      Math.ceil(getCategoryGames(category.slug).length / CATEGORY_PAGE_SIZE),
+    );
+
+    return Array.from({ length: totalPages - 1 }, (_, index) => index + 2).flatMap((page) =>
+      bilingual(
+        `/category/${category.slug}?page=${page}`,
+        "weekly",
+        0.5,
+        0.4,
+        { lastModified: GAME_CATALOG_LAST_MODIFIED },
+      )
+    );
+  });
+
   const gameRoutes: MetadataRoute.Sitemap = allGames.flatMap((game) => {
     const hasAr = hasEditorialGameContent(game.slug, "ar");
     const hasEn = hasEditorialGameContent(game.slug, "en");
@@ -113,6 +130,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticRoutes,
     ...categoryRoutes,
+    ...categoryPaginationRoutes,
     ...gameRoutes,
     ...newsRoutes,
   ];

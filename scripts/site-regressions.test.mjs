@@ -437,7 +437,7 @@ test("paginated category JSON-LD describes the visible canonical page", () => {
   assert.match(categoryPage, /const url = SITE \+ href\(pagePath\)/);
   assert.match(categoryPage, /numberOfItems: visibleGames\.length/);
   assert.match(categoryPage, /itemListElement: visibleGames\.map/);
-  assert.match(categoryPage, /position: \(currentPage - 1\) \* PAGE_SIZE \+ idx \+ 1/);
+  assert.match(categoryPage, /position: \(currentPage - 1\) \* CATEGORY_PAGE_SIZE \+ idx \+ 1/);
 });
 
 test("home page uses the localized search-intent heading before the daily game", () => {

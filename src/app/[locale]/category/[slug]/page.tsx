@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
-import { categories, getCategoryGames } from "@/lib/games";
+import { CATEGORY_PAGE_SIZE, categories, getCategoryGames } from "@/lib/games";
 import type { CategorySlug } from "@/lib/games";
 import { categoryContent, categoryContentEn } from "@/lib/categoryContent";
 import { getLocalizedCategoryMeta } from "@/lib/categoryI18n";
@@ -23,7 +23,6 @@ import {
 } from "@/lib/i18n";
 
 const SITE = "https://www.plixfy.com";
-const PAGE_SIZE = 60;
 
 // trending و top صفحات ديناميكية إضافية إلى جانب التصنيفات الثابتة
 const extraSlugs = ["trending", "top"] as const;
@@ -106,7 +105,7 @@ export async function generateMetadata({
   }
   const games = getCategoryGames(slug);
   const requestedPage = Number.parseInt(String(query.page ?? "1"), 10);
-  const totalPages = Math.max(1, Math.ceil(games.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(games.length / CATEGORY_PAGE_SIZE));
   const currentPage = Number.isFinite(requestedPage)
     ? Math.min(Math.max(requestedPage, 1), totalPages)
     : 1;
@@ -160,14 +159,14 @@ export default async function CategoryPage({
   }
 
   const requestedPage = Number.parseInt(String(query.page ?? "1"), 10);
-  const totalPages = Math.max(1, Math.ceil(games.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(games.length / CATEGORY_PAGE_SIZE));
   if (!Number.isFinite(requestedPage) || requestedPage < 1 || requestedPage > totalPages) {
     notFound();
   }
   const currentPage = requestedPage;
   const visibleGames = games.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
+    (currentPage - 1) * CATEGORY_PAGE_SIZE,
+    currentPage * CATEGORY_PAGE_SIZE,
   );
 
   const pagePath = "/category/" + slug + (currentPage > 1 ? `?page=${currentPage}` : "");
@@ -203,7 +202,7 @@ export default async function CategoryPage({
       numberOfItems: visibleGames.length,
       itemListElement: visibleGames.map((g, idx) => ({
         "@type": "ListItem",
-        position: (currentPage - 1) * PAGE_SIZE + idx + 1,
+        position: (currentPage - 1) * CATEGORY_PAGE_SIZE + idx + 1,
         url: SITE + href("/play/" + g.slug),
         name: g.title,
       })),
@@ -311,7 +310,7 @@ export default async function CategoryPage({
             key={game.slug}
             {...game}
             locale={locale}
-            position={(currentPage - 1) * PAGE_SIZE + idx + 1}
+            position={(currentPage - 1) * CATEGORY_PAGE_SIZE + idx + 1}
             placement={"category-" + slug}
             showStats
           />
