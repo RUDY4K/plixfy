@@ -43,6 +43,9 @@ function loadSitemap(games) {
     if (specifier === "@/lib/gameContent") return { hasEditorialGameContent: () => false };
     if (specifier === "@/lib/news") return { getSearchEligibleNews: () => [] };
     if (specifier === "@/lib/newsImage") return { newsImageHref: (slug) => `/api/news-image/${slug}` };
+    if (specifier === "@/lib/blog") return { getAllPosts: () => [] };
+    if (specifier === "@/lib/blogEn") return { getAllPostsEn: () => [] };
+    if (specifier === "@/lib/blog-publication") return { getBlogSearchAlternates: () => null };
     throw new Error(`Unexpected dependency: ${specifier}`);
   };
 
