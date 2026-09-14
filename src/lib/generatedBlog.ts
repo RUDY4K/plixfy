@@ -19,6 +19,9 @@ export interface GeneratedBlogContent {
   intro: string;
   sections: readonly GeneratedBlogSection[];
   faq: readonly GeneratedBlogFaq[];
+  primaryCtaLabel?: string;
+  featuredGamesHeading?: string;
+  featuredGamesIntro?: string;
 }
 
 export interface GeneratedBlogRecord {
@@ -27,6 +30,7 @@ export interface GeneratedBlogRecord {
   updatedAt: string;
   relatedCategory: CategorySlug;
   relatedCategoryTitle: string;
+  featuredGameSlugs?: readonly string[];
   ar: GeneratedBlogContent;
   en: GeneratedBlogContent;
 }

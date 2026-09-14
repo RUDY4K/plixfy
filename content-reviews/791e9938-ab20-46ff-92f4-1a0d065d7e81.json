@@ -1,0 +1,18 @@
+{
+  "kind": "blog",
+  "slug": "alaab-sibaq-jawal-w-computer-2026",
+  "locales": [
+    "ar",
+    "en"
+  ],
+  "reviewer": "editorial-triage-first-pass",
+  "reviewedAt": "2026-09-14T11:40:33.398Z",
+  "originalValue": "Original bilingual device-control guide grounded in current Playgama catalog fields and documented live route checks; removes unsupported generated claims and links readers to verified game pages.",
+  "evidenceFile": "docs/editorial-evidence/2026-09-14-racing-device-guide.md",
+  "evidenceHash": "053862e948c0dfe9535b365acb7c190210f0e5d0738b635f929e4536c1462dd4",
+  "draftHash": "9df975ffd145874a4198d33b1f8d999e97e49010ca009b1916e36c84f337328f",
+  "target": "src/data/blog-generated.json",
+  "previousFileHash": "f79adf293bc91e8895f703975bb4501f9ab30758aaf2dfac89b1323c4880a22d",
+  "proposedFileHash": "31f571080c828386a468fcf0d5f5bff0e45078494118ecce2026f43ee1f5d799",
+  "status": "prepared"
+}

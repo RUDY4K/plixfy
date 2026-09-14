@@ -81,6 +81,12 @@ export function promoteContent(root, review) {
           }
           required(content.relatedCategory, "category");
           required(content.relatedCategoryTitle, "category title");
+          if (content.featuredGameSlugs !== undefined) {
+            if (!Array.isArray(content.featuredGameSlugs) || !content.featuredGameSlugs.length || content.featuredGameSlugs.length > 6 || new Set(content.featuredGameSlugs).size !== content.featuredGameSlugs.length || content.featuredGameSlugs.some((slug) => typeof slug !== "string" || !slug.trim())) throw new Error("Invalid featured game slugs");
+            for (const language of ["ar", "en"]) {
+              for (const key of ["primaryCtaLabel", "featuredGamesHeading", "featuredGamesIntro"]) required(content[language]?.[key], `${language}.${key}`);
+            }
+          }
         }
         items.unshift({ ...content, publishedAt: date, ...(review.kind === "blog" ? { updatedAt: date } : {}) });
       }
@@ -98,10 +104,16 @@ export function promoteContent(root, review) {
           publishedAt: approvedRecord.publishedAt, updatedAt: approvedRecord.updatedAt,
           keywords: c.keywords, intro: c.intro, sections: c.sections, faq: c.faq,
           relatedCategory: approvedRecord.relatedCategory, relatedCategoryTitle: approvedRecord.relatedCategoryTitle,
+          featuredGameSlugs: approvedRecord.featuredGameSlugs,
+          primaryCtaLabel: c.primaryCtaLabel, featuredGamesHeading: c.featuredGamesHeading,
+          featuredGamesIntro: c.featuredGamesIntro,
         } : {
           slug: approvedRecord.slug, title: c.title, h1: c.h1, description: c.description,
           keywords: c.keywords, intro: c.intro, sections: c.sections, faq: c.faq,
           relatedCategory: approvedRecord.relatedCategory, publishedAt: approvedRecord.publishedAt, updatedAt: approvedRecord.updatedAt,
+          featuredGameSlugs: approvedRecord.featuredGameSlugs,
+          primaryCtaLabel: c.primaryCtaLabel, featuredGamesHeading: c.featuredGamesHeading,
+          featuredGamesIntro: c.featuredGamesIntro,
         };
         hash = contentHash(post);
       } else hash = newsContentHash(mergeNewsEditorial(approvedRecord, editorial));

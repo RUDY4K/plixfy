@@ -51,14 +51,14 @@ test("blog registry hashes normalized rendered records for each explicitly revie
   const { root, review } = setup(t);
   fs.writeFileSync(path.join(root, "src/data/blog-generated.json"), "[]");
   fs.writeFileSync(path.join(root, "src/data/blog-publication-review.json"), "[]");
-  const c = { title: "Observed game", h1: "Observed game", description: "Test", keywords: [], intro: "Observed controls", sections: [{ heading: "Controls", paragraphs: ["Tap tile"] }], faq: [] };
-  saveDrafts(root, "blog", [{ content: { slug: "guide", relatedCategory: "puzzle", relatedCategoryTitle: "Puzzles", ar: c, en: c }, evidence: { source: "fixture" } }]);
+  const c = { title: "Observed game", h1: "Observed game", description: "Test", keywords: [], intro: "Observed controls", sections: [{ heading: "Controls", paragraphs: ["Tap tile"] }], faq: [], primaryCtaLabel: "Play now", featuredGamesHeading: "Verified games", featuredGamesIntro: "Catalog-backed picks" };
+  saveDrafts(root, "blog", [{ content: { slug: "guide", relatedCategory: "puzzle", relatedCategoryTitle: "Puzzles", featuredGameSlugs: ["verified-game"], ar: c, en: c }, evidence: { source: "fixture" } }]);
   const draft = readDrafts(root, "blog")[0];
   promoteContent(root, { ...review, kind: "blog", slug: "guide", draftHash: draft.contentHash, locales: ["ar", "en"], reviewedAt: new Date().toISOString() });
   const [post] = JSON.parse(fs.readFileSync(path.join(root, "src/data/blog-generated.json")));
   const reviews = JSON.parse(fs.readFileSync(path.join(root, "src/data/blog-publication-review.json")));
-  const en = { slug: post.slug, title: c.title, h1: c.h1, description: c.description, keywords: c.keywords, intro: c.intro, sections: c.sections, faq: c.faq, relatedCategory: post.relatedCategory, publishedAt: post.publishedAt, updatedAt: post.updatedAt };
-  const ar = { slug: post.slug, title: c.title, h1: c.h1, description: c.description, publishedAt: post.publishedAt, updatedAt: post.updatedAt, keywords: c.keywords, intro: c.intro, sections: c.sections, faq: c.faq, relatedCategory: post.relatedCategory, relatedCategoryTitle: post.relatedCategoryTitle };
+  const en = { slug: post.slug, title: c.title, h1: c.h1, description: c.description, keywords: c.keywords, intro: c.intro, sections: c.sections, faq: c.faq, relatedCategory: post.relatedCategory, publishedAt: post.publishedAt, updatedAt: post.updatedAt, featuredGameSlugs: post.featuredGameSlugs, primaryCtaLabel: c.primaryCtaLabel, featuredGamesHeading: c.featuredGamesHeading, featuredGamesIntro: c.featuredGamesIntro };
+  const ar = { slug: post.slug, title: c.title, h1: c.h1, description: c.description, publishedAt: post.publishedAt, updatedAt: post.updatedAt, keywords: c.keywords, intro: c.intro, sections: c.sections, faq: c.faq, relatedCategory: post.relatedCategory, relatedCategoryTitle: post.relatedCategoryTitle, featuredGameSlugs: post.featuredGameSlugs, primaryCtaLabel: c.primaryCtaLabel, featuredGamesHeading: c.featuredGamesHeading, featuredGamesIntro: c.featuredGamesIntro };
   assert.equal(reviews.find((entry) => entry.locale === "en").contentSha256, contentHash(en));
   assert.equal(reviews.find((entry) => entry.locale === "ar").contentSha256, contentHash(ar));
 });
