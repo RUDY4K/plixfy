@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "managerId": "plixfy-manager",
+  "mode": "continuous-cycles",
+  "executionAgentLifecycle": "ephemeral-per-cycle",
+  "concurrencyLimit": 3,
+  "noFixedTotalAgentCap": true,
+  "paidExternalCallsPerDay": 0,
+  "sameCauseMaxAttempts": 3,
+  "retryMinutes": [5, 15, 60],
+  "dedupeRequired": true,
+  "resourceBudget": {
+    "budgetRequiredPerCycle": true,
+    "unattendedScheduler": "disabled-until-owner-approved-limit",
+    "maxOpenTasks": 20,
+    "taskTtlHours": 168,
+    "pauseNewCyclesWhenBudgetMissingOrExceeded": true
+  },
+  "independentReviewRequiredFor": ["multi-agent", "repository-write"],
+  "automaticActions": [
+    "observe",
+    "public-research",
+    "aggregated-analytics-read",
+    "draft",
+    "isolated-review-required-patch",
+    "offline-dry-run"
+  ],
+  "approvalRequiredFor": [
+    "push",
+    "merge",
+    "deploy",
+    "rollback",
+    "production-change",
+    "production-workflow-change",
+    "publish",
+    "external-send",
+    "indexnow",
+    "financial-change",
+    "paid-external-call",
+    "credential-change",
+    "connector-add",
+    "delete",
+    "production-database-write"
+  ],
+  "cadence": {
+    "productionHealthMinutes": 120,
+    "managerTriageMinutes": 360,
+    "analyticsHours": 24,
+    "catalogHours": 24,
+    "contentDraftHours": 24,
+    "crossDeviceRegressionHours": 24,
+    "monetizationDays": 3,
+    "boardReportDays": 7,
+    "strategyReviewDays": 30
+  },
+  "stopRules": {
+    "p0": "observe-and-diagnose-only",
+    "sameFailureThreeTimes": "blocked",
+    "secretExposureRisk": "quarantined",
+    "dirtyOwnedPath": "blocked",
+    "staleBaseCommit": "review"
+  }
+}

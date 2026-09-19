@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "plixfy.run/v1",
+  "runId": "RUN-CATALOG-READ-001",
+  "revision": 1,
+  "objective": "تحقق مستقل من عدد ألعاب الكتالوج وتاريخ آخر مزامنة دون تعديل المشروع",
+  "constraints": [
+    "قراءة فقط",
+    "لا كتابة داخل المستودع",
+    "لا شبكة أدوات أو shell أو أسرار"
+  ],
+  "dataHandling": {
+    "classification": "public-repository",
+    "modelProvider": "anthropic",
+    "modelTransport": "claude-cli",
+    "model": "haiku",
+    "toolNetwork": "deny",
+    "operatorConfirmationRequired": true
+  },
+  "executionMode": "read_only",
+  "noWorkspaceWrites": true,
+  "workspace": {
+    "root": ".",
+    "baseCommit": "db9a2bec5dc6729b9cb14fc69d9301f62a3eb9bb"
+  },
+  "scheduler": {
+    "strategy": "dependency_dag",
+    "maxConcurrency": 2,
+    "managerMayExpand": true
+  },
+  "budget": {
+    "wallMinutes": 10,
+    "modelCalls": 3,
+    "paidExternalCalls": 0
+  },
+  "tasks": [
+    {
+      "taskId": "CATALOG-MD",
+      "roleId": "catalog-summary-reader",
+      "roleContract": {
+        "reportsTo": "plixfy-manager",
+        "canDelegate": false,
+        "contractVersion": 1,
+        "secretsAccess": "denied",
+        "networkPolicy": "deny",
+        "defaultWriteScope": "none"
+      },
+      "objective": "استخرج عدد الألعاب وتاريخ المزامنة من ملخص الكتالوج",
+      "wave": 1,
+      "dependsOn": [],
+      "accessTier": "read-only",
+      "inputs": {
+        "pathAllowlist": ["data/catalog-summary.md"],
+        "dataScope": "ملخص الكتالوج العام فقط"
+      },
+      "capabilities": ["repo.read"],
+      "security": {
+        "secretPathsDenied": [".env*", ".private/**", ".vercel/**", ".next/**", ".git/**"],
+        "toolNetwork": "deny",
+        "environment": "scrubbed",
+        "shell": "deny",
+        "writes": "deny",
+        "followSymlinks": false
+      },
+      "acceptanceChecks": ["اذكر Imported وSynced مع اسم المصدر"]
+    },
+    {
+      "taskId": "CATALOG-JSON",
+      "roleId": "catalog-metadata-reader",
+      "roleContract": {
+        "reportsTo": "plixfy-manager",
+        "canDelegate": false,
+        "contractVersion": 1,
+        "secretsAccess": "denied",
+        "networkPolicy": "deny",
+        "defaultWriteScope": "none"
+      },
+      "objective": "استخرج gameCount وsyncedAt من ملف metadata مستقلًا",
+      "wave": 1,
+      "dependsOn": [],
+      "accessTier": "read-only",
+      "inputs": {
+        "pathAllowlist": ["src/data/playgama-catalog-meta.json"],
+        "dataScope": "بيانات الكتالوج العامة فقط"
+      },
+      "capabilities": ["repo.read"],
+      "security": {
+        "secretPathsDenied": [".env*", ".private/**", ".vercel/**", ".next/**", ".git/**"],
+        "toolNetwork": "deny",
+        "environment": "scrubbed",
+        "shell": "deny",
+        "writes": "deny",
+        "followSymlinks": false
+      },
+      "acceptanceChecks": ["اذكر gameCount وsyncedAt مع اسم المصدر"]
+    },
+    {
+      "taskId": "QA-FINAL",
+      "roleId": "qa-compliance",
+      "roleContract": {
+        "reportsTo": "plixfy-manager",
+        "canDelegate": false,
+        "contractVersion": 1,
+        "secretsAccess": "denied",
+        "networkPolicy": "deny",
+        "defaultWriteScope": "none"
+      },
+      "objective": "قارن نتيجتي المصدرين وارفض أي تعارض",
+      "wave": 2,
+      "dependsOn": ["CATALOG-MD", "CATALOG-JSON"],
+      "accessTier": "read-only",
+      "inputs": {
+        "pathAllowlist": [],
+        "dataScope": "تسليمات الوكلاء السابقين فقط"
+      },
+      "capabilities": ["repo.read"],
+      "security": {
+        "secretPathsDenied": [".env*", ".private/**", ".vercel/**", ".next/**", ".git/**"],
+        "toolNetwork": "deny",
+        "environment": "scrubbed",
+        "shell": "deny",
+        "writes": "deny",
+        "followSymlinks": false
+      },
+      "acceptanceChecks": ["تأكد أن العدد والتاريخ متطابقان بين المصدرين"]
+    }
+  ],
+  "finalReviewTaskId": "QA-FINAL"
+}

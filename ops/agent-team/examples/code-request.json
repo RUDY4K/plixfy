@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "plixfy.write-request/v2",
+  "objective": "حسّن توثيق تشغيل المشروع في README مع الحفاظ على المعلومات الحالية وسلّم patch للمراجعة",
+  "executionMode": "isolated_write",
+  "allowedInputs": [
+    "README.md"
+  ],
+  "writeScope": {
+    "create": [],
+    "replace": [
+      "README.md"
+    ]
+  },
+  "dataClassification": "public-repository",
+  "model": "gpt-5.6-luna",
+  "budget": {
+    "wallMinutes": 30,
+    "modelCalls": 12,
+    "paidExternalCalls": 0,
+    "maxChangedFiles": 8,
+    "maxPatchBytes": 262144
+  },
+  "maxConcurrency": "auto",
+  "constraints": [
+    "لا تعدل checkout الرئيسي",
+    "لا shell أو شبكة أو أسرار",
+    "لا حذف أو rename أو ملفات binary",
+    "لا merge أو commit أو push أو deploy"
+  ]
+}

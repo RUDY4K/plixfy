@@ -1,0 +1,106 @@
+{
+  "version": 2,
+  "managerId": "plixfy-manager",
+  "defaultExecutionMode": "read_only",
+  "noFixedAgentCap": true,
+  "dynamicRolesRequireValidatedContract": true,
+  "engineeringStandard": "ops/agent-team/ENGINEERING-STANDARD.md",
+  "requiredDeliveryGates": [
+    "source-of-truth",
+    "scope-and-acceptance",
+    "exclusive-ownership",
+    "isolated-worktree",
+    "implementation",
+    "targeted-verification",
+    "full-verification",
+    "independent-review",
+    "local-preview",
+    "external-approval",
+    "production-verification",
+    "run-record"
+  ],
+  "allowedAccessTiers": ["read-only", "draft-write", "workspace-write"],
+  "requiredRoleFields": [
+    "role_id",
+    "reports_to",
+    "access_tier",
+    "can_delegate",
+    "contract_version",
+    "secrets_access",
+    "network_policy",
+    "default_write_scope"
+  ],
+  "roleDefaults": {
+    "reports_to": "plixfy-manager",
+    "can_delegate": "false",
+    "contract_version": "1",
+    "secrets_access": "denied",
+    "network_policy": "task-allowlist",
+    "default_write_scope": "none"
+  },
+  "forbiddenPaths": [".env*", ".private/**"],
+  "managerOnlyPaths": [
+    "ops/agent-team/STATE.md",
+    "ops/agent-team/DECISIONS.md",
+    "ops/agent-team/RUNS.md",
+    "ops/agent-team/runs/**"
+  ],
+  "ownerApprovalRequiredFor": [
+    "publish",
+    "external-send",
+    "deploy",
+    "push",
+    "merge",
+    "delete",
+    "production-change",
+    "financial-change",
+    "credential-change",
+    "paid-external-call"
+  ],
+  "actionPolicy": {
+    "observe": { "risk": "low", "automaticWithinGoal": true },
+    "public-research": { "risk": "low", "automaticWithinGoal": true },
+    "draft": { "risk": "medium", "automaticWithinGoal": true, "externalEffect": false },
+    "repository-write": { "risk": "medium", "automaticWithinGoal": true, "reversible": true },
+    "external-send": { "risk": "high", "explicitApproval": true, "scopeBound": true },
+    "publish": { "risk": "high", "explicitApproval": true, "scopeBound": true },
+    "deploy": { "risk": "critical", "explicitApproval": true, "scopeBound": true },
+    "financial-change": { "risk": "critical", "explicitApproval": true, "scopeBound": true },
+    "delete": { "risk": "critical", "explicitApproval": true, "scopeBound": true },
+    "credential-change": { "risk": "critical", "explicitApproval": true, "scopeBound": true }
+  },
+  "readOnlyRuntimeRequires": [
+    "filesystem-read-only",
+    "secret-path-deny",
+    "environment-scrubbed",
+    "network-off-or-allowlist",
+    "mutating-command-deny"
+  ],
+  "isolatedWriteRuntimeRequires": [
+    "exact-path-ownership",
+    "detached-temporary-worktree-per-writer",
+    "structured-create-replace-only",
+    "secret-and-link-deny",
+    "dirty-owned-path-deny",
+    "source-checkout-fingerprint",
+    "patch-artifact-only",
+    "owner-review-required"
+  ],
+  "enforcement": {
+    "launcher": "scripts/agent-team-cli.mjs",
+    "sandbox": "wsl2-bubblewrap",
+    "modelTools": "none",
+    "toolNetwork": "deny",
+    "readModelTransport": "anthropic-cli-public-data-only",
+    "writeModelAdapters": {
+      "codex": "openai-signed-codex-chatgpt-public-data-only",
+      "claude": "anthropic-cli-public-data-only"
+    },
+    "workspaceWrites": "isolated-temporary-worktrees-only",
+    "sourceCheckoutWrites": "deny",
+    "writeAgentMode": "isolated-patch-v2",
+    "writeModelTools": "none",
+    "writeIntegration": "patch-artifact-only-review-required",
+    "publishAgentMode": "unsupported-fail-closed"
+  }
+}

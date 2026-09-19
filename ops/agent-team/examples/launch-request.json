@@ -1,0 +1,20 @@
+{
+  "objective": "حلل الكتالوج وحدد حقائق المزامنة مع مراجعة مستقلة",
+  "allowedInputs": [
+    "data/catalog-summary.md",
+    "src/data/playgama-catalog-meta.json"
+  ],
+  "dataClassification": "public-repository",
+  "model": "haiku",
+  "budget": {
+    "wallMinutes": 15,
+    "modelCalls": 12,
+    "paidExternalCalls": 0
+  },
+  "maxConcurrency": "auto",
+  "constraints": [
+    "قراءة فقط",
+    "لا كتابة داخل المستودع",
+    "لا شبكة أو shell أو أسرار"
+  ]
+}
