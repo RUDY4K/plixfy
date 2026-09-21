@@ -562,3 +562,23 @@ test("trust pages explain sources, corrections, funding, and automation", () => 
   assert.match(editorial, /الأتمتة والذكاء الاصطناعي/);
   assert.match(editorial, /5 سبتمبر 2026/);
 });
+
+test("search renders one bounded result page instead of the full catalog", async () => {
+  const pagination = await import("../src/lib/searchPagination.mjs").catch(() => null);
+  assert.ok(pagination, "search pagination must be implemented as reusable behavior");
+
+  const results = Array.from({ length: 800 }, (_, index) => index + 1);
+  const firstPage = pagination.paginateSearchResults(results, 1);
+  const lastPage = pagination.paginateSearchResults(results, 17);
+
+  assert.equal(pagination.SEARCH_PAGE_SIZE, 48);
+  assert.deepEqual(firstPage?.items, results.slice(0, 48));
+  assert.equal(firstPage?.totalPages, 17);
+  assert.deepEqual(lastPage?.items, results.slice(768));
+  assert.equal(pagination.paginateSearchResults(results, 18), null);
+
+  const searchPage = read("src/app/[locale]/search/page.tsx");
+  assert.match(searchPage, /paginateSearchResults\(results, requestedPage\)/);
+  assert.match(searchPage, /pagedResults\.items\.map/);
+  assert.doesNotMatch(searchPage, /\{results\.map/);
+});

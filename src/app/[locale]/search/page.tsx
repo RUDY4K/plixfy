@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { allGames } from "@/lib/games";
 import GameCard from "@/components/GameCard";
 import TrackOnMount from "@/components/TrackOnMount";
 import { hasLocale, localeHref, pageAlternates } from "@/lib/i18n";
+import { paginateSearchResults } from "@/lib/searchPagination.mjs";
 
 const copyByLocale = {
   ar: {
@@ -15,6 +17,9 @@ const copyByLocale = {
     results: (n: number, q: string) => `${n} نتيجة لـ "${q}"`,
     noResults: (q: string) => `لا توجد نتائج لـ "${q}"`,
     emptyPrompt: "اكتب لتبدأ البحث",
+    previous: "السابق",
+    next: "التالي",
+    page: (current: number, total: number) => `صفحة ${current} من ${total}`,
   },
   en: {
     title: "Search | Plixfy",
@@ -25,6 +30,9 @@ const copyByLocale = {
     results: (n: number, q: string) => `${n} results for "${q}"`,
     noResults: (q: string) => `No results for "${q}"`,
     emptyPrompt: "Start typing to search",
+    previous: "Previous",
+    next: "Next",
+    page: (current: number, total: number) => `Page ${current} of ${total}`,
   },
 } as const;
 
@@ -50,12 +58,12 @@ export default async function SearchPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   const { locale } = await params;
   if (!hasLocale(locale)) notFound();
   const copy = copyByLocale[locale];
-  const { q = "" } = await searchParams;
+  const { q = "", page = "1" } = await searchParams;
   const query = q.slice(0, 200).trim();
   const needle = query.toLowerCase();
 
@@ -66,6 +74,11 @@ export default async function SearchPage({
           g.category.toLowerCase().includes(needle),
       )
     : [];
+  const requestedPage = Number(page);
+  const pagedResults = paginateSearchResults(results, requestedPage);
+  if (!pagedResults) notFound();
+  const pageHref = (targetPage: number) =>
+    localeHref(locale, `/search?q=${encodeURIComponent(query)}&page=${targetPage}`);
 
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
@@ -101,11 +114,39 @@ export default async function SearchPage({
               : copy.noResults(query)}
           </p>
           {results.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-6">
-              {results.map((game) => (
-                <GameCard key={game.slug} {...game} locale={locale} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-6">
+                {pagedResults.items.map((game) => (
+                  <GameCard key={game.slug} {...game} locale={locale} />
+                ))}
+              </div>
+              {pagedResults.totalPages > 1 ? (
+                <nav
+                  className="mt-10 flex items-center justify-center gap-4"
+                  aria-label={copy.page(pagedResults.currentPage, pagedResults.totalPages)}
+                >
+                  {pagedResults.currentPage > 1 ? (
+                    <Link
+                      href={pageHref(pagedResults.currentPage - 1)}
+                      className="rounded-full border border-white/10 bg-surface px-5 py-3 text-sm font-bold text-text-primary hover:border-primary/40"
+                    >
+                      {copy.previous}
+                    </Link>
+                  ) : null}
+                  <span className="text-sm text-text-secondary">
+                    {copy.page(pagedResults.currentPage, pagedResults.totalPages)}
+                  </span>
+                  {pagedResults.currentPage < pagedResults.totalPages ? (
+                    <Link
+                      href={pageHref(pagedResults.currentPage + 1)}
+                      className="rounded-full border border-white/10 bg-surface px-5 py-3 text-sm font-bold text-text-primary hover:border-primary/40"
+                    >
+                      {copy.next}
+                    </Link>
+                  ) : null}
+                </nav>
+              ) : null}
+            </>
           ) : null}
         </>
       ) : (
