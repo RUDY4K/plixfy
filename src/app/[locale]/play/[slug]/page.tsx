@@ -32,7 +32,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import catalogMeta from "@/data/playgama-catalog-meta.json";
-import { cleanCatalogText } from "@/lib/catalogText.mjs";
+import { cleanCatalogText, distinctCatalogInstructions } from "@/lib/catalogText.mjs";
 
 const SITE = "https://www.plixfy.com";
 
@@ -276,6 +276,9 @@ export default async function PlayPage({
     : game.description
       ? cleanCatalogText(game.description).split("\n\n").filter((p) => p.trim().length > 0)
       : [];
+  const catalogInstructions = content
+    ? ""
+    : distinctCatalogInstructions(game.description, game.howToPlay);
   const videoUrl = game.videoId ? getPlaygamaVideoUrl(game.videoId) : null;
   const catalogDate = new Intl.DateTimeFormat(locale === "ar" ? "ar-SA" : "en-US", {
     timeZone: "Asia/Riyadh",
@@ -484,6 +487,7 @@ export default async function PlayPage({
         </section>
       ) : null}
 
+      {content || catalogInstructions ? (
       <section className="mt-6 pt-6 border-t border-surface-elevated">
         <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-3">
           {t.play.howToPlay}
@@ -502,14 +506,13 @@ export default async function PlayPage({
               </li>
             ))}
           </ol>
-        ) : game.howToPlay ? (
-          <p dir="auto" className="text-text-secondary leading-relaxed">
-            {cleanCatalogText(game.howToPlay)}
-          </p>
         ) : (
-          <p className="text-text-secondary leading-relaxed">{t.play.genericControls}</p>
+          <p dir="auto" className="text-text-secondary leading-relaxed">
+            {catalogInstructions}
+          </p>
         )}
       </section>
+      ) : null}
 
       {content && content.tips.length > 0 ? (
         <section className="mt-6 pt-6 border-t border-surface-elevated">

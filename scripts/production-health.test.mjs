@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
+  decodeUtf8PreservingBom,
   parseSitemap,
   selectSitemapProbes,
   validateAdsTxt,
@@ -105,10 +106,14 @@ test("explicit social content dates accept only real YYYY-MM-DD dates", () => {
 
 test("ads.txt allows only the exact Plixfy AdSense publisher line", () => {
   const expected = "google.com, pub-7564871953180369, DIRECT, f08c47fec0942fa0";
-  assert.deepEqual(validateAdsTxt(`\uFEFF${expected}\n# Plixfy AdSense`, "pub-7564871953180369"), {
+  assert.deepEqual(validateAdsTxt(`${expected}\n# Plixfy AdSense`, "pub-7564871953180369"), {
     publisherId: "pub-7564871953180369",
     sellerLines: 1,
   });
+  assert.throws(
+    () => validateAdsTxt(`\uFEFF${expected}`, "pub-7564871953180369"),
+    /byte-order mark/i,
+  );
   assert.throws(
     () => validateAdsTxt("google.com, pub-wrong, DIRECT, f08c47fec0942fa0", "pub-7564871953180369"),
     /missing the exact AdSense authorization/,
@@ -121,6 +126,11 @@ test("ads.txt allows only the exact Plixfy AdSense publisher line", () => {
     () => validateAdsTxt(`${expected}\n${expected}`, "pub-7564871953180369"),
     /unexpected or duplicate seller entries/,
   );
+});
+
+test("HTTP body decoding preserves a UTF-8 BOM for ads.txt validation", () => {
+  const bytes = Uint8Array.from([0xef, 0xbb, 0xbf, 0x61]);
+  assert.equal(decodeUtf8PreservingBom(bytes), "\uFEFFa");
 });
 
 test("robots.txt points to the canonical sitemap and does not block ads.txt", () => {

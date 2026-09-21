@@ -29,3 +29,35 @@ export function cleanCatalogText(value, maxLength = 1200) {
   if (deduplicated.length <= maxLength) return deduplicated;
   return deduplicated.slice(0, maxLength - 1).trimEnd() + "…";
 }
+
+/**
+ * Keep the publisher's control instructions while removing prose already
+ * shown in the description section. Empty output means there is no distinct
+ * instruction content worth rendering as a second section.
+ */
+export function distinctCatalogInstructions(description, instructions) {
+  const cleanDescription = cleanCatalogText(description);
+  const cleanInstructions = cleanCatalogText(instructions);
+  if (!cleanInstructions) return "";
+  if (!cleanDescription) return cleanInstructions;
+
+  const lowerDescription = cleanDescription.toLocaleLowerCase();
+  const lowerInstructions = cleanInstructions.toLocaleLowerCase();
+  if (lowerInstructions.startsWith(lowerDescription)) {
+    return cleanInstructions
+      .slice(cleanDescription.length)
+      .replace(/^[\s.;:!?؟…-]+/u, "")
+      .trim();
+  }
+
+  const descriptionSentences = new Set(
+    cleanDescription
+      .split(/(?<=[.!?؟…])\s+/u)
+      .map((sentence) => sentence.toLocaleLowerCase().trim()),
+  );
+  return cleanInstructions
+    .split(/(?<=[.!?؟…])\s+/u)
+    .filter((sentence) => !descriptionSentences.has(sentence.toLocaleLowerCase().trim()))
+    .join(" ")
+    .trim();
+}

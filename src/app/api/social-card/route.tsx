@@ -3,37 +3,13 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getGameBySlug } from "@/lib/games";
 import { getNewsBySlug } from "@/lib/news";
+import { loadSocialCardImageDataUrl } from "@/lib/socialCardImage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const WIDTH = 1200;
 const HEIGHT = 1200;
-
-async function fetchImageDataUrl(value: string | undefined): Promise<string | null> {
-  if (!value) return null;
-
-  try {
-    const url = new URL(value);
-    if (url.protocol !== "https:") return null;
-
-    const response = await fetch(url, {
-      redirect: "follow",
-      signal: AbortSignal.timeout(12_000),
-      headers: { "user-agent": "PlixfySocialCard/2.0 (+https://www.plixfy.com)" },
-    });
-    if (!response.ok) return null;
-
-    const type = response.headers.get("content-type")?.split(";")[0] || "";
-    if (!type.startsWith("image/")) return null;
-
-    const bytes = Buffer.from(await response.arrayBuffer());
-    if (bytes.length === 0 || bytes.length > 12 * 1024 * 1024) return null;
-    return `data:${type};base64,${bytes.toString("base64")}`;
-  } catch {
-    return null;
-  }
-}
 
 async function getLogoDataUrl(): Promise<string> {
   const logo = await readFile(join(process.cwd(), "public/brand/plixfy-mark-v2-compact.png"));
@@ -50,7 +26,7 @@ export async function GET(request: Request) {
   if (!game && !news) return new Response("Social card not found", { status: 404 });
 
   const [sourceImage, logo] = await Promise.all([
-    fetchImageDataUrl(game?.thumbnailWide || game?.thumbnail || news?.image),
+    loadSocialCardImageDataUrl(game?.thumbnailWide || game?.thumbnail || news?.image),
     getLogoDataUrl(),
   ]);
 

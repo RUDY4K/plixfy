@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { cleanCatalogText } from "../src/lib/catalogText.mjs";
+import { cleanCatalogText, distinctCatalogInstructions } from "../src/lib/catalogText.mjs";
 
 const ROOT = process.cwd();
 const read = (file) => readFileSync(path.join(ROOT, file), "utf8");
@@ -258,9 +258,21 @@ test("publisher catalog copy renders as clean plain text", () => {
     "Aim for the longest shot. Collect coins to upgrade. Keep improving.",
   );
   assert.match(playPage, /cleanCatalogText\(game\.description\)/);
-  assert.match(playPage, /cleanCatalogText\(game\.howToPlay\)/);
+  assert.match(playPage, /distinctCatalogInstructions\(game\.description, game\.howToPlay\)/);
   assert.match(sync, /description: cleanCatalogText\(game\.description\)/);
   assert.match(sync, /howToPlay: cleanCatalogText\(game\.howToPlayText, 1200\)/);
+});
+
+test("publisher instructions do not repeat the catalog description", () => {
+  const description = "Explore several worlds. Collect pets and upgrade your hero.";
+  assert.equal(
+    distinctCatalogInstructions(
+      description,
+      "Explore several worlds. Collect pets and upgrade your hero. PC: WASD to move; Space to jump.",
+    ),
+    "PC: WASD to move; Space to jump.",
+  );
+  assert.equal(distinctCatalogInstructions(description, description), "");
 });
 
 test("password recovery pages localize metadata for both languages", () => {
