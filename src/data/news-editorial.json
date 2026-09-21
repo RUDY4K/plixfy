@@ -61,5 +61,24 @@
     "searchEligible": true,
     "searchEligibleEn": true,
     "reviewedAt": "2026-09-14"
+  },
+  "xbox-releases-september-21-25-2026": {
+    "keyPoints": [
+      "Dune: Awakening مدرجة في 22 سبتمبر مع Game Pass وتحسين Xbox Series X|S.",
+      "CONTROL Resonant مدرجة في 24 سبتمبر مع Xbox Play Anywhere وتحسين Series X|S.",
+      "EA Sports FC 27 مدرجة في 25 سبتمبر، وتضم القائمة أيضًا عدة إصدارات مستقلة.",
+      "Xbox تنبه إلى أن مواعيد الإصدار قابلة للتغيير."
+    ],
+    "whyItMatters": "القائمة تمنح اللاعب جدولًا عمليًا لأسبوع واحد بدل متابعة إعلانات متفرقة. Game Pass يعني الوصول إلى اللعبة من مكتبة الاشتراك ما دامت متاحة، بينما Play Anywhere يربط النسخة الرقمية المدعومة بين Xbox وWindows والأجهزة المحمولة المدعومة مع انتقال الحفظ والإنجازات دون تكلفة إضافية. لا يضمن أي من الوسمين التوفر أو السعر نفسه في كل منطقة.",
+    "keyPointsEn": [
+      "Dune: Awakening is listed for September 22 with Game Pass and Series X|S optimization.",
+      "CONTROL Resonant is listed for September 24 with Xbox Play Anywhere and Series X|S optimization.",
+      "EA Sports FC 27 is listed for September 25, alongside several independent releases.",
+      "Xbox notes that release dates are subject to change."
+    ],
+    "whyItMattersEn": "The schedule gives players a practical single-week view instead of scattered announcements. Game Pass provides access through the subscription catalog while a game remains available, whereas Play Anywhere links a supported digital purchase across Xbox, Windows PC, and supported handhelds with shared saves and achievements at no extra cost. Neither label guarantees identical availability or pricing in every region.",
+    "searchEligible": true,
+    "searchEligibleEn": true,
+    "reviewedAt": "2026-09-21"
   }
 }

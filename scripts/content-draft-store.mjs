@@ -49,6 +49,29 @@ export function clearDraftStatus(root, kind) {
   }
 }
 
+export function transitionDrafts(root, kind, transition) {
+  if (typeof transition !== "function") throw new Error("Draft transition must be a function");
+  const file = draftFile(root, kind);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const lock = `${file}.lock`;
+  const descriptor = fs.openSync(lock, "wx");
+  const temporary = `${file}.${randomUUID()}.tmp`;
+  try {
+    const latest = readDrafts(root, kind);
+    const result = transition(latest);
+    if (!result || !Array.isArray(result.drafts)) throw new Error("Draft transition must return a draft collection");
+    if (result.changed > 0) {
+      fs.writeFileSync(temporary, JSON.stringify(result.drafts, null, 2) + "\n", { encoding: "utf8", flag: "wx" });
+      fs.renameSync(temporary, file);
+    }
+    return result;
+  } finally {
+    if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+    fs.closeSync(descriptor);
+    fs.unlinkSync(lock);
+  }
+}
+
 export function saveDrafts(root, kind, candidates, { published = [], revision = false } = {}) {
   const file = draftFile(root, kind);
   fs.mkdirSync(path.dirname(file), { recursive: true });

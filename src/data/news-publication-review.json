@@ -16,5 +16,23 @@
     "evidenceSha256": "4871091d1aa25fca0308f48c99937eb92a824531e966494b922e921568829577",
     "reviewer": "daily-growth-review + daily-ops-review (independent passes)",
     "reviewedAt": "2026-09-14T19:33:48.951Z"
+  },
+  {
+    "slug": "xbox-releases-september-21-25-2026",
+    "locale": "ar",
+    "contentSha256": "eb0f86f83e4034155fd87a40ca83beb88965de425760dfb54ebfd51d998c67ad",
+    "evidencePath": "docs/editorial-evidence/2026-09-21-xbox-releases.md",
+    "evidenceSha256": "05b93108b29c18cb7d08f38c4857951d078195047d423d2bf9382da33e1aa108",
+    "reviewer": "daily-growth-review + daily-ops-review (independent passes)",
+    "reviewedAt": "2026-09-21T20:31:00.000Z"
+  },
+  {
+    "slug": "xbox-releases-september-21-25-2026",
+    "locale": "en",
+    "contentSha256": "eb0f86f83e4034155fd87a40ca83beb88965de425760dfb54ebfd51d998c67ad",
+    "evidencePath": "docs/editorial-evidence/2026-09-21-xbox-releases.md",
+    "evidenceSha256": "05b93108b29c18cb7d08f38c4857951d078195047d423d2bf9382da33e1aa108",
+    "reviewer": "daily-growth-review + daily-ops-review (independent passes)",
+    "reviewedAt": "2026-09-21T20:31:00.000Z"
   }
 ]
