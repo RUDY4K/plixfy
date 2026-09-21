@@ -29,6 +29,7 @@ const copyByLocale = {
     h1: "جميع الألعاب",
     intro: `${TOTAL} لعبة مجانية أونلاين على بليكسفاي، مرتّبة حسب التصنيف. تعمل الألعاب من المتصفح مباشرة بدون تحميل، وتوضح صفحة كل لعبة ما إذا كانت تدعم الجوال أو الكمبيوتر أو كليهما. اختر فئتك ثم افتح صفحة التصنيف لمشاهدة المجموعة كاملة.`,
     quickNavAria: "تنقّل سريع للتصنيفات",
+    guideLabel: "قبل أن تبدأ: دليل الألعاب الأونلاين بدون تحميل",
     gamesCount: (n: number) => `(${n} لعبة)`,
     viewCategory: "عرض الفئة ←",
     ldName: (label: string) => label + " - بليكسفاي",
@@ -43,6 +44,7 @@ const copyByLocale = {
     h1: "All Games",
     intro: `${TOTAL} free online games on Plixfy, organized by category. Games run directly in your browser with no download, and each game page states whether it supports mobile, desktop, or both. Choose a category to browse its complete collection.`,
     quickNavAria: "Quick category navigation",
+    guideLabel: "Before you start: the no-download online games guide",
     gamesCount: (n: number) => `(${n} games)`,
     viewCategory: "View category →",
     ldName: (label: string) => label + " - Plixfy",
@@ -145,6 +147,9 @@ export default async function AllGamesPage({
         <p className="text-sm md:text-base text-text-secondary mt-2 max-w-3xl">
           {copy.intro}
         </p>
+        <Link href={href("/guides/browser-games")} className="mt-3 inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
+          {copy.guideLabel}
+        </Link>
       </header>
 
       <nav

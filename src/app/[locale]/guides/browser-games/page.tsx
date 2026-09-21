@@ -5,10 +5,19 @@ import { hasLocale, localeHref, pageAlternates } from "@/lib/i18n";
 
 const content = {
   ar: {
-    title: "دليل اختيار ألعاب المتصفح وتشغيلها | بليكسفاي",
-    heading: "قبل أن تبدأ لعبة في المتصفح",
-    description: "خطوات اختيار لعبة تناسب جهازك ولغتك، وفهم شاشة التشغيل، وتشخيص مشكلات التحميل والتحكم وحفظ التقدم على بليكسفاي.",
-    intro: "ابدأ من معلومات اللعبة، ثم جرّب التحكم قبل أن تقضي وقتًا طويلًا فيها. يساعدك هذا الدليل على التمييز بين مشكلة في اختيار اللعبة ومشكلة في تشغيلها، وعلى وصف العطل بطريقة تسهّل متابعته.",
+    title: "ألعاب أونلاين بدون تحميل: دليل الاختيار والتشغيل | بليكسفاي",
+    heading: "ألعاب أونلاين بدون تحميل: كيف تختار وتشغّل اللعبة المناسبة؟",
+    description: "دليل عملي لاختيار ألعاب أونلاين بدون تحميل، وفهم تشغيلها داخل المتصفح، ودعم الجوال والكمبيوتر، وحل مشكلات التحميل والتحكم وحفظ التقدم.",
+    intro: "تستطيع بدء ألعاب بليكسفاي من المتصفح من دون تثبيت برنامج أو ملف لعبة يدويًا. ابدأ من معلومات اللعبة، ثم جرّب التحكم قبل أن تقضي وقتًا طويلًا فيها. يوضح هذا الدليل ما يحدث عند التشغيل، وكيف تختار عنوانًا مناسبًا لجهازك، وكيف تصف العطل بطريقة يمكن متابعتها.",
+    meaning: "ماذا يعني «بدون تحميل» على بليكسفاي؟",
+    meaningBody: "يعني أنك لا تحتاج إلى تنزيل مُثبّت أو إضافة لعبة إلى جهازك قبل البدء؛ تفتح صفحة اللعبة ثم تُحمّل ملفات التشغيل داخل المتصفح من مزوّدها. لا يعني ذلك أن اللعبة لا تستخدم بيانات الإنترنت أو مساحة تخزين مؤقتة في المتصفح. قد تختلف مدة البدء واستهلاك البيانات حسب حجم اللعبة والاتصال والجهاز، وقد تحتاج بعض الألعاب إلى حساب أو تخزين محلي لحفظ التقدم.",
+    quickRoutesTitle: "ابدأ من النوع الذي تريده",
+    quickRoutes: [
+      ["كل الألعاب", "/all-games"],
+      ["ألعاب سباق", "/category/racing"],
+      ["ألعاب ألغاز", "/category/puzzle"],
+      ["ألعاب خفيفة", "/category/casual"],
+    ],
     choose: "١. اختر وفق المعلومات المعلنة",
     chooseBody: "في صفحة اللعبة، افتح قسم «معلومات اللعبة» واقرأ الأجهزة المدعومة واللغات والمشتريات داخل اللعبة. هذه بيانات الكتالوج الواردة من Playgama؛ هي نقطة بداية للاختيار، وليست ضمانًا بأن كل هاتف أو متصفح سيشغّل اللعبة بالطريقة نفسها. صورة اللعبة واسم فئتها لا يكفيان لمعرفة طريقة التحكم.",
     tableCaption: "قرار سريع قبل الضغط على «العب الآن»",
@@ -46,10 +55,19 @@ const content = {
     navigation: "خطوتك التالية",
   },
   en: {
-    title: "Choosing and Running Browser Games | Plixfy",
-    heading: "Before you start a browser game",
-    description: "Choose games using device and language information, understand the player, and troubleshoot loading, controls, audio, and saved progress on Plixfy.",
-    intro: "Start with the game's information, then try its controls before committing to a long session. This guide helps you distinguish an unsuitable game from a loading problem and describe a fault so it can be investigated.",
+    title: "Online Games Without Downloads: Choosing and Playing | Plixfy",
+    heading: "Online games without downloads: how to choose and start the right game",
+    description: "A practical guide to online games without downloads, browser play, mobile and desktop support, loading, controls, audio, and saved progress.",
+    intro: "You can start Plixfy games in your browser without manually installing an app or game file. Begin with the game's information, then test its controls before committing to a long session. This guide explains what happens at launch, how to choose for your device, and how to report a problem clearly.",
+    meaning: "What “no download” means on Plixfy",
+    meaningBody: "You do not need to download an installer or add a game to your device before starting. You open the game page and its provider delivers the playing files through your browser. This does not mean the game uses no internet data or temporary browser storage. Start time and data use vary with the game, connection, and device, and some titles may rely on an account or local storage for progress.",
+    quickRoutesTitle: "Start with the kind of game you want",
+    quickRoutes: [
+      ["All games", "/all-games"],
+      ["Racing games", "/category/racing"],
+      ["Puzzle games", "/category/puzzle"],
+      ["Casual games", "/category/casual"],
+    ],
     choose: "1. Choose using the declared information",
     chooseBody: "On a game page, find Game Info and read Supported devices, Languages, and In-game purchases. These catalog details come from Playgama. They are a starting point, not a guarantee that every phone or browser will run the title identically. A thumbnail or category alone cannot tell you which controls a game needs.",
     tableCaption: "A quick decision before selecting Play Now",
@@ -116,6 +134,18 @@ export default async function BrowserGamesGuide({ params }: Props) {
           <h1 className="mt-3 text-3xl font-black leading-tight text-text-primary md:text-5xl">{c.heading}</h1>
           <p className={paragraphClass}>{c.intro}</p>
         </header>
+        <section className="mt-10" aria-labelledby="no-download-meaning">
+          <h2 id="no-download-meaning" className={headingClass}>{c.meaning}</h2>
+          <p className={paragraphClass}>{c.meaningBody}</p>
+          <h3 className="mt-6 text-lg font-bold text-text-primary">{c.quickRoutesTitle}</h3>
+          <nav aria-label={c.quickRoutesTitle} className="mt-3 flex flex-wrap gap-3">
+            {c.quickRoutes.map(([label, path]) => (
+              <Link key={path} href={localeHref(locale, path)} className="inline-flex min-h-11 items-center rounded-xl border border-white/15 px-4 py-2 font-semibold text-primary hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary">
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </section>
         <section className="mt-10" aria-labelledby="choose-game">
           <h2 id="choose-game" className={headingClass}>{c.choose}</h2>
           <p className={paragraphClass}>{c.chooseBody}</p>
