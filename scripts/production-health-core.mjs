@@ -35,6 +35,51 @@ export function validateAdsTxt(text, publisherId) {
   return { publisherId, sellerLines: normalizedLines.length };
 }
 
+export function validateAdSenseExcludedPage(html, { requireNoIndex = false } = {}) {
+  if (/<script\b[^>]*\bsrc=["'][^"']*(?:pagead2\.googlesyndication\.com|adsbygoogle)[^"']*["']/i.test(html)) {
+    throw new Error("AdSense delivery script is present on an excluded page");
+  }
+  if (/<ins\b[^>]*\bclass=["'][^"']*\badsbygoogle\b[^"']*["']/i.test(html)) {
+    throw new Error("AdSense ad slot is present on an excluded page");
+  }
+
+  const noIndex = (html.match(/<meta\b[^>]*>/gi) || []).some((tag) =>
+    /\bname=["']robots["']/i.test(tag)
+    && /\bcontent=["'][^"']*\bnoindex\b[^"']*["']/i.test(tag));
+  if (requireNoIndex && !noIndex) {
+    throw new Error("excluded page is missing a noindex robots directive");
+  }
+
+  return { adDeliveryDisabled: true, noIndex };
+}
+
+export function validateAdSenseSourceBoundary(
+  files,
+  { isolatedImplementation = "src/components/DeferredAdSense.tsx" } = {},
+) {
+  const normalizedImplementation = isolatedImplementation.replaceAll("\\", "/");
+  let implementationPresent = false;
+
+  for (const file of files) {
+    const filePath = file.path.replaceAll("\\", "/");
+    if (filePath === normalizedImplementation) {
+      implementationPresent = true;
+      continue;
+    }
+    if (/\bDeferredAdSense\b/.test(file.source)) {
+      throw new Error(`DeferredAdSense is referenced outside its isolated implementation: ${filePath}`);
+    }
+    if (/(?:pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle|adsbygoogle\.push|className?=["'][^"']*\badsbygoogle\b)/i.test(file.source)) {
+      throw new Error(`AdSense loader or ad slot is present outside its isolated implementation: ${filePath}`);
+    }
+  }
+
+  return {
+    filesChecked: files.length,
+    isolatedImplementation: implementationPresent ? normalizedImplementation : null,
+  };
+}
+
 export function validateRobotsTxt(text, canonicalOrigin) {
   const expectedSitemap = `Sitemap: ${canonicalOrigin}/sitemap.xml`;
   if (!text.includes(expectedSitemap)) {
