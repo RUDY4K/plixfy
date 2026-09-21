@@ -1,0 +1,18 @@
+{
+  "kind": "news",
+  "slug": "xbox-releases-september-21-25-2026",
+  "draftHash": "e83d7e956c520cbfa6a59412fd46247e2ea1d0e67c4970adddefeaec83b7be66",
+  "locales": [
+    "ar",
+    "en"
+  ],
+  "reviewer": "daily-growth-review + daily-ops-review (independent passes)",
+  "reviewedAt": "2026-09-21T20:31:00.000Z",
+  "originalValue": "Selected the most useful releases from the official weekly schedule, explained the practical difference between subscription access and Play Anywhere digital ownership using official Xbox definitions, documented regional and date limitations, and used neutral original Plixfy artwork with no platform device or symbols.",
+  "evidenceFile": "docs/editorial-evidence/2026-09-21-xbox-releases.md",
+  "evidenceHash": "05b93108b29c18cb7d08f38c4857951d078195047d423d2bf9382da33e1aa108",
+  "target": "src/data/news.json",
+  "previousFileHash": "ee9f106355b9699c6b9727dadb942d39bd13ce1450c83f044ec1e8dd48cd0401",
+  "proposedFileHash": "2087c70361812b111047e36efa4dd72c5b5a0f3f79bc5a1999b84f8c2ad8c11c",
+  "status": "prepared"
+}

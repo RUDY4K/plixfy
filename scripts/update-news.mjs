@@ -1,7 +1,13 @@
 // Prepares unverified bilingual RSS drafts; never changes published news.
 // يستخدم Gemini API في GitHub Actions، مع Claude CLI كخيار محلي عند التشغيل اليدوي.
 import fs from "node:fs";
-import { clearDraftStatus, readDrafts, saveDraftStatus, saveDrafts } from "./content-draft-store.mjs";
+import {
+  clearDraftStatus,
+  readDrafts,
+  saveDraftStatus,
+  saveDrafts,
+  transitionDrafts,
+} from "./content-draft-store.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runClaude, extractJson } from "./claude-cli.mjs";
@@ -13,8 +19,9 @@ import {
 } from "./text-encoding.mjs";
 
 const ROOT = process.cwd();
-const MAX_NEW_PER_RUN = 4;
-const MAX_PENDING_NEWS_DRAFTS = 12;
+const MAX_NEW_PER_RUN = 1;
+const MAX_PENDING_NEWS_DRAFTS = 3;
+const EDITORIAL_WINDOW_HOURS = 48;
 const CANDIDATE_WINDOW_HOURS = 36;
 
 const FEEDS = [
@@ -174,13 +181,45 @@ export function oldestPendingNewsDraft(drafts) {
     .sort((a, b) => Date.parse(a.generatedAt) - Date.parse(b.generatedAt))[0]?.generatedAt ?? null;
 }
 
-export async function main({ root = ROOT } = {}) {
+export function expireStaleNewsDrafts(
+  drafts,
+  { now = new Date(), ttlHours = EDITORIAL_WINDOW_HOURS } = {},
+) {
+  const nowMs = now.getTime();
+  if (!Number.isFinite(nowMs)) throw new Error("A valid current time is required");
+  const cutoff = nowMs - ttlHours * 3600 * 1000;
+  let changed = 0;
+  const expiredAt = now.toISOString();
+  const next = drafts.map((draft) => {
+    if (draft?.status !== "pending_review") return draft;
+    const generatedAt = Date.parse(draft.generatedAt);
+    const expiredReason = !Number.isFinite(generatedAt)
+      ? "invalid_generated_at"
+      : generatedAt < cutoff
+        ? "editorial_window_elapsed"
+        : null;
+    if (!expiredReason) return draft;
+    changed += 1;
+    return { ...draft, status: "expired", expiredAt, expiredReason };
+  });
+  return { drafts: next, changed };
+}
+
+export async function main({ root = ROOT, now = new Date() } = {}) {
   clearDraftStatus(root, "news");
   const existing = loadExisting(root);
   if (process.argv.includes("--images-only")) {
     throw new Error("Automatic edits to published images are disabled; prepare a reviewed revision instead.");
   }
-  const pendingDrafts = readDrafts(root, "news");
+  const expiry = transitionDrafts(
+    root,
+    "news",
+    (latestDrafts) => expireStaleNewsDrafts(latestDrafts, { now }),
+  );
+  const pendingDrafts = expiry.drafts;
+  if (expiry.changed > 0) {
+    console.log(`Expired ${expiry.changed} stale news drafts; audit records retained.`);
+  }
   const pendingCount = pendingNewsDraftCount(pendingDrafts);
   if (pendingCount >= MAX_PENDING_NEWS_DRAFTS) {
     const oldest = oldestPendingNewsDraft(pendingDrafts) ?? "unknown";
@@ -191,7 +230,7 @@ export async function main({ root = ROOT } = {}) {
       oldestPendingAt: oldest,
       generationAttempted: false,
       nextAction: "editorial_review_required",
-      updatedAt: new Date().toISOString(),
+      updatedAt: now.toISOString(),
     });
     console.log(`waiting_for_editorial: ${pendingCount} pending news drafts; oldest ${oldest}. No generation performed.`);
     return;
@@ -202,7 +241,7 @@ export async function main({ root = ROOT } = {}) {
   const knownSlugs = new Set(known.map((n) => n.slug));
 
   const feedResults = await Promise.all(FEEDS.map(fetchFeed));
-  const cutoff = Date.now() - CANDIDATE_WINDOW_HOURS * 3600 * 1000;
+  const cutoff = now.getTime() - CANDIDATE_WINDOW_HOURS * 3600 * 1000;
 
   const candidateStubs = feedResults
     .flat()
@@ -276,7 +315,7 @@ export async function main({ root = ROOT } = {}) {
     process.exit(1);
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = now.toISOString().slice(0, 10);
   const fresh = (parsed.items || [])
     .filter((it) => {
       const candidate = candidates[it.candidateIndex];
@@ -309,7 +348,7 @@ export async function main({ root = ROOT } = {}) {
         sourceUrl: candidate.link,
         image: candidate.image,
         sourcePublishedAt: Number.isNaN(Date.parse(candidate.pubDate))
-          ? new Date().toISOString()
+          ? now.toISOString()
           : new Date(candidate.pubDate).toISOString(),
         generatedDate: today,
       };

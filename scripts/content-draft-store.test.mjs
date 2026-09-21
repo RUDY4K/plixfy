@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { contentHash, draftFile, readDrafts, saveDrafts } from "./content-draft-store.mjs";
+import { contentHash, draftFile, readDrafts, saveDrafts, transitionDrafts } from "./content-draft-store.mjs";
 
 const repository = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const candidate = (slug, extra = {}) => ({ content: { slug, summary: "Unverified draft", ...extra }, evidence: { source: "fixture" } });
@@ -54,6 +54,30 @@ test("corrupt queue is never silently replaced; concurrent write fails closed", 
   fs.writeFileSync(`${file}.lock`, "");
   assert.throws(() => saveDrafts(root, "news", [candidate("one")]), /EEXIST/);
   assert.equal(fs.readFileSync(file, "utf8"), "broken");
+});
+
+test("review state transitions use the latest locked queue without dropping a concurrent draft", (t) => {
+  const root = fixture(t);
+  saveDrafts(root, "news", [candidate("one")]);
+  const staleSnapshot = readDrafts(root, "news");
+  saveDrafts(root, "news", [candidate("concurrent")]);
+
+  const result = transitionDrafts(root, "news", (latest) => ({
+    changed: 1,
+    drafts: latest.map((draft) => (
+      draft.slug === staleSnapshot[0].slug
+        ? { ...draft, status: "expired", expiredReason: "editorial_window_elapsed" }
+        : draft
+    )),
+  }));
+
+  const stored = readDrafts(root, "news");
+  assert.equal(stored.length, 2);
+  assert.equal(stored[0].status, "expired");
+  assert.equal(stored[1].status, "pending_review");
+  assert.equal(stored[1].slug, "concurrent");
+  assert.equal(result.changed, 1);
+  assert.deepEqual(fs.readdirSync(path.dirname(draftFile(root, "news"))), ["news.json"]);
 });
 
 test("translation revisions require a base hash and model approval fields grant nothing", (t) => {
