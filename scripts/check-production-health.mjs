@@ -1,11 +1,13 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import {
   decodeUtf8PreservingBom,
   parseSitemap,
   selectSitemapProbes,
   validateAdsTxt,
+  validateAdSenseExcludedPage,
+  validateAdSenseSourceBoundary,
   validateAutomationRun,
   validateRobotsTxt,
   withRetries,
@@ -92,6 +94,42 @@ async function checkPage(label, url) {
   }
 }
 
+function collectSourceFiles(directory) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const absolutePath = path.join(directory, entry.name);
+    if (entry.isDirectory()) return collectSourceFiles(absolutePath);
+    if (!/\.(?:[cm]?[jt]sx?)$/i.test(entry.name)) return [];
+    return [{
+      path: path.relative(process.cwd(), absolutePath).replaceAll("\\", "/"),
+      source: readFileSync(absolutePath, "utf8"),
+    }];
+  });
+}
+
+function checkAdSenseSourceBoundary() {
+  try {
+    const details = validateAdSenseSourceBoundary(collectSourceFiles(path.resolve("src")));
+    recordSuccess("AdSense source boundary", details);
+  } catch (error) {
+    recordFailure("AdSense source boundary", error);
+  }
+}
+
+async function checkAdSenseExclusion(label, url, options = {}) {
+  try {
+    const result = await fetchResponse(url, "text/html");
+    const details = validateAdSenseExcludedPage(result.body, options);
+    recordSuccess(label, {
+      ...details,
+      url,
+      durationMs: result.durationMs,
+      attempt: result.attempt,
+    });
+  } catch (error) {
+    recordFailure(label, error);
+  }
+}
+
 async function checkStaticFiles() {
   let sitemapUrls = [];
   try {
@@ -164,6 +202,8 @@ async function checkAutomation() {
   }
 }
 
+checkAdSenseSourceBoundary();
+
 await Promise.all([
   checkPage("Arabic home", `${canonicalOrigin}/`),
   checkPage("English home", `${canonicalOrigin}/en`),
@@ -182,6 +222,16 @@ try {
   if (typeof slug !== "string" || !/^[a-z0-9-]+$/.test(slug)) throw new Error("no valid catalog game probe");
   await checkPage("Arabic catalog game", `${canonicalOrigin}/play/${slug}`);
   await checkPage("English catalog game", `${canonicalOrigin}/en/play/${slug}`);
+  await checkAdSenseExclusion(
+    "Arabic catalog game AdSense exclusion",
+    `${canonicalOrigin}/play/${slug}`,
+    { requireNoIndex: true },
+  );
+  await checkAdSenseExclusion(
+    "English catalog game AdSense exclusion",
+    `${canonicalOrigin}/en/play/${slug}`,
+    { requireNoIndex: true },
+  );
 } catch (error) {
   recordFailure("catalog game probes", error);
 }

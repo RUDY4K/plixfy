@@ -6,6 +6,8 @@ import {
   parseSitemap,
   selectSitemapProbes,
   validateAdsTxt,
+  validateAdSenseExcludedPage,
+  validateAdSenseSourceBoundary,
   validateAutomationRun,
   validateRobotsTxt,
   withRetries,
@@ -131,6 +133,68 @@ test("ads.txt allows only the exact Plixfy AdSense publisher line", () => {
 test("HTTP body decoding preserves a UTF-8 BOM for ads.txt validation", () => {
   const bytes = Uint8Array.from([0xef, 0xbb, 0xbf, 0x61]);
   assert.equal(decodeUtf8PreservingBom(bytes), "\uFEFFa");
+});
+
+test("AdSense exclusion allows ownership metadata but rejects ad delivery on quarantined pages", () => {
+  const safe = `<!doctype html><html><head>
+    <meta name="google-adsense-account" content="ca-pub-7564871953180369">
+    <meta name="robots" content="noindex, follow">
+  </head><body>Game details</body></html>`;
+  assert.deepEqual(validateAdSenseExcludedPage(safe, { requireNoIndex: true }), {
+    adDeliveryDisabled: true,
+    noIndex: true,
+  });
+
+  assert.throws(
+    () => validateAdSenseExcludedPage(`${safe}<script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>`),
+    /AdSense delivery script/i,
+  );
+  assert.throws(
+    () => validateAdSenseExcludedPage(`${safe}<ins class="adsbygoogle"></ins>`),
+    /AdSense ad slot/i,
+  );
+  assert.throws(
+    () => validateAdSenseExcludedPage("<html><body>Game details</body></html>", { requireNoIndex: true }),
+    /noindex/i,
+  );
+});
+
+test("AdSense source boundary catches dynamic loaders before deployment", () => {
+  const safeFiles = [
+    {
+      path: "src/app/[locale]/layout.tsx",
+      source: '<meta name="google-adsense-account" content="ca-pub-7564871953180369" />',
+    },
+    {
+      path: "src/components/DeferredAdSense.tsx",
+      source: 'const SCRIPT_ID = "plixfy-adsense"; script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";',
+    },
+  ];
+  assert.deepEqual(validateAdSenseSourceBoundary(safeFiles), {
+    filesChecked: 2,
+    isolatedImplementation: "src/components/DeferredAdSense.tsx",
+  });
+
+  assert.throws(
+    () => validateAdSenseSourceBoundary([
+      ...safeFiles,
+      {
+        path: "src/app/[locale]/layout.tsx",
+        source: 'import DeferredAdSense from "@/components/DeferredAdSense";',
+      },
+    ]),
+    /DeferredAdSense.*layout\.tsx/i,
+  );
+  assert.throws(
+    () => validateAdSenseSourceBoundary([
+      ...safeFiles,
+      {
+        path: "src/components/OtherLoader.tsx",
+        source: 'script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";',
+      },
+    ]),
+    /AdSense loader.*OtherLoader\.tsx/i,
+  );
 });
 
 test("robots.txt points to the canonical sitemap and does not block ads.txt", () => {
