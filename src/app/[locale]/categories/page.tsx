@@ -9,12 +9,14 @@ const copyByLocale = {
     title: "الفئات | بليكسفاي",
     description: "تصفّح كل فئات الألعاب — سباق، أكشن، ألغاز، رياضة وأكثر.",
     h1: "الفئات",
+    guideLabel: "دليل اختيار وتشغيل ألعاب أونلاين بدون تحميل",
   },
   en: {
     title: "Categories | Plixfy",
     description:
       "Browse all game categories — racing, action, puzzle, sports and more.",
     h1: "Categories",
+    guideLabel: "Guide to choosing and playing online games without downloads",
   },
 } as const;
 
@@ -43,6 +45,9 @@ export default async function CategoriesPage({
       <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-6">
         {copy.h1}
       </h1>
+      <Link href={localeHref(locale, "/guides/browser-games")} className="mb-6 inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
+        {copy.guideLabel}
+      </Link>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {categories.map((cat) => (

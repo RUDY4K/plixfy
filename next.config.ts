@@ -51,7 +51,53 @@ const nextConfig: NextConfig = {
         destination: "https://www.plixfy.com/:path*",
         statusCode: 301,
       },
-      // بنية الموقع القديم كانت /games/<slug> — لا شيء منها موجود في الكتالوج الحالي
+      // روابط قديمة ما زالت تظهر في Search Console؛ نوجّه كل نية إلى أقرب فئة حالية.
+      {
+        source: "/games/race-burnout-drift",
+        destination: "/category/racing",
+        statusCode: 301,
+      },
+      {
+        source: "/games/og-basket-hoop",
+        destination: "/category/sports",
+        statusCode: 301,
+      },
+      {
+        source: "/games/snake-blocks-and-numbers",
+        destination: "/category/puzzle",
+        statusCode: 301,
+      },
+      {
+        source: "/games/cement-trucks-hidden-objects",
+        destination: "/category/puzzle",
+        statusCode: 301,
+      },
+      {
+        source: "/games/og-2-player-crazy-racer",
+        destination: "/category/racing",
+        statusCode: 301,
+      },
+      {
+        source: "/games/helix-piano-tiles",
+        destination: "/category/casual",
+        statusCode: 301,
+      },
+      {
+        source: "/games/plug-run-race",
+        destination: "/category/racing",
+        statusCode: 301,
+      },
+      {
+        source: "/games/y8-100-doors-challenge",
+        destination: "/category/puzzle",
+        statusCode: 301,
+      },
+      {
+        source: "/games/miami-traffic-racer",
+        destination: "/category/racing",
+        statusCode: 301,
+      },
+      // بقية بنية الموقع القديم /games/<slug> لا تطابق الكتالوج الحالي.
       {
         source: "/games/:path*",
         destination: "/all-games",

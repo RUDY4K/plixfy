@@ -459,6 +459,35 @@ test("home page uses the localized search-intent heading before the daily game",
   assert.match(homePage, /<h2[^>]*>\{dailyGame\.title\}<\/h2>/);
 });
 
+test("the browser guide owns the no-download search intent and is linked from key discovery pages", () => {
+  const guide = read("src/app/[locale]/guides/browser-games/page.tsx");
+  const home = read("src/app/[locale]/page.tsx");
+  const allGames = read("src/app/[locale]/all-games/page.tsx");
+  const categories = read("src/app/[locale]/categories/page.tsx");
+
+  assert.match(guide, /ألعاب أونلاين بدون تحميل: دليل الاختيار والتشغيل/);
+  assert.match(guide, /ماذا يعني «بدون تحميل» على بليكسفاي؟/);
+  assert.match(guide, /لا يعني ذلك أن اللعبة لا تستخدم بيانات الإنترنت/);
+  assert.match(guide, /Online Games Without Downloads: Choosing and Playing/);
+  assert.match(guide, /What “no download” means on Plixfy/);
+  assert.match(home, /ألعاب أونلاين بدون تحميل/);
+  assert.match(allGames, /guideLabel/);
+  assert.match(allGames, /\/guides\/browser-games/);
+  assert.match(categories, /guideLabel/);
+  assert.match(categories, /\/guides\/browser-games/);
+});
+
+test("observed legacy game URLs redirect to the closest category before the fallback", () => {
+  const config = read("next.config.ts");
+  const specific = config.indexOf('/games/race-burnout-drift');
+  const fallback = config.indexOf('/games/:path*');
+
+  assert.ok(specific > 0 && specific < fallback);
+  assert.match(config, /source: "\/games\/race-burnout-drift"[\s\S]*?destination: "\/category\/racing"/);
+  assert.match(config, /source: "\/games\/og-basket-hoop"[\s\S]*?destination: "\/category\/sports"/);
+  assert.match(config, /source: "\/games\/y8-100-doors-challenge"[\s\S]*?destination: "\/category\/puzzle"/);
+});
+
 test("template roundups stay out while reviewed news uses a fail-closed search gate", () => {
   const sitemap = read("src/app/sitemap.ts");
   const blogIndex = read("src/app/[locale]/blog/page.tsx");

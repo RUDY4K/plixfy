@@ -157,9 +157,9 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       </nav>
 
       <section className="mt-8 rounded-2xl border border-primary/20 bg-surface p-5 md:p-7">
-        <h2 className="text-xl font-bold text-text-primary">{locale === "ar" ? "اختر لعبة تناسب جهازك، واعرف ما تفعله إذا لم تعمل" : "Choose a game for your device and know what to do if it will not run"}</h2>
+        <h2 className="text-xl font-bold text-text-primary">{locale === "ar" ? "ألعاب أونلاين بدون تحميل: اختر ما يناسب جهازك" : "Online games without downloads: choose what suits your device"}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">{locale === "ar" ? "دليل بليكسفاي لقراءة معلومات الأجهزة واللغات، التمييز بين المفضلة وحفظ التقدم، وتشخيص الشاشة الفارغة ومشكلات اللمس والصوت خطوة بخطوة." : "A Plixfy guide to device and language information, favorites versus saved progress, and step-by-step checks for blank screens, touch controls, and sound."}</p>
-        <Link href={href("/guides/browser-games")} className="mt-3 inline-flex min-h-11 items-center font-bold text-primary hover:underline">{locale === "ar" ? "اقرأ دليل اللعب من المتصفح" : "Read the browser game guide"}</Link>
+        <Link href={href("/guides/browser-games")} className="mt-3 inline-flex min-h-11 items-center font-bold text-primary hover:underline">{locale === "ar" ? "اقرأ دليل الألعاب الأونلاين بدون تحميل" : "Read the no-download online games guide"}</Link>
       </section>
 
       <section className="mt-12">
