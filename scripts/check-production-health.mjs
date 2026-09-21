@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import {
+  decodeUtf8PreservingBom,
   parseSitemap,
   selectSitemapProbes,
   validateAdsTxt,
@@ -55,7 +56,7 @@ async function fetchResponse(url, expectedType) {
       headers: { "user-agent": "Plixfy-Production-Monitor/1.0" },
       signal: AbortSignal.timeout(15_000),
     });
-    const body = await response.text();
+    const body = decodeUtf8PreservingBom(new Uint8Array(await response.arrayBuffer()));
     if (response.status !== 200) throw new Error(`HTTP ${response.status} at ${response.url}`);
     const contentType = response.headers.get("content-type") || "";
     if (expectedType && !contentType.toLowerCase().includes(expectedType)) {

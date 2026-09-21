@@ -10,9 +10,15 @@ function decodeXml(value) {
   return value.replace(/&(amp|lt|gt|quot|apos);/g, (entity) => XML_ENTITY_MAP[entity] ?? entity);
 }
 
+export function decodeUtf8PreservingBom(bytes) {
+  return new TextDecoder("utf-8", { ignoreBOM: true }).decode(bytes);
+}
+
 export function validateAdsTxt(text, publisherId) {
+  if (text.startsWith("\uFEFF")) {
+    throw new Error("ads.txt must not contain a UTF-8 byte-order mark");
+  }
   const normalizedLines = text
-    .replace(/^\uFEFF/, "")
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line && !line.startsWith("#"));
