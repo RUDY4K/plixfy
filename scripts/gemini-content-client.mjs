@@ -3,6 +3,7 @@
 
 const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/interactions";
 const DEFAULT_MODEL = "gemini-3.6-flash";
+const DEFAULT_FALLBACK_MODEL = "gemini-3.5-flash";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -30,64 +31,127 @@ function responseText(body) {
     .trim();
 }
 
+function isMissingModel(response, body) {
+  if (response.status !== 404) return false;
+  const code = String(body?.error?.code || body?.error?.status || "").toLowerCase();
+  const message = String(body?.error?.message || body?.status?.message || "").toLowerCase();
+  return code === "model_not_found"
+    || (code === "not_found" && message.includes("model"))
+    || message.includes("model not found")
+    || message.includes("requested model was not found");
+}
+
+function exhaustedModelsError(failures) {
+  const summary = failures
+    .map(({ model, error }) => `${model}: ${error.message}`)
+    .join("; ");
+  return new AggregateError(
+    failures.map(({ error }) => error),
+    `Gemini API failed across model chain: ${summary}`,
+  );
+}
+
 export async function runGeminiContent({
   prompt,
   system = "Return accurate, original content grounded only in the supplied material.",
   maxTokens = 5_000,
+  apiKey = process.env.GEMINI_API_KEY,
+  models,
+  attemptsPerModel = 2,
+  baseRetryDelayMs = 5_000,
+  requestTimeoutMs = 90_000,
+  fetchImpl = fetch,
+  sleepFn = sleep,
 }) {
-  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY is required in GitHub Actions secrets");
 
-  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
-  let lastError;
+  const configuredModels = models || [
+    process.env.GEMINI_MODEL || DEFAULT_MODEL,
+    process.env.GEMINI_FALLBACK_MODEL || DEFAULT_FALLBACK_MODEL,
+  ];
+  const modelChain = [...new Set(configuredModels.filter(Boolean))];
+  if (modelChain.length === 0) throw new Error("At least one Gemini model is required");
 
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
-    try {
-      const response = await fetch(ENDPOINT, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-goog-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          model,
-          system_instruction: system,
-          input: prompt,
-          store: false,
-          generation_config: {
-            max_output_tokens: maxTokens,
-            thinking_level: "low",
+  const failures = [];
+
+  for (const [modelIndex, model] of modelChain.entries()) {
+    for (let attempt = 1; attempt <= attemptsPerModel; attempt += 1) {
+      let failure;
+      let skipRemainingModelAttempts = false;
+
+      try {
+        const response = await fetchImpl(ENDPOINT, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-goog-api-key": apiKey,
           },
-          response_format: [
-            {
-              type: "text",
-              mime_type: "application/json",
+          body: JSON.stringify({
+            model,
+            system_instruction: system,
+            input: prompt,
+            store: false,
+            generation_config: {
+              max_output_tokens: maxTokens,
+              thinking_level: "low",
             },
-          ],
-        }),
-        signal: AbortSignal.timeout(180_000),
-      });
+            response_format: [
+              {
+                type: "text",
+                mime_type: "application/json",
+              },
+            ],
+          }),
+          signal: AbortSignal.timeout(requestTimeoutMs),
+        });
 
-      const body = await response.json().catch(() => ({}));
-      const output = responseText(body);
-      if (response.ok && output) {
-        console.log(`Gemini content draft completed with ${model}.`);
-        return output;
+        const body = await response.json().catch(() => ({}));
+        const output = responseText(body);
+        if (response.ok && output) {
+          console.log(`Gemini content draft completed with ${model}.`);
+          return output;
+        }
+
+        const description =
+          body?.error?.message || body?.status?.message || `HTTP ${response.status}`;
+        failure = new Error(`Gemini API failed with ${model}: ${description}`);
+        skipRemainingModelAttempts = isMissingModel(response, body);
+        const retryable = response.ok
+          || response.status === 408
+          || response.status === 429
+          || response.status >= 500;
+        if (!retryable && !skipRemainingModelAttempts) throw failure;
+      } catch (error) {
+        if (error === failure) throw error;
+        failure = error;
       }
 
-      const description =
-        body?.error?.message || body?.status?.message || `HTTP ${response.status}`;
-      lastError = new Error(`Gemini API failed: ${description}`);
-      const retryable = response.status === 429 || response.status >= 500;
-      if (!retryable) break;
-      if (attempt < 3) await sleep(attempt * 3_000);
-    } catch (error) {
-      lastError = error;
-      if (attempt < 3) await sleep(attempt * 3_000);
+      failures.push({ model, error: failure });
+      const hasSameModelRetry = attempt < attemptsPerModel;
+      const hasFallback = modelIndex < modelChain.length - 1;
+      if (skipRemainingModelAttempts) {
+        if (hasFallback) {
+          console.warn(
+            `Gemini ${model} is unavailable (${failure.message}); trying ${modelChain[modelIndex + 1]}.`,
+          );
+        }
+        break;
+      } else if (hasSameModelRetry) {
+        const delay = baseRetryDelayMs * (2 ** (attempt - 1));
+        console.warn(
+          `Gemini ${model} attempt ${attempt}/${attemptsPerModel} failed (${failure.message}); retrying in ${delay}ms.`,
+        );
+        if (delay > 0) await sleepFn(delay);
+      } else if (hasFallback) {
+        console.warn(
+          `Gemini ${model} remained unavailable (${failure.message}); trying ${modelChain[modelIndex + 1]}.`,
+        );
+      }
     }
   }
 
-  throw lastError || new Error("Gemini API returned no usable response");
+  if (failures.length > 0) throw exhaustedModelsError(failures);
+  throw new Error("Gemini API returned no usable response");
 }
 
 export async function runGeminiJson({
