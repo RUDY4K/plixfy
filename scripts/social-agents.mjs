@@ -142,7 +142,7 @@ export class EditorialAgent {
 
       if (item.url) {
         const url = new URL(item.url);
-        const isFastNews = pack.campaign === "ar_fast_news_v1";
+        const isFastNews = pack.campaign === "official_fast_news_v1";
         const allowedHost = isFastNews
           ? FAST_NEWS_SOURCE_HOSTS.has(url.hostname)
           : ["plixfy.com", "www.plixfy.com"].includes(url.hostname);
