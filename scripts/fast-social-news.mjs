@@ -8,7 +8,8 @@ const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
 const STATE_FILE = path.join(SOCIAL_DIR, "fast-news-state.json");
 const DEFAULT_MAX_AGE_MS = 2 * 60 * 60 * 1000;
-const DEFAULT_PLATFORMS = Object.freeze(["telegram", "discord", "x", "facebook"]);
+const SUPPORTED_PLATFORMS = Object.freeze(["telegram", "discord", "x", "facebook"]);
+const DEFAULT_PLATFORMS = Object.freeze(["x"]);
 
 export const OFFICIAL_FAST_NEWS_SOURCES = Object.freeze([
   {
@@ -95,7 +96,7 @@ export function selectNextFastNews(items, state, { now = new Date(), maxAgeMs = 
 }
 
 function cleanPlatforms(platforms) {
-  const allowed = new Set(DEFAULT_PLATFORMS);
+  const allowed = new Set(SUPPORTED_PLATFORMS);
   return [...new Set(platforms)].filter((platform) => allowed.has(platform));
 }
 
