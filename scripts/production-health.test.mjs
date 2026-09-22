@@ -36,7 +36,7 @@ test("fast social news runs every five minutes while reviewed-site distribution 
 
   assert.match(fast, /cron: "\*\/5 \* \* \* \*"/);
   assert.match(fast, /node scripts\/fast-social-news\.mjs/);
-  assert.match(fast, /SOCIAL_PLATFORMS: telegram,discord,x,facebook/);
+  assert.match(fast, /SOCIAL_PLATFORMS: x(?:\r?\n|$)/);
   assert.match(fast, /cancel-in-progress: false/);
   assert.match(fast, /permissions:\s*\n\s*contents: read/);
   assert.doesNotMatch(fast, /contents: write/);
@@ -45,7 +45,8 @@ test("fast social news runs every five minutes while reviewed-site distribution 
   assert.match(fast, /retention-days: 90/);
   assert.match(fast, /secrets\.TELEGRAM_BOT_TOKEN/);
   assert.match(fast, /secrets\.BUFFER_API_KEY/);
-  assert.match(fast, /secrets\.DISCORD_WEBHOOK_URL/);
+  assert.doesNotMatch(fast, /secrets\.TELEGRAM_CHANNEL_ID/);
+  assert.doesNotMatch(fast, /secrets\.DISCORD_WEBHOOK_URL/);
   assert.match(fast, /if: failure\(\)/);
   assert.doesNotMatch(reviewed, /\n\s*schedule:/);
   assert.match(reviewed, /workflow_dispatch:/);

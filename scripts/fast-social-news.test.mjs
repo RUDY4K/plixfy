@@ -86,6 +86,20 @@ test("fast-news packs use source links, Arabic summaries, and no borrowed media"
   }));
 });
 
+test("fast-news defaults to X only", () => {
+  const pack = buildFastNewsPack({
+    item: {
+      id: "xbox-default",
+      title: "Official title",
+      url: "https://news.xbox.com/en-us/update/",
+      sourceNameAr: "إكس بوكس",
+      publishedAt: now.toISOString(),
+    },
+    date: "2026-09-22",
+  });
+  assert.deepEqual(pack.items.map((item) => item.platform), ["x"]);
+});
+
 test("fast-news external links are allowlisted and never receive Plixfy tracking parameters", () => {
   const pack = buildFastNewsPack({
     item: { id: "xbox-abc", title: "Official title", url: "https://news.xbox.com/en-us/update/", sourceNameAr: "إكس بوكس", publishedAt: now.toISOString() },
@@ -103,9 +117,9 @@ test("the fast-news workflow checks every five minutes and excludes image-only c
   const workflow = fs.readFileSync(new URL("../.github/workflows/fast-social-news.yml", import.meta.url), "utf8");
   assert.match(workflow, /cron: "\*\/5 \* \* \* \*"/);
   assert.doesNotMatch(workflow, /GEMINI_API_KEY/);
-  assert.match(workflow, /SOCIAL_PLATFORMS: telegram,discord,x,facebook/);
+  assert.match(workflow, /SOCIAL_PLATFORMS: x(?:\r?\n|$)/);
+  assert.doesNotMatch(workflow, /SOCIAL_PLATFORMS:.*(?:telegram|discord|facebook|instagram)/);
   assert.match(workflow, /\.social\/fast-news-state\.json/);
   assert.match(workflow, /fast-news-state/);
   assert.doesNotMatch(workflow, /npm ci/);
-  assert.doesNotMatch(workflow, /SOCIAL_PLATFORMS:.*instagram/);
 });
