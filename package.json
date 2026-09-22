@@ -20,7 +20,7 @@
     "social:info-short": "node scripts/generate-info-short.mjs",
     "social:gameplay": "node scripts/capture-gameplay-video.mjs",
     "social:buffer:check": "node scripts/check-buffer.mjs",
-    "test:social-agents": "node --test scripts/social-agents.test.mjs scripts/traffic-acquisition-agent.test.mjs",
+    "test:social-agents": "node --test scripts/social-agents.test.mjs scripts/traffic-acquisition-agent.test.mjs scripts/fast-social-news.test.mjs",
     "test:social-card": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test scripts/social-card-route.test.mjs",
     "test:site": "node --test scripts/site-regressions.test.mjs scripts/news-images.test.mjs scripts/game-progressive-launch.test.mjs scripts/security-regressions.test.mjs scripts/analytics-consent.test.mjs scripts/page-tracking.test.mjs scripts/sitemap-pagination.test.mjs",
     "test:browserstack:ios15": "node scripts/browserstack-ios15-game.mjs --expect-start",

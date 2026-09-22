@@ -30,33 +30,25 @@ test("the production monitor runs around the clock and alerts only on failure", 
   assert.doesNotMatch(workflow, /TELEGRAM_BOT_TOKEN:\s*[^$\s]/);
 });
 
-test("social workflow checks continuously for fresh news twice per hour", () => {
-  const workflow = readFileSync(".github/workflows/cloud-social.yml", "utf8");
-  assert.match(workflow, /cron: "25,55 \* \* \* \*"/);
-  assert.match(workflow, /reason=continuous_news_watch/);
-  assert.match(workflow, /echo "slot=news"/);
-  assert.match(workflow, /if: steps\.plan\.outputs\.should_run == 'true'/);
-  assert.match(workflow, /--date=\$\{SOCIAL_DATE\}/);
-  assert.match(workflow, /cancel-in-progress: false/);
-  assert.match(workflow, /permissions:\s*\n\s*contents: read/);
-  assert.doesNotMatch(workflow, /contents: write/);
+test("fast social news runs every five minutes while reviewed-site distribution is manual", () => {
+  const fast = readFileSync(".github/workflows/fast-social-news.yml", "utf8");
+  const reviewed = readFileSync(".github/workflows/cloud-social.yml", "utf8");
 
-  const dryRunStep = workflow.slice(
-    workflow.indexOf("- name: Run social agents in dry-run mode"),
-    workflow.indexOf("- name: Run scout, editor, publisher, and auditor agents"),
-  );
-  const publishStep = workflow.slice(
-    workflow.indexOf("- name: Run scout, editor, publisher, and auditor agents"),
-    workflow.indexOf("- name: Save delivery state"),
-  );
-  assert.match(dryRunStep, /outputs\.dry_run == 'true'/);
-  assert.match(dryRunStep, /--dry-run/);
-  assert.doesNotMatch(dryRunStep, /(?:TELEGRAM|BUFFER|DISCORD)_[A-Z_]+/);
-  assert.match(publishStep, /outputs\.dry_run != 'true'/);
-  assert.match(publishStep, /secrets\.TELEGRAM_BOT_TOKEN/);
-  assert.match(publishStep, /secrets\.BUFFER_API_KEY/);
-  assert.match(publishStep, /secrets\.DISCORD_WEBHOOK_URL/);
-  assert.match(workflow, /Alert admin on failure[\s\S]{0,160}github\.event_name != 'workflow_dispatch'[\s\S]{0,80}inputs\.dry_run != true/);
+  assert.match(fast, /cron: "\*\/5 \* \* \* \*"/);
+  assert.match(fast, /node scripts\/fast-social-news\.mjs/);
+  assert.match(fast, /SOCIAL_PLATFORMS: telegram,discord,x,facebook/);
+  assert.match(fast, /cancel-in-progress: false/);
+  assert.match(fast, /permissions:\s*\n\s*contents: read/);
+  assert.doesNotMatch(fast, /contents: write/);
+  assert.doesNotMatch(fast, /GEMINI_API_KEY/);
+  assert.match(fast, /Recover durable fast-news state after a cache miss/);
+  assert.match(fast, /retention-days: 90/);
+  assert.match(fast, /secrets\.TELEGRAM_BOT_TOKEN/);
+  assert.match(fast, /secrets\.BUFFER_API_KEY/);
+  assert.match(fast, /secrets\.DISCORD_WEBHOOK_URL/);
+  assert.match(fast, /if: failure\(\)/);
+  assert.doesNotMatch(reviewed, /\n\s*schedule:/);
+  assert.match(reviewed, /workflow_dispatch:/);
 });
 
 test("social schedule opens only the first 60 minutes and deduplicates delivered slots", () => {
