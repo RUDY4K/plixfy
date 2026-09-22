@@ -60,7 +60,7 @@ test("fast-news selection is fresh, newest-first, and deduplicated", () => {
   assert.equal(selectNextFastNews(candidates, { published: {}, attempts: { newest: { count: 3 } } }, { now, maxAgeMs: 3_600_000 }).id, "older");
 });
 
-test("fast-news packs use source links, Arabic summaries, and no borrowed media", () => {
+test("fast-news packs use attributed official titles and no borrowed media", () => {
   const pack = buildFastNewsPack({
     item: {
       id: "playstation-blog-abc",
@@ -72,7 +72,7 @@ test("fast-news packs use source links, Arabic summaries, and no borrowed media"
     date: "2026-09-22",
     platforms: ["telegram", "discord", "x", "facebook"],
   });
-  assert.equal(pack.campaign, "ar_fast_news_v1");
+  assert.equal(pack.campaign, "official_fast_news_v1");
   assert.deepEqual(pack.items.map((item) => item.platform), ["telegram", "discord", "x", "facebook"]);
   assert.ok(pack.items.every((item) => item.url.startsWith("https://blog.playstation.com/")));
   assert.ok(pack.items.every((item) => !item.image && !item.video));
@@ -84,6 +84,19 @@ test("fast-news packs use source links, Arabic summaries, and no borrowed media"
     url: "https://blog.playstation.com/2026/09/22/update/",
     sourceNameAr: "بلايستيشن",
   }));
+});
+
+test("a long English official title passes the mixed-language fast-news gate", () => {
+  const item = {
+    id: "xbox-english-title",
+    title: "Discover the complete collection of games arriving this week with new releases and official launch details",
+    url: "https://news.xbox.com/en-us/update/",
+    sourceNameAr: "إكس بوكس",
+    publishedAt: now.toISOString(),
+  };
+  const pack = buildFastNewsPack({ item, date: "2026-09-22" });
+  assert.doesNotThrow(() => new EditorialAgent().review(pack));
+  assert.doesNotThrow(() => reviewFastNewsRights(pack, item));
 });
 
 test("fast-news defaults to X only", () => {

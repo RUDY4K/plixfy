@@ -159,7 +159,7 @@ test("reviewed-site social distribution remains manual while fast official news 
   assert.doesNotMatch(workflow, /slot=(?:morning|evening)/);
   assert.match(fastWorkflow, /cron: "\*\/5 \* \* \* \*"/);
   assert.match(fastRunner, /OFFICIAL_FAST_NEWS_SOURCES/);
-  assert.match(fastRunner, /campaign: "ar_fast_news_v1"/);
+  assert.match(fastRunner, /campaign: "official_fast_news_v1"/);
   assert.match(fastRunner, /DEFAULT_MAX_AGE_MS = 2 \* 60 \* 60 \* 1000/);
   assert.match(contentWorkflow, /cron: "5 \* \* \* \*"/);
   assert.match(packageJson.scripts["social:preflight"], /--dry-run.*--slot=news/);

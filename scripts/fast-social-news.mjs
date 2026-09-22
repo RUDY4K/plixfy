@@ -121,7 +121,7 @@ export function buildFastNewsPack({ item, date, platforms = DEFAULT_PLATFORMS })
   return {
     date,
     slot: "fast-news",
-    campaign: "ar_fast_news_v1",
+    campaign: "official_fast_news_v1",
     source: { kind: "fast-news", id: item.id, publisher: item.sourceId, publishedAt: item.publishedAt },
     items: selected.map((platform) => ({
       platform,
