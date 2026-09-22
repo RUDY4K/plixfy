@@ -1,10 +1,8 @@
 name: Plixfy Cloud Social
 
 on:
-  schedule:
-    # Watch for publishable gaming news around the clock. The runner applies a
-    # 90-minute cooldown and never republishes the same story.
-    - cron: "25,55 * * * *"
+  # Reviewed website stories remain available for explicit manual distribution.
+  # Continuous social publishing is owned by fast-social-news.yml.
   workflow_dispatch:
     inputs:
       slot:

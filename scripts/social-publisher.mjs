@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { loadEnvLocal, sendTelegramMessage, sendTelegramPhoto } from "./telegram-client.mjs";
 import {
   discoverBufferChannels,
@@ -20,9 +21,10 @@ function loadPack(file) {
   return new EditorialAgent().review(JSON.parse(fs.readFileSync(file, "utf8")));
 }
 
-function trackedUrl(item, pack) {
+export function trackedUrl(item, pack) {
   if (!item.url) return "";
   const url = new URL(item.url);
+  if (!['plixfy.com', 'www.plixfy.com'].includes(url.hostname)) return url.toString();
   url.searchParams.set("utm_source", item.platform);
   url.searchParams.set("utm_medium", "organic_social");
   url.searchParams.set("utm_campaign", pack.campaign || "plixfy_daily");
@@ -282,7 +284,10 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exit(1);
-});
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exit(1);
+  });
+}

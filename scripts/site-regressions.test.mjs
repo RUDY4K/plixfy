@@ -133,9 +133,11 @@ test("Final Fantasy Revelation news keeps its matching source and artwork", () =
   assert.doesNotMatch(item.sourceUrl, /steam-has-generated/);
 });
 
-test("continuous social automation publishes reviewed news or allowlisted evergreen pages", () => {
+test("reviewed-site social distribution remains manual while fast official news owns the schedule", () => {
   const runner = read("scripts/cloud-social-runner.mjs");
   const workflow = read(".github/workflows/cloud-social.yml");
+  const fastWorkflow = read(".github/workflows/fast-social-news.yml");
+  const fastRunner = read("scripts/fast-social-news.mjs");
   const contentWorkflow = read(".github/workflows/content-engine.yml");
   const packageJson = JSON.parse(read("package.json"));
 
@@ -152,8 +154,13 @@ test("continuous social automation publishes reviewed news or allowlisted evergr
   assert.match(runner, /platformHistory/);
   assert.doesNotMatch(runner, /No public news post was recorded for 24 hours/);
   assert.doesNotMatch(runner, /platform: "tiktok"/);
-  assert.match(workflow, /cron: "25,55 \* \* \* \*"/);
+  assert.doesNotMatch(workflow, /\n\s*schedule:/);
+  assert.match(workflow, /workflow_dispatch:/);
   assert.doesNotMatch(workflow, /slot=(?:morning|evening)/);
+  assert.match(fastWorkflow, /cron: "\*\/5 \* \* \* \*"/);
+  assert.match(fastRunner, /OFFICIAL_FAST_NEWS_SOURCES/);
+  assert.match(fastRunner, /campaign: "ar_fast_news_v1"/);
+  assert.match(fastRunner, /DEFAULT_MAX_AGE_MS = 2 \* 60 \* 60 \* 1000/);
   assert.match(contentWorkflow, /cron: "5 \* \* \* \*"/);
   assert.match(packageJson.scripts["social:preflight"], /--dry-run.*--slot=news/);
   assert.match(packageJson.scripts["social:preflight"], /--offline/);

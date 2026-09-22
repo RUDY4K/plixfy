@@ -31,6 +31,10 @@ const SECRET_PATTERNS = [
 // characters, so rejecting them prevents the broken Arabic seen in old feeds.
 const MOJIBAKE_PATTERN = /[\uFFFD\u00C2\u00C3\u00D8\u00D9]|\u00F0\u0178/u;
 const PUBLIC_ORIGIN = "https://www.plixfy.com";
+const FAST_NEWS_SOURCE_HOSTS = new Set([
+  "blog.playstation.com",
+  "news.xbox.com",
+]);
 
 export function normalizePublicUrl(value) {
   const url = new URL(value);
@@ -138,8 +142,16 @@ export class EditorialAgent {
 
       if (item.url) {
         const url = new URL(item.url);
-        if (url.protocol !== "https:" || !["plixfy.com", "www.plixfy.com"].includes(url.hostname)) {
-          throw new Error(`EditorAgent: items[${index}].url must be a Plixfy HTTPS URL`);
+        const isFastNews = pack.campaign === "ar_fast_news_v1";
+        const allowedHost = isFastNews
+          ? FAST_NEWS_SOURCE_HOSTS.has(url.hostname)
+          : ["plixfy.com", "www.plixfy.com"].includes(url.hostname);
+        if (url.protocol !== "https:" || !allowedHost) {
+          throw new Error(
+            isFastNews
+              ? `EditorAgent: items[${index}].url must use an approved official source`
+              : `EditorAgent: items[${index}].url must be a Plixfy HTTPS URL`,
+          );
         }
       }
       if (item.image && new URL(item.image).protocol !== "https:") {
