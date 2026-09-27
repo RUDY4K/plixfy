@@ -201,13 +201,13 @@ function mergeManualHistory(state) {
   return { ...state, lastPublishedAt, platformHistory };
 }
 
-function enabledPlatforms() {
+function enabledPlatforms({ allowXPreview = false } = {}) {
   const configured = process.env.SOCIAL_PLATFORMS || PUBLIC_PLATFORMS.join(",");
   const allowed = new Set(PUBLIC_PLATFORMS);
   return configured
     .split(",")
     .map((value) => value.trim().toLowerCase())
-    .filter((value) => allowed.has(value));
+    .filter((value) => allowed.has(value) && (allowXPreview || value !== "x"));
 }
 
 function platformPublishedToday(state, platform, date) {
@@ -240,14 +240,14 @@ function platformUsedUrlRecently(state, platform, url, now) {
   });
 }
 
-function eligiblePlatforms(state, date, { url = "", preventRecentUrl = false, now = new Date() } = {}) {
-  return enabledPlatforms().filter((platform) =>
+function eligiblePlatforms(state, date, { url = "", preventRecentUrl = false, now = new Date(), allowXPreview = false } = {}) {
+  return enabledPlatforms({ allowXPreview }).filter((platform) =>
     !platformPublishedToday(state, platform, date)
     && (!preventRecentUrl || !platformUsedUrlRecently(state, platform, url, now)),
   );
 }
 
-function evergreenPack(page, date, slot, state, now = new Date()) {
+function evergreenPack(page, date, slot, state, now = new Date(), allowXPreview = false) {
   const contentId = cleanContentId(`evergreen-${page.id}-${date.replaceAll("-", "")}`);
   const shared = `${page.summary}\n\n${page.title} على بليكسفاي:`;
   return {
@@ -255,7 +255,7 @@ function evergreenPack(page, date, slot, state, now = new Date()) {
     campaign: "ar_evergreen_social_v1",
     slot,
     source: { kind: "evergreen", id: page.id },
-    items: eligiblePlatforms(state, date, { url: page.url, preventRecentUrl: true, now }).map((platform) => ({
+    items: eligiblePlatforms(state, date, { url: page.url, preventRecentUrl: true, now, allowXPreview }).map((platform) => ({
       platform,
       kind: "evergreen",
       contentId,
@@ -356,7 +356,7 @@ async function main() {
     }
     const now = new Date();
     const candidatePacks = EVERGREEN_PAGES
-      .map((page) => evergreenPack(page, args.date, args.slot, state, now))
+      .map((page) => evergreenPack(page, args.date, args.slot, state, now, args.dryRun))
       .sort((left, right) => right.items.length - left.items.length);
     const rawPack = candidatePacks.find((candidate) => candidate.items.length > 0);
     if (!rawPack) {
@@ -407,6 +407,7 @@ async function main() {
   const availablePlatforms = new Set(eligiblePlatforms(state, args.date, {
     url: rawPack.items[0]?.url,
     preventRecentUrl: true,
+    allowXPreview: args.dryRun,
   }));
   rawPack.items = rawPack.items.filter((item) => availablePlatforms.has(item.platform));
   if (rawPack.items.length === 0) {

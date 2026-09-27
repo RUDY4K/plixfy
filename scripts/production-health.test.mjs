@@ -30,13 +30,13 @@ test("the production monitor runs around the clock and alerts only on failure", 
   assert.doesNotMatch(workflow, /TELEGRAM_BOT_TOKEN:\s*[^$\s]/);
 });
 
-test("fast social news runs every five minutes while reviewed-site distribution is manual", () => {
+test("official news monitoring runs every five minutes while all public distribution is manual", () => {
   const fast = readFileSync(".github/workflows/fast-social-news.yml", "utf8");
   const reviewed = readFileSync(".github/workflows/cloud-social.yml", "utf8");
 
   assert.match(fast, /cron: "\*\/5 \* \* \* \*"/);
   assert.match(fast, /node scripts\/fast-social-news\.mjs/);
-  assert.match(fast, /SOCIAL_PLATFORMS: x(?:\r?\n|$)/);
+  assert.match(fast, /queue one original-content brief/i);
   assert.match(fast, /cancel-in-progress: false/);
   assert.match(fast, /permissions:\s*\n\s*contents: read/);
   assert.doesNotMatch(fast, /contents: write/);
@@ -44,10 +44,14 @@ test("fast social news runs every five minutes while reviewed-site distribution 
   assert.match(fast, /Recover durable fast-news state after a cache miss/);
   assert.match(fast, /retention-days: 90/);
   assert.match(fast, /secrets\.TELEGRAM_BOT_TOKEN/);
-  assert.match(fast, /secrets\.BUFFER_API_KEY/);
+  assert.doesNotMatch(fast, /secrets\.BUFFER_API_KEY|BUFFER_ORGANIZATION_ID|SOCIAL_PLATFORMS/);
+  assert.doesNotMatch(fast, /social-publisher\.mjs/);
+  assert.match(fast, /original-content-brief/);
   assert.doesNotMatch(fast, /secrets\.TELEGRAM_CHANNEL_ID/);
   assert.doesNotMatch(fast, /secrets\.DISCORD_WEBHOOK_URL/);
   assert.match(fast, /if: failure\(\)/);
+  assert.doesNotMatch(reviewed, /default:\s*[^\r\n]*\bx\b/);
+  assert.match(reviewed, /X publishing is manual-only/);
   assert.doesNotMatch(reviewed, /\n\s*schedule:/);
   assert.match(reviewed, /workflow_dispatch:/);
 });

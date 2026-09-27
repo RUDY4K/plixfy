@@ -133,7 +133,7 @@ test("Final Fantasy Revelation news keeps its matching source and artwork", () =
   assert.doesNotMatch(item.sourceUrl, /steam-has-generated/);
 });
 
-test("reviewed-site social distribution remains manual while fast official news owns the schedule", () => {
+test("all public X distribution remains manual while the official monitor owns the schedule", () => {
   const runner = read("scripts/cloud-social-runner.mjs");
   const workflow = read(".github/workflows/cloud-social.yml");
   const fastWorkflow = read(".github/workflows/fast-social-news.yml");
@@ -157,10 +157,19 @@ test("reviewed-site social distribution remains manual while fast official news 
   assert.doesNotMatch(workflow, /\n\s*schedule:/);
   assert.match(workflow, /workflow_dispatch:/);
   assert.doesNotMatch(workflow, /slot=(?:morning|evening)/);
+  assert.doesNotMatch(workflow, /default:\s*[^\r\n]*\bx\b/);
+  assert.match(workflow, /X publishing is manual-only/);
+  const socialDocs = read("docs/social-automation.md");
+  assert.doesNotMatch(socialDocs, /--slot=(?:morning|evening)/);
+  assert.match(socialDocs, /--slot=(?:news|auto)/);
   assert.match(fastWorkflow, /cron: "\*\/5 \* \* \* \*"/);
   assert.match(fastRunner, /OFFICIAL_FAST_NEWS_SOURCES/);
-  assert.match(fastRunner, /campaign: "official_fast_news_v1"/);
-  assert.match(fastRunner, /DEFAULT_MAX_AGE_MS = 2 \* 60 \* 60 \* 1000/);
+  assert.match(fastRunner, /kind: "original-content-brief"/);
+  assert.match(fastRunner, /publishMode: "manual-only"/);
+  assert.match(fastRunner, /DEFAULT_MAX_AGE_MS = 8 \* 60 \* 60 \* 1000/);
+  assert.doesNotMatch(fastRunner, /social-publisher\.mjs|publishBufferPost|PublicationAuditAgent/);
+  assert.doesNotMatch(fastWorkflow, /BUFFER_API_KEY|BUFFER_ORGANIZATION_ID|SOCIAL_PLATFORMS/);
+  assert.match(fastWorkflow, /original-content-brief/);
   assert.match(contentWorkflow, /cron: "5 \* \* \* \*"/);
   assert.match(packageJson.scripts["social:preflight"], /--dry-run.*--slot=news/);
   assert.match(packageJson.scripts["social:preflight"], /--offline/);

@@ -1,4 +1,10 @@
-# Plixfy cloud social automation
+# Plixfy social operations
+
+Public X posting is manual. The scheduled official-news monitor creates a
+research brief and alerts the private Telegram administrator; it has no Buffer
+credential and cannot call the public publisher. This boundary protects the
+Original Content Rewards path, which requires a human-reviewed original
+perspective rather than copied, minimally transformed, or automated posts.
 
 The social system is intentionally deterministic, runs as five local agents, and does not require a paid AI provider:
 
@@ -19,22 +25,38 @@ The trend feed contributes search phrases only. Plixfy does not copy external tr
 - The private Telegram completion report includes the score and selection reasons.
 - The agent improves which existing page is promoted. It does not mass-generate indexable pages, buy traffic, post spam, or automate TikTok.
 
-## Schedule
+## Reviewed website distribution
 
-- Morning: one game spotlight at 09:30 Asia/Riyadh.
-- Evening: one gaming-news post at 19:30 Asia/Riyadh.
-- Telegram is published directly.
-- Buffer publishes to every connected channel (currently X; Facebook and Instagram activate automatically after connection).
-- Disconnected channels are copied to the private Telegram chat and explicitly recorded as `fallback_admin`, never as public posts.
+- `.github/workflows/cloud-social.yml` is manual-only and defaults to dry-run.
+- Any public delivery requires explicit review and authorization for that item.
+- X is rejected by this workflow; the final X post must be written and submitted
+  by a human in X.
+- Buffer remains available to legacy/manual distribution tools, but scheduled
+  official-news monitoring does not receive Buffer credentials.
+
+## Official-news research queue
+
+- `.github/workflows/fast-social-news.yml` checks PlayStation Blog and Xbox Wire
+  every five minutes.
+- A verified fresh source becomes an `original-content-brief` artifact. It does
+  not contain publish-ready copy or third-party media.
+- Telegram receives a private notice with the workflow link.
+- A human adds Plixfy's perspective, checks rights, and performs the final X
+  post manually.
+- Queued sources are deduplicated independently from the legacy published-state
+  history. The editorial freshness window is eight hours to tolerate delayed
+  GitHub schedules.
 
 ## Reliability
 
 - GitHub Actions runs even when the local PC is off.
 - A restored cache keeps delivery and rotation state between runs.
-- Per-destination delivery markers prevent duplicate public or admin messages after partial failures.
+- Queue-state markers prevent duplicate research alerts.
+- Failed source checks persist a bounded attempt counter even when the watcher
+  exits with an error, so one broken source cannot block the queue indefinitely.
 - Telegram requests retry transient errors up to three times.
 - Failed workflows send a private Telegram alert.
-- Every run uploads the generated pack and delivery report as a GitHub Actions artifact.
+- A changed run uploads the research brief and durable queue state as artifacts.
 - The generator falls back to site data and fixed templates; no LLM is required.
 - A Vercel cron checks once daily that GitHub Actions has succeeded within the previous 18 hours.
 
@@ -42,18 +64,19 @@ The trend feed contributes search phrases only. Plixfy does not copy external tr
 
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
-- `TELEGRAM_CHANNEL_ID`
-- `BUFFER_API_KEY`
+- `TELEGRAM_CHANNEL_ID` and `BUFFER_API_KEY` are needed only by legacy/manual
+  distribution workflows, not by the scheduled original-content research queue.
 
-Optional: `BUFFER_ORGANIZATION_ID` as a GitHub Actions variable when the Buffer account has more than one organization.
+Optional for legacy/manual Buffer delivery: `BUFFER_ORGANIZATION_ID` when the
+Buffer account has more than one organization.
 
 The Vercel production environment also requires `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, and a random `CRON_SECRET` of at least 16 characters for the protected watchdog route.
 
 ## Local verification
 
 ```powershell
-npm run social:cloud:dry -- --slot=morning
-npm run social:cloud:dry -- --slot=evening
+npm run social:cloud:dry -- --slot=news
+npm run social:cloud:dry -- --slot=auto
 npm run growth:dry
 npm run test:social-agents
 ```
