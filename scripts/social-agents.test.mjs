@@ -216,6 +216,25 @@ test("publisher dry-run performs no network request even when a channel key exis
   assert.deepEqual(report.deliveries.map((delivery) => delivery.status), ["dry_run"]);
 });
 
+test("publisher refuses every non-dry automated X delivery before network access", (context) => {
+  const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-x-manual-only-"));
+  context.after(() => fs.rmSync(temporaryDirectory, { recursive: true, force: true }));
+  const packFile = path.join(temporaryDirectory, "pack.json");
+  const reportFile = path.join(temporaryDirectory, "report.json");
+  fs.writeFileSync(packFile, JSON.stringify({ date: "2026-09-27", campaign: "manual-x-gate", items: [baseItem] }));
+  const sentinel = "PLIXFY_X_NETWORK_FORBIDDEN";
+  const preload = `data:text/javascript,${encodeURIComponent(`globalThis.fetch=async()=>{throw new Error("${sentinel}")}`)}`;
+  const result = spawnSync(
+    process.execPath,
+    ["--import", preload, path.resolve("scripts/social-publisher.mjs"), packFile, `--report=${reportFile}`],
+    { cwd: temporaryDirectory, encoding: "utf8", env: { ...process.env, SOCIAL_PLATFORMS: "x" } },
+  );
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Automated X publishing is disabled/);
+  assert.doesNotMatch(`${result.stdout}\n${result.stderr}`, new RegExp(sentinel));
+  assert.equal(fs.existsSync(reportFile), false);
+});
+
 test("cloud dry-run only selects evidence-approved news and remains offline", (context) => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "plixfy-cloud-review-"));
   context.after(() => {
@@ -651,15 +670,15 @@ test("evergreen partial delivery saves the successful platform then fails the ru
     encoding: "utf8",
     env: {
       ...process.env,
-      SOCIAL_PLATFORMS: "x,facebook",
+      SOCIAL_PLATFORMS: "facebook,instagram",
       NODE_OPTIONS: `--import=data:text/javascript,${encodeURIComponent(preloadSource)}`,
     },
   });
   assert.equal(result.status, 1, result.stdout + result.stderr);
   assert.match(result.stderr, /partial delivery/i);
   const state = JSON.parse(fs.readFileSync(path.join(root, ".social/cloud-state.json"), "utf8"));
-  assert.equal(state.platformHistory.x.length, 1);
-  assert.equal(state.platformHistory.facebook, undefined);
+  assert.equal(state.platformHistory.facebook.length, 1);
+  assert.equal(state.platformHistory.instagram, undefined);
   assert.equal(state.runs["evergreen:browser-games-guide"].status, "partial");
 });
 
@@ -726,7 +745,7 @@ test("news partial delivery saves the successful platform then fails the runner"
     encoding: "utf8",
     env: {
       ...process.env,
-      SOCIAL_PLATFORMS: "x,facebook",
+      SOCIAL_PLATFORMS: "facebook,instagram",
       NODE_OPTIONS: `--import=data:text/javascript,${encodeURIComponent(preloadSource)}`,
     },
   });
@@ -734,8 +753,8 @@ test("news partial delivery saves the successful platform then fails the runner"
   assert.match(result.stderr, /partial delivery/i);
   const state = JSON.parse(fs.readFileSync(path.join(root, ".social/cloud-state.json"), "utf8"));
   assert.deepEqual(state.recentNews, []);
-  assert.equal(state.platformHistory.x.length, 1);
-  assert.equal(state.platformHistory.facebook, undefined);
+  assert.equal(state.platformHistory.facebook.length, 1);
+  assert.equal(state.platformHistory.instagram, undefined);
   assert.equal(state.runs[`news:${item.slug}`].status, "partial");
 });
 
@@ -854,7 +873,7 @@ function exerciseNonPublicNewsDelivery(context, secondaryStatus) {
   };`;
   const environment = {
     ...process.env,
-    SOCIAL_PLATFORMS: "x,facebook",
+    SOCIAL_PLATFORMS: "facebook,instagram",
     NODE_OPTIONS: `--import=data:text/javascript,${encodeURIComponent(preloadSource)}`,
   };
   const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh" }).format(new Date());
@@ -867,8 +886,8 @@ function exerciseNonPublicNewsDelivery(context, secondaryStatus) {
   assert.match(firstResult.stderr, /partial delivery/i);
   const state = JSON.parse(fs.readFileSync(path.join(root, ".social/cloud-state.json"), "utf8"));
   assert.deepEqual(state.recentNews, []);
-  assert.equal(state.platformHistory.x.length, 1);
-  assert.equal(state.platformHistory.facebook, undefined);
+  assert.equal(state.platformHistory.facebook.length, 1);
+  assert.equal(state.platformHistory.instagram, undefined);
   assert.equal(state.runs[`news:${item.slug}`].status, "partial");
 
   state.lastPublishedAt = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
@@ -883,7 +902,7 @@ function exerciseNonPublicNewsDelivery(context, secondaryStatus) {
   );
   assert.equal(recoveryResult.status, 0, recoveryResult.stdout + recoveryResult.stderr);
   const recoveryPack = JSON.parse(fs.readFileSync(path.join(root, `.social/${recoveryDate}-news.json`), "utf8"));
-  assert.deepEqual(recoveryPack.items.map((entry) => entry.platform), ["facebook"]);
+  assert.deepEqual(recoveryPack.items.map((entry) => entry.platform), ["instagram"]);
 }
 
 for (const secondaryStatus of ["fallback_admin", "skipped_disconnected"]) {

@@ -2,14 +2,11 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { EditorialAgent, PublicationAuditAgent } from "./social-agents.mjs";
 
 const ROOT = process.cwd();
 const SOCIAL_DIR = path.join(ROOT, ".social");
 const STATE_FILE = path.join(SOCIAL_DIR, "fast-news-state.json");
-const DEFAULT_MAX_AGE_MS = 2 * 60 * 60 * 1000;
-const SUPPORTED_PLATFORMS = Object.freeze(["telegram", "discord", "x", "facebook"]);
-const DEFAULT_PLATFORMS = Object.freeze(["x"]);
+const DEFAULT_MAX_AGE_MS = 8 * 60 * 60 * 1000;
 
 export const OFFICIAL_FAST_NEWS_SOURCES = Object.freeze([
   {
@@ -45,8 +42,14 @@ function tag(block, name) {
   return block.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`, "i"))?.[1] || "";
 }
 
-function stableStoryId(sourceId, guid, url) {
-  return `${sourceId}-${crypto.createHash("sha256").update(`${guid}|${url}`).digest("hex").slice(0, 20)}`;
+function normalizeStoryUrl(value) {
+  const url = new URL(value);
+  url.hash = "";
+  return url.toString();
+}
+
+function stableStoryId(sourceId, url) {
+  return `${sourceId}-${crypto.createHash("sha256").update(`${sourceId}|${normalizeStoryUrl(url)}`).digest("hex").slice(0, 20)}`;
 }
 
 export function parseOfficialFeed(xml, source) {
@@ -55,7 +58,6 @@ export function parseOfficialFeed(xml, source) {
     const block = match[1];
     const title = decodeXml(tag(block, "title"));
     const link = decodeXml(tag(block, "link"));
-    const guid = decodeXml(tag(block, "guid")) || link;
     const description = decodeXml(tag(block, "description")).slice(0, 1200);
     const publishedAt = new Date(decodeXml(tag(block, "pubDate")) || decodeXml(tag(block, "dc:date")));
     let url;
@@ -71,7 +73,7 @@ export function parseOfficialFeed(xml, source) {
       || !Number.isFinite(publishedAt.getTime())
     ) continue;
     items.push({
-      id: stableStoryId(source.id, guid, url.toString()),
+      id: stableStoryId(source.id, url.toString()),
       sourceId: source.id,
       sourceNameAr: source.nameAr,
       title,
@@ -85,8 +87,22 @@ export function parseOfficialFeed(xml, source) {
 
 export function selectNextFastNews(items, state, { now = new Date(), maxAgeMs = DEFAULT_MAX_AGE_MS } = {}) {
   const nowMs = now.getTime();
+  const seenUrls = new Set(
+    [...Object.values(state.published || {}), ...Object.values(state.queued || {})]
+      .map((entry) => entry?.url)
+      .filter(Boolean)
+      .map((url) => {
+        try { return normalizeStoryUrl(url); } catch { return null; }
+      })
+      .filter(Boolean),
+  );
   return items
     .filter((item) => !state.published?.[item.id])
+    .filter((item) => !state.queued?.[item.id])
+    .filter((item) => {
+      if (!item.url) return true;
+      try { return !seenUrls.has(normalizeStoryUrl(item.url)); } catch { return false; }
+    })
     .filter((item) => (state.attempts?.[item.id]?.count || 0) < 3)
     .filter((item) => {
       const published = Date.parse(item.publishedAt || "");
@@ -95,55 +111,54 @@ export function selectNextFastNews(items, state, { now = new Date(), maxAgeMs = 
     .sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt))[0] || null;
 }
 
-function cleanPlatforms(platforms) {
-  const allowed = new Set(SUPPORTED_PLATFORMS);
-  return [...new Set(platforms)].filter((platform) => allowed.has(platform));
-}
-
-function truncate(value, max) {
-  const normalized = String(value || "").replace(/\s+/g, " ").trim();
-  return normalized.length <= max ? normalized : `${normalized.slice(0, max - 1).trim()}…`;
-}
-
-export function buildFastNewsPack({ item, date, platforms = DEFAULT_PLATFORMS }) {
-  const selected = cleanPlatforms(platforms);
-  if (selected.length === 0) throw new Error("Fast-news pack has no supported public platform");
-  const contentId = `fast-${item.id}`.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 80);
-  const sourceLine = `المصدر الرسمي: ${item.sourceNameAr}`;
-  const title = truncate(item.title, 110);
-  const shortTitle = truncate(item.title, 72);
-  const textByPlatform = {
-    telegram: `⚡ نشر ${item.sourceNameAr} مادة جديدة بعنوان:\n\n${title}\n\n${sourceLine}\nالتفاصيل من الرابط الرسمي:`,
-    discord: `⚡ نشر ${item.sourceNameAr} مادة جديدة بعنوان:\n\n${title}\n\n${sourceLine}`,
-    x: `⚡ جديد ${item.sourceNameAr}:\n${shortTitle}\n\n${sourceLine}`,
-    facebook: `⚡ نشر ${item.sourceNameAr} مادة جديدة بعنوان:\n\n${title}\n\n${sourceLine}\nالتفاصيل من الرابط الرسمي.`,
-  };
+export function buildOriginalContentBrief({ item, queuedAt = new Date() }) {
   return {
-    date,
-    slot: "fast-news",
-    campaign: "official_fast_news_v1",
-    source: { kind: "fast-news", id: item.id, publisher: item.sourceId, publishedAt: item.publishedAt },
-    items: selected.map((platform) => ({
-      platform,
-      kind: "fast-news",
-      contentId,
-      title,
-      text: textByPlatform[platform],
+    version: 1,
+    kind: "original-content-brief",
+    status: "awaiting-human-originality-review",
+    publishMode: "manual-only",
+    queuedAt: queuedAt.toISOString(),
+    source: {
+      id: item.id,
+      publisher: item.sourceId,
+      publisherNameAr: item.sourceNameAr,
+      title: item.title,
+      description: item.description,
       url: item.url,
-    })),
+      publishedAt: item.publishedAt,
+    },
+    editorialQuestions: [
+      "ما الذي تغير فعليًا في الخبر؟",
+      "لماذا يهم هذا الخبر اللاعب العربي؟",
+      "ما رأي أو تجربة Plixfy الأصلية التي تضيف قيمة؟",
+      "هل توجد لقطة أو مادة مرئية مملوكة لـPlixfy أو هل ننشر بلا وسائط؟",
+    ],
+    requiredEvidence: [
+      "official-source-verified",
+      "plixfy-original-perspective",
+      "rights-cleared-media-or-no-media",
+      "human-final-review-and-manual-post",
+    ],
+    prohibited: [
+      "copied-or-title-only-post",
+      "automated-publication",
+      "unlicensed-third-party-media",
+      "unsupported-claims",
+    ],
   };
 }
 
-export function reviewFastNewsRights(pack, item) {
-  if (pack.source?.id !== item.id) throw new Error("Fast-news rights gate received a mismatched source item");
-  for (const post of pack.items || []) {
-    if (post.image || post.video) throw new Error("Fast-news posts must not reuse third-party media");
-    if (post.url !== item.url) throw new Error("Fast-news posts must link directly to the reviewed official page");
-    if (!post.text.includes(item.sourceNameAr)) throw new Error("Fast-news posts must visibly attribute the official source");
-    const expectedTitle = post.platform === "x" ? truncate(item.title, 72) : truncate(item.title, 110);
-    if (!post.text.includes(expectedTitle)) throw new Error("Fast-news posts may only carry the official title and fixed attribution copy");
-  }
-  return pack;
+export function markBriefQueued(state, item, queuedAt = new Date()) {
+  const next = {
+    version: 2,
+    published: { ...(state.published || {}) },
+    queued: { ...(state.queued || {}) },
+    attempts: { ...(state.attempts || {}) },
+  };
+  delete next.attempts[item.id];
+  next.queued[item.id] = { queuedAt: queuedAt.toISOString(), url: item.url };
+  next.queued = Object.fromEntries(Object.entries(next.queued).slice(-1000));
+  return next;
 }
 
 function readJson(file, fallback) {
@@ -167,34 +182,20 @@ function persistState(value) {
   markStateChanged();
 }
 
-function recordFailedAttempt(state, item, error) {
+export function recordFailedAttempt(state, item, error, attemptedAt = new Date()) {
   const previous = state.attempts?.[item.id]?.count || 0;
   return {
     ...state,
-    version: 1,
+    version: 2,
     attempts: {
       ...(state.attempts || {}),
       [item.id]: {
         count: previous + 1,
-        lastAttemptAt: new Date().toISOString(),
+        lastAttemptAt: attemptedAt.toISOString(),
         error: String(error?.message || error).slice(0, 300),
       },
     },
   };
-}
-
-export function requireCompleteFastNewsDelivery(audit) {
-  if (!audit?.ok) {
-    const counts = audit?.counts || {};
-    throw new Error(
-      `Fast-news delivery incomplete; published=${counts.publishedPublic || 0}, accepted=${counts.acceptedByBuffer || 0}, fallback=${counts.fallbackAdmin || 0}, disconnected=${counts.skippedDisconnected || 0}, failed=${counts.failed || 0}`,
-    );
-  }
-  return audit;
-}
-
-function riyadhDate(now = new Date()) {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh" }).format(now);
 }
 
 async function fetchOfficialItems(fetchImpl = fetch) {
@@ -239,42 +240,22 @@ async function main() {
     console.log("[FastNews] Offline dry-run: feed and model requests skipped.");
     return;
   }
-  const state = readJson(STATE_FILE, { version: 1, published: {} });
+  const state = readJson(STATE_FILE, { version: 2, published: {}, queued: {} });
   const candidate = selectNextFastNews(await fetchOfficialItems(), state);
   if (!candidate) {
-    console.log("[FastNews] No new official story inside the two-hour freshness window.");
+    console.log("[FastNews] No new official story inside the eight-hour editorial window.");
     return;
   }
   try {
     await verifyOfficialArticle(candidate);
     console.log(`[SourceGate] verified live official page for ${candidate.id}`);
-    const platforms = (process.env.SOCIAL_PLATFORMS || DEFAULT_PLATFORMS.join(",")).split(",").map((value) => value.trim());
-    const pack = reviewFastNewsRights(
-      new EditorialAgent().review(buildFastNewsPack({ item: candidate, date: riyadhDate(), platforms })),
-      candidate,
-    );
-    console.log(`[RightsGate] approved title-only attributed post for ${candidate.id}`);
-    const packFile = path.join(SOCIAL_DIR, `${candidate.id}.json`);
-    const reportFile = path.join(SOCIAL_DIR, `${candidate.id}-delivery.json`);
-    writeJson(packFile, pack);
+    const brief = buildOriginalContentBrief({ item: candidate });
+    const briefFile = path.join(SOCIAL_DIR, `${candidate.id}-original-content-brief.json`);
+    writeJson(briefFile, brief);
+    console.log(`[OriginalityGate] created a manual-only editorial brief for ${candidate.id}`);
 
-    const { spawnSync } = await import("node:child_process");
-    const publisherArgs = [path.join(ROOT, "scripts", "social-publisher.mjs"), packFile, `--report=${reportFile}`];
-    if (dryRun) publisherArgs.push("--dry-run");
-    const result = spawnSync(process.execPath, publisherArgs, { cwd: ROOT, stdio: "inherit" });
-    if (result.status !== 0) throw new Error(`Fast-news publisher exited with code ${result.status}`);
-    const report = readJson(reportFile, null);
-    const audit = new PublicationAuditAgent().evaluate(report, { requirePublicDelivery: !dryRun });
-    if (!dryRun) requireCompleteFastNewsDelivery(audit);
-
-    if (!dryRun) {
-      const next = { version: 1, published: { ...(state.published || {}) }, attempts: { ...(state.attempts || {}) } };
-      delete next.attempts[candidate.id];
-      next.published[candidate.id] = { completedAt: new Date().toISOString(), url: candidate.url };
-      next.published = Object.fromEntries(Object.entries(next.published).slice(-1000));
-      persistState(next);
-    }
-    console.log(`[FastNews] ${dryRun ? "validated" : "published"} ${candidate.id}`);
+    if (!dryRun) persistState(markBriefQueued(state, candidate));
+    console.log(`[FastNews] ${dryRun ? "validated" : "queued"} ${candidate.id}; public publishing disabled`);
   } catch (error) {
     if (!dryRun) persistState(recordFailedAttempt(state, candidate, error));
     throw error;

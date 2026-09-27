@@ -2,7 +2,8 @@ name: Plixfy Cloud Social
 
 on:
   # Reviewed website stories remain available for explicit manual distribution.
-  # Continuous social publishing is owned by fast-social-news.yml.
+  # Official-source monitoring is owned by fast-social-news.yml, which queues
+  # research briefs but cannot publish public X posts.
   workflow_dispatch:
     inputs:
       slot:
@@ -23,9 +24,9 @@ on:
         default: false
         type: boolean
       platforms:
-        description: Comma-separated destinations for this run
+        description: Comma-separated non-X destinations for this run
         required: true
-        default: telegram,discord,x,facebook,instagram
+        default: telegram,discord,facebook,instagram
         type: string
 
 permissions:
@@ -79,6 +80,10 @@ jobs:
               echo "Invalid platform list" >&2
               exit 1
             fi
+            if [[ ",$INPUT_PLATFORMS," == *",x,"* ]]; then
+              echo "X publishing is manual-only" >&2
+              exit 1
+            fi
             echo "should_run=true" >> "$GITHUB_OUTPUT"
             echo "reason=manual_dispatch" >> "$GITHUB_OUTPUT"
             echo "slot=$INPUT_SLOT" >> "$GITHUB_OUTPUT"
@@ -93,7 +98,7 @@ jobs:
             echo "date=" >> "$GITHUB_OUTPUT"
             echo "dry_run=false" >> "$GITHUB_OUTPUT"
             echo "force=false" >> "$GITHUB_OUTPUT"
-            echo "platforms=telegram,discord,x,facebook,instagram" >> "$GITHUB_OUTPUT"
+            echo "platforms=telegram,discord,facebook,instagram" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install social agent dependencies

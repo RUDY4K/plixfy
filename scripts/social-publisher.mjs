@@ -125,6 +125,9 @@ async function main() {
   if (!dryRun) loadEnvLocal();
 
   const pack = loadPack(path.resolve(file));
+  if (!dryRun && pack.items.some((item) => item.platform === "x")) {
+    throw new Error("Automated X publishing is disabled; review and publish the final original post manually in X");
+  }
   const state = readState();
   const enabled = activePlatforms();
   const selected = pack.items.filter((item) => enabled.has(item.platform));
