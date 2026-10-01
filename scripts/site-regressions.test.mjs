@@ -68,6 +68,13 @@ test("mobile game exits stay compact and above install prompts in every orientat
   );
 });
 
+test("game titles keep their own text direction on Arabic play pages", () => {
+  const playPage = read("src/app/[locale]/play/[slug]/page.tsx");
+
+  assert.match(playPage, /<h1[^>]*dir="auto"[^>]*>\s*\{game\.title\}\s*<\/h1>/);
+  assert.match(playPage, /<dd[^>]*dir=\{props\.valueLatin \? "auto" : undefined\}[^>]*>\{props\.value\}<\/dd>/);
+});
+
 test("Roblox-style mobile games lead daily, trending, and top discovery", () => {
   const games = read("src/lib/games.ts");
   const gameStats = read("src/lib/gameStats.ts");

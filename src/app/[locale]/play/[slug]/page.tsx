@@ -329,7 +329,7 @@ export default async function PlayPage({
       </div>
 
       <div className="mt-5 rounded-[1.75rem] border border-white/[0.06] bg-surface/55 p-4 md:mt-6 md:p-6">
-        <h1 className="font-latin text-2xl font-black tracking-tight text-text-primary md:text-4xl">
+        <h1 dir="auto" className="font-latin text-2xl font-black tracking-tight text-text-primary md:text-4xl">
           {game.title}
         </h1>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm md:text-base text-text-secondary">
@@ -640,7 +640,7 @@ function InfoRow(props: { label: string; value: React.ReactNode; valueLatin?: bo
   return (
     <div className="flex items-center justify-between gap-4">
       <dt className="text-sm text-text-secondary">{props.label}</dt>
-      <dd className={"text-sm " + valueClass}>{props.value}</dd>
+      <dd dir={props.valueLatin ? "auto" : undefined} className={"text-sm " + valueClass}>{props.value}</dd>
     </div>
   );
 }
