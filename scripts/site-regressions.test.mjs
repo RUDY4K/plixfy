@@ -646,3 +646,19 @@ test("search renders one bounded result page instead of the full catalog", async
   assert.match(searchPage, /pagedResults\.items\.map/);
   assert.doesNotMatch(searchPage, /\{results\.map/);
 });
+
+test("Arabic cars search finds car titles without matching every racing game", async () => {
+  const search = await import("../src/lib/searchPagination.mjs");
+  const games = [
+    { title: "Car Parking Simulator", category: "سباق" },
+    { title: "Motorcycle Racing", category: "سباق" },
+    { title: "Card Solitaire", category: "ألغاز" },
+    { title: "Scary Rooms", category: "رعب" },
+    { title: "TB World", category: "بنات" },
+  ];
+
+  assert.deepEqual(
+    search.filterSearchResults(games, "سيارات", "ar").map((game) => game.title),
+    ["Car Parking Simulator"],
+  );
+});

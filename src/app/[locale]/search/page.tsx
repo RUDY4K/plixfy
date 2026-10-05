@@ -5,7 +5,7 @@ import { allGames } from "@/lib/games";
 import GameCard from "@/components/GameCard";
 import TrackOnMount from "@/components/TrackOnMount";
 import { hasLocale, localeHref, pageAlternates } from "@/lib/i18n";
-import { paginateSearchResults } from "@/lib/searchPagination.mjs";
+import { filterSearchResults, paginateSearchResults } from "@/lib/searchPagination.mjs";
 
 const copyByLocale = {
   ar: {
@@ -65,15 +65,7 @@ export default async function SearchPage({
   const copy = copyByLocale[locale];
   const { q = "", page = "1" } = await searchParams;
   const query = q.slice(0, 200).trim();
-  const needle = query.toLowerCase();
-
-  const results = needle
-    ? allGames.filter(
-        (g) =>
-          g.title.toLowerCase().includes(needle) ||
-          g.category.toLowerCase().includes(needle),
-      )
-    : [];
+  const results = filterSearchResults(allGames, query, locale);
   const requestedPage = Number(page);
   const pagedResults = paginateSearchResults(results, requestedPage);
   if (!pagedResults) notFound();
