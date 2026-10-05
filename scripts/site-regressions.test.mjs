@@ -662,3 +662,19 @@ test("Arabic cars search finds car titles without matching every racing game", a
     ["Car Parking Simulator"],
   );
 });
+
+test("English car search excludes words that merely contain car", async () => {
+  const { filterSearchResults } = await import("../src/lib/searchPagination.mjs");
+  const games = [
+    { title: "Car Parking 3D", category: "Racing" },
+    { title: "Tiny Cars", category: "Racing" },
+    { title: "Scary Rooms", category: "Horror" },
+    { title: "Card Solitaire", category: "Cards" },
+    { title: "Cardivo Adventure", category: "Puzzle" },
+  ];
+
+  assert.deepEqual(
+    filterSearchResults(games, "car", "en").map((game) => game.title),
+    ["Car Parking 3D", "Tiny Cars"],
+  );
+});

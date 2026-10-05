@@ -10,6 +10,9 @@ export const SEARCH_PAGE_SIZE = 48;
 export function filterSearchResults(games, query, locale) {
   const needle = query.trim().toLowerCase();
   if (!needle) return [];
+  if (locale === "en" && needle === "car") {
+    return games.filter((game) => /\bcars?\b/.test(game.title.toLowerCase()));
+  }
   const titleAlias = locale === "ar" && needle === "سيارات" ? /\bcars?\b/ : null;
 
   return games.filter((game) => {
