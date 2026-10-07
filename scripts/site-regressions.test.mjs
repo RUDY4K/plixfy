@@ -7,6 +7,22 @@ import { cleanCatalogText, distinctCatalogInstructions } from "../src/lib/catalo
 const ROOT = process.cwd();
 const read = (file) => readFileSync(path.join(ROOT, file), "utf8");
 
+test("mobile navigation highlights only the current English or Arabic tab", async () => {
+  const { isBottomNavActive } = await import("../src/lib/bottomNavActive.mjs");
+
+  for (const [pathname, href, expected] of [
+    ["/en", "/en", true],
+    ["/en/categories", "/en", false],
+    ["/en/categories", "/en/categories", true],
+    ["/en/search", "/en", false],
+    ["/", "/", true],
+    ["/ar/categories", "/", false],
+    ["/ar/categories", "/categories", true],
+  ]) {
+    assert.equal(isBottomNavActive(pathname, href), expected, `${pathname} -> ${href}`);
+  }
+});
+
 test("home copy uses the live catalog count instead of a stale number", () => {
   const games = JSON.parse(read("src/data/playgama-games.json"));
   const catalogMeta = JSON.parse(read("src/data/playgama-catalog-meta.json"));

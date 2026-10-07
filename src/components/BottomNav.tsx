@@ -4,30 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, LayoutGrid, Search, Heart, User, type LucideIcon } from "lucide-react";
 import { localeFromPathname, localeHref, getDict } from "@/lib/i18n";
+import { isBottomNavActive } from "@/lib/bottomNavActive.mjs";
 
 interface NavItem {
   href: string;
   label: string;
   Icon: LucideIcon;
-}
-
-function isActive(pathname: string, href: string): boolean {
-  // Arabic URLs are canonical without a prefix, but the server renders them
-  // through an internal /ar rewrite. Normalize both views so hydration sees
-  // the same active navigation item.
-  const visiblePathname =
-    pathname === "/ar"
-      ? "/"
-      : pathname.startsWith("/ar/")
-        ? pathname.slice(3)
-        : pathname;
-
-  if (href === "/") {
-    return visiblePathname === "/" || visiblePathname === "/en";
-  }
-  return (
-    visiblePathname === href || visiblePathname.startsWith(href + "/")
-  );
 }
 
 export default function BottomNav() {
@@ -50,7 +32,7 @@ export default function BottomNav() {
       aria-label={t.nav.mainNavAria}
     >
       {items.map((item) => {
-        const active = isActive(pathname, item.href);
+        const active = isBottomNavActive(pathname, item.href);
         const colorClass = active
           ? "text-white"
           : "text-text-faint";
