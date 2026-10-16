@@ -54,7 +54,7 @@ export default function ConsentBanner() {
       role="dialog"
       aria-live="polite"
       aria-label={t.consent.notice}
-      className="fixed bottom-20 md:bottom-4 inset-x-3 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-30 max-w-3xl mx-auto"
+      className="fixed bottom-20 md:bottom-4 inset-x-3 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[calc(100vw-2rem)] z-30 max-w-3xl mx-auto"
     >
       <div className="glass bg-bg/95 backdrop-blur border border-surface-elevated rounded-2xl shadow-2xl p-4 md:p-5 flex flex-col md:flex-row gap-3 md:items-center">
         <div className="flex items-start md:items-center gap-3 flex-1">
