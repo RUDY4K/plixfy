@@ -679,6 +679,21 @@ test("Arabic cars search finds car titles without matching every racing game", a
   );
 });
 
+test("Arabic chess search finds chess titles without matching unrelated games", async () => {
+  const { filterSearchResults } = await import("../src/lib/searchPagination.mjs");
+  const games = [
+    { title: "Master Chess", category: "آيو" },
+    { title: "Chess Online Playing", category: "آيو" },
+    { title: "CHESSVOLA Puzzles", category: "ألغاز" },
+    { title: "Snake 2048", category: "آيو" },
+  ];
+
+  assert.deepEqual(
+    filterSearchResults(games, "شطرنج", "ar").map((game) => game.title),
+    ["Master Chess", "Chess Online Playing", "CHESSVOLA Puzzles"],
+  );
+});
+
 test("English car search excludes words that merely contain car", async () => {
   const { filterSearchResults } = await import("../src/lib/searchPagination.mjs");
   const games = [

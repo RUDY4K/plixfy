@@ -1,5 +1,10 @@
 export const SEARCH_PAGE_SIZE = 48;
 
+const ARABIC_TITLE_ALIASES = new Map([
+  ["سيارات", /\bcars?\b/],
+  ["شطرنج", /\bchess/],
+]);
+
 /**
  * @template {{ title: string, category: string }} T
  * @param {readonly T[]} games
@@ -13,7 +18,7 @@ export function filterSearchResults(games, query, locale) {
   if (locale === "en" && needle === "car") {
     return games.filter((game) => /\bcars?\b/.test(game.title.toLowerCase()));
   }
-  const titleAlias = locale === "ar" && needle === "سيارات" ? /\bcars?\b/ : null;
+  const titleAlias = locale === "ar" ? ARABIC_TITLE_ALIASES.get(needle) ?? null : null;
 
   return games.filter((game) => {
     const title = game.title.toLowerCase();
