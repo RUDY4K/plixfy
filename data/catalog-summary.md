@@ -1,30 +1,30 @@
 # Playgama catalog sync
 
-- Synced: 2026-10-28T09:41:23.626Z
+- Synced: 2026-10-29T09:59:32.122Z
 - Source: https://playgama.com/api/v1/partner/export/catalogue/games
 - Publisher: Playgama only
-- Reported by Playgama: 2697
-- Imported: 2695
-- Games with preview video: 1657
-- Games with multiple images: 2695
+- Reported by Playgama: 2729
+- Imported: 2727
+- Games with preview video: 1667
+- Games with multiple images: 2727
 - Content-policy exclusions: 2
 - Invalid entries skipped: 0
 - Duplicate slugs skipped: 0
 
 ## Categories
 
-- racing: 220
-- action: 467
-- puzzle: 770
-- io: 123
-- girls: 133
-- casual: 735
+- racing: 222
+- action: 472
+- puzzle: 776
+- io: 125
+- girls: 135
+- casual: 744
 - sports: 81
-- shooting: 166
+- shooting: 172
 
 ## Device support
 
-- mobile-and-desktop: 2585
+- mobile-and-desktop: 2615
 - mobile-only: 6
-- desktop-only: 104
+- desktop-only: 106
 - unknown: 0
