@@ -1,6 +1,6 @@
 # Playgama catalog sync
 
-- Synced: 2026-11-21T11:03:23.713Z
+- Synced: 2026-11-22T11:26:37.930Z
 - Source: https://playgama.com/api/v1/partner/export/catalogue/games
 - Publisher: Playgama only
 - Reported by Playgama: 3027
